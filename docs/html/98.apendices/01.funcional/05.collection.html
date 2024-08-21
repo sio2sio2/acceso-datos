@@ -1,0 +1,802 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Colecciones &#8212; documentación de Acceso a datos - rolling</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=461dccb6"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/translations.js?v=d190bf04"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '98.apendices/01.funcional/05.collection';</script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Flujos" href="10.flujos.html" />
+    <link rel="prev" title="Interfaces funcionales" href="01.function.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="documentación de Acceso a datos - rolling - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="documentación de Acceso a datos - rolling - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Búsqueda</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../01.archivos/index.html">1. Manejo de archivos</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/01.gestion.html">1.1. Gestión de archivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulaci%C3%B3n.html">1.2. Consulta y manipulación de contenidos</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../01.funcional.html">Java funcional</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01.function.html">Interfaces funcionales</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Colecciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.flujos.html">Flujos</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ide.html">Entorno de desarrollo</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/98.apendices/01.funcional/05.collection.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Colecciones</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#collection">Collection</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interfaz">Interfaz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementaciones">Implementaciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#listas">Listas</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conjuntos">Conjuntos</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map">Map</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Interfaz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Implementaciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#hashmap">HashMap</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#treemap">TreeMap</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="colecciones">
+<h1>Colecciones<a class="headerlink" href="#colecciones" title="Link to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Las colecciones, en realidad, están disponibles desde muy
+tempranamente (desde <a class="reference external" href="https://en.wikipedia.org/wiki/Java_version_history#J2SE_1.2">Java1.2</a> en 1998). Se
+incluyen, no obstante, porque se usan habitualmente en el estilo funcional de
+programación.</p>
+</div>
+<p>El tipo más básico de agrupar datos en <em>Java</em> es el <em>Array</em>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="p">};</span><span class="w"> </span><span class="c1">// O, simplemente, {&quot;A&quot;, &quot;B&quot;, &quot;C&quot;}</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">t</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span><span class="w">  </span><span class="c1">// Pone todos los elementos a 0.</span>
+</pre></div>
+</div>
+<p>Sin embargo, en su creación hay que establecer un tamaño determinado y no
+siempre es posible prever cuántos serán los elementos que contendrá como máximo.
+Para solucionar estos casos existe la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html">Collection&lt;E&gt;</a> que extiende <a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable&lt;E&gt;</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Para convertir una <em>array</em> existente en una lista puede usarse
+<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html">Arrays.asList</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="p">};</span>
+<span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+</pre></div>
+</div>
+</div>
+<section id="collection">
+<span id="java-collection"></span><h2>Collection<a class="headerlink" href="#collection" title="Link to this heading">#</a></h2>
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html">java.util.Collection</a> es una interfaz que representa un grupo de objetos, cada
+uno de los cuales se llama «elemento». Dependiendo de implementaciones más
+específicas los elementos podrán estar ordenador (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">java.util.List</a>) o
+desordenados (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">java.util.Set</a>).</p>
+<img alt="../../_images/Collection.png" src="../../_images/Collection.png" />
+<section id="interfaz">
+<h3>Interfaz<a class="headerlink" href="#interfaz" title="Link to this heading">#</a></h3>
+<p>Esta interfaz recoge todos los métodos que describen los comportamientos
+asociados a que el objeto sea una colección entre ellos:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">size()</span></code></dt><dd><p>que devuelve la cantidad de elementos que contiene la colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">add(E</span> <span class="pre">e)</span></code> y <code class="docutils literal notranslate"><span class="pre">addAll(Collection&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que añaden a la colección un nuevo elemento o todos los elementos de otra
+colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">remove(E</span> <span class="pre">e)</span></code> y <code class="docutils literal notranslate"><span class="pre">removeAll(Collection&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que eliminan en vez de añadir.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">removeIf(Predicate&lt;E&gt;</span> <span class="pre">filter)</span></code></dt><dd><p>que elimina los elementos que cumplen el predicado que hace de filtro. Por
+ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">));</span>
+<span class="n">c</span><span class="p">.</span><span class="na">removeIf</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// Elimina todos los números pares.</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clear()</span></code></dt><dd><p>que vacía la colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">isEmpty()</span></code></dt><dd><p>que comprueba si la colección está vacía.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">equals(Object</span> <span class="pre">o)</span></code></dt><dd><p>que comprueba si dos colecciones son iguales:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">));</span>
+<span class="n">c</span><span class="p">.</span><span class="na">removeIf</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">));</span>
+<span class="n">c</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">d</span><span class="p">);</span><span class="w"> </span><span class="c1">// true</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">contains(Object</span> <span class="pre">o)</span></code></dt><dd><p>que comprueba si el objeto está incluido en la colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">containsAll(Collection&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que comprueba si todos los objetos de la colección suministrada se encuentran
+en la colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stream()</span></code></dt><dd><p>que devuelve un <a class="reference internal" href="10.flujos.html#java-stream"><span class="std std-ref">flujo</span></a> con los elementos de la colección.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">toArray()</span></code></dt><dd><p>que devuelve un array con los elementos de la colección. Sin argumentos, los
+elementos del array generado se considerarán objetos de tipo <code class="docutils literal notranslate"><span class="pre">Object</span></code> con
+lo que normalmente interesa especificar el tipo particular:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">));</span>
+<span class="n">c</span><span class="p">.</span><span class="na">toArray</span><span class="p">(</span><span class="n">Integer</span><span class="o">[]</span><span class="p">::</span><span class="k">new</span><span class="p">);</span><span class="w"> </span><span class="c1">// también c.toArray(new Integer[0]);</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Además, como las colecciones son iterables, siempre podremos usar con ellas una
+estructura de tipo <cite>for-each</cite>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Dependiendo de la naturaleza de &quot;c&quot; podremos o no predecir el orden.</span>
+<span class="k">for</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>o el método <code class="docutils literal notranslate"><span class="pre">.forEach(Consumer&lt;E&gt;</span> <span class="pre">c)</span></code>.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>No todas las colecciones son mutables, por lo que con aquellas que
+no lo sean no será posible usar los métodos que alteran su contenido
+(<code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>, etc.)</p>
+</div>
+</section>
+<section id="implementaciones">
+<h3>Implementaciones<a class="headerlink" href="#implementaciones" title="Link to this heading">#</a></h3>
+<p>Dependiendo de las características que deseamos que presenten las colecciones,
+deberemos elegir la implementación más apropiada.</p>
+<section id="listas">
+<span id="java-list"></span><h4>Listas<a class="headerlink" href="#listas" title="Link to this heading">#</a></h4>
+<p>La naturaleza de algunas implementaciones es la de una secuencia ordenada de
+elementos a los cuales se puede acceder individualmente (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">java.util.List</a>). Por
+eso se añaden métodos como:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">get(int</span> <span class="pre">i)</span></code></dt><dd><p>que permite obtener el elemento i-ésimo.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">indexOf(Object</span> <span class="pre">o)</span></code> y <code class="docutils literal notranslate"><span class="pre">lastIndexOf(Object</span> <span class="pre">o)</span></code></dt><dd><p>que obtienen respectivamente la posición de la primera y la última ocurrencia
+del objeto que se proporciona como argumento.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">add(int</span> <span class="pre">i,</span> <span class="pre">E</span> <span class="pre">e)</span></code></dt><dd><p>que añade un nuevo elemento en la posición especificado.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">set(int</span> <span class="pre">i,</span> <span class="pre">E</span> <span class="pre">e)</span></code></dt><dd><p>que lo sustituye en vez de añadirlo.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">remove(int</span> <span class="pre">i)</span></code></dt><dd><p>que elimina el elemento i-ésimo.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sort(Comparator&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que reordena los elementos utilizando el <a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Comparator.html">comparador</a> facilitado en el argumento.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">subList(int</span> <span class="pre">i,</span> <span class="pre">int</span> <span class="pre">j)</span></code></dt><dd><p>que devuelve una lista con los elementos incluidos entre la posición «i» y la
+«j» (este último sin incluir).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">replaceAll(UnaryOperator&lt;E&gt;</span> <span class="pre">o)</span></code></dt><dd><p>sustituye cada elemento por el resultado de aplicarle la función suministrada
+como argumento.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Nótese que es el típico <cite>map</cite> de la programación funcional, pero
+alterando la propia colección y no generando una nueva.</p>
+</div>
+</dd>
+</dl>
+<p>Implementaciones particulares de las listas son:</p>
+<dl>
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html">ArrayList</a></dt><dd><p>se comporta, digámoslo así, como un array de dimensiones dinámicas, de manera
+que, a diferencia de aquellos, podemos ir incrementando su tamaño a voluntad.
+En principio, tiene un tamaño suficiente para almacenar los elementos que
+contiene, pero si se añaden tantos que se vuelve insuficiente, se
+redimensiona automáticamente.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">al</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">al</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">);</span>
+<span class="n">al</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">);</span>
+<span class="n">al</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="c1">// 2</span>
+<span class="n">al</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// B</span>
+<span class="n">al</span><span class="p">.</span><span class="na">trimToSize</span><span class="p">();</span><span class="w"> </span><span class="c1">// Error.</span>
+<span class="p">((</span><span class="n">ArrayList</span><span class="p">)</span><span class="w"> </span><span class="n">al</span><span class="p">).</span><span class="na">trimToSize</span><span class="p">();</span><span class="w"> </span><span class="c1">// No da problemas.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Obsérvese que no se ha definido la variable <cite>al</cite> como <cite>ArrayList</cite>,
+sino como <cite>List</cite>. Esto significa que tendremos disponibles los métodos
+definidos en la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">List</a>, pero no los que añade
+la clase <cite>ArrayList</cite>.</p>
+</div>
+</dd>
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Stack.html">Stack</a></dt><dd><p>es la implementación de una <a class="reference external" href="https://es.wikipedia.org/wiki/Pila_(inform%C3%A1tica)">pila</a> y añade algunos
+método propios de su uso como tal:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">push(E</span> <span class="pre">e)</span></code></dt><dd><p>que añade un elemento en lo alto de la pila (equivale a usar <code class="docutils literal notranslate"><span class="pre">add</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pop()</span></code></dt><dd><p>que devuelve eliminándolo el elemento en lo alto de la pila.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">peek()</span></code></dt><dd><p>que devuelve sin eliminarlo el elemento en lo alto de la pila.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">search(Object</span> <span class="pre">o)</span></code></dt><dd><p>que devuelve la primera posición en la que se encuentra el elemento
+suministrado. En este caso, se empieza a contar por <strong>1</strong> desde lo alto de
+la pila.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">empty()</span></code></dt><dd><p>comnprueba si la pila está vacía (hace pues lo mismo que <code class="docutils literal notranslate"><span class="pre">isEmpty</span></code>).</p>
+</dd>
+</dl>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Por supuesto, los métodos de las interfaces que implemente están
+disponibles, pero es absurdo utilizarlos, porque en ese caso es muy
+probable que lo que se necesitase es un <cite>ArrayList</cite>, y no una pila.</p>
+</div>
+</dd>
+</dl>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Cuando se define el método de una clase es conveniente que los
+tipos de sus argumentos sean los mas generales posibles. Por ejemplo, si lo
+único que se pretende hacer dentro del método es recorrer el grupo de objetos
+con una estructura <em>foreach</em>, debería definirse el método como:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">foobar</span><span class="p">(</span><span class="n">Iterable</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>y no:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">foobar</span><span class="p">(</span><span class="n">ArrayList</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="conjuntos">
+<h4>Conjuntos<a class="headerlink" href="#conjuntos" title="Link to this heading">#</a></h4>
+<p>Los conjuntos (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">java.util.Set</a>) agrupan datos que no pueden repetirse por lo
+que:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// true, añadimos 1 al conjunto.</span>
+<span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// false, no no se añade pues ya está.</span>
+</pre></div>
+</div>
+<p>Además, no tienen en principio orden, por lo que referirlos mediante un índice
+carece de sentido; y no añade como la interfaz <a class="reference internal" href="#java-list"><span class="std std-ref">List</span></a> métodos
+relacionados con la posición que ocupan los elementos.</p>
+<dl>
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html">HashSet</a></dt><dd><p>Es una clase para construir conjuntos tal y como los hemos descrito.</p>
+</dd>
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/TreeSet.html">TreeSet</a></dt><dd><p>Es una clase que implementa la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html">SortedSet</a> y
+que se diferencia de los conjuntos anteriores en que sí existe un orden: los
+elementos se ordenan según su orden natural si existiera (p.e. los enteros o
+las cadenas tienen definido un orden) o según el <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html">comparador</a> que se proporciona al crear el objeto:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">SortedSet</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ts1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">ts1</span><span class="p">;</span><span class="w"> </span><span class="c1">// [1, 10, 100, 1000]</span>
+<span class="n">SortedSet</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ts2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeSet</span><span class="o">&lt;&gt;</span><span class="p">((</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?-</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">ts2</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">ts1</span><span class="p">);</span>
+<span class="n">ts2</span><span class="p">;</span><span class="w"> </span><span class="c1">// [1000, 100, 10, 1]</span>
+</pre></div>
+</div>
+<p>Los métodos que añade <cite>SortedSet</cite> tiene relación con la existencia del orden:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">first()</span></code></dt><dd><p>que devuelve el primer elemento.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">last()</span></code></dt><dd><p>que devuelve el último.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">headSet(E</span> <span class="pre">e)</span></code></dt><dd><p>que devuelve un subconjunto con los elementos anteriores al suministrado.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tailSet(E</span> <span class="pre">e)</span></code></dt><dd><p>que devuelve un subconjunto con el propio elemento suministrado y todos los
+posteriores.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">subSet(E</span> <span class="pre">e1,</span> <span class="pre">E</span> <span class="pre">e2)</span></code></dt><dd><p>que devuelve el subconjunto de elementos entre el primero y el segundo
+(éste último sin incluir).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+<section id="map">
+<span id="java-map"></span><h2>Map<a class="headerlink" href="#map" title="Link to this heading">#</a></h2>
+<p>Los mapas son objetos que contienen parejas clave-valor. En <em>Python</em> reciben el
+nombre de <em>diccionarios</em>.</p>
+<img alt="../../_images/Map.png" src="../../_images/Map.png" />
+<section id="id1">
+<h3>Interfaz<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>La interfaz básica <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html">Map&lt;K, V&gt;</a> recoge los métodos comunes a
+todos los mapas:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">size()</span></code></dt><dd><p>que devuelve</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clear()</span></code></dt><dd><p>que vacía el mapa.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">isEmpty()</span></code></dt><dd><p>que comprueba si el mapa está vacío.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">containsKey(Object</span> <span class="pre">o)</span></code></dt><dd><p>que devuelve <code class="docutils literal notranslate"><span class="pre">true</span></code> si existe la clave suministrada.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">containsValue(Object</span> <span class="pre">o)</span></code></dt><dd><p>que devuelve <code class="docutils literal notranslate"><span class="pre">true</span></code> en caso de que alguna clave contenga el valor
+suministrado.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">put(K</span> <span class="pre">k,</span> <span class="pre">V</span> <span class="pre">v)</span></code> y <code class="docutils literal notranslate"><span class="pre">putIfAbsent(K</span> <span class="pre">k,</span> <span class="pre">V</span> <span class="pre">v)</span></code></dt><dd><p>que añade la clave «k» con valor «v». Si la clave, ya existe, sustituye su
+valor y devuelve el que había. El segundo método sólo añade la clave, si no
+existe previamente.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">putAll(Map&lt;K,</span> <span class="pre">V&gt;</span> <span class="pre">m)</span></code></dt><dd><p>que copia todas las parejas clave-valor del mapa proporcionado.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">get(K</span> <span class="pre">k)</span></code> y <code class="docutils literal notranslate"><span class="pre">getOrDefault(K</span> <span class="pre">k,</span> <span class="pre">V</span> <span class="pre">v)</span></code></dt><dd><p>que devuelve el valor correspondiente a la clave «k» o <code class="docutils literal notranslate"><span class="pre">null</span></code> si la clave no
+existe. El segundo método devuelve, en caso de no existir la clave, el valor
+que se pasa como segundo argumento.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">remove(K</span> <span class="pre">k)</span></code> y <code class="docutils literal notranslate"><span class="pre">remove(K</span> <span class="pre">k,</span> <span class="pre">V</span> <span class="pre">v)</span></code></dt><dd><p>que elimina la pareja clave-valor de clave k. La segunda versión del método
+sólo elimina la pareja si también tiene el valor especificado.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">replace(K</span> <span class="pre">k,</span> <span class="pre">V</span> <span class="pre">v)</span></code></dt><dd><p>que sustituye el valor de la pareja clave-valor de clave «k».</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">replaceAll(Bifunction&lt;K,</span> <span class="pre">V,</span> <span class="pre">V&gt;</span> <span class="pre">transformer)</span></code></dt><dd><p>que sustituye el valor de cada pareja según la función proporcionada.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">forEach(Biconsumer&lt;K,</span> <span class="pre">V&gt;</span> <span class="pre">action)</span></code></dt><dd><p>que para cada clave pareja-valor ejecuta la función suministrada como
+argumento.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">keySet()</span></code></dt><dd><p>que devuelve un conjunto cuyos elementos son las claves del mapa.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">entrySet()</span></code></dt><dd><p>que devuelve un conjunto cuyos elementos son parejas clave-valor en la forma
+<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html">Map.Entry</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;uno&quot;</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dos&quot;</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;tres&quot;</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">entrySet</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;%s=&gt;%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getKey</span><span class="p">(),</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getValue</span><span class="p">()));</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">values()</span></code></dt><dd><p>que devuelve una <a class="reference internal" href="#java-collection"><span class="std std-ref">colección</span></a> con todos los valores.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Implementaciones<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Citaremos dos implementaciones de esta interfaz:</p>
+<section id="hashmap">
+<h4>HashMap<a class="headerlink" href="#hashmap" title="Link to this heading">#</a></h4>
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html">HashMap&lt;K, V&gt;</a> es la implementación que permite la
+creación de mapas tal y como los hemos explicado y que se asemejan a los de
+otros lenguajes como <em>Python</em>.</p>
+</section>
+<section id="treemap">
+<h4>TreeMap<a class="headerlink" href="#treemap" title="Link to this heading">#</a></h4>
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html">TreeMap&lt;K, V&gt;</a> es un mapa ordenado en el que sus claves se
+ordenan según su orden natural o el comparador que facilitemos al construirlo
+como argumento del constructor:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Ordenado según el orden alfabético de sus claves (que son cadenas)</span>
+<span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;X&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;H&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">50001</span><span class="p">);</span>
+<span class="n">m</span><span class="p">.</span><span class="na">values</span><span class="p">();</span><span class="w"> </span><span class="c1">// [6, 50001, 100]: La colección de valores siempre se ordena así.</span>
+</pre></div>
+</div>
+<p>Añade, a los métodos propios de <a class="reference internal" href="#java-map"><span class="std std-ref">Map</span></a> otros que tiene relación
+con que las claves estén ordenadas. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">floorKey(K</span> <span class="pre">k)</span></code> devuelve la
+clave mayor en el mapa que sea menor o igual a la que se suministra como
+argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="p">.</span><span class="na">floorKey</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// Devuelve &quot;B&quot;.</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01.function.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">Interfaces funcionales</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="10.flujos.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">Flujos</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#collection">Collection</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interfaz">Interfaz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementaciones">Implementaciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#listas">Listas</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conjuntos">Conjuntos</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map">Map</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Interfaz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Implementaciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#hashmap">HashMap</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#treemap">TreeMap</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por José Miguel Sánchez Alés
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright CC BY 4.0, 2024-2024, José Miguel Sánchez Alés.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -158,7 +158,7 @@
         <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../01.archivos/index.html">1. Manejo de archivos</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../01.archivos/01.gestion.html">1.1. Gestión de archivos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulaci%C3%B3n.html">1.2. Consulta y manipulación de contenidos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -333,9 +333,16 @@ document.write(`
                   
   <section id="flujos">
 <span id="java-stream"></span><h1>Flujos<a class="headerlink" href="#flujos" title="Link to this heading">#</a></h1>
-<p>Los flujos (<a class="extlink-java-stream reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html">Stream&lt;T&gt;</a>) son las secuencias de elementos
-que permiten realizar operaciones sobre ellos, esto es, el tipo de datos que nos
-permite implementar las típicas operaciones (<a class="reference external" href="https://en.wikipedia.org/wiki/Map_(higher-order_function)">map</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Filter_(higher-order_function)">filter</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Fold_(higher-order_function)">reduce</a>) de programación funcional.</p>
+<p>Los flujos (<a class="extlink-java-stream reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html">Stream&lt;T&gt;</a>) son secuencias de elementos que se consumen
+al aplicar sobre ellas alguna operación:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Stream</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">st</span><span class="p">.</span><span class="na">count</span><span class="p">();</span><span class="w"> </span><span class="c1">// 4</span>
+<span class="n">st</span><span class="p">.</span><span class="na">count</span><span class="p">();</span><span class="w"> </span><span class="c1">// Lo consuminos contando antes, así que se produce un IllegalStateException</span>
+</pre></div>
+</div>
+<p>Una de sus características fundamentales es que nos permiten implementar las
+típicas operaciones (<a class="reference external" href="https://en.wikipedia.org/wiki/Map_(higher-order_function)">map</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Filter_(higher-order_function)">filter</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Fold_(higher-order_function)">reduce</a>) de programación
+funcional.</p>
 <p><a class="reference internal" href="05.collection.html#java-collection"><span class="std std-ref">Collection</span></a> tiene un método (<code class="docutils literal notranslate"><span class="pre">stream()</span></code>) que convierte
 la colección en un flujo y que, por tanto, nos permitirá aplicar estas
 operaciones a los elementos:</p>

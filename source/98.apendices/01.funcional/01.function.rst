@@ -28,7 +28,6 @@ simplemente, en indicarle a la partida cuántos puntos ha sacado cada uno:
        Partida(String[] nombres) {
            jugador = nombres;
            puntuacion = new int[nombres.length];
-           this.condicion = condicion;
        }
 
        /**
@@ -48,13 +47,13 @@ simplemente, en indicarle a la partida cuántos puntos ha sacado cada uno:
        // Faltan los getters, pero no queremos perder más el tiempo.
    }
 
-Supongamos ahora que queremos comprobar qué jugador ha ganado. Es sencillo, pero
-el problema es que dependiendo de cuál sea el juego el criterio para escoger
-el ganador es distinto. En algunos juegos gana el que tiene más puntos, mientras
-que en otro el que tiene menos. Incluso el criterio podría ser mucho más
-extravagante. Consecuentemente decidimos definir fuera esta implementación
-el algoritmo para calcular el ganador\ [#]_ y pasárselo al constructor al crear
-la partida. Para ello debemos definir la interfaz funcional adecuada:
+Supongamos ahora que queremos comprobar qué jugador ha ganado. Es sencillo,
+pero, dependiendo de cuál sea el juego, el criterio para escoger el ganador es
+distinto. En algunos juegos gana el que tiene más puntos, mientras que en otros
+el que tiene menos. Incluso el criterio podría ser mucho más extravagante.
+Consecuentemente, decidimos definir fuera de esta implementación el algoritmo
+para calcular el ganador\ [#]_ y pasárselo al constructor al crear la partida,
+para lo cual debemos definir la interfaz funcional adecuada:
 
 .. literalinclude:: files/Victoria.java
 
@@ -64,7 +63,7 @@ encarga de comprobar que la interfaz no tiene más de un método. Reescribamos
 ahora la partida:
 
 .. literalinclude:: files/Partida.java
-   :emphasize-lines: 6,8,12,22
+   :emphasize-lines: 6,8,11,21
 
 Como vemos, al crear la partida proporcionamos la condición que servirá para
 decidir el ganador y en el método ``vencedor`` la utilizamos ejecutando su
@@ -137,7 +136,7 @@ definidas que podemos usar:
 :java-function:`Function<T, R> <Function>`
    Permte la definición de funciones que toman un argumento de entrada (el
    genérico ``T``) y devuelven un valor (el genético ``R``). Para la ejecución
-   se requiere aplicar ``appply``. Justamente nuestra interfaz funcional era de
+   se requiere aplicar ``apply``. Justamente nuestra interfaz funcional era de
    este tipo así que podríamos haber usado la predefinida en vez de definir una
    nosotros. La única dificultad es que es una interfaz genérica:
 
@@ -185,8 +184,8 @@ definidas que podemos usar:
 .. 
 .. rubric:: Notas al pie
 
-.. [#] Al lector más avispado no se le habrá pasado posiblemente que podríamos
-   haber definido Partida como una clase abstracta con un método abstracto
-   llamador ``vencedor`` y en cada una de las subclases implementásemos este
-   método en particular. Podríamos hacerlo, pero entonces no podríamos ilustrar
-   lo que pretendemos.
+.. [#] Posiblemente al lector más avispado no se le habrá pasado por alto que
+   podríamos haber definido Partida como una clase con un método abstracto
+   llamador ``vencedor`` y en cada una de sus subclases implementar este
+   método. Podríamos hacerlo, pero entonces no podríamos ilustrar lo que
+   pretendemos.

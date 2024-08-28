@@ -158,7 +158,7 @@
         <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../01.archivos/index.html">1. Manejo de archivos</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../01.archivos/01.gestion.html">1.1. Gestión de archivos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulaci%C3%B3n.html">1.2. Consulta y manipulación de contenidos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -356,7 +356,6 @@ simplemente, en indicarle a la partida cuántos puntos ha sacado cada uno:</p>
 <span class="w">    </span><span class="n">Partida</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">nombres</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">jugador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombres</span><span class="p">;</span>
 <span class="w">        </span><span class="n">puntuacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="n">nombres</span><span class="p">.</span><span class="na">length</span><span class="o">]</span><span class="p">;</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">condicion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">condicion</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -377,13 +376,13 @@ simplemente, en indicarle a la partida cuántos puntos ha sacado cada uno:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Supongamos ahora que queremos comprobar qué jugador ha ganado. Es sencillo, pero
-el problema es que dependiendo de cuál sea el juego el criterio para escoger
-el ganador es distinto. En algunos juegos gana el que tiene más puntos, mientras
-que en otro el que tiene menos. Incluso el criterio podría ser mucho más
-extravagante. Consecuentemente decidimos definir fuera esta implementación
-el algoritmo para calcular el ganador<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> y pasárselo al constructor al crear
-la partida. Para ello debemos definir la interfaz funcional adecuada:</p>
+<p>Supongamos ahora que queremos comprobar qué jugador ha ganado. Es sencillo,
+pero, dependiendo de cuál sea el juego, el criterio para escoger el ganador es
+distinto. En algunos juegos gana el que tiene más puntos, mientras que en otros
+el que tiene menos. Incluso el criterio podría ser mucho más extravagante.
+Consecuentemente, decidimos definir fuera de esta implementación el algoritmo
+para calcular el ganador<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> y pasárselo al constructor al crear la partida,
+para lo cual debemos definir la interfaz funcional adecuada:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Victoria</span><span class="o">.</span><span class="n">java</span>
 <span class="nd">@FunctionalInterface</span>
 <span class="n">interface</span> <span class="n">Victoria</span> <span class="p">{</span>
@@ -405,9 +404,9 @@ ahora la partida:</p>
 <span class="hll">    <span class="n">Partida</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">nombres</span><span class="p">,</span> <span class="n">Victoria</span> <span class="n">condicion</span><span class="p">)</span> <span class="p">{</span>
 </span>        <span class="n">jugador</span> <span class="o">=</span> <span class="n">nombres</span><span class="p">;</span>
         <span class="n">puntuacion</span> <span class="o">=</span> <span class="n">new</span> <span class="nb">int</span><span class="p">[</span><span class="n">nombres</span><span class="o">.</span><span class="n">length</span><span class="p">];</span>
-        <span class="n">this</span><span class="o">.</span><span class="n">condicion</span> <span class="o">=</span> <span class="n">condicion</span><span class="p">;</span>
-<span class="hll">    <span class="p">}</span>
-</span>
+<span class="hll">        <span class="n">this</span><span class="o">.</span><span class="n">condicion</span> <span class="o">=</span> <span class="n">condicion</span><span class="p">;</span>
+</span>    <span class="p">}</span>
+
     <span class="n">public</span> <span class="n">boolean</span> <span class="n">jugar</span><span class="p">(</span><span class="nb">int</span><span class="p">[]</span> <span class="n">puntos</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span><span class="p">(</span><span class="n">puntos</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">puntuacion</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="k">return</span> <span class="n">false</span><span class="p">;</span>
         <span class="k">for</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">puntos</span><span class="o">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">puntuacion</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">puntos</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
@@ -415,9 +414,9 @@ ahora la partida:</p>
     <span class="p">}</span>
 
     <span class="n">public</span> <span class="n">String</span> <span class="n">vencedor</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nb">int</span> <span class="n">vencedor</span> <span class="o">=</span> <span class="n">condicion</span><span class="o">.</span><span class="n">comprobar</span><span class="p">(</span><span class="n">puntuacion</span><span class="p">);</span>
-<span class="hll">        <span class="k">return</span> <span class="n">jugador</span><span class="p">[</span><span class="n">vencedor</span><span class="p">];</span>
-</span>    <span class="p">}</span>
+<span class="hll">        <span class="nb">int</span> <span class="n">vencedor</span> <span class="o">=</span> <span class="n">condicion</span><span class="o">.</span><span class="n">comprobar</span><span class="p">(</span><span class="n">puntuacion</span><span class="p">);</span>
+</span>        <span class="k">return</span> <span class="n">jugador</span><span class="p">[</span><span class="n">vencedor</span><span class="p">];</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -562,7 +561,7 @@ definidas que podemos usar:</p>
 <dl>
 <dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html">Function&lt;T, R&gt;</a></dt><dd><p>Permte la definición de funciones que toman un argumento de entrada (el
 genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y devuelven un valor (el genético <code class="docutils literal notranslate"><span class="pre">R</span></code>). Para la ejecución
-se requiere aplicar <code class="docutils literal notranslate"><span class="pre">appply</span></code>. Justamente nuestra interfaz funcional era de
+se requiere aplicar <code class="docutils literal notranslate"><span class="pre">apply</span></code>. Justamente nuestra interfaz funcional era de
 este tipo así que podríamos haber usado la predefinida en vez de definir una
 nosotros. La única dificultad es que es una interfaz genérica:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">App</span><span class="o">.</span><span class="n">java</span>
@@ -654,11 +653,11 @@ artículo <a class="reference external" href="https://www.geeksforgeeks.org/func
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Al lector más avispado no se le habrá pasado posiblemente que podríamos
-haber definido Partida como una clase abstracta con un método abstracto
-llamador <code class="docutils literal notranslate"><span class="pre">vencedor</span></code> y en cada una de las subclases implementásemos este
-método en particular. Podríamos hacerlo, pero entonces no podríamos ilustrar
-lo que pretendemos.</p>
+<p>Posiblemente al lector más avispado no se le habrá pasado por alto que
+podríamos haber definido Partida como una clase con un método abstracto
+llamador <code class="docutils literal notranslate"><span class="pre">vencedor</span></code> y en cada una de sus subclases implementar este
+método. Podríamos hacerlo, pero entonces no podríamos ilustrar lo que
+pretendemos.</p>
 </aside>
 </aside>
 </section>

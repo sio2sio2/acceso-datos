@@ -97,17 +97,23 @@ asociados a que el objeto sea una colección entre ellos:
       Collection<Integer> c = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
       c.toArray(Integer[]::new); // también c.toArray(new Integer[0]);
 
-Además, como las colecciones son iterables, siempre podremos usar con ellas una
-estructura de tipo `for-each`:
+``.forEach(Consumer<E> c)``
+   que ejecuta la función *consumidora* que se proporciona como argumento para
+   cada elemento de la colección:
 
-.. code-block:: java
+   .. code-block:: java
 
-   // Dependiendo de la naturaleza de "c" podremos o no predecir el orden.
-   for(Integer n: c) {
-      System.out.println(c);
-   }
+      // Dependiendo de la naturaleza de "c" podremos o no predecir el orden.
+      c.forEach(e -> System.out.println(e)); // También c.forEach(System.out:println)
 
-o el método ``.forEach(Consumer<E> c)``.
+   Además, como las colecciones son iterables, siempre podremos usar con ellas
+   una estructura de tipo `for-each` como alternativa a este método:
+
+   .. code-block:: java
+
+      for(Integer n: c) {
+         System.out.println(c);
+      }
 
 .. caution:: No todas las colecciones son mutables, por lo que con aquellas que
    no lo sean no será posible usar los métodos que alteran su contenido
@@ -201,7 +207,7 @@ Implementaciones particulares de las listas son:
       la pila.
 
    ``empty()``
-      comnprueba si la pila está vacía (hace pues lo mismo que ``isEmpty``).
+      comprueba si la pila está vacía (hace pues lo mismo que ``isEmpty``).
 
    .. caution:: Por supuesto, los métodos de las interfaces que implemente están
       disponibles, pero es absurdo utilizarlos, porque en ese caso es muy
@@ -231,11 +237,11 @@ que:
 
    Set<Integer> s = new HashSet<>();
    s.add(1);  // true, añadimos 1 al conjunto.
-   s.add(1);  // false, no no se añade pues ya está.
+   s.add(1);  // false, no se añade pues ya está.
 
 Además, no tienen en principio orden, por lo que referirlos mediante un índice
-carece de sentido; y no añade como la interfaz :ref:`List <java-list>` métodos
-relacionados con la posición que ocupan los elementos.
+carece de sentido; y, en consecuencia, no añade como la interfaz :ref:`List
+<java-list>` métodos relacionados con la posición que ocupan los elementos.
 
 :java-util:`HashSet <HashSet>`
    Es una clase para construir conjuntos tal y como los hemos descrito.

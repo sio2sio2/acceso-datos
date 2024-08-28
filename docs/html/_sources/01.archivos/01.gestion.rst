@@ -13,7 +13,7 @@ que realizar estas tareas intentando evitar estas dependencias.
 
    + La original que se basa en la clase :java-io:`File`.
    + La surgida a partir de *Java7* basada en :java-nio:`Path <Path>` (interfaz),
-     :java-nio:`Paths <Paths>` (clase) y :java-nio:`Files <Files>` (clase).
+     y :java-nio:`Files <Files>` (clase).
 
    Analizaremos la segunda.
 
@@ -85,15 +85,15 @@ operativo y, en función de ello, que obtenga la variable.
 Rutas
 =====
 Antes de entrar de lleno a gestionar archivos, hay que aprender cómo referirnos
-a ellos, esto es, cómo construir rutas, para lo cual usaremos :java-nio:`Paths
-<Paths>`. El modo habitual de constituir una es con:
+a ellos, esto es, cómo construir rutas, para lo cual usaremos :java-nio:`Path
+<Path>`. El modo habitual de constituir una es con:
 
-``Paths.get(String path)``
+``Path.of(String path)``
    que crea una ruta a partir de la cadena que se le proporcione:
 
    .. code-block:: java
 
-      Path dir = Paths.get("/home/usuario/.config");
+      Path dir = Path.of("/home/usuario/.config");
 
    Esta, sin embargo, no es una buena estrategia, ya que la ruta que hemos
    definido es una ruta de sistemas *UNIX* y hará dependiente nuestro código del
@@ -103,19 +103,19 @@ a ellos, esto es, cómo construir rutas, para lo cual usaremos :java-nio:`Paths
    .. code-block:: java
 
       String home = System.getProperty("user.home");
-      Path dir = Paths.get(home, ".config");
+      Path dir = Path.of(home, ".config");
 
    esto es, utilizar una ruta ya hecha que nos proporciona el propio Java y
    corregirla añadiendo los subdirectorios necesarios mediante la adición de
    argumentos (tantos como subdirectarios requiramos).
 
-   .. note:: Con el mismo fin también puede usarse el método estático ``of()``
-      de :java-nio:`Path <Path>`:
+   .. note:: Con el mismo fin también puede usarse el método estático ``get()``
+      de :java-nio:`Paths <Paths>`:
 
       .. code-block:: java
 
          String home = System.getProperty("user.home");
-         Path dir = Path.of(home, ".config");
+         Path dir = Paths.get(home, ".config");
 
 Una vez que tenemos un objeto que implementa la interfaz :java-nio:`Path
 <Path>`, podemos usar los métodos que nos brinda para alterarla:

@@ -2,12 +2,21 @@
 
 Flujos
 ******
-Los flujos (:java-stream:`Stream<T> <Stream>`) son las secuencias de elementos
-que permiten realizar operaciones sobre ellos, esto es, el tipo de datos que nos
-permite implementar las típicas operaciones (`map
+Los flujos (:java-stream:`Stream<T> <Stream>`) son secuencias de elementos que se consumen
+al aplicar sobre ellas alguna operación:
+
+.. code-block:: java
+
+   Stream<Integer> st = Stream.of(1, 2, 3 ,4);
+   st.count(); // 4
+   st.count(); // Lo consuminos contando antes, así que se produce un IllegalStateException
+
+Una de sus características fundamentales es que nos permiten implementar las
+típicas operaciones (`map
 <https://en.wikipedia.org/wiki/Map_(higher-order_function)>`_, `filter
 <https://en.wikipedia.org/wiki/Filter_(higher-order_function)>`_, `reduce
-<https://en.wikipedia.org/wiki/Fold_(higher-order_function)>`_) de programación funcional.
+<https://en.wikipedia.org/wiki/Fold_(higher-order_function)>`_) de programación
+funcional.
 
 :ref:`Collection <java-collection>` tiene un método (``stream()``) que convierte
 la colección en un flujo y que, por tanto, nos permitirá aplicar estas

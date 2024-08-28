@@ -158,7 +158,7 @@
         <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../01.archivos/index.html">1. Manejo de archivos</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../01.archivos/01.gestion.html">1.1. Gestión de archivos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulaci%C3%B3n.html">1.2. Consulta y manipulación de contenidos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../01.archivos/02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -426,16 +426,21 @@ lo que normalmente interesa especificar el tipo particular:</p>
 </pre></div>
 </div>
 </dd>
-</dl>
-<p>Además, como las colecciones son iterables, siempre podremos usar con ellas una
-estructura de tipo <cite>for-each</cite>:</p>
+<dt><code class="docutils literal notranslate"><span class="pre">.forEach(Consumer&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que ejecuta la función <em>consumidora</em> que se proporciona como argumento para
+cada elemento de la colección:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Dependiendo de la naturaleza de &quot;c&quot; podremos o no predecir el orden.</span>
-<span class="k">for</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="n">c</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">e</span><span class="p">));</span><span class="w"> </span><span class="c1">// También c.forEach(System.out:println)</span>
+</pre></div>
+</div>
+<p>Además, como las colecciones son iterables, siempre podremos usar con ellas
+una estructura de tipo <cite>for-each</cite> como alternativa a este método:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>o el método <code class="docutils literal notranslate"><span class="pre">.forEach(Consumer&lt;E&gt;</span> <span class="pre">c)</span></code>.</p>
+</dd>
+</dl>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>No todas las colecciones son mutables, por lo que con aquellas que
@@ -515,7 +520,7 @@ método propios de su uso como tal:</p>
 suministrado. En este caso, se empieza a contar por <strong>1</strong> desde lo alto de
 la pila.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">empty()</span></code></dt><dd><p>comnprueba si la pila está vacía (hace pues lo mismo que <code class="docutils literal notranslate"><span class="pre">isEmpty</span></code>).</p>
+<dt><code class="docutils literal notranslate"><span class="pre">empty()</span></code></dt><dd><p>comprueba si la pila está vacía (hace pues lo mismo que <code class="docutils literal notranslate"><span class="pre">isEmpty</span></code>).</p>
 </dd>
 </dl>
 <div class="admonition caution">
@@ -547,12 +552,11 @@ con una estructura <em>foreach</em>, debería definirse el método como:</p>
 que:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// true, añadimos 1 al conjunto.</span>
-<span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// false, no no se añade pues ya está.</span>
+<span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// false, no se añade pues ya está.</span>
 </pre></div>
 </div>
 <p>Además, no tienen en principio orden, por lo que referirlos mediante un índice
-carece de sentido; y no añade como la interfaz <a class="reference internal" href="#java-list"><span class="std std-ref">List</span></a> métodos
-relacionados con la posición que ocupan los elementos.</p>
+carece de sentido; y, en consecuencia, no añade como la interfaz <a class="reference internal" href="#java-list"><span class="std std-ref">List</span></a> métodos relacionados con la posición que ocupan los elementos.</p>
 <dl>
 <dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html">HashSet</a></dt><dd><p>Es una clase para construir conjuntos tal y como los hemos descrito.</p>
 </dd>

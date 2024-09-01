@@ -83,10 +83,18 @@ hacer lo siguiente:
 
 .. code-block:: java
 
-   InputStreamReader sr =  new InputStreamReader(st);
+   InputStreamReader sr =  new InputStreamReader(st, StandardCharsets.UTF_8);
    BufferedReader br = new BufferedReader(sr);
 
-y ya este objeto tratarlo como prefiramos:
+.. note:: Al establecer el lector a partir del flujo  de entrada debemos indicar
+   qué codificación se usa. Si no se especifica, se sobreentiende que es UTF-8,
+   de modo que a partir de ahora, no volveremos a indicarlo:
+
+   .. code-block:: java
+
+      InputStreamReader sr =  new InputStreamReader(st);
+
+Al objeto resultado podemos tratarlo como prefiramos:
 
 .. code-block:: java
 

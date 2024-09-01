@@ -40,11 +40,11 @@ extlinks = {
     'java-nio': ('https://docs.oracle.com/javase/8/docs/api/java/nio/file/%s.html', 'java.nio.file.%s'),
     'java-lang': ('https://docs.oracle.com/javase/8/docs/api/java/lang/%s.html', 'java.lang.%s'),
     'java-function': ('https://docs.oracle.com/javase/8/docs/api/java/util/function/%s.html', 'java.util.function.%s'),
-    'java-stream': ('https://docs.oracle.com/javase/8/docs/api/java/util/stream/%s.html', 'java.util.stream.%s')
+    'java-stream': ('https://docs.oracle.com/javase/8/docs/api/java/util/stream/%s.html', 'java.util.stream.%s'),
+    'deb': ('https://packages.debian.org/stable/%s','%s'),
 }
 
 intersphinx_mapping = {
     'linux': ('https://sio2sio2.github.io/doc-linux/', None),
     'lm': ('https://sio2sio2.github.io/LM/', None),
 }
-

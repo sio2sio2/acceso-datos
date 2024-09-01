@@ -324,11 +324,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sin-mapeo-a-objetos">2.1.1. Sin mapeo a objetos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1.1. Lectura</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.1.2. Escritura</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.2. Escritura</a></li>
 </ul>
             </nav>
         </div>
@@ -346,97 +343,152 @@ document.write(`
 podríamos improvisar una biblioteca para su soporte nosotros mismos. Sin embargo,
 tiene algunos casos especiales (p.ej. valores entre comillas que pueden contener el
 propio carácter separador), que aconsejan el uso de una biblioteca de terceros.
-Una muy apropiada es <a class="reference external" href="https://opencsv.sourceforge.net/">OpenCSV</a> de la que
-podemos obtener fácilmente <a class="reference external" href="https://mvnrepository.com/artifact/com.opencsv/opencsv">un JAR listo para su uso</a>.</p>
+Una muy apropiada es <a class="reference external" href="https://commons.apache.org/proper/commons-csv/">Apache Commons CSV</a> de la que
+podemos obtener fácilmente <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.commons/commons-csv">un JAR listo para su uso</a>.</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
-<p>Esta biblioteca, a su vez, necesita <a class="reference external" href="https://commons.apache.org/proper/commons-lang/">Apache Commons Lang</a> que podemos instalarla
-para <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.commons/commons-lang3">su uso exclusivo en un proyecto</a> o
-para su uso general (las distribuciones de <em>Linux</em> traen un paquete para su
-instalación).</p>
+<p>Esta biblioteca, a su vez, necesita:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://commons.apache.org/proper/commons-io/">Apache Commons IO</a> ( <a class="reference external" href="https://mvnrepository.com/artifact/commons-io/commons-io">JAR para commons-io</a>).</p></li>
+<li><p><a class="reference external" href="https://commons.apache.org/proper/commons-codec/">Apache Commons Codec</a>
+(<a class="reference external" href="https://mvnrepository.com/artifact/commons-codec/commons-codec">JAR para commons-codec</a>).</p></li>
+</ul>
+<p>Algunas distribuciones de <em>Linux</em> traen paquete para su instalación directa
+en el sistema (p.e. <a class="extlink-deb reference external" href="https://packages.debian.org/stable/libcommons-csv-java">este paquete de Debian</a>).</p>
 </div>
-<p>En los archivos <abbr title="Comma-Separated Values">CSV</abbr> cada línea representa un registro y podemos asimilar cada
-registro a un objeto. Por ejemplo, si un <abbr title="Comma-Separated Values">CSV</abbr> tuviera tres columnas que
-representaran un nombre, una fecha de nacimiento y unos estudios, podríamos
-considerar que cada registro representa un estudiante y, por tanto, podríamos
-construir a partir de cada registro un objeto estudiante. Dependiendo de si el
-proceso de traducción genera o no objetos, tenemos dos estrategias.</p>
-<section id="sin-mapeo-a-objetos">
-<h2><span class="section-number">2.1.1. </span>Sin mapeo a objetos<a class="headerlink" href="#sin-mapeo-a-objetos" title="Link to this heading">#</a></h2>
-<p>En este caso, no hay objetos: simplemente un registro de tres campos <abbr title="Comma-Separated Values">CSV</abbr> será
-un array de tres cadenas.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Una alternativa interesante es <a class="reference external" href="https://opencsv.sourceforge.net/">OpenCSV</a>.</p>
+</div>
 <section id="lectura">
-<h3><span class="section-number">2.1.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
-<p>El modo más sencillo de leer un archivo es hacer uso de la clase <cite>CSVReader</cite>
-sobre un flujo de entrada:</p>
+<h2><span class="section-number">2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
+<p>Veamos cómo leer un <abbr title="Comma-Separated Values">CSV</abbr> que se obtiene como flujo de entrada<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">   </span><span class="n">CSVReader</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">));</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// readAll devuelve List&lt;String[]&gt;</span>
-<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">readAll</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Tratamos cada registro del archivo.</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Lo puede provocar la apertura del flujo o los lectores.</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">CsvException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Se produce al interpretar el CSV (o sea, al ejecutar readAll.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>También podemos leer línea a linea el archivo en vez de sopetón como hemos hecho
-arriba:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">;</span>
-<span class="k">while</span><span class="p">((</span><span class="n">registro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">readNext</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Tratamos cada registro del archivo.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>La diferencia con el tratamiento anterior es que, si se produce un error en la
-lectura de una línea (p.e. porque unas comillas quedan sin cerrar), saltará
-entonces el error y podremos haber leído todas las líneas anteriores
-correctamente.</p>
-<p>Estas lecturas, sin embargo, son muy simples y definen un comportamiento
-predeterminado para el procesador (el separador es la coma, el aglutinador de
-campos es la comilla doble, etc). Si nuestro archivo no cumple con este
-comportamiento entonces tendremos que definir cómo hacer el procesamiento
-primero:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
-<span class="hll"><span class="n">CSVParser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVParserBuilder</span><span class="p">()</span>
-</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">withSeparator</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">)</span><span class="w">           </span><span class="c1">// El separador es la coma.</span>
-</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">withIgnoreQuotations</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w">  </span><span class="c1">// Queremos agrupar campos con comillas.</span>
-</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">withQuoteChar</span><span class="p">(</span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w">          </span><span class="c1">// Para agrupar se usan las comillas dobles.</span>
-</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">withEscapeChar</span><span class="p">(</span><span class="sc">&#39;\\&#39;</span><span class="p">)</span><span class="w">         </span><span class="c1">// La contrabarra escapa caracteres especiales.</span>
-</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span>
-<span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="hll"><span class="w">   </span><span class="n">CSVReader</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVReaderBuilder</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">))</span>
-</span><span class="hll"><span class="w">      </span><span class="p">.</span><span class="na">withSkipLines</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">    </span><span class="c1">// No saltamos ninguna línea.</span>
-</span><span class="hll"><span class="w">      </span><span class="p">.</span><span class="na">withCSVParser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-</span><span class="hll"><span class="w">      </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="hll"><span class="w">   </span><span class="n">CSVParser</span><span class="w"> </span><span class="n">parse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVParser</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// readAll devuelve List&lt;String[]&gt;</span>
-<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">readAll</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Tratamos cada registro del archivo.</span>
+<span class="hll"><span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">CSVRecord</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">parse</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">      </span><span class="c1">// Tratamos cada registro del archivo. Por ejemplo:</span>
+<span class="w">      </span><span class="kt">long</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse</span><span class="p">.</span><span class="na">getRecordNumber</span><span class="p">();</span><span class="w"> </span><span class="c1">// Número de registro.</span>
+<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="c1">// Cantidad de campos en el registro.</span>
+<span class="w">      </span><span class="c1">// Unimos los campos con &quot; -- &quot;.</span>
+<span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">registro</span><span class="p">.</span><span class="na">spliterator</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">).</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">joining</span><span class="p">(</span><span class="s">&quot; -- &quot;</span><span class="p">));</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;%d: [%d]  %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">cantidad</span><span class="p">,</span><span class="w"> </span><span class="n">contenido</span><span class="p">);</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 <span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Lo puede provocar la apertura del flujo o los lectores.</span>
 <span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">CsvException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Se produce al interpretar el CSV (o sea, al ejecutar readAll.</span>
-<span class="p">}</span>
 </pre></div>
 </div>
+<p>Este es la lectura más simple que podemos hacer:</p>
+<ul>
+<li><p>Como los objetos <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVParser.html">CSVParser</a>
+son iterables usamos un bucle <cite>for-each</cite> (aunque también podríamos haber usado
+el método <code class="docutils literal notranslate"><span class="pre">.forEach</span></code> de los iterables). También dispone de un
+método <code class="docutils literal notranslate"><span class="pre">getRecords</span></code> que devuelve una lista.</p></li>
+<li><p>Cada elemento de la iteración es un objeto <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html">CSVRecord</a>.
+Podemos acceder a cada elemento por separado (con el método <code class="docutils literal notranslate"><span class="pre">.get</span></code>), pero es
+a su vez también iterable, lo que hemos preferido usar en este caso.</p></li>
+<li><p>Al procesar el <abbr title="Comma-Separated Values">CSV</abbr> hemos declarado que el archivo cumple extrictamente el
+<span class="target" id="index-0"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4180.html"><strong>RFC 4180</strong></a> con la salvedad de que permite líneas vacías. <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html">CSVFormat</a>
+lista otras variantes del estándar predefinidas indicándo cuál es su
+definición. En cualquier caso, podemos definir nosotros mismos el formato:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define los nombres de las columnas.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>En este caso, hemos tomado como base el formato anterior y hemos añadido que
+no se tengan en consideración los espacios que pueda haber alrededor del
+carácter separador<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Además definimos los nombres de las columnas, con lo
+que podremos acceder a los valores de los campos usando <code class="docutils literal notranslate"><span class="pre">get</span></code> no sólo con el
+índice (<code class="code docutils literal notranslate"><span class="pre">registro.get(0)</span></code>), sino también con el propio nombre
+(<code class="code docutils literal notranslate"><span class="pre">registro.get(&quot;Nombre&quot;)</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En realidad, lo recomendable es que la primera línea del <abbr title="Comma-Separated Values">CSV</abbr> no
+sea valores, sino los nombres de las columnas, por lo que muy comunmente
+conviene redefinir el formato así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">()</span><span class="w">        </span><span class="c1">// Respetamos los nombres incluidos.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">()</span><span class="w">  </span><span class="c1">// Saltamos la primera línea al leer.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
 </section>
 <section id="escritura">
-<h3><span class="section-number">2.1.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
-</section>
+<h2><span class="section-number">2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<p>La creación de archivos <abbr title="Comma-Separated Values">CSV</abbr> también es bastante sencilla utilizando
+<a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVPrinter.html">CSVPrinter</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Datos que se han generado de alguna manera.</span>
+<span class="n">String</span><span class="o">[][]</span><span class="w"> </span><span class="n">datos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="p">{</span><span class="s">&quot;Pepe&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;13&quot;</span><span class="p">},</span>
+<span class="w">   </span><span class="p">{</span><span class="s">&quot;Manolo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;22,5&quot;</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
+<span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Incluirá los nombres en la salida.</span>
+<span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
+<span class="w">   </span><span class="n">CSVPrinter</span><span class="w"> </span><span class="n">printer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVPrinter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">formato</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">datos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">//printer.printRecord(registro[0], registro[1]);</span>
+<span class="w">      </span><span class="n">printer</span><span class="p">.</span><span class="na">printRecord</span><span class="p">(</span><span class="n">registro</span><span class="p">);</span><span class="w"> </span><span class="c1">// Puede ser cualquier objeto iterable.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="n">printer</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Lo puede provocar la apertura del flujo o los lectores.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>No es necesario escribir registro a registro. Si disponemos los datos
+en un flujo, una colección o una lista, podemos usar <code class="docutils literal notranslate"><span class="pre">printRecords</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">printer</span><span class="p">.</span><span class="na">printRecords</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">datos</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p><a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a> tiene también un método <code class="docutils literal notranslate"><span class="pre">newBufferedReader</span></code>
+que devuelve directamente un lector de flujo, lo que nos permitiría
+ahorrarnos un paso, pero hemos preferido usar obtener un flujo a partir del
+fichero, para que el resto del código sea igual si la entrada no es un
+fichero, sino de otra naturaleza (p.e. un servicio web).</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>En realidad, la librería usando <code class="docutils literal notranslate"><span class="pre">CSVFormat.DEFAULT</span></code> no devuelve un
+error (como debería), sino que interpreta la línea a su manera.</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">3</a><span class="fn-bracket">]</span></span>
+<p>Es decir, que:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b, c&quot;</span>
+</pre></div>
+</div>
+<p>no es una línea inválida<a class="footnote-reference brackets" href="#id6" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, sino que se interpreta como:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span><span class="s">&quot;b, c&quot;</span>
+</pre></div>
+</div>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -485,11 +537,8 @@ primero:</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sin-mapeo-a-objetos">2.1.1. Sin mapeo a objetos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1.1. Lectura</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.1.2. Escritura</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.2. Escritura</a></li>
 </ul>
   </nav></div>
 

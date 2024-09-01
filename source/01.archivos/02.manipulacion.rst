@@ -83,10 +83,18 @@ hacer lo siguiente:
 
 .. code-block:: java
 
-   InputStreamReader sr =  new InputStreamReader(st);
+   InputStreamReader sr =  new InputStreamReader(st, StandardCharsets.UTF_8);
    BufferedReader br = new BufferedReader(sr);
 
-y ya este objeto tratarlo como prefiramos:
+.. note:: Al establecer el lector a partir del flujo  de entrada debemos indicar
+   qué codificación se usa. Si no se especifica, se sobreentiende que es UTF-8,
+   de modo que a partir de ahora, no volveremos a indicarlo:
+
+   .. code-block:: java
+
+      InputStreamReader sr =  new InputStreamReader(st);
+
+Al objeto resultado podemos tratarlo como prefiramos:
 
 .. code-block:: java
 
@@ -265,14 +273,6 @@ Para recuperar un objeto serializado, hay que hacer el proceso inverso:
       err.printStackTrace();
    }
 
-
-.. Enlaces:
-   https://www.arquitecturajava.com/java-stream-file-y-manejo-de-ficheros/
-   https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
-   https://stackoverflow.com/questions/28977308/read-all-lines-with-bufferedreader
-
-   https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/package-summary.html
-   https://jarroba.com/gson-json-java-ejemplos/
 
 .. |SGBD| replace:: :abbr:`SGBD (Sistemas Gestores de Bases de Datos)`
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`

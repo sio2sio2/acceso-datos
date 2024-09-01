@@ -418,11 +418,20 @@ extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> media
 <p>En consecuencia, a partir de este punto podemos tratar estas tres entradas
 diferentes de un mismo modo (p.e. usando la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Scanner.html">Scanner</a>). Si el archivo lo vamos a manejar por líneas lo más adecuado es
 hacer lo siguiente:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
 <span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>y ya este objeto tratarlo como prefiramos:</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Al establecer el lector a partir del flujo  de entrada debemos indicar
+qué codificación se usa. Si no se especifica, se sobreentiende que es UTF-8,
+de modo que a partir de ahora, no volveremos a indicarlo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<p>Al objeto resultado podemos tratarlo como prefiramos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">;</span>
 <span class="k">while</span><span class="p">((</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Tratamiento de cada línea.</span>

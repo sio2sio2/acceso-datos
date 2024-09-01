@@ -115,25 +115,29 @@ Finalmente, habría que cerrar el flujo:
 
 .. code-block:: java
 
-   st.close();
-
-Poniendo todo junto:
-
-.. code-block:: java
-
-   Path archivo = Path.of(System.getProperty("user.home"), ".bashrc");
-   InputStream st = Files.newInputStream(archivo);
-   BufferedReader br = new BufferedReader(new InputStramReader(st));
-
-   for(String line: br.lines().toList()) {
-      // Tratamiento de cada línea.
-   }
-
-   st.close();
+   br.close();  // El resto se cierra en cascada.
 
 .. note:: El método ``lines()`` devuelve un flujo por líneas (``Stream<String>``)
    al que se puede aplicar :ref:`estrategias de programación funcional
    <java-stream>`.
+
+Poniendo todo junto y usando `try para el tratamiento de errores y el autocierre
+<https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html>`_:
+
+.. code-block:: java
+
+   Path archivo = Path.of(System.getProperty("user.home"), ".bashrc");
+   try (
+      InputStream st = Files.newInputStream(archivo);
+      BufferedReader br = new BufferedReader(new InputStreamReader(st))
+   ) {
+      for(String line: br.lines().toList()) {
+         // Tratamiento de cada línea.
+      }
+   }
+   catch (Exception err) {
+      err.printStackTrace();
+   }
 
 Escritura
 ---------
@@ -146,10 +150,13 @@ utilizar otro método de :java-nio:`Files <Files>` para abrir un flujo de salida
    String contenido = "Este es el texto del archivo";
 
    Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "caca.txt");
-   OutputStream st = Files.newOutputStream(archivo);
-   st.write(contenido.getBytes());
 
-   st.close();
+   try (OutputStream st = Files.newOutputStream(archivo)) {
+      st.write(contenido.getBytes());
+   }
+   catch (IOException err) {
+      err.printStackTrace();
+   }
 
 En este caso, se ha abierto el archivo para incluir en él la información
 suministrada sin respetar la que ya pudiera haber. Sin embargo, pueden añadirse
@@ -236,9 +243,9 @@ Para escribir en disco varios objetos "*Persona*", podemos hacer lo siguiente:
    );
 
    Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "caca.bin");
-   ObjectOutputStream st = new ObjectOutputStream(Files.newOutputStream(ruta));
-   st.writeObject(o);
-   st.close();
+   try (ObjectOutputStream st = new ObjectOutputStream(Files.newOutputStream(ruta))) {
+      st.writeObject(o);
+   }
 
 Y listo, tendremos en :file:`caca.bin` la lista de personas serializadas. 
 
@@ -248,13 +255,15 @@ Para recuperar un objeto serializado, hay que hacer el proceso inverso:
 
 .. code-block:: java
 
-   ObjectInputStream st = new ObjectInputStream(Files.newInputStream(ruta));
-   Object o = st.readObject();
-   st.close();
+   try (ObjectInputStream st = new ObjectInputStream(Files.newInputStream(ruta))) {
+      Object o = st.readObject();
 
-   // Ahora podemos usar "o" como prefiramos:
-
-   ((List<Persona>) o).forEach(System.out::println);
+      // Ahora podemos usar "o" como prefiramos:
+      ((List<Persona>) o).forEach(System.out::println);
+   }
+   catch (Exception err) {
+      err.printStackTrace();
+   }
 
 
 .. Enlaces:

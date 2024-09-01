@@ -18,7 +18,8 @@ release = 'rolling'
 
 extensions = [
     'sphinx.ext.extlinks',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo'
 ]
 
 templates_path = ['_templates']

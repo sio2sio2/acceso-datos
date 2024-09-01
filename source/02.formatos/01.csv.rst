@@ -1,0 +1,116 @@
+.. _csv:
+
+|CSV|
+*****
+
+.. todo:: Cambiar a `Apache Commons CSV
+   <https://mvnrepository.com/artifact/org.apache.commons/commons-csv>`_, que
+   requiere commons-io y commons-codec.
+
+El :ref:`formato CSV <lm:csv>` es un formato relativamente sencillo del que casi
+podríamos improvisar una biblioteca para su soporte nosotros mismos. Sin embargo,
+tiene algunos casos especiales (p.ej. valores entre comillas que pueden contener el
+propio carácter separador), que aconsejan el uso de una biblioteca de terceros.
+Una muy apropiada es `OpenCSV <https://opencsv.sourceforge.net/>`_ de la que
+podemos obtener fácilmente `un JAR listo para su uso
+<https://mvnrepository.com/artifact/com.opencsv/opencsv>`_.
+
+.. caution:: Esta biblioteca, a su vez, necesita `Apache Commons Lang
+   <https://commons.apache.org/proper/commons-lang/>`_ que podemos instalarla
+   para `su uso exclusivo en un proyecto
+   <https://mvnrepository.com/artifact/org.apache.commons/commons-lang3>`_ o
+   para su uso general (las distribuciones de *Linux* traen un paquete para su
+   instalación).
+
+En los archivos |CSV| cada línea representa un registro y podemos asimilar cada
+registro a un objeto. Por ejemplo, si un |CSV| tuviera tres columnas que
+representaran un nombre, una fecha de nacimiento y unos estudios, podríamos
+considerar que cada registro representa un estudiante y, por tanto, podríamos
+construir a partir de cada registro un objeto estudiante. Dependiendo de si el
+proceso de traducción genera o no objetos, tenemos dos estrategias.
+
+Sin mapeo a objetos
+===================
+En este caso, no hay objetos: simplemente un registro de tres campos |CSV| será
+un array de tres cadenas.
+
+Lectura
+-------
+El modo más sencillo de leer un archivo es hacer uso de la clase `CSVReader`
+sobre un flujo de entrada:
+
+.. code-block:: java
+
+   Path ruta = Path.of(System.getProperty("user.home"), "caca.csv");
+
+   try (
+      InputStream st = Files.newInputStream(ruta);
+      CSVReader r = new CSVReader(new InputStreamReader(st));
+   ) {
+      // readAll devuelve List<String[]>
+      for(String[] registro: r.readAll()) {
+         // Tratamos cada registro del archivo.
+      }
+   }
+   catch(IOException err) {
+      // Lo puede provocar la apertura del flujo o los lectores.
+   }
+   catch(CsvException err) {
+      // Se produce al interpretar el CSV (o sea, al ejecutar readAll.
+   }
+
+También podemos leer línea a linea el archivo en vez de sopetón como hemos hecho
+arriba:
+
+.. code-block:: java
+
+   String[] registro;
+   while((registro = r.readNext()) != null) {
+      // Tratamos cada registro del archivo.
+   }
+
+La diferencia con el tratamiento anterior es que, si se produce un error en la
+lectura de una línea (p.e. porque unas comillas quedan sin cerrar), saltará
+entonces el error y podremos haber leído todas las líneas anteriores
+correctamente.
+
+Estas lecturas, sin embargo, son muy simples y definen un comportamiento
+predeterminado para el procesador (el separador es la coma, el aglutinador de
+campos es la comilla doble, etc). Si nuestro archivo no cumple con este
+comportamiento entonces tendremos que definir cómo hacer el procesamiento
+primero:
+
+.. code-block:: java
+   :emphasize-lines: 2-7,11-14
+
+   Path ruta = Path.of(System.getProperty("user.home"), "caca.csv");
+   CSVParser parser = new CSVParserBuilder()
+      .withSeparator(',')           // El separador es la coma.
+      .withIgnoreQuotations(false)  // Queremos agrupar campos con comillas.
+      .withQuoteChar('"')          // Para agrupar se usan las comillas dobles.
+      .withEscapeChar('\\')         // La contrabarra escapa caracteres especiales.
+      .build();
+
+   try (
+      InputStream st = Files.newInputStream(ruta);
+      CSVReader r = new CSVReaderBuilder(new InputStreamReader(st))
+         .withSkipLines(0)    // No saltamos ninguna línea.
+         .withCSVParser(parser)
+         .build();
+   ) {
+      // readAll devuelve List<String[]>
+      for(String[] registro: r.readAll()) {
+         // Tratamos cada registro del archivo.
+      }
+   }
+   catch(IOException err) {
+      // Lo puede provocar la apertura del flujo o los lectores.
+   }
+   catch(CsvException err) {
+      // Se produce al interpretar el CSV (o sea, al ejecutar readAll.
+   }
+
+Escritura
+---------
+
+.. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`

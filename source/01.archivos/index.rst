@@ -1,8 +1,8 @@
 .. _ud1:
 .. _archivos:
 
-Manejo de archivos
-==================
+Tratamiento de archivos
+=======================
 La unidad está dedicada a dos tareas distintas, aunque complementarias:
 
 + La **gestión** de archivos locales de disco: listado de directorios,

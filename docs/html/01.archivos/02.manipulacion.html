@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '01.archivos/02.manipulacion';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Java funcional" href="../98.apendices/01.funcional.html" />
+    <link rel="next" title="2. Formatos de información" href="../02.formatos/index.html" />
     <link rel="prev" title="1.1. Gestión de archivos" href="01.gestion.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -156,9 +156,15 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">1. Manejo de archivos</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">1. Tratamiento de archivos</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.gestion.html">1.1. Gestión de archivos</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">1.2. Consulta y manipulación de contenidos</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02.formatos/index.html">2. Formatos de información</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/02.json.html">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
 </ul>
 </details></li>
 </ul>
@@ -436,25 +442,28 @@ hacer lo siguiente:</p>
 </pre></div>
 </div>
 <p>Finalmente, habría que cerrar el flujo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">st</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>Poniendo todo junto:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.bashrc&quot;</span><span class="p">);</span>
-<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span>
-<span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStramReader</span><span class="p">(</span><span class="n">st</span><span class="p">));</span>
-
-<span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">:</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">lines</span><span class="p">().</span><span class="na">toList</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Tratamiento de cada línea.</span>
-<span class="p">}</span>
-
-<span class="n">st</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">br</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">  </span><span class="c1">// El resto se cierra en cascada.</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">lines()</span></code> devuelve un flujo por líneas (<code class="docutils literal notranslate"><span class="pre">Stream&lt;String&gt;</span></code>)
 al que se puede aplicar <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream"><span class="std std-ref">estrategias de programación funcional</span></a>.</p>
+</div>
+<p>Poniendo todo junto y usando <a class="reference external" href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try para el tratamiento de errores y el autocierre</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.bashrc&quot;</span><span class="p">);</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span>
+<span class="w">   </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">))</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">:</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">lines</span><span class="p">().</span><span class="na">toList</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Tratamiento de cada línea.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
 </div>
 </section>
 <section id="escritura">
@@ -465,10 +474,13 @@ utilizar otro método de <a class="extlink-java-nio reference external" href="ht
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
-<span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span>
-<span class="n">st</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">contenido</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
 
-<span class="n">st</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">st</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">contenido</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>En este caso, se ha abierto el archivo para incluir en él la información
@@ -544,9 +556,9 @@ de datos.</p></li>
 <span class="p">);</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.bin&quot;</span><span class="p">);</span>
-<span class="n">ObjectOutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectOutputStream</span><span class="p">(</span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">));</span>
-<span class="n">st</span><span class="p">.</span><span class="na">writeObject</span><span class="p">(</span><span class="n">o</span><span class="p">);</span>
-<span class="n">st</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ObjectOutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectOutputStream</span><span class="p">(</span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">st</span><span class="p">.</span><span class="na">writeObject</span><span class="p">(</span><span class="n">o</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Y listo, tendremos en <code class="file docutils literal notranslate"><span class="pre">caca.bin</span></code> la lista de personas serializadas.</p>
@@ -554,13 +566,15 @@ de datos.</p></li>
 <section id="id2">
 <h3><span class="section-number">1.2.2.2. </span>Lectura<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <p>Para recuperar un objeto serializado, hay que hacer el proceso inverso:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectInputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">));</span>
-<span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">st</span><span class="p">.</span><span class="na">readObject</span><span class="p">();</span>
-<span class="n">st</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ObjectInputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">st</span><span class="p">.</span><span class="na">readObject</span><span class="p">();</span>
 
-<span class="c1">// Ahora podemos usar &quot;o&quot; como prefiramos:</span>
-
-<span class="p">((</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Persona</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">).</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
+<span class="w">   </span><span class="c1">// Ahora podemos usar &quot;o&quot; como prefiramos:</span>
+<span class="w">   </span><span class="p">((</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Persona</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">).</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -588,11 +602,11 @@ de datos.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="../98.apendices/01.funcional.html"
+       href="../02.formatos/index.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title">Java funcional</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Formatos de información</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -44,6 +44,8 @@ a. Dedicaremos el resto de la unidad a ver cómo acceder a archivos de texto sin
 #. El resto de las unidades se dedicarán al acceso a bases de datos de distinto
    tipo con distintas técnicas.
 
+.. _iotext:
+
 Archivos de texto
 =================
 En este tipo de archivos el acceso es :dfn:`secuencial`, de manera que no hay
@@ -51,6 +53,8 @@ modo de acceder a una parte concreta de la información: simplemente se abre el
 archivo y se genera un flujo. Para su manipulación (tanto lectura como
 escritura) basta con utilizar algunos de los métodos del ya mencionado
 :java-nio:`Files <Files>`:
+
+.. _iotext-r:
 
 Lectura
 -------
@@ -60,9 +64,9 @@ por:
 .. code-block:: java
 
    Path archivo = Path.of(System.getProperty("user.home"), ".bashrc");
-   InputStream st = Files.newInputStream(archivo); // Si no puede abrirse, puede generar un error.
+   InputStream st = Files.newInputStream(archivo); // Si no puede abrirse, genera un error.
 
-ya que genera un objeto ``InputStream``, que es el mismo que se obtiene al
+ya que genera un objeto ``InputStream``, que es lo mismo que se obtiene al
 extraer contenido de una |URL| mediante este código:
 
 .. code-block:: java
@@ -86,9 +90,9 @@ hacer lo siguiente:
    InputStreamReader sr =  new InputStreamReader(st, StandardCharsets.UTF_8);
    BufferedReader br = new BufferedReader(sr);
 
-.. note:: Al establecer el lector a partir del flujo  de entrada debemos indicar
-   qué codificación se usa. Si no se especifica, se sobreentiende que es UTF-8,
-   de modo que a partir de ahora, no volveremos a indicarlo:
+.. note:: Cuando establecemos el lector a partir del flujo de entrada, debemos
+   indicar qué codificación se usa. Si no se especifica, se sobreentiende que es
+   UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:
 
    .. code-block:: java
 
@@ -147,6 +151,8 @@ Poniendo todo junto y usando `try para el tratamiento de errores y el autocierre
       err.printStackTrace();
    }
 
+.. _iotext-w:
+
 Escritura
 ---------
 En este tipo de archivos, obviamente, tenemos que escribir texto, o sea,
@@ -160,7 +166,7 @@ utilizar otro método de :java-nio:`Files <Files>` para abrir un flujo de salida
    Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "caca.txt");
 
    try (OutputStream st = Files.newOutputStream(archivo)) {
-      st.write(contenido.getBytes());
+      st.write(contenido.getBytes(StandardCharset.UTF_8));
    }
    catch (IOException err) {
       err.printStackTrace();
@@ -176,6 +182,32 @@ opciones que modifiquen este comportamiento (véase
 
    // Se añade contenido, por lo que se respeta el que pudiera haber.
    OutputStream st = Files.newOutputStream(archivo, StandardOpenOption.APPEND);
+
+Por otro lado, para transformar la cadena en *bytes* es necesario especificar la
+codificación usada (:java-lang:`StandardCharsets.UTF-8 <StandardCharsets>`),
+aunque si no se indica se sobreentiende UTF-8, que es lo habitual en los
+sistemas modernos. Una alternativa, es utilizar un escritor de flujo:
+
+.. code-block:: java
+
+   String contenido = "Este es el texto del archivo";
+
+   Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "caca.txt");
+
+   try (
+      OutputStream st = Files.newOutputStream(archivo)
+      OutputStreamWriter sw = new OutputStreamWriter(st, StandardCharsets.UTF-8);
+   ) {
+      sw.write(contenido);  // Cuidado que no incluye salto de línea.
+   }
+   catch (IOException err) {
+      err.printStackTrace();
+   }
+
+De nuevo, si la codificación es UTF-8, podemos prescindir de indicarla
+explícitamente.
+
+.. _serialize:
 
 Serialización de objetos
 ========================

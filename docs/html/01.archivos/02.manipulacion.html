@@ -391,21 +391,21 @@ texto. No lo haremos lo propio con formatos de archivos binarios.</p></li>
 tipo con distintas técnicas.</p></li>
 </ol>
 <section id="archivos-de-texto">
-<h2><span class="section-number">1.2.1. </span>Archivos de texto<a class="headerlink" href="#archivos-de-texto" title="Link to this heading">#</a></h2>
+<span id="iotext"></span><h2><span class="section-number">1.2.1. </span>Archivos de texto<a class="headerlink" href="#archivos-de-texto" title="Link to this heading">#</a></h2>
 <p>En este tipo de archivos el acceso es <em class="dfn">secuencial</em>, de manera que no hay
 modo de acceder a una parte concreta de la información: simplemente se abre el
 archivo y se genera un flujo. Para su manipulación (tanto lectura como
 escritura) basta con utilizar algunos de los métodos del ya mencionado
 <a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a>:</p>
 <section id="lectura">
-<h3><span class="section-number">1.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
+<span id="iotext-r"></span><h3><span class="section-number">1.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
 <p>Hay varios métodos que pueden ayudarnos a leer un archivo, pero nos decantamos
 por:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.bashrc&quot;</span><span class="p">);</span>
-<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Si no puede abrirse, puede generar un error.</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Si no puede abrirse, genera un error.</span>
 </pre></div>
 </div>
-<p>ya que genera un objeto <code class="docutils literal notranslate"><span class="pre">InputStream</span></code>, que es el mismo que se obtiene al
+<p>ya que genera un objeto <code class="docutils literal notranslate"><span class="pre">InputStream</span></code>, que es lo mismo que se obtiene al
 extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> mediante este código:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">URL</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="s">&quot;https://etc...&quot;</span><span class="p">).</span><span class="na">toURL</span><span class="p">();</span>
 <span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="na">openStream</span><span class="p">();</span>
@@ -424,9 +424,9 @@ hacer lo siguiente:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Al establecer el lector a partir del flujo  de entrada debemos indicar
-qué codificación se usa. Si no se especifica, se sobreentiende que es UTF-8,
-de modo que a partir de ahora, no volveremos a indicarlo:</p>
+<p>Cuando establecemos el lector a partir del flujo de entrada, debemos
+indicar qué codificación se usa. Si no se especifica, se sobreentiende que es
+UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -476,7 +476,7 @@ al que se puede aplicar <a class="reference internal" href="../98.apendices/01.f
 </div>
 </section>
 <section id="escritura">
-<h3><span class="section-number">1.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
+<span id="iotext-w"></span><h3><span class="section-number">1.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
 <p>En este tipo de archivos, obviamente, tenemos que escribir texto, o sea,
 cadenas, pero no directamente caracteres, sino bytes. Por lo demás, basta con
 utilizar otro método de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a> para abrir un flujo de salida:</p>
@@ -485,7 +485,7 @@ utilizar otro método de <a class="extlink-java-nio reference external" href="ht
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">st</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">contenido</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+<span class="w">   </span><span class="n">st</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">contenido</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="n">StandardCharset</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">));</span>
 <span class="p">}</span>
 <span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
@@ -501,10 +501,31 @@ opciones que modifiquen este comportamiento (véase
 <span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">,</span><span class="w"> </span><span class="n">StandardOpenOption</span><span class="p">.</span><span class="na">APPEND</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>Por otro lado, para transformar la cadena en <em>bytes</em> es necesario especificar la
+codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
+aunque si no se indica se sobreentiende UTF-8, que es lo habitual en los
+sistemas modernos. Una alternativa, es utilizar un escritor de flujo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
+
+<span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">)</span>
+<span class="w">   </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF</span><span class="o">-</span><span class="mi">8</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">sw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">contenido</span><span class="p">);</span><span class="w">  </span><span class="c1">// Cuidado que no incluye salto de línea.</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>De nuevo, si la codificación es UTF-8, podemos prescindir de indicarla
+explícitamente.</p>
 </section>
 </section>
 <section id="serializacion-de-objetos">
-<h2><span class="section-number">1.2.2. </span>Serialización de objetos<a class="headerlink" href="#serializacion-de-objetos" title="Link to this heading">#</a></h2>
+<span id="serialize"></span><h2><span class="section-number">1.2.2. </span>Serialización de objetos<a class="headerlink" href="#serializacion-de-objetos" title="Link to this heading">#</a></h2>
 <p>El otro mecanismo de acceso a archivos es el <em class="dfn">aleatorio</em>, implementado
 mediante la clase <a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/RandomAccessFile.html">java.io.RandomAccessFile</a> y gracias al cual se puede acceder
 a bytes concretos y avanzar o retroceder dentro de él, tanto para leer como para

@@ -301,7 +301,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -317,6 +319,19 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-automatica">2.2.1. Conversión automática</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1. Lectura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.2. Escritura</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-manual">2.2.2. Conversión manual</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -328,6 +343,316 @@ document.write(`
                   
   <section id="json">
 <span id="id1"></span><h1><span class="section-number">2.2. </span><abbr title="JavaScript Object Notation">JSON</abbr><a class="headerlink" href="#json" title="Link to this heading">#</a></h1>
+<p><a class="reference external" href="https://sio2sio2.github.io/LM/01.intro/02a.serial.html#json" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">JSON</span></a> es otro formato de intercambios de datos ampliamente
+utilizado y, como en el caso de <abbr title="Comma-Separated Values">CSV</abbr>, necesitaremos una librería de terceros
+para la lectura y la escritura de este formato. De entre todas las alternativas
+utilizaremos <a class="reference external" href="https://github.com/google/gson">la librería GSON</a>, desarrollada
+por <em>Google</em>.</p>
+<p>Al utilizar esta librería tenemos dos estrategias para leer y escribir <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
+<ul class="simple">
+<li><p>Procesar el archivo y realizar la conversión manualmente a clases de Java.</p></li>
+<li><p>Realizar la conversión a clases automáticamente.</p></li>
+</ul>
+<p>Veamos ambas, pero antes tomemos un archivo <abbr title="JavaScript Object Notation">JSON</abbr> para ilustrar los ejemplos:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Federico Arias Torres&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Inglés&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Matías Sánchez Aguado&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">12</span>
+         <span class="p">},</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;María Bonet Periáñez&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">12</span>
+         <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">},</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Gertrudis Avelladena Pérez&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Francés&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Marcela Venegas Pancorbo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">13</span>
+         <span class="p">},</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Feliciano Martín Suárez&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">13</span>
+         <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<section id="conversion-automatica">
+<h2><span class="section-number">2.2.1. </span>Conversión automática<a class="headerlink" href="#conversion-automatica" title="Link to this heading">#</a></h2>
+<p>Para ello necesitamos que las clases con las que vamos a convertir los objetos
+codificados en <abbr title="JavaScript Object Notation">JSON</abbr> sigan el estándar <a class="reference external" href="https://es.wikipedia.org/wiki/JavaBean">JavaBean</a>.</p>
+<p>Es obvio que en el ejemplo anterior tenemos tres objetos (<cite>Grupo</cite>, <cite>Alumno</cite> y
+<cite>Tutor</cite>) así que definámoslos, de modo que sus atributos se ajusten a lo que
+recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Tutor</span><span class="o">.</span><span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">Tutor</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">especialidad</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">String</span> <span class="n">especialidad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+        <span class="n">setEspecialidad</span><span class="p">(</span><span class="n">especialidad</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getEspecialidad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">especialidad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setEspecialidad</span><span class="p">(</span><span class="n">String</span> <span class="n">especialidad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">especialidad</span> <span class="o">=</span> <span class="n">especialidad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Alumno</span><span class="o">.</span><span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="n">private</span> <span class="nb">int</span> <span class="n">edad</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="nb">int</span> <span class="n">edad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+        <span class="n">setEdad</span><span class="p">(</span><span class="n">edad</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="nb">int</span> <span class="n">getEdad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">edad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setEdad</span><span class="p">(</span><span class="nb">int</span> <span class="n">edad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">edad</span> <span class="o">=</span> <span class="n">edad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">edad</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Grupo</span><span class="o">.</span><span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">Grupo</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">short</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">etapa</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">char</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">Tutor</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Grupo</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Grupo</span><span class="p">(</span><span class="n">short</span> <span class="n">nivel</span><span class="p">,</span> <span class="n">String</span> <span class="n">etapa</span><span class="p">,</span> <span class="n">char</span> <span class="n">grupo</span><span class="p">,</span> <span class="n">Tutor</span> <span class="n">tutor</span><span class="p">,</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNivel</span><span class="p">(</span><span class="n">nivel</span><span class="p">);</span>
+        <span class="n">setEtapa</span><span class="p">(</span><span class="n">etapa</span><span class="p">);</span>
+        <span class="n">setGrupo</span><span class="p">(</span><span class="n">grupo</span><span class="p">);</span>
+        <span class="n">setTutor</span><span class="p">(</span><span class="n">tutor</span><span class="p">);</span>
+        <span class="n">setMiembros</span><span class="p">(</span><span class="n">miembros</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">short</span> <span class="n">getNivel</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNivel</span><span class="p">(</span><span class="n">short</span> <span class="n">nivel</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nivel</span> <span class="o">=</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getEtapa</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">etapa</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setEtapa</span><span class="p">(</span><span class="n">String</span> <span class="n">etapa</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">etapa</span> <span class="o">=</span>  <span class="n">etapa</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">char</span> <span class="n">getGrupo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setGrupo</span><span class="p">(</span><span class="n">char</span> <span class="n">grupo</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">grupo</span> <span class="o">=</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span> <span class="n">getTutor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setTutor</span><span class="p">(</span><span class="n">Tutor</span> <span class="n">tutor</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">tutor</span> <span class="o">=</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">getMiembros</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">miembros</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setMiembros</span><span class="p">(</span><span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">miembros</span> <span class="o">=</span> <span class="n">miembros</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">º</span><span class="si">%s</span><span class="s2">-</span><span class="si">%c</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nivel</span><span class="p">,</span> <span class="n">etapa</span><span class="p">,</span> <span class="n">grupo</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">(),</span> <span class="n">tutor</span><span class="p">,</span> <span class="n">Arrays</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="n">miembros</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
+se observan en el <abbr title="JavaScript Object Notation">JSON</abbr> y cumplen los requisitos para ser un <em>JavaBean</em>:</p>
+<ul class="simple">
+<li><p>Disponen de un constructor sin argumentos.</p></li>
+<li><p>Es serializable.</p></li>
+<li><p>Sus atributos son privados.</p></li>
+<li><p>Dispone de <em>getters</em> y <em>setters</em> con la convención de nombres apropiada.</p></li>
+</ul>
+<section id="lectura">
+<h3><span class="section-number">2.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
+<p>La lectura es sumamente sencilla  y se basa en crear un objeto <a class="reference external" href="https://javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/Gson.html">GSON</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
+<span class="hll"><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Gson</span><span class="p">();</span>
+</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
+<span class="w">   </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gson</span><span class="p">.</span><span class="na">fromJson</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</span><span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Grupo</span><span class="w"> </span><span class="n">g</span><span class="p">:</span><span class="w"> </span><span class="n">grupos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Obsérvese que, dado que el archivo es una secuencia de objetos <cite>Grupo</cite> al usar
+el método <code class="docutils literal notranslate"><span class="pre">fromJson</span></code>, indicamos que la traducción se haga como
+<code class="code docutils literal notranslate"><span class="pre">Grupo[].class</span></code>. Si quisiéramos que <cite>grupos</cite> fuera una lista y no un
+array, entonces tendríamos que complicar un poco el código:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Type</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TypeToken</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{}.</span><span class="na">getType</span><span class="p">();</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gson</span><span class="p">.</span><span class="na">fromJson</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En cambio, no tenemos que preocuparnos por el atributo
+<cite>Grupo.miembros</cite>: si en vez de haberlo definido como un array lo hubiéramos
+definido como un <code class="docutils literal notranslate"><span class="pre">ArrayList</span></code>, todo nuestro código sería válido.</p>
+</div>
+</section>
+<section id="escritura">
+<h3><span class="section-number">2.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
+<p>La escritura también es bastante sencilla:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
+<span class="hll"><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Gson</span><span class="p">();</span>
+</span>
+<span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span>
+<span class="w">        </span><span class="p">(</span><span class="kt">short</span><span class="p">)</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&quot;ESO&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sc">&#39;B&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Tutor</span><span class="p">(</span><span class="s">&quot;Pepe M.J.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Matemáticas&quot;</span><span class="p">),</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Pablito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Juanito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">)}</span>
+<span class="w">    </span><span class="p">),</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span>
+<span class="w">        </span><span class="p">(</span><span class="kt">short</span><span class="p">)</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&quot;ESO&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sc">&#39;C&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Tutor</span><span class="p">(</span><span class="s">&quot;Pedro J.M.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Lengua&quot;</span><span class="p">),</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Lola&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Manolito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">)}</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">};</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">    </span><span class="n">gson</span><span class="p">.</span><span class="na">toJson</span><span class="p">(</span><span class="n">grupo</span><span class="p">,</span><span class="w"> </span><span class="n">sw</span><span class="p">);</span>
+</span><span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>En este caso, se escribe el archivo <cite>grupos.json</cite> con todos los campos
+apelotonados. Si queremos alterar este modo predeterminado podemos construir un
+objeto <code class="docutils literal notranslate"><span class="pre">Gson</span></code> utilizando <a class="reference external" href="https://javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html">GsonBuilder</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GsonBuilder</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setPrettyPrinting</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setDateFormat</span><span class="p">(</span><span class="n">DateFormat</span><span class="p">.</span><span class="na">SHORT</span><span class="p">,</span><span class="w"> </span><span class="n">DateFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span><span class="w"> </span><span class="c1">// Definimos cómo queremos almacenar fecha y hora.</span>
+<span class="w">      </span><span class="p">.</span><span class="na">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Hemos aprovechado para indicar cómo traducir los objetos de tiempo a
+una cadena en el archivo <abbr title="JavaScript Object Notation">JSON</abbr>. Para conocer más sobre estos formatos
+eche un vistazo al <a class="reference external" href="https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html">tutorial sobre DateFormat</a>.</p>
+</div>
+<p>También puede generarse una cadena en vez de escribir directamente en un
+archivo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gson</span><span class="p">.</span><span class="na">toJson</span><span class="p">(</span><span class="n">grupo</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Y usar posteriormente esta cadena para lo que nos interese (p.e. <a class="reference internal" href="../01.archivos/02.manipulacion.html#iotext-w"><span class="std std-ref">guardarla en un
+archivo</span></a>).</p>
+</section>
+</section>
+<section id="conversion-manual">
+<h2><span class="section-number">2.2.2. </span>Conversión manual<a class="headerlink" href="#conversion-manual" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -365,6 +690,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-automatica">2.2.1. Conversión automática</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1. Lectura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.2. Escritura</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-manual">2.2.2. Conversión manual</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

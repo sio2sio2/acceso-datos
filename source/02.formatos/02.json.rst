@@ -2,11 +2,159 @@
 
 |JSON|
 ******
+:ref:`JSON <lm:json>` es otro formato de intercambios de datos ampliamente
+utilizado y, como en el caso de |CSV|, necesitaremos una librería de terceros
+para la lectura y la escritura de este formato. De entre todas las alternativas
+utilizaremos `la librería GSON <https://github.com/google/gson>`_, desarrollada
+por *Google*.
+
+Al utilizar esta librería tenemos dos estrategias para leer y escribir |JSON|:
+
+* Procesar el archivo y realizar la conversión manualmente a clases de Java.
+* Realizar la conversión a clases automáticamente.
+
+Veamos ambas, pero antes tomemos un archivo |JSON| para ilustrar los ejemplos:
+
+.. literalinclude:: files/grupos.json
+
+Conversión automática
+=====================
+Para ello necesitamos que las clases con las que vamos a convertir los objetos
+codificados en |JSON| sigan el estándar `JavaBean
+<https://es.wikipedia.org/wiki/JavaBean>`_.
+
+Es obvio que en el ejemplo anterior tenemos tres objetos (`Grupo`, `Alumno` y
+`Tutor`) así que definámoslos, de modo que sus atributos se ajusten a lo que
+recoge el |JSON|:
+
+.. literalinclude:: files/Tutor.java
+
+.. literalinclude:: files/Alumno.java
+
+.. literalinclude:: files/Grupo.java
+
+No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
+se observan en el |JSON| y cumplen los requisitos para ser un *JavaBean*:
+
+.. rst-class:: simple
+
+* Disponen de un constructor sin argumentos.
+* Es serializable.
+* Sus atributos son privados.
+* Dispone de *getters* y *setters* con la convención de nombres apropiada.
+
+Lectura
+-------
+La lectura es sumamente sencilla  y se basa en crear un objeto `GSON
+<https://javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/Gson.html>`_:
+
+.. code-block:: java
+   :emphasize-lines: 2,8
+
+   Path ruta = Path.of(System.getProperty("user.home"), "grupos.json");
+   Gson gson = new Gson();
+
+   try (
+      InputStream st = Files.newInputStream(ruta);
+      InputStreamReader sr = new InputStreamReader(st);
+   ) {
+      Grupo[] grupos = gson.fromJson(sr, Grupo[].class);
+      for(Grupo g: grupos) {
+         System.out.println(g);
+      }
+   }
+   catch(IOException err) {
+      err.printStackTrace();
+   }
+
+Obsérvese que, dado que el archivo es una secuencia de objetos `Grupo` al usar
+el método ``fromJson``, indicamos que la traducción se haga como
+:code:`Grupo[].class`. Si quisiéramos que `grupos` fuera una lista y no un
+array, entonces tendríamos que complicar un poco el código:
+
+.. code-block:: java
+
+   Type GrupoLista = new TypeToken<ArrayList<Grupo>>() {}.getType();
+   ArrayList<Grupo> grupos = gson.fromJson(sr, GrupoLista);
+
+.. note:: En cambio, no tenemos que preocuparnos por el atributo
+   `Grupo.miembros`: si en vez de haberlo definido como un array lo hubiéramos
+   definido como un ``ArrayList``, todo nuestro código sería válido.
+
+Escritura
+---------
+La escritura también es bastante sencilla:
+
+.. code-block:: java
+   :emphasize-lines: 2,25
+
+   Path ruta = Path.of(System.getProperty("user.home"), "grupos.json");
+   Gson gson = new Gson();
+
+   Grupo[] grupo = {
+       new Grupo(
+           (short) 1,
+           "ESO",
+           'B',
+           new Tutor("Pepe M.J.", "Matemáticas"),
+           new Alumno[] {new Alumno("Pablito", 12), new Alumno("Juanito", 13)}
+       ),
+       new Grupo(
+           (short) 2,
+           "ESO",
+           'C',
+           new Tutor("Pedro J.M.", "Lengua"),
+           new Alumno[] {new Alumno("Lola", 13), new Alumno("Manolito", 13)}
+       )
+   };
+
+   try (
+       OutputStream st = Files.newOutputStream(ruta);
+       OutputStreamWriter sw = new OutputStreamWriter(st);
+   ) {
+       gson.toJson(grupo, sw);            
+   }
+   catch(IOException err) {
+       err.printStackTrace();
+   }
+
+En este caso, se escribe el archivo `grupos.json` con todos los campos
+apelotonados. Si queremos alterar este modo predeterminado podemos construir un
+objeto ``Gson`` utilizando `GsonBuilder
+<https://javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html>`_:
+
+.. code-block:: java
+
+   Gson gson = new GsonBuilder()
+         .setPrettyPrinting()
+         .setDateFormat(DateFormat.SHORT, DateFormat.DEFAULT) // Definimos cómo queremos almacenar fecha y hora.
+         .create()
+
+.. note:: Hemos aprovechado para indicar cómo traducir los objetos de tiempo a
+   una cadena en el archivo |JSON|. Para conocer más sobre estos formatos
+   eche un vistazo al `tutorial sobre DateFormat
+   <https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html>`_.
+
+También puede generarse una cadena en vez de escribir directamente en un
+archivo:
+
+.. code-block:: java
+
+   String contenido = gson.toJson(grupo);
+
+Y usar posteriormente esta cadena para lo que nos interese (p.e. :ref:`guardarla en un
+archivo <iotext-w>`).
+
+Conversión manual
+=================
+
 .. Enlaces:
    https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
 
    https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/package-summary.html
    https://jarroba.com/gson-json-java-ejemplos/
+   https://mkyong.com/java/how-do-convert-java-object-to-from-json-format-gson-api/
 
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`

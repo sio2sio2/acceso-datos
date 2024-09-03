@@ -134,6 +134,15 @@ objeto ``Gson`` utilizando `GsonBuilder
    una cadena en el archivo |JSON|. Para conocer más sobre estos formatos
    eche un vistazo al `tutorial sobre DateFormat
    <https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html>`_.
+   También podríamos optar por definir más explicatamente el formato según lo
+   expuesto para :java-text:`SimpleDateFormat <SimpleDateFormat>`:
+
+   .. code-block:: java
+
+      Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .setDateFormat("yyyy-MM-dd") // Por ejemplo, 2024-09-03
+            .create()
 
 También puede generarse una cadena en vez de escribir directamente en un
 archivo:
@@ -145,14 +154,95 @@ archivo:
 Y usar posteriormente esta cadena para lo que nos interese (p.e. :ref:`guardarla en un
 archivo <iotext-w>`).
 
+Tipos no primitivos
+-------------------
+En el ejemplo anterior, los valores de todos los campos eran tipos primitivos de
+|JSON| y, en consecuencia, su traducción al modelo de objetos de Java no
+revestía problemas. Supongamos, sin embargo, el mismo ejemplo, pero con una
+pequeña diferencia: de los alumnos no se expresa la edad, sino su fecha de
+nacimiento:
+
+.. literalinclude:: files/grupos-nacimiento.json
+   :emphasize-lines: 13,17,32,36
+
+Como el estándar |JSON| no tiene definido un campo específico para las fechas,
+las hemos expresados, simplemente, con una cadena con un formato apropiado y de
+este modo aparecen en el archivo.
+
+.. note:: La librería ya proporciona una solución predefinida para el caso
+   particular del tipo `Date` y que se citó un poco más arriba:
+
+   .. code-block:: java
+      :emphasize-lines: 3
+
+      Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .setDateFormat("yyyy-MM-dd") // Por ejemplo, 2024-09-03
+            .create()
+
+   Con crear así el objeto ``GSON`` y que el atributo ``Alumno.nacimiento`` sea
+   de tipo `Date` ya se estará definiendo cómo es la tradución entre el objeto y
+   el campo |JSON| (una cadena de la forma indicada). Pero esta traducción sólo
+   es posible para fechas, y no para otro tipo de objetos para los cuales
+   necesitaremos definir nosotros la traducción. Como queremos ilustrar cómo se
+   hace esta traducción, prescindimos de la ayuda de ``setDateFormat``.
+
+Para lograr la traducción entre una cadena con formato `yyyy-MM-dd` y el tipo
+`Date` necesitamos definir así al alumno:
+
+.. literalinclude:: files/Alumno-adapter.java
+   :emphasize-lines: 4,5,8,13,14,16,20,37-39,41-43
+
+¿Qué hemos hecho? Básicamente:
+
+* La trivialidad de cambiar todo lo pertinente para que el campo entero `edad`
+  pase a ser `nacimiento` de tipo `Date`
+* Hemos, no obstante, añadido un segundo *setter* a `nacimiento` para permitir
+  que se pueda definir usando una cadena en vez de un objeto `Date`. Esto, en
+  realidad, no tiene nada que ver con la traducción y se hace para poder definir
+  manualmente en la aplicación alumnos de esta forma:
+
+  .. code-block:: java
+
+     Alumno lola = new Alumno("Lola", "2011-08-11");
+
+* Declaramos que para el campo `nacimiento` usaremos un adaptador:
+
+  .. code-block:: java
+
+     @JsonAdapter(YyyyMMddDateTypeAdapter.class)
+     private Date nacimiento;
+
+Y ahora hay que definir esa clase que define cómo es la traducción. Lo más
+limpio, por si se quiere soportar fácilmente diferentes formatos para la fecha
+es crear una clase abstracta:
+
+.. literalinclude:: files/AbstractDateTypeAdapter.java
+
+Y una clase que concretamente define cuál es el formato de fecha:
+
+.. literalinclude:: files/YyyyMMddDateTypeAdapter.java
+   
+La parte molar de la traducción está en la clase abstracta:
+
+* El método ``out`` es el que se encarga de tomar el atributo del objeto y
+  convertirlo en el valor |JSON|: por eso uno de sus argumentos un tipo
+  `Date`.
+
+* El método ``in`` es el que hace la traducción inversa: de la cadena |JSON| se
+  obtiene el atributo de tipo `Date`
+
 Conversión manual
 =================
+
+.. todo:: Tómese como referencia inicial `GSON en Java con ejemplos
+   <https://jarroba.com/gson-json-java-ejemplos/>`_..
 
 .. Enlaces:
    https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
 
    https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/package-summary.html
-   https://jarroba.com/gson-json-java-ejemplos/
+   
    https://mkyong.com/java/how-do-convert-java-object-to-from-json-format-gson-api/
 
 

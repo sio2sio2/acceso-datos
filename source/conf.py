@@ -36,6 +36,7 @@ html_logo = '_static/logo.png'
 
 extlinks = {
     'java-util': ('https://docs.oracle.com/javase/8/docs/api/java/util/%s.html', 'java.util.%s'),
+    'java-text': ('https://docs.oracle.com/javase/8/docs/api/java/text/%s.html', 'java.text.%s'),
     'java-io': ('https://docs.oracle.com/javase/8/docs/api/java/io/%s.html', 'java.io.%s'),
     'java-nio': ('https://docs.oracle.com/javase/8/docs/api/java/nio/file/%s.html', 'java.nio.file.%s'),
     'java-lang': ('https://docs.oracle.com/javase/8/docs/api/java/lang/%s.html', 'java.lang.%s'),
@@ -48,3 +49,5 @@ intersphinx_mapping = {
     'linux': ('https://sio2sio2.github.io/doc-linux/', None),
     'lm': ('https://sio2sio2.github.io/LM/', None),
 }
+
+todo_include_todos = True

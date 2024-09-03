@@ -327,6 +327,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-automatica">2.2.1. Conversión automática</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1. Lectura</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.2. Escritura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.1.3. Tipos no primitivos</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-manual">2.2.2. Conversión manual</a></li>
@@ -639,7 +640,15 @@ objeto <code class="docutils literal notranslate"><span class="pre">Gson</span><
 <p class="admonition-title">Nota</p>
 <p>Hemos aprovechado para indicar cómo traducir los objetos de tiempo a
 una cadena en el archivo <abbr title="JavaScript Object Notation">JSON</abbr>. Para conocer más sobre estos formatos
-eche un vistazo al <a class="reference external" href="https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html">tutorial sobre DateFormat</a>.</p>
+eche un vistazo al <a class="reference external" href="https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html">tutorial sobre DateFormat</a>.
+También podríamos optar por definir más explicatamente el formato según lo
+expuesto para <a class="extlink-java-text reference external" href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GsonBuilder</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setPrettyPrinting</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Por ejemplo, 2024-09-03</span>
+<span class="w">      </span><span class="p">.</span><span class="na">create</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 <p>También puede generarse una cadena en vez de escribir directamente en un
 archivo:</p>
@@ -649,9 +658,208 @@ archivo:</p>
 <p>Y usar posteriormente esta cadena para lo que nos interese (p.e. <a class="reference internal" href="../01.archivos/02.manipulacion.html#iotext-w"><span class="std std-ref">guardarla en un
 archivo</span></a>).</p>
 </section>
+<section id="tipos-no-primitivos">
+<h3><span class="section-number">2.2.1.3. </span>Tipos no primitivos<a class="headerlink" href="#tipos-no-primitivos" title="Link to this heading">#</a></h3>
+<p>En el ejemplo anterior, los valores de todos los campos eran tipos primitivos de
+<abbr title="JavaScript Object Notation">JSON</abbr> y, en consecuencia, su traducción al modelo de objetos de Java no
+revestía problemas. Supongamos, sin embargo, el mismo ejemplo, pero con una
+pequeña diferencia: de los alumnos no se expresa la edad, sino su fecha de
+nacimiento:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Federico Arias Torres&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Inglés&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Matías Sánchez Aguado&quot;</span><span class="p">,</span>
+<span class="hll">            <span class="s2">&quot;nacimiento&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-01-02&quot;</span>
+</span>         <span class="p">},</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;María Bonet Periáñez&quot;</span><span class="p">,</span>
+<span class="hll">            <span class="s2">&quot;nacimiento&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-02-21&quot;</span>
+</span>         <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">},</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Gertrudis Avelladena Pérez&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Francés&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Marcela Venegas Pancorbo&quot;</span><span class="p">,</span>
+<span class="hll">            <span class="s2">&quot;nacimiento&quot;</span><span class="p">:</span> <span class="s2">&quot;2011-08-09&quot;</span>
+</span>         <span class="p">},</span>
+         <span class="p">{</span>
+            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Feliciano Martín Suárez&quot;</span><span class="p">,</span>
+<span class="hll">            <span class="s2">&quot;nacimiento&quot;</span><span class="p">:</span> <span class="s2">&quot;2011-09-15&quot;</span>
+</span>         <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Como el estándar <abbr title="JavaScript Object Notation">JSON</abbr> no tiene definido un campo específico para las fechas,
+las hemos expresados, simplemente, con una cadena con un formato apropiado y de
+este modo aparecen en el archivo.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La librería ya proporciona una solución predefinida para el caso
+particular del tipo <cite>Date</cite> y que se citó un poco más arriba:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GsonBuilder</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setPrettyPrinting</span><span class="p">()</span>
+<span class="hll"><span class="w">      </span><span class="p">.</span><span class="na">setDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Por ejemplo, 2024-09-03</span>
+</span><span class="w">      </span><span class="p">.</span><span class="na">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Con crear así el objeto <code class="docutils literal notranslate"><span class="pre">GSON</span></code> y que el atributo <code class="docutils literal notranslate"><span class="pre">Alumno.nacimiento</span></code> sea
+de tipo <cite>Date</cite> ya se estará definiendo cómo es la tradución entre el objeto y
+el campo <abbr title="JavaScript Object Notation">JSON</abbr> (una cadena de la forma indicada). Pero esta traducción sólo
+es posible para fechas, y no para otro tipo de objetos para los cuales
+necesitaremos definir nosotros la traducción. Como queremos ilustrar cómo se
+hace esta traducción, prescindimos de la ayuda de <code class="docutils literal notranslate"><span class="pre">setDateFormat</span></code>.</p>
+</div>
+<p>Para lograr la traducción entre una cadena con formato <cite>yyyy-MM-dd</cite> y el tipo
+<cite>Date</cite> necesitamos definir así al alumno:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Alumno</span><span class="o">.</span><span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+<span class="hll"><span class="kn">import</span> <span class="nn">java.text.ParseException</span><span class="p">;</span>
+</span><span class="hll"><span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
+</span><span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
+
+<span class="hll"><span class="kn">import</span> <span class="nn">com.google.gson.annotations.JsonAdapter</span><span class="p">;</span>
+</span>
+<span class="n">public</span> <span class="k">class</span> <span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+    
+<span class="hll">    <span class="nd">@JsonAdapter</span><span class="p">(</span><span class="n">YyyyMMddDateTypeAdapter</span><span class="o">.</span><span class="n">class</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">private</span> <span class="n">Date</span> <span class="n">nacimiento</span><span class="p">;</span>
+</span>
+<span class="hll">    <span class="n">private</span> <span class="n">static</span> <span class="n">SimpleDateFormat</span> <span class="n">df</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s2">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
+</span>
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="hll">    <span class="n">public</span> <span class="n">Alumno</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
+</span>        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+        <span class="n">setNacimiento</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">Date</span> <span class="n">getNacimiento</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nacimiento</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="hll">    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">Date</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">nacimiento</span><span class="p">;</span>
+</span><span class="hll">    <span class="p">}</span>
+</span>
+<span class="hll">    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
+</span><span class="hll">        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
+</span><span class="hll">    <span class="p">}</span>
+</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>¿Qué hemos hecho? Básicamente:</p>
+<ul>
+<li><p>La trivialidad de cambiar todo lo pertinente para que el campo entero <cite>edad</cite>
+pase a ser <cite>nacimiento</cite> de tipo <cite>Date</cite></p></li>
+<li><p>Hemos, no obstante, añadido un segundo <em>setter</em> a <cite>nacimiento</cite> para permitir
+que se pueda definir usando una cadena en vez de un objeto <cite>Date</cite>. Esto, en
+realidad, no tiene nada que ver con la traducción y se hace para poder definir
+manualmente en la aplicación alumnos de esta forma:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Alumno</span><span class="w"> </span><span class="n">lola</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Lola&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;2011-08-11&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>Declaramos que para el campo <cite>nacimiento</cite> usaremos un adaptador:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonAdapter</span><span class="p">(</span><span class="n">YyyyMMddDateTypeAdapter</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Y ahora hay que definir esa clase que define cómo es la traducción. Lo más
+limpio, por si se quiere soportar fácilmente diferentes formatos para la fecha
+es crear una clase abstracta:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.text.DateFormat</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.google.gson.TypeAdapter</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.google.gson.stream.JsonReader</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.google.gson.stream.JsonWriter</span><span class="p">;</span>
+
+<span class="n">abstract</span> <span class="k">class</span> <span class="nc">AbstractDateTypeAdapter</span> <span class="n">extends</span> <span class="n">TypeAdapter</span><span class="o">&lt;</span><span class="n">Date</span><span class="o">&gt;</span> <span class="p">{</span>
+
+    <span class="n">protected</span> <span class="n">abstract</span> <span class="n">DateFormat</span> <span class="n">getDateFormat</span><span class="p">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s2">&quot;resource&quot;</span><span class="p">)</span>
+    <span class="n">public</span> <span class="n">final</span> <span class="n">void</span> <span class="n">write</span><span class="p">(</span><span class="n">final</span> <span class="n">JsonWriter</span> <span class="n">out</span><span class="p">,</span> <span class="n">final</span> <span class="n">Date</span> <span class="n">value</span><span class="p">)</span> <span class="n">throws</span> <span class="n">IOException</span> <span class="p">{</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">getDateFormat</span><span class="p">()</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>  <span class="o">//</span> <span class="n">Traduce</span> <span class="n">Date</span> <span class="n">a</span> <span class="n">una</span> <span class="n">cadena</span> <span class="s2">&quot;yyyy-MM-dd&quot;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">final</span> <span class="n">Date</span> <span class="n">read</span><span class="p">(</span><span class="n">final</span> <span class="n">JsonReader</span> <span class="ow">in</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">getDateFormat</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="ow">in</span><span class="o">.</span><span class="n">nextString</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="ne">Exception</span> <span class="n">err</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">null</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Y una clase que concretamente define cuál es el formato de fecha:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.text.DateFormat</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">YyyyMMddDateTypeAdapter</span> <span class="n">extends</span> <span class="n">AbstractDateTypeAdapter</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">YyyyMMddDateTypeAdapter</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">protected</span> <span class="n">DateFormat</span> <span class="n">getDateFormat</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">new</span> <span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s2">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>La parte molar de la traducción está en la clase abstracta:</p>
+<ul class="simple">
+<li><p>El método <code class="docutils literal notranslate"><span class="pre">out</span></code> es el que se encarga de tomar el atributo del objeto y
+convertirlo en el valor <abbr title="JavaScript Object Notation">JSON</abbr>: por eso uno de sus argumentos un tipo
+<cite>Date</cite>.</p></li>
+<li><p>El método <code class="docutils literal notranslate"><span class="pre">in</span></code> es el que hace la traducción inversa: de la cadena <abbr title="JavaScript Object Notation">JSON</abbr> se
+obtiene el atributo de tipo <cite>Date</cite></p></li>
+</ul>
+</section>
 </section>
 <section id="conversion-manual">
 <h2><span class="section-number">2.2.2. </span>Conversión manual<a class="headerlink" href="#conversion-manual" title="Link to this heading">#</a></h2>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Por hacer</p>
+<p>Tómese como referencia inicial <a class="reference external" href="https://jarroba.com/gson-json-java-ejemplos/">GSON en Java con ejemplos</a>..</p>
+</div>
 </section>
 </section>
 
@@ -703,6 +911,7 @@ archivo</span></a>).</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-automatica">2.2.1. Conversión automática</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1. Lectura</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.2. Escritura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.1.3. Tipos no primitivos</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-manual">2.2.2. Conversión manual</a></li>

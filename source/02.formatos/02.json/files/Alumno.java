@@ -29,6 +29,7 @@ public class Alumno implements Serializable {
         this.edad = edad;
     }
 
+    @Override
     public String toString() {
         return String.format("%s: %d", nombre, edad);
     }

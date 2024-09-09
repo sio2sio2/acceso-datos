@@ -90,6 +90,14 @@ hacer lo siguiente:
    InputStreamReader sr =  new InputStreamReader(st, StandardCharsets.UTF_8);
    BufferedReader br = new BufferedReader(sr);
 
+.. note:: En las siguientes unidades, para el tratamiento de archivos en
+   distintos formatos de intercambio de información conocidos intentaramos
+   utilizar un método que nos permita convertir la entrada en un objeto
+   `InputStream`, aunque pueda existir algún otro menos verborreico que permita
+   utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
+   entrada no es un archivo sino el teclado o una |URL| externa, sabremos cómo
+   tratarlo.
+
 .. note:: Cuando establecemos el lector a partir del flujo de entrada, debemos
    indicar qué codificación se usa. Si no se especifica, se sobreentiende que es
    UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:

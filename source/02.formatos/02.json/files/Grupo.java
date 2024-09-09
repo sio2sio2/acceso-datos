@@ -64,6 +64,7 @@ public class Grupo implements Serializable {
         return String.format("%dº%s-%c", nivel, etapa, grupo);
     }
 
+    @Override
     public String toString() {
         return String.format("%s (%s): %s", nombre(), tutor, Arrays.toString(miembros));
     }

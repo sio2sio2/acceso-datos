@@ -29,6 +29,7 @@ public class Tutor implements Serializable {
         this.especialidad = especialidad;
     }
 
+    @Override
     public String toString() {
         return nombre;
     }

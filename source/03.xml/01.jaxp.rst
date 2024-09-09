@@ -1,0 +1,41 @@
+.. _jaxp:
+
+|JAXP|
+******
+La librería viene incluida en el |JDK| y tiene soporte para :ref:`XPath 1.0
+<lm:xpath>` y :ref:`XSLT 1.0 <lm:xslt>`. Para :ref:`XQuery <xquery>` no tiene
+soporte alguno.
+
+.. https://www.developer.com/java/java-api-for-xml-processing-jaxp-getting-started/
+   https://studytrails.com/2016/09/12/java-api-for-xml-validation/
+   https://stackoverflow.com/questions/37114546/disable-dtd-validation
+
+Lectura
+=======
+Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
+
+.. code-block:: java
+
+   Path ruta = Path.of(System.getProperty("user.home"), "profesores.xml");
+   DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+   // La siguiente línea puede provocar un ParseConfiguracionException
+   DocumentBuilder builder = factory.newDocumentBuilder();
+
+   try (InputStream st = Files.newInputStream(ruta)) {
+      // La línea posterior también puede generar una excepción.
+      Document xml = builder.parse(st);
+      // Accedemos a la información del documento a través de su DOM.
+      // ...
+   }
+
+Una vez tenemos disponible el objeto `Document` podemos acceder a los nodos de
+distintas formas:
+
+.. code-block:: java
+
+   Element root = xml.getDocumentElement(); // Obtiene el nodo raíz.
+
+.. |JAXP| replace:: :abbr:`JAXP (Java API for XML Processing)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |DOM| replace:: :abbr:`DOM (Document Object Model)`
+.. |JDK| replace:: :abbr:`JDK (Java Development Kit)`

@@ -24,11 +24,7 @@ Unidades del curso
 
    [0-8]*/index
 
-Apéndices
----------
-
 .. toctree::
-   :maxdepth: 1
-   :glob:
+   :maxdepth: 2
 
-   98.apendices/[0-9]*
+   98.apendices/index

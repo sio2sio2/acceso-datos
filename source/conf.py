@@ -32,7 +32,7 @@ language = 'es'
 
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
-html_logo = '_static/logo.png'
+html_logo = '_static/logo.jpg'
 
 extlinks = {
     'java-util': ('https://docs.oracle.com/javase/8/docs/api/java/util/%s.html', 'java.util.%s'),
@@ -49,5 +49,8 @@ intersphinx_mapping = {
     'linux': ('https://sio2sio2.github.io/doc-linux/', None),
     'lm': ('https://sio2sio2.github.io/LM/', None),
 }
+
+#intersphinx_disabled_reftypes = ["std:doc"]
+
 
 todo_include_todos = True

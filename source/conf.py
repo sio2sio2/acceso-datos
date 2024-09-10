@@ -19,7 +19,9 @@ release = 'rolling'
 extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.todo'
+    'sphinx.ext.todo',
+    'sphinx_copybutton',
+    'sphinx_togglebutton'
 ]
 
 templates_path = ['_templates']
@@ -54,3 +56,7 @@ intersphinx_mapping = {
 
 
 todo_include_todos = True
+
+# Eliminamos los prompts de la copia
+copybutton_prompt_text = r"\$ |>>> |jshell> "
+copybutton_prompt_is_regexp = True

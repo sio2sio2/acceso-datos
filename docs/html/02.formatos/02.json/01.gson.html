@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" href="../../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/particular.css" type="text/css" />
   
@@ -43,8 +45,16 @@
     <script src="../../_static/documentation_options.js?v=461dccb6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ffc2f2e8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../_static/translations.js?v=d190bf04"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '02.formatos/02.json/01.gson';</script>
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
@@ -378,9 +388,9 @@ codificados en <abbr title="JavaScript Object Notation">JSON</abbr> sigan el est
 <p>Es obvio que en el ejemplo anterior tenemos tres objetos (<cite>Grupo</cite>, <cite>Alumno</cite> y
 <cite>Tutor</cite>) así que definámoslos, de modo que sus atributos se ajusten a lo que
 recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Tutor</span><span class="o">.</span><span class="n">java</span>
-
-<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span> <span class="nc">Tutor</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
     <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
@@ -416,9 +426,10 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Alumno</span><span class="o">.</span><span class="n">java</span>
-
-<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span> <span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
     <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
@@ -454,9 +465,10 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Grupo</span><span class="o">.</span><span class="n">java</span>
-
-<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span> <span class="nc">Grupo</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
@@ -526,6 +538,7 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
 </div>
 <p>No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
 se observan en el <abbr title="JavaScript Object Notation">JSON</abbr> y cumplen los requisitos para ser un <em>JavaBean</em>:</p>
@@ -642,7 +655,7 @@ archivo</span></a>).</p>
 revestía problemas. Supongamos, sin embargo, el mismo ejemplo, pero con una
 pequeña diferencia: de los alumnos no se expresa la edad, sino su fecha de
 nacimiento:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
    <span class="p">{</span>
       <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
       <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
@@ -706,29 +719,29 @@ hace esta traducción, prescindimos de la ayuda de <code class="docutils literal
 </div>
 <p>Para lograr la traducción entre una cadena con formato <cite>yyyy-MM-dd</cite> y el tipo
 <cite>Date</cite> necesitamos definir así al alumno:</p>
-<div class="highlight-default notranslate" id="json-alumno-nacimiento"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Alumno</span><span class="o">.</span><span class="n">java</span>
+<div class="literal-block-wrapper docutils container" id="id6">
+<span id="json-alumno-nacimiento"></span><div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.text.ParseException</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
+<span class="hll"><span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
+</span><span class="hll">
+</span><span class="kn">import</span> <span class="nn">com.google.gson.annotations.JsonAdapter</span><span class="p">;</span>
 
-<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="p">;</span>
-<span class="hll"><span class="kn">import</span> <span class="nn">java.text.ParseException</span><span class="p">;</span>
-</span><span class="hll"><span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
-</span><span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
-
-<span class="hll"><span class="kn">import</span> <span class="nn">com.google.gson.annotations.JsonAdapter</span><span class="p">;</span>
-</span>
-<span class="n">public</span> <span class="k">class</span> <span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
-    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+<span class="hll"><span class="n">public</span> <span class="k">class</span> <span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
+</span>    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
     
-<span class="hll">    <span class="nd">@JsonAdapter</span><span class="p">(</span><span class="n">YyyyMMddDateTypeAdapter</span><span class="o">.</span><span class="n">class</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">private</span> <span class="n">Date</span> <span class="n">nacimiento</span><span class="p">;</span>
+    <span class="nd">@JsonAdapter</span><span class="p">(</span><span class="n">YyyyMMddDateTypeAdapter</span><span class="o">.</span><span class="n">class</span><span class="p">)</span>
+    <span class="n">private</span> <span class="n">Date</span> <span class="n">nacimiento</span><span class="p">;</span>
+<span class="hll">
+</span><span class="hll">    <span class="n">private</span> <span class="n">static</span> <span class="n">SimpleDateFormat</span> <span class="n">df</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s2">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
 </span>
-<span class="hll">    <span class="n">private</span> <span class="n">static</span> <span class="n">SimpleDateFormat</span> <span class="n">df</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s2">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
+<span class="hll">    <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
 </span>
-    <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
-
-<span class="hll">    <span class="n">public</span> <span class="n">Alumno</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
-</span>        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
-        <span class="n">setNacimiento</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
+        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+<span class="hll">        <span class="n">setNacimiento</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
+</span>    <span class="p">}</span>
 
     <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
@@ -742,20 +755,21 @@ hace esta traducción, prescindimos de la ayuda de <code class="docutils literal
         <span class="k">return</span> <span class="n">nacimiento</span><span class="p">;</span>
     <span class="p">}</span>
 
-<span class="hll">    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">Date</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="p">{</span>
-</span><span class="hll">        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">nacimiento</span><span class="p">;</span>
-</span><span class="hll">    <span class="p">}</span>
-</span>
-<span class="hll">    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
-</span><span class="hll">        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
-</span><span class="hll">    <span class="p">}</span>
-</span>
-    <span class="nd">@Override</span>
-    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">Date</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">nacimiento</span><span class="p">;</span>
+<span class="hll">    <span class="p">}</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="n">public</span> <span class="n">void</span> <span class="n">setNacimiento</span><span class="p">(</span><span class="n">String</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ParseException</span> <span class="p">{</span>
+</span>        <span class="n">this</span><span class="o">.</span><span class="n">nacimiento</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
+<span class="hll">    <span class="p">}</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="nd">@Override</span>
+</span>    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">));</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
 </div>
 <p>¿Qué hemos hecho? Básicamente:</p>
 <ul>
@@ -779,7 +793,9 @@ manualmente en la aplicación alumnos de esta forma:</p>
 <p>Y ahora hay que definir esa clase que define cómo es la traducción. Lo más
 limpio, por si se quiere soportar fácilmente diferentes formatos para la fecha
 es crear una clase abstracta:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="p">;</span>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">AbstractDateTypeAdapter.java</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">java.text.DateFormat</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">com.google.gson.TypeAdapter</span><span class="p">;</span>
@@ -808,8 +824,11 @@ es crear una clase abstracta:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
 <p>Y una clase que concretamente define cuál es el formato de fecha:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.text.DateFormat</span><span class="p">;</span>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">YyyyyMMddDateTypeAdapter.java</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.text.DateFormat</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span> <span class="nc">YyyyMMddDateTypeAdapter</span> <span class="n">extends</span> <span class="n">AbstractDateTypeAdapter</span> <span class="p">{</span>
@@ -821,6 +840,7 @@ es crear una clase abstracta:</p>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
 </div>
 <p>La parte molar de la traducción está en la clase abstracta:</p>
 <ul class="simple">

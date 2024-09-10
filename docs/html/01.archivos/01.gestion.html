@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -43,8 +45,16 @@
     <script src="../_static/documentation_options.js?v=461dccb6"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ffc2f2e8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=d190bf04"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '01.archivos/01.gestion';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
@@ -453,8 +463,8 @@ hacer lo siguiente:</p>
 <p>esto es, utilizar una ruta ya hecha que nos proporciona el propio Java y
 corregirla añadiendo los subdirectorios necesarios mediante la adición de
 argumentos (tantos como subdirectarios requiramos).</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
 <p>Con el mismo fin también puede usarse el método estático <code class="docutils literal notranslate"><span class="pre">get()</span></code>
 de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html">Paths</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">home</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">);</span>
@@ -493,7 +503,7 @@ el argumento:</p>
 </pre></div>
 </div>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">resolveiSibling(String</span> <span class="pre">otro)</span></code> y <code class="docutils literal notranslate"><span class="pre">resolveSibling(Path</span> <span class="pre">otro)</span></code></dt><dd><p>que es como los anteriores métodos, pero la ruta se construye sobre el
+<dt><code class="docutils literal notranslate"><span class="pre">resolveSibling(String</span> <span class="pre">otro)</span></code> y <code class="docutils literal notranslate"><span class="pre">resolveSibling(Path</span> <span class="pre">otro)</span></code></dt><dd><p>que es como los anteriores métodos, pero la ruta se construye sobre el
 directorio padre:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">resolveSibling</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario/.cache</span>
 </pre></div>
@@ -501,12 +511,12 @@ directorio padre:</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">toAbsolutePath()</span></code> y <code class="docutils literal notranslate"><span class="pre">toRealPath()</span></code></dt><dd><p>que devuelve la ruta absoluta. El segundo método, resuelve, además, los
 enlaces simbólicos en caso de que existiera alguno:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Paths</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/.</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/.</span>
 </pre></div>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></dt><dd><p>que elimina elementos redundantes en la ruta:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Paths</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">().</span><span class="na">normalize</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/ (sin el punto)</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">().</span><span class="na">normalize</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/ (sin el punto)</span>
 </pre></div>
 </div>
 </dd>
@@ -538,8 +548,8 @@ podemos hacer construcciones como esta:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
 <p>Con estas herramientas sólo construimos rutas, así que tales rutas
 no tienen por qué existir.</p>
 </div>
@@ -614,9 +624,10 @@ para crear un directorio.</p>
 <span class="n">Files</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">caca</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>También se pueden copiar a archivo, flujos (<a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html">InputStream</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>También se pueden copiar flujos (<a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html">InputStream</a>)
+a archivo.</p>
 </div>
 <p>Para cambiar el usuario o los atributos del archivo también existen métodos.</p>
 <p>Los métodos que nos queda por revisar son aquellos que permiten leer y escribir

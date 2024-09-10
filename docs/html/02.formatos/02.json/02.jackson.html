@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" href="../../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/particular.css" type="text/css" />
   
@@ -43,8 +45,16 @@
     <script src="../../_static/documentation_options.js?v=461dccb6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ffc2f2e8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../_static/translations.js?v=d190bf04"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '02.formatos/02.json/02.jackson';</script>
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
@@ -447,7 +457,7 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 <p>En el ejemplo anterior todos lo tipos de los objetos de Java tiene
 correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>. Supongamos ahora que no es así
 y que de los alumnos se registra la fecha de nacimiento:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
    <span class="p">{</span>
       <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
       <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
@@ -536,11 +546,11 @@ nuestro propio traductor<a class="footnote-reference brackets" href="#id2" id="i
 <span class="w">        </span><span class="nd">@Override</span>
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">JsonParser</span><span class="w"> </span><span class="n">parser</span><span class="p">,</span><span class="w"> </span><span class="n">DeserializationContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span>
 <span class="w">            </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">JsonProcessingException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                 </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                   </span><span class="k">return</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">.</span><span class="na">getText</span><span class="p">());</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">ParseException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                   </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>

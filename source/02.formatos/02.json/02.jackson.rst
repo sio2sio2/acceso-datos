@@ -101,6 +101,7 @@ correspondencia con un tipo primitivo de |JSON|. Supongamos ahora que no es así
 y que de los alumnos se registra la fecha de nacimiento:
 
 .. literalinclude:: files/grupos-nacimiento.json
+   :class: toggle
    :emphasize-lines: 13,17,32,36
 
 y, por supuesto, se modifica la clase ``Alumno`` para que contenga un atributo
@@ -156,11 +157,11 @@ nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
            @Override
            public Date deserialize(JsonParser parser, DeserializationContext context)
                throws IOException, JsonProcessingException {
-                    try {
+                   try {
                       return df.parse(parser.getText());
                    }
                    catch(ParseException err) {
-                       throw new RuntimeException(err);
+                      throw new RuntimeException(err);
                    }
            } 
        }

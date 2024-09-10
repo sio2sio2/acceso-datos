@@ -1,5 +1,3 @@
-// Tutor.java
-
 import java.io.Serializable;
 
 public class Tutor implements Serializable {

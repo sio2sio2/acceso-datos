@@ -109,7 +109,7 @@ a ellos, esto es, cómo construir rutas, para lo cual usaremos :java-nio:`Path
    corregirla añadiendo los subdirectorios necesarios mediante la adición de
    argumentos (tantos como subdirectarios requiramos).
 
-   .. note:: Con el mismo fin también puede usarse el método estático ``get()``
+   .. tip:: Con el mismo fin también puede usarse el método estático ``get()``
       de :java-nio:`Paths <Paths>`:
 
       .. code-block:: java
@@ -156,7 +156,7 @@ Una vez que tenemos un objeto que implementa la interfaz :java-nio:`Path
       Path path = dir.getParent();
       dir.equals(path.resolve(config)); // true
 
-``resolveiSibling(String otro)`` y ``resolveSibling(Path otro)``
+``resolveSibling(String otro)`` y ``resolveSibling(Path otro)``
    que es como los anteriores métodos, pero la ruta se construye sobre el
    directorio padre:
 
@@ -170,14 +170,14 @@ Una vez que tenemos un objeto que implementa la interfaz :java-nio:`Path
 
    .. code-block:: java
 
-      Paths.get(".").toAbsolutePath(); // /home/usuario/.
+      Path.of(".").toAbsolutePath(); // /home/usuario/.
 
 ``normalize()``
    que elimina elementos redundantes en la ruta:
 
    .. code-block:: java
 
-      Paths.get(".").toAbsolutePath().normalize(); // /home/usuario/ (sin el punto)
+      Path.of(".").toAbsolutePath().normalize(); // /home/usuario/ (sin el punto)
 
 ``relativize(Path parent)``
    que construye una ruta relativa tomando como base la ruta que se proporciona
@@ -215,7 +215,7 @@ podemos hacer construcciones como esta:
       System.out.println(p);
    }
 
-.. caution:: Con estas herramientas sólo construimos rutas, así que tales rutas
+.. attention:: Con estas herramientas sólo construimos rutas, así que tales rutas
    no tienen por qué existir.
 
 .. _file.files:
@@ -312,7 +312,8 @@ Podemos también copiar, mover o borrar archivos:
    Files.move(caca, tmp.resolve("caca.txt"), StandardCopyOption.REPLACE_EXISTING);
    Files.delete(caca);
 
-.. note:: También se pueden copiar a archivo, flujos (:java-io:`InputStream <InputStream>`).
+.. tip:: También se pueden copiar flujos (:java-io:`InputStream <InputStream>`)
+   a archivo.
 
 Para cambiar el usuario o los atributos del archivo también existen métodos.
 

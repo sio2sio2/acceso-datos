@@ -24,10 +24,16 @@ Es obvio que en el ejemplo anterior tenemos tres objetos (`Grupo`, `Alumno` y
 recoge el |JSON|:
 
 .. literalinclude:: files/Tutor.java
+   :class: toggle
+   :caption: Tutor.java
 
 .. literalinclude:: files/Alumno.java
+   :class: toggle
+   :caption: Alumno.java
 
 .. literalinclude:: files/Grupo.java
+   :class: toggle
+   :caption: Grupo.java
 
 No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
 se observan en el |JSON| y cumplen los requisitos para ser un *JavaBean*:
@@ -159,6 +165,7 @@ pequeña diferencia: de los alumnos no se expresa la edad, sino su fecha de
 nacimiento:
 
 .. literalinclude:: files/grupos-nacimiento.json
+   :class: toggle
    :emphasize-lines: 13,17,32,36
 
 Como el estándar |JSON| no tiene definido un campo específico para las fechas,
@@ -189,6 +196,8 @@ Para lograr la traducción entre una cadena con formato `yyyy-MM-dd` y el tipo
 .. _json-alumno-nacimiento:
 
 .. literalinclude:: files/Alumno-adapter.java
+   :caption: Alumno.java
+   :class: toggle
    :emphasize-lines: 4,5,8,13,14,16,20,37-39,41-43
 
 ¿Qué hemos hecho? Básicamente:
@@ -216,10 +225,14 @@ limpio, por si se quiere soportar fácilmente diferentes formatos para la fecha
 es crear una clase abstracta:
 
 .. literalinclude:: files/AbstractDateTypeAdapter.java
+   :class: toggle
+   :caption: AbstractDateTypeAdapter.java
 
 Y una clase que concretamente define cuál es el formato de fecha:
 
 .. literalinclude:: files/YyyyMMddDateTypeAdapter.java
+   :class: toggle
+   :caption: YyyyyMMddDateTypeAdapter.java
    
 La parte molar de la traducción está en la clase abstracta:
 

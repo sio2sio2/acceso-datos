@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -43,8 +45,16 @@
     <script src="../_static/documentation_options.js?v=461dccb6"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ffc2f2e8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=d190bf04"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '03.xml/01.jaxp';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
@@ -342,6 +352,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.1.1. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.1.2. Escritura</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generacion-del-dom">3.1.2.1. Generación del <abbr title="Document Object Model">DOM</abbr></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura-a-archivo">3.1.2.2. Escritura a archivo</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xpath">3.1.3. XPath</a></li>
 </ul>
             </nav>
         </div>
@@ -360,7 +376,7 @@ soporte alguno.</p>
 <section id="lectura">
 <h2><span class="section-number">3.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>Comencemos por conocer cómo abrir un documento <abbr title="eXtensible Markup Language">XML</abbr> y acceder a sus nodos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;profesores.xml&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
 <span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
 <span class="c1">// La siguiente línea puede provocar un ParseConfiguracionException</span>
 <span class="n">DocumentBuilder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="na">newDocumentBuilder</span><span class="p">();</span>
@@ -373,11 +389,268 @@ soporte alguno.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Una vez tenemos disponible el objeto <cite>Document</cite> podemos acceder a los nodos de
-distintas formas:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Element</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getDocumentElement</span><span class="p">();</span><span class="w"> </span><span class="c1">// Obtiene el nodo raíz.</span>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Con este código se producirá un error si el <abbr title="eXtensible Markup Language">XML</abbr> no es bien
+formado, pero no se realizará con un <abbr title="Document Type Definition">DTD</abbr> ninguna comprobación sobre su
+validez. Sin embargo, si hay una declaración de tipo de documento:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE claustro SYSTEM &quot;claustro.dtd&quot;&gt;</span>
 </pre></div>
 </div>
+<p>y el <abbr title="Document Type Definition">DTD</abbr> no existe, se generará un error por no encontrar la referencia.
+Evite incluir esta cláusula hasta que <a class="reference internal" href="#xml-dtd"><span class="std std-ref">estudiemos la validación</span></a>.</p>
+</div>
+<p>Una vez tenemos disponible el objeto <cite>Document</cite> ya podremos acceder a los nodos
+del documento. En principio, los nodos se modelan mediante la clase <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> sobre la que
+construyen subsclases que modelan los distintos tipos de nodos (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html">Element</a>, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Text.html">Text</a>, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>, etc.). Cada
+uno de estos tipos de nodos está asociado a un número entero al que se da
+nombre mediante un atributo estático de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a>. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Element</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getDocumentElement</span><span class="p">();</span><span class="w">  </span><span class="c1">// Obtiene el nodo raíz.</span>
+<span class="n">root</span><span class="p">.</span><span class="na">getNodeType</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">ELEMENT_NODE</span><span class="w">   </span><span class="c1">// true.</span>
+</pre></div>
+</div>
+<p>El propio documento (la variable <cite>xml</cite>) es un tipo de nodo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">xml</span><span class="p">.</span><span class="na">getNodeType</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">DOCUMENT_NODE</span><span class="w">  </span><span class="c1">// true</span>
+</pre></div>
+</div>
+<p>A partir de un nodo (y el propio documento se considera como tal) se pueden
+hacer diversas pesquisas:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">hasChildNodes()</span></code></dt><dd><p>devuelve verdadero si el nodo tiene algún hijo.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hasAttributes()</span></code></dt><dd><p>devuelve verdadero si el nodo tiene algún atributo.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getNodeName()</span></code></dt><dd><p>devuelve el nombre del nodo (si es un elemento, el nombre de la etiqueta).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getNodeValue()</span></code></dt><dd><p>devuelve el valor del nodo. Dependiendo del tipo de nodo, así será su valor
+(al comienzo de la explicación sobre <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> hay una tabla que indica qué valor
+devuelve cada tipo).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getTextContent()</span></code></dt><dd><p>devuelve el valor de texto del elemento<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, que es la concatenación de los nodos de
+texto del propio elemmento y de todos sus descendientes. Obsérvese que para un
+nodo así:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;apelativo&gt;</span>Paco<span class="nt">&lt;/apelativo&gt;</span>
+</pre></div>
+</div>
+<p>resulta que:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// apelativo es una variable que contiene el elemento apelativo comentado</span>
+<span class="n">apelativo</span><span class="p">.</span><span class="na">getTextContent</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">apelativo</span><span class="p">.</span><span class="na">firstChild</span><span class="p">().</span><span class="na">getNodeValue</span><span class="p">();</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getFirstChild()</span></code> o <code class="docutils literal notranslate"><span class="pre">getLastChild()</span></code></dt><dd><p>Devuelve el primero o el último <strong>nodo</strong> hijo de aquel. Se ha remarcado nodo,
+porque el nodo no tiene que ser forzosamente un elemento (téngase, pues,
+cuidado con los documentos indentados)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getParentNode()</span></code> o <code class="docutils literal notranslate"><span class="pre">getPreviousSibling()</span></code> o <code class="docutils literal notranslate"><span class="pre">getFollowingSibling()</span></code></dt><dd><p>devuelve el nodo padre o el hermano previo o el hermano siguiente.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getChildNodes()</span></code></dt><dd><p>devuelve un objeto <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>  con
+los nodos hijos. A pesar de su naturaleza no implementa la interfaz
+<a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable</a> y sólo presenta un método (<code class="docutils literal notranslate"><span class="pre">getLength()</span></code>)
+que devuelve la cantidad de hijos y un método <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> que
+devuelve el i-ésimo nodo de la lista. Por tanto, si se quiere quiere recorrer
+la colección, habrá que usar un <cite>for</cite> clásico:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">hijos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">getChildNodes</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="n">hijos</span><span class="p">.</span><span class="na">getLength</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Node</span><span class="w"> </span><span class="n">nodo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hijos</span><span class="p">.</span><span class="na">item</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">   </span><span class="k">switch</span><span class="p">(</span><span class="n">nodo</span><span class="p">.</span><span class="na">getNodeType</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">ELEMENT_NODE</span><span class="p">:</span>
+<span class="w">         </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">nodo</span><span class="p">.</span><span class="na">getNodeName</span><span class="p">());</span>
+<span class="w">         </span><span class="k">break</span><span class="p">;</span>
+<span class="w">      </span><span class="k">default</span><span class="p">:</span>
+<span class="w">         </span><span class="k">break</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getAttributes()</span></code></dt><dd><p>devuelve los atributos del elemento en forma de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a>
+que como <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a> tampoco implemente la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable</a>. Además de <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> y <code class="docutils literal notranslate"><span class="pre">getLength()</span></code>, dispone también
+de <code class="docutils literal notranslate"><span class="pre">getNamedItem(String</span> <span class="pre">name)</span></code> que permite obtener el nodo atributo a
+partir de su nombre:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;profesores&quot;</span><span class="p">);</span>
+<span class="n">Element</span><span class="w"> </span><span class="n">p4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Element</span><span class="p">)</span><span class="w"> </span><span class="n">profesores</span><span class="p">.</span><span class="na">item</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">NamedNodeMap</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p4</span><span class="p">.</span><span class="na">getAttributes</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="w"> </span><span class="n">attrs</span><span class="p">.</span><span class="na">getLength</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Attr</span><span class="w"> </span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Attr</span><span class="p">)</span><span class="w"> </span><span class="n">attrs</span><span class="p">.</span><span class="na">item</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;%s: %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">.</span><span class="na">getNodeName</span><span class="p">(),</span><span class="w"> </span><span class="n">attr</span><span class="p">.</span><span class="na">getNodeValue</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Por otra parte, los tipos de nodos tiene también sus métodos específicos. Por
+ejemplo, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html">Element</a>:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">getElementsByTagName(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve los elementos descendientes cuyo nombre de etiqueta es el
+suministrado en el argumento. El método también existe para los nodo
+<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html">Document</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;profesores&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getElementById(String</span> <span class="pre">id)</span></code></dt><dd><p>devuelve el elemento con el identificador suministrado como argumento.
+Evidentemente el procesador debe conocer cuáles son los atributos de tipo
+identificador, por lo que es necesario que el documento se haya validado.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Element</span><span class="w"> </span><span class="n">p17</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getElementById</span><span class="p">(</span><span class="s">&quot;p17&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// null, porque no estamos usando el DTD</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getAttributeNode(String</span> <span class="pre">name)</span></code> o <code class="docutils literal notranslate"><span class="pre">getAttribute(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve el attributo (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>) o el valor del atributo cuyo nombre se
+proporciona en el argumento.</p>
+</dd>
+</dl>
+<p class="rubric" id="xml-dtd">Validación</p>
+<p>Hemos evitado validar el documento hasta ahora. Sin embargo, la validación puede
+ser interesante o incluso, puede ser preciso, intentar que ni siquiera se haga
+ninguna comprobación en caso de que la declaración exista, pero el <abbr title="Document Type Definition">DTD</abbr> no.</p>
+<p>En primer lugar, si queremos que la validación se lleve a cabo debemos añadir:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">factory</span><span class="p">.</span><span class="na">setValidating</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Otro aspecto importante es el de la manipulación de la validación, que se lleva
+cabo definiendo un &quot;<em>resolutor de entitades</em>&quot;.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">builder</span><span class="p">.</span><span class="na">setEntityResolver</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">EntityResolver2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">getExternalSubset</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemID</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resolveEntity</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">systemID</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemID</span><span class="p">)</span>
+</span><span class="hll"><span class="w">        </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">systemID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="n">systemID</span><span class="p">).</span><span class="na">isAbsolute</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">systemID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ruta</span><span class="p">.</span><span class="na">getParent</span><span class="p">().</span><span class="na">resolve</span><span class="p">(</span><span class="n">systemID</span><span class="p">).</span><span class="na">toString</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">URISyntaxException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputSource</span><span class="p">(</span><span class="n">systemID</span><span class="p">);</span>
+<span class="hll"><span class="w">    </span><span class="p">}</span>
+</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Debemos fijarnos en el último método. Cuando devuelve <cite>null</cite>, es como, si no
+hubiéramos definido nada, y el procesador obrará como lo hace habitualmente para
+llevar a cabo la validación. En cambio, si devolvemos un <code class="code docutils literal notranslate"><span class="pre">new</span>
+<span class="pre">InputSource(cadena)</span></code> utilizará el <abbr title="Document Type Definition">DTD</abbr> que indique esa cadena (puede ser una
+<abbr title="Uniform Resource Locator">URL</abbr> o un archivo local) con independencia de lo que expresase la declaración
+original.</p>
+<p>¿Qué hace exactamente el código que hemos propuesto? En principio, si
+no hay definido ninguno, no hace nada. En cambio, si hay definido uno,
+comprueba si el <abbr title="Document Type Definition">DTD</abbr> se proporcionó con ruta absoluta (lo cual incluye una
+<abbr title="Uniform Resource Locator">URL</abbr> completa). Si fue así, respeta el valor y la validación se hará con el
+valor expresado en el archivo. En cambio, si la ruta era relativa, hay un
+problema: la librería entiende la ruta relativa no respecto al <abbr title="eXtensible Markup Language">XML</abbr> (que sería
+lo esperable), sino respecto al directorio de trabajo. Lo que hace nuestro
+código en este caso, es hacerla relativa respecto al <abbr title="eXtensible Markup Language">XML</abbr>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>El argumento del construtor de <cite>InputSource</cite> también puede ser un
+<a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/Reader.html">Reader</a>, así que si nuestra intención es que el programa no
+escupa nunca un error (incluso aunque el <abbr title="Document Type Definition">DTD</abbr> de la declaración no se
+encuentre), podemos hacer hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemID</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputSource</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">StringReader</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="escritura">
+<h2><span class="section-number">3.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<p>Bajo el epigrafe anterior hemos tratado únicamente cómo acceder a información,
+pero no cómo crear nueva información en formato <abbr title="eXtensible Markup Language">XML</abbr>. Para ello debemos
+construir primero un <abbr title="Document Object Model">DOM</abbr> y luego escribirlo a un archivo.</p>
+<section id="generacion-del-dom">
+<h3><span class="section-number">3.1.2.1. </span>Generación del <abbr title="Document Object Model">DOM</abbr><a class="headerlink" href="#generacion-del-dom" title="Link to this heading">#</a></h3>
+<p>Podemos tomar uno ya existente resultado de haber leído una archivo previo o
+crearlo <em>ex novo</em>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
+<span class="n">DocumentBuilder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="na">newDocumentBuilder</span><span class="p">();</span>
+
+<span class="n">Document</span><span class="w"> </span><span class="n">xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">newDocument</span><span class="p">();</span>
+<span class="n">Element</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">createElement</span><span class="p">(</span><span class="s">&quot;claustro&quot;</span><span class="p">);</span>
+<span class="n">root</span><span class="p">.</span><span class="na">setAttribute</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">);</span>
+
+<span class="n">Element</span><span class="w"> </span><span class="n">profesor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">createElement</span><span class="p">(</span><span class="s">&quot;profesor&quot;</span><span class="p">);</span>
+<span class="n">profesor</span><span class="p">.</span><span class="na">setAttribute</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;p1&quot;</span><span class="p">);</span>
+<span class="n">profesor</span><span class="p">.</span><span class="na">setIdAttribute</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w">  </span><span class="c1">// Es un identificador</span>
+
+<span class="n">Text</span><span class="w"> </span><span class="n">texto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">createTextNode</span><span class="p">(</span><span class="s">&quot;Me he hartado de crear elementos&quot;</span><span class="p">);</span>
+
+<span class="n">profesor</span><span class="p">.</span><span class="na">appendChild</span><span class="p">(</span><span class="n">texto</span><span class="p">);</span>
+<span class="n">root</span><span class="p">.</span><span class="na">appendChild</span><span class="p">(</span><span class="n">profesor</span><span class="p">);</span>
+<span class="n">xml</span><span class="p">.</span><span class="na">appendChild</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="escritura-a-archivo">
+<h3><span class="section-number">3.1.2.2. </span>Escritura a archivo<a class="headerlink" href="#escritura-a-archivo" title="Link to this heading">#</a></h3>
+<p>Partamos de que ya tenemos un <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html">Document</a> construido como queremos que quede
+(véase el apartado anterior) y queremos ahora generar el <abbr title="eXtensible Markup Language">XML</abbr> correspondiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DOMSource</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DOMSource</span><span class="p">(</span><span class="n">xml</span><span class="p">);</span>
+
+<span class="n">TransformerFactory</span><span class="w"> </span><span class="n">tfactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransformerFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
+<span class="n">Transformer</span><span class="w"> </span><span class="n">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tfactory</span><span class="p">.</span><span class="na">newTransformer</span><span class="p">();</span><span class="w">  </span><span class="c1">// Puede provocar excepción.</span>
+
+<span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">StreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StreamResult</span><span class="p">(</span><span class="n">sw</span><span class="p">);</span>
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">transform</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">TrasnformerException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>En cambio, si simplemente quisiéramos volcar el <abbr title="eXtensible Markup Language">XML</abbr> como una cadena:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">StringWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringWriter</span><span class="p">();</span>
+<span class="n">StreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StreamResult</span><span class="p">(</span><span class="n">sw</span><span class="p">);</span>
+<span class="n">transformer</span><span class="p">.</span><span class="na">transform</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+
+<span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sw</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Podemos, además, manipular cómo se escribe el <abbr title="eXtensible Markup Language">XML</abbr> resultante y qué
+declaraciones incluirá su cabecera:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">transformer</span><span class="p">.</span><span class="na">setOutputProperty</span><span class="p">(</span><span class="n">OutputKeys</span><span class="p">.</span><span class="na">INDENT</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;yes&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Salida bonita.</span>
+<span class="n">transformer</span><span class="p">.</span><span class="na">setOutputProperty</span><span class="p">(</span><span class="n">OutputKeys</span><span class="p">.</span><span class="na">DOCTYPE_SYSTEM</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;claustro.dtd&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Añadimos DOCTYPE</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para otras propiedades, consúltese <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/javax/xml/transform/OutputKeys.html">OutputKeys</a>.</p>
+</div>
+</section>
+</section>
+<section id="xpath">
+<h2><span class="section-number">3.1.3. </span>XPath<a class="headerlink" href="#xpath" title="Link to this heading">#</a></h2>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>En realidad el métodos tiene sentido para otros nodos que no sean
+elementos. Véase la tabla que resume sus significados en la explicación del
+método que ofrece la documentación original de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a>.</p>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -427,6 +700,12 @@ distintas formas:</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.1.1. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.1.2. Escritura</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generacion-del-dom">3.1.2.1. Generación del <abbr title="Document Object Model">DOM</abbr></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura-a-archivo">3.1.2.2. Escritura a archivo</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xpath">3.1.3. XPath</a></li>
 </ul>
   </nav></div>
 

@@ -374,7 +374,7 @@ document.write(`
 <p>La librería viene incluida en el <abbr title="Java Development Kit">JDK</abbr> y tiene soporte para <a class="reference external" href="https://sio2sio2.github.io/LM/03.consulta/01.xpath.html#xpath" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">XPath 1.0</span></a> y <a class="reference external" href="https://sio2sio2.github.io/LM/98.apendices/41.xslt.html#xslt" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">XSLT 1.0</span></a>. Para <a class="reference external" href="https://sio2sio2.github.io/LM/04.transformacion/index.html#xquery" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">XQuery</span></a> no tiene
 soporte alguno.</p>
 <section id="lectura">
-<h2><span class="section-number">3.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
+<span id="jaxp-read"></span><h2><span class="section-number">3.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>Comencemos por conocer cómo abrir un documento <abbr title="eXtensible Markup Language">XML</abbr> y acceder a sus nodos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
 <span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
@@ -398,7 +398,7 @@ validez. Sin embargo, si hay una declaración de tipo de documento:</p>
 </pre></div>
 </div>
 <p>y el <abbr title="Document Type Definition">DTD</abbr> no existe, se generará un error por no encontrar la referencia.
-Evite incluir esta cláusula hasta que <a class="reference internal" href="#xml-dtd"><span class="std std-ref">estudiemos la validación</span></a>.</p>
+Evite incluir esta cláusula hasta que <a class="reference internal" href="#jaxp-dtd"><span class="std std-ref">estudiemos la validación</span></a>.</p>
 </div>
 <p>Una vez tenemos disponible el objeto <cite>Document</cite> ya podremos acceder a los nodos
 del documento. En principio, los nodos se modelan mediante la clase <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> sobre la que
@@ -426,7 +426,7 @@ hacer diversas pesquisas:</p>
 (al comienzo de la explicación sobre <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> hay una tabla que indica qué valor
 devuelve cada tipo).</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">getTextContent()</span></code></dt><dd><p>devuelve el valor de texto del elemento<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, que es la concatenación de los nodos de
+<dt><code class="docutils literal notranslate"><span class="pre">getTextContent()</span></code></dt><dd><p>devuelve el valor de texto del elemento<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, que es la concatenación de los nodos de
 texto del propio elemmento y de todos sus descendientes. Obsérvese que para un
 nodo así:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;apelativo&gt;</span>Paco<span class="nt">&lt;/apelativo&gt;</span>
@@ -500,7 +500,7 @@ identificador, por lo que es necesario que el documento se haya validado.</p>
 proporciona en el argumento.</p>
 </dd>
 </dl>
-<p class="rubric" id="xml-dtd">Validación</p>
+<p class="rubric" id="jaxp-dtd">Validación</p>
 <p>Hemos evitado validar el documento hasta ahora. Sin embargo, la validación puede
 ser interesante o incluso, puede ser preciso, intentar que ni siquiera se haga
 ninguna comprobación en caso de que la declaración exista, pero el <abbr title="Document Type Definition">DTD</abbr> no.</p>
@@ -568,9 +568,13 @@ encuentre), podemos hacer hacer lo siguiente:</p>
 </pre></div>
 </div>
 </div>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Por hacer</p>
+<p>¿Cómo forzar una validación, aunque no haya declaración DOCTYPE?</p>
+</div>
 </section>
 <section id="escritura">
-<h2><span class="section-number">3.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<span id="jaxp-write"></span><h2><span class="section-number">3.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
 <p>Bajo el epigrafe anterior hemos tratado únicamente cómo acceder a información,
 pero no cómo crear nueva información en formato <abbr title="eXtensible Markup Language">XML</abbr>. Para ello debemos
 construir primero un <abbr title="Document Object Model">DOM</abbr> y luego escribirlo a un archivo.</p>
@@ -641,10 +645,36 @@ declaraciones incluirá su cabecera:</p>
 </section>
 </section>
 <section id="xpath">
-<h2><span class="section-number">3.1.3. </span>XPath<a class="headerlink" href="#xpath" title="Link to this heading">#</a></h2>
+<span id="jaxp-xpath"></span><h2><span class="section-number">3.1.3. </span>XPath<a class="headerlink" href="#xpath" title="Link to this heading">#</a></h2>
+<p>Hemos visto <a class="reference internal" href="#jaxp-read"><span class="std std-ref">una lectura bastante torpe</span></a> en que el único
+criterio para acceder de forma selectivas a los nodos es mediante un
+identificador (<code class="docutils literal notranslate"><span class="pre">getElementById</span></code>) o mediante el nombre de la etiqueta
+(<code class="docutils literal notranslate"><span class="pre">getElementsByTagName</span></code>). Sin embargo, si conocemos <a class="reference external" href="https://sio2sio2.github.io/LM/03.consulta/01.xpath.html#xpath" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">XPath</span></a>,
+podemos seleccionar nodos usando esta tecnología:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">XPath</span><span class="w"> </span><span class="n">xPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XPathFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">().</span><span class="na">newXPath</span><span class="p">();</span>
+
+<span class="n">XPathExpression</span><span class="w"> </span><span class="n">expresion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xpath</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;//profesor[@casillero]&quot;</span><span class="p">);</span>
+<span class="c1">// xml es el Document del ejemplo anterior.</span>
+<span class="n">NodeList</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">NodeList</span><span class="p">)</span><span class="w"> </span><span class="n">expresion</span><span class="p">.</span><span class="na">evaluate</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span><span class="w"> </span><span class="n">XPathConstants</span><span class="p">.</span><span class="na">NODESET</span><span class="p">);</span>
+<span class="c1">// ... Consultamos la lista de profesores con atributo casillero</span>
+</pre></div>
+</div>
+<p>No puede ser más fácil… si se conoce <em>XPath</em> y se sabe cómo construir la
+expresión pertinente. También podemos usar una expresión sin compilarla primero,
+si nuestra intención es usarla una sola vez:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Element</span><span class="w"> </span><span class="n">profesor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Element</span><span class="p">)</span><span class="w"> </span><span class="n">xPath</span><span class="p">.</span><span class="na">evaluate</span><span class="p">(</span><span class="s">&quot;//profesor[@id=&#39;p81&#39;]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xml</span><span class="p">,</span><span class="w"> </span><span class="n">XPathConstants</span><span class="p">.</span><span class="na">NODE</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">profesor</span><span class="p">.</span><span class="na">getTagName</span><span class="p">());</span><span class="w">  </span><span class="c1">// profesor</span>
+
+<span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">xPath</span><span class="p">.</span><span class="na">evaluate</span><span class="p">(</span><span class="s">&quot;//profesor[@id=&#39;p81&#39;]/apelativo&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xml</span><span class="p">,</span><span class="w"> </span><span class="n">XPathConstants</span><span class="p">.</span><span class="na">STRING</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">apelativo</span><span class="p">);</span><span class="w">  </span><span class="c1">// Verónica</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">Double</span><span class="p">)</span><span class="w"> </span><span class="n">xPath</span><span class="p">.</span><span class="na">evaluate</span><span class="p">(</span><span class="s">&quot;count(//profesor)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xml</span><span class="p">,</span><span class="w"> </span><span class="n">XPathConstants</span><span class="p">.</span><span class="na">STRING</span><span class="p">)).</span><span class="na">intValue</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">cantidad</span><span class="p">);</span>
+</pre></div>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>En realidad el métodos tiene sentido para otros nodos que no sean
 elementos. Véase la tabla que resume sus significados en la explicación del

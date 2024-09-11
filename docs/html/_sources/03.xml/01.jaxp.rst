@@ -6,9 +6,7 @@ La librería viene incluida en el |JDK| y tiene soporte para :ref:`XPath 1.0
 <lm:xpath>` y :ref:`XSLT 1.0 <lm:xslt>`. Para :ref:`XQuery <xquery>` no tiene
 soporte alguno.
 
-.. https://www.developer.com/java/java-api-for-xml-processing-jaxp-getting-started/
-   https://studytrails.com/2016/09/12/java-api-for-xml-validation/
-   https://stackoverflow.com/questions/37114546/disable-dtd-validation
+.. _jaxp-read:
 
 Lectura
 =======
@@ -38,7 +36,7 @@ Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
 
    y el |DTD| no existe, se generará un error por no encontrar la referencia.
    Evite incluir esta cláusula hasta que :ref:`estudiemos la validación
-   <xml-dtd>`.
+   <jaxp-dtd>`.
 
 Una vez tenemos disponible el objeto `Document` ya podremos acceder a los nodos
 del documento. En principio, los nodos se modelan mediante la clase `Node
@@ -168,7 +166,7 @@ ejemplo, Element_:
    devuelve el attributo (Attr_) o el valor del atributo cuyo nombre se
    proporciona en el argumento.
 
-.. _xml-dtd:
+.. _jaxp-dtd:
 
 .. rubric:: Validación
 
@@ -246,6 +244,10 @@ código en este caso, es hacerla relativa respecto al |XML|.
               return new InputSource(new StringReader(""));
       }
 
+.. todo:: ¿Cómo forzar una validación, aunque no haya declaración DOCTYPE?
+
+.. _jaxp-write:
+
 Escritura
 =========
 Bajo el epigrafe anterior hemos tratado únicamente cómo acceder a información,
@@ -322,8 +324,39 @@ declaraciones incluirá su cabecera:
 .. seealso:: Para otras propiedades, consúltese `OutputKeys
    <https://docs.oracle.com/javase/8/docs/api/javax/xml/transform/OutputKeys.html>`_.
 
+.. _jaxp-xpath:
+
 XPath
 =====
+Hemos visto :ref:`una lectura bastante torpe <jaxp-read>` en que el único
+criterio para acceder de forma selectivas a los nodos es mediante un
+identificador (``getElementById``) o mediante el nombre de la etiqueta
+(``getElementsByTagName``). Sin embargo, si conocemos :ref:`XPath <lm:xpath>`,
+podemos seleccionar nodos usando esta tecnología:
+
+.. code-block:: java
+
+   XPath xPath = XPathFactory.newInstance().newXPath();
+
+   XPathExpression expresion = xpath.compile("//profesor[@casillero]");
+   // xml es el Document del ejemplo anterior.
+   NodeList profesores = (NodeList) expresion.evaluate(xml, XPathConstants.NODESET); 
+   // ... Consultamos la lista de profesores con atributo casillero
+
+No puede ser más fácil... si se conoce *XPath* y se sabe cómo construir la
+expresión pertinente. También podemos usar una expresión sin compilarla primero,
+si nuestra intención es usarla una sola vez:
+
+.. code-block:: java
+
+   Element profesor = (Element) xPath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); 
+   System.out.println(profesor.getTagName());  // profesor
+   
+   String apelativo = (String) xPath.evaluate("//profesor[@id='p81']/apelativo", xml, XPathConstants.STRING); 
+   System.out.println(apelativo);  // Verónica
+
+   int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.STRING)).intValue();
+   System.out.println(cantidad);
 
 .. rubric:: Notas al pie
 

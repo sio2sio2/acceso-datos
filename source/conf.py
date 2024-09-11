@@ -36,6 +36,11 @@ html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_logo = '_static/logo.jpg'
 
+html_theme_options = {
+    #"collapse_navbar": True
+    #"max_navbar_depth": 2,
+}
+
 extlinks = {
     'java-util': ('https://docs.oracle.com/javase/8/docs/api/java/util/%s.html', 'java.util.%s'),
     'java-text': ('https://docs.oracle.com/javase/8/docs/api/java/text/%s.html', 'java.text.%s'),

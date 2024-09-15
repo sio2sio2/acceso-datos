@@ -1,3 +1,5 @@
+.. _xml:
+
 |XML|
 *****
 Para la manipulación del formato :ref:`XML <lm:xml>` tenemos varias estrategias
@@ -17,7 +19,24 @@ y, dentro de ellas varias alternativas. Nos centraremos en tres:
 
 #. El accesso a bases de datos |XML| como :ref:`BaseX <lm:basex>`.
 
-Vayamos con ellas:
+Para los ejemplos ilustrativos utilizaremos este |XML|:
+
+.. literalinclude:: files/claustro.xml
+   :caption: claustro.xml
+   :language: xml
+   :class: toggle
+
+que puede validarse con el siguiente |DTD|:
+
+.. literalinclude:: files/claustro.dtd
+   :caption: claustro.dtd
+   :language: dtd
+   :class: toggle
+
+
+.. literalinclude::
+
+Vayamos con las estrategias antes enumeradas:
 
 .. toctree::
    :glob:
@@ -25,8 +44,10 @@ Vayamos con ellas:
 
    [0-9]*
 
+
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |DOM| replace:: :abbr:`DOM (Document Object Model)`
 .. |JAXP| replace:: :abbr:`JAXP (Java API for XML Processing)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |DTD| replace:: :abbr:`DTD (Document Type Definition)`

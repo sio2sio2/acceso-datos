@@ -354,7 +354,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="xml">
-<h1><span class="section-number">3. </span><abbr title="eXtensible Markup Language">XML</abbr><a class="headerlink" href="#xml" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1><span class="section-number">3. </span><abbr title="eXtensible Markup Language">XML</abbr><a class="headerlink" href="#xml" title="Link to this heading">#</a></h1>
 <p>Para la manipulación del formato <a class="reference external" href="https://sio2sio2.github.io/LM/01.intro/02b.marcas.html#xml" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">XML</span></a> tenemos varias estrategias
 y, dentro de ellas varias alternativas. Nos centraremos en tres:</p>
 <ol class="arabic simple">
@@ -369,7 +369,106 @@ tratar <abbr title="JavaScript Object Notation">JSON</abbr>. También hay varias
 <em>Jackson</em>, que <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson"><span class="std std-ref">ya usamos para tratar JSON</span></a>.</p></li>
 <li><p>El accesso a bases de datos <abbr title="eXtensible Markup Language">XML</abbr> como <a class="reference external" href="https://sio2sio2.github.io/LM/05.almacenamiento/02.nativas.html#basex" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">BaseX</span></a>.</p></li>
 </ol>
-<p>Vayamos con ellas:</p>
+<p>Para los ejemplos ilustrativos utilizaremos este <abbr title="eXtensible Markup Language">XML</abbr>:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">claustro.xml</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="toggle highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE claustro SYSTEM &quot;claustro.dtd&quot;&gt;</span>
+
+<span class="nt">&lt;claustro</span><span class="w"> </span><span class="na">centro=</span><span class="s">&quot;IES Pepe Botella&quot;</span><span class="nt">&gt;</span>
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p1&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Pepe<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>José<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Suárez<span class="w"> </span>Lantilla<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Inglés<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p13&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Cristina<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>María<span class="w"> </span>Cristina<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Prieto<span class="w"> </span>Monagas<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Biología<span class="w"> </span>y<span class="w"> </span>Geología<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p15&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Manolo<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>Manuel<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Páez<span class="w"> </span>Robledo<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Matemáticas<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Profesor con casillero(s) adicional(es) --&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p17&quot;</span><span class="w"> </span><span class="na">casillero=</span><span class="s">&quot;17 43&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Lucía<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>Lucía<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Gálvez<span class="w"> </span>Ruiz<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Inglés<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- En principio, si el casillero está vacío</span>
+<span class="cm">        la aplicación les asigna el que indica su identificador,</span>
+<span class="cm">        pero se puede asignar uno distinto.</span>
+<span class="cm">    --&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p28&quot;</span><span class="w"> </span><span class="na">casillero=</span><span class="s">&quot;52&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Miguel<span class="w"> </span>Ángel<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>Miguel<span class="w"> </span>Ángel<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Campos<span class="w"> </span>Sánchez<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Historia<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Profesor sin casillero (tienen el 0) --&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p81&quot;</span><span class="w"> </span><span class="na">casillero=</span><span class="s">&quot;0&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Verónica<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>Verónica<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Martín<span class="w"> </span>Díaz<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">      </span><span class="nt">&lt;departamento&gt;</span>Biología<span class="w"> </span>y<span class="w"> </span>Geología<span class="nt">&lt;/departamento&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Profesor sustituto --&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p86&quot;</span><span class="w"> </span><span class="na">sustituye=</span><span class="s">&quot;p81&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apelativo&gt;</span>Roberto<span class="nt">&lt;/apelativo&gt;</span>
+<span class="w">      </span><span class="nt">&lt;nombre&gt;</span>Roberto<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">      </span><span class="nt">&lt;apellidos&gt;</span>Mínguez<span class="w"> </span>Torralbo<span class="nt">&lt;/apellidos&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/profesor&gt;</span>
+<span class="nt">&lt;/claustro&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>que puede validarse con el siguiente <abbr title="Document Type Definition">DTD</abbr>:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">claustro.dtd</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="toggle highlight-dtd notranslate"><div class="highlight"><pre><span></span><span class="k">&lt;!ENTITY</span> <span class="ni">%</span> <span class="ni">datospers</span> <span class="s2">&quot;(apelativo,nombre,apellidos)&quot;</span><span class="k">&gt;</span>
+<span class="c">&lt;!--</span>
+<span class="c">   id:         Identificador del profesor (formato i&lt;N&gt;)</span>
+<span class="c">   sustituye:  A quién sustituye al profesor.</span>
+<span class="c">   casillero:  Número de casillero asignado. Si no se especifica:</span>
+<span class="c">                  - En caso de profesor titular, la &lt;N&gt; de &quot;id&quot;</span>
+<span class="c">                  - En caso de sustituto, el casillero del titular.</span>
+<span class="c">               Si está vacío, el profesor no tiene asignado casillero.</span>
+<span class="c">--&gt;</span>
+<span class="k">&lt;!ENTITY</span> <span class="ni">%</span> <span class="ni">attrpers</span> 
+   <span class="s2">&quot;id        ID       #REQUIRED</span>
+<span class="s2">    casillero CDATA    #IMPLIED</span>
+<span class="s2">    sustituye IDREF    #IMPLIED&quot;</span><span class="k">&gt;</span>
+
+<span class="k">&lt;!ELEMENT</span> <span class="nt">claustro</span> <span class="o">(</span><span class="nt">profesor</span><span class="o">|</span><span class="nt">asistente</span><span class="o">)+</span><span class="k">&gt;</span>
+<span class="k">&lt;!ATTLIST</span> <span class="nt">claustro</span> <span class="na">centro</span> <span class="kc">CDATA</span> <span class="kc">#REQUIRED</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">profesor</span> <span class="o">(</span><span class="ni">%datospers;</span><span class="o">,</span><span class="nt">departamento</span><span class="o">?)</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">asistente</span> <span class="ni">%datospers;</span><span class="k">&gt;</span>
+<span class="k">&lt;!ATTLIST</span> <span class="nt">profesor</span> <span class="ni">%attrpers;</span><span class="k">&gt;</span>
+<span class="k">&lt;!ATTLIST</span> <span class="nt">asistente</span> <span class="ni">%attrpers;</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">nombre</span> <span class="o">(</span><span class="kc">#PCDATA</span><span class="o">)</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">apellidos</span> <span class="o">(</span><span class="kc">#PCDATA</span><span class="o">)</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">apelativo</span> <span class="o">(</span><span class="kc">#PCDATA</span><span class="o">)</span><span class="k">&gt;</span>
+<span class="k">&lt;!ELEMENT</span> <span class="nt">departamento</span> <span class="o">(</span><span class="kc">#PCDATA</span><span class="o">)</span><span class="k">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>Vayamos con las estrategias antes enumeradas:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="01.jaxp.html">3.1. <abbr title="Java API for XML Processing">JAXP</abbr></a><ul>
@@ -378,7 +477,11 @@ tratar <abbr title="JavaScript Object Notation">JSON</abbr>. También hay varias
 <li class="toctree-l2"><a class="reference internal" href="01.jaxp.html#xpath">3.1.3. XPath</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="02.jackson.html">3.2. Jackson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.jackson.html">3.2. Jackson</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="02.jackson.html#escritura">3.2.1. Escritura</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02.jackson.html#lectura">3.2.2. Lectura</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="03.basex.html">3.3. BaseX</a></li>
 </ul>
 </div>

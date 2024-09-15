@@ -1,0 +1,24 @@
+<!ENTITY % datospers "(apelativo,nombre,apellidos)">
+<!--
+   id:         Identificador del profesor (formato i<N>)
+   sustituye:  A quién sustituye al profesor.
+   casillero:  Número de casillero asignado. Si no se especifica:
+                  - En caso de profesor titular, la <N> de "id"
+                  - En caso de sustituto, el casillero del titular.
+               Si está vacío, el profesor no tiene asignado casillero.
+-->
+<!ENTITY % attrpers 
+   "id        ID       #REQUIRED
+    casillero CDATA    #IMPLIED
+    sustituye IDREF    #IMPLIED">
+
+<!ELEMENT claustro (profesor|asistente)+>
+<!ATTLIST claustro centro CDATA #REQUIRED>
+<!ELEMENT profesor (%datospers;,departamento?)>
+<!ELEMENT asistente %datospers;>
+<!ATTLIST profesor %attrpers;>
+<!ATTLIST asistente %attrpers;>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT apellidos (#PCDATA)>
+<!ELEMENT apelativo (#PCDATA)>
+<!ELEMENT departamento (#PCDATA)>

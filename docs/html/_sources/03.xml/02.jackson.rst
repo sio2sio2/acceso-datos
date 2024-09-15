@@ -2,3 +2,163 @@
 
 Jackson
 *******
+La otra estrategia para manipular el formato |XML| es traducirlo al modelo de
+objetos de *Java*, estrategia que ya seguimos con |JSON| y con |YAML| y que,
+como en el caso de estos otros dos formatos, también puede llevarse a cabo con
+*Jackson*, para lo cual necesitaremos `jackson-dataformat-xml
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/>`_.
+
+En este caso, usaremos también como ejemplo ilustrativo :ref:`el XML sobre un
+claustro de profesores <xml>`. En principio, podemos modelar las dos entidades
+existentes (`claustro` y `profesor`) con esta clase ``Claustro``:
+
+.. literalinclude:: files/Claustro.java
+   :language: java
+   :class: toggle
+   :caption: Claustro.java
+
+y esta otra ``Profesor``:
+
+.. literalinclude:: files/Profesor.java
+   :language: java
+   :class: toggle
+   :caption: Profesor.java
+
+Escritura
+=========
+Antes de comenzar a exponerla repasemos algunas diferencias significativas
+respecto a |JSON|:
+
++ En |XML| la información se proporciona mediante nodos elementos, pero también
+  mediante nodos atributo. En cambio, en el modelo de objetos sólo existen los
+  atributos del objeto. Por tanto, debe existir un modo de indicar cuándo quiere
+  mapearse un atributo de objeto a elemento y cuando a atributo |XML|.
+
++ La conversión de una campo que fuera una secuencia |JSON| al modelo de objetos
+  era evidente: un atributo del objeto que sea una lista o un array. En cambio,
+  en |XML| esto no es tan claro y el ejemplo lo ilustra. Los profesores del
+  claustro son conceptualmente una secuencia, pero no están contenidos dentro
+  todos ellos dentro de un elemento hijo de `claustro`, sino que son todos hijos
+  inmediatos de `claustro`. Dicho de otra forma, no nos encontramos con esto:
+
+  .. code-block:: xml
+
+     <claustro centro="...">
+         <profesores>
+            <profesor id="p1">
+               <!-- contenido del primer profesor -->
+            </profesor>
+            <profesor id="p2">
+               <!-- contenido del segundo profesor -->
+            </profesor>
+         </profesores>
+     </claustro>
+
+  sino con esto otro:
+
+  .. code-block:: xml
+
+     <claustro centro="...">
+         <profesor id="p1">
+            <!-- contenido del primer profesor -->
+         </profesor>
+         <profesor id="p2">
+            <!-- contenido del segundo profesor -->
+         </profesor>
+     </claustro>
+
++ En |XML| el orden de los nodos elemento importa y podría ser que nos
+  interesara predefinirlo.
+
+Teniendo presente esto, podemos alterar las clases anteriores del siguiente
+modo:
+
+.. literalinclude:: files/Claustro-xml.java
+   :language: java
+   :class: toggle
+   :caption: Claustro.java
+   :emphasize-lines: 1,4,7,8
+
+.. literalinclude:: files/Profesor-xml.java
+   :language: java
+   :class: toggle
+   :caption: Profesor.java
+   :emphasize-lines: 3
+
+Hemos utilizados anotaciones sobre las clases para:
+
+- Que la etiqueta raíz sea `claustro` y no `Claustro`.
+- Que los atributos `centro` e `id` se transcriban como atributos |XML|, no como
+  un nodos elemento.
+- Que la lista de profesores este directamente incluida dentro de `claustro` y
+  no dentro de un hijo de `claustro` (repásese la segunda diferencia
+  significativa que se acaba de enumerar).
+- Que la etiqueta sea `profesor` y no `plantilla`.
+
+.. note:: Si quisieramos modificar el orden en que se vuelcan en el |XML| los
+   aributos de una clase, podríamos usar ``@JsonPropertyOrder``:
+
+   .. code-block:: java
+      
+      @JsonPropertyOrder({"nombre", "apelativo", "departamento", "apellidos"})
+      public class Profesor {
+         // ...
+      }
+
+   Por supuesto, la anotación también es válida cuando se genera el formato
+   |JSON|, pero no suele tener importancia.
+
+Por último queda generar la salida en el programa principal:
+
+.. code-block:: java
+
+   Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "claustro.xml");
+
+   Claustro claustro = new Claustro(
+       "IES Castillo de Luna",
+       new Profesor[] {
+           new Profesor("p1", "Paco", "Francisco", "Calderón Márquez", "Inglés"),
+           new Profesor("p2", "Loli", "Dolores", "Fuertes de Barriga", "Francés")
+       }
+   );
+   
+   ObjectMapper mapper = new XmlMapper()
+       .configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true)
+       .enable(SerializationFeature.INDENT_OUTPUT);   // Salida "bonita".
+
+   try (
+       OutputStream st = Files.newOutputStream(archivo);
+       OutputStreamWriter sw = new OutputStreamWriter(st);
+   )
+   {
+       mapper.writeValue(sw, claustro);
+   }
+   catch(IOException err) {
+       err.printStackTrace();
+   }
+   
+También podríamos haber generado una cadena con la salida:
+
+
+.. code-block:: java
+
+   try {
+       String contenido = mapper.writeValueAsString(claustro);
+       System.out.println(contenido);
+   }
+   catch(IOException err) {
+       err.printStackTrace();
+   }
+
+
+.. todo:: Cómo traducir fechas.
+
+
+Lectura
+=======
+
+.. https://www.baeldung.com/java-xml
+
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`

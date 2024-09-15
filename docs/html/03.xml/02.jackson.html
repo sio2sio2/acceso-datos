@@ -373,8 +373,8 @@ como en el caso de estos otros dos formatos, también puede llevarse a cabo con
 <p>En este caso, usaremos también como ejemplo ilustrativo <a class="reference internal" href="index.html#xml"><span class="std std-ref">el XML sobre un
 claustro de profesores</span></a>. En principio, podemos modelar las dos entidades
 existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Claustro.java</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Claustro.java</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Claustro</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
@@ -396,8 +396,8 @@ existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code 
 </div>
 </div>
 <p>y esta otra <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Profesor</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
@@ -480,8 +480,8 @@ interesara predefinirlo.</p></li>
 </ul>
 <p>Teniendo presente esto, podemos alterar las clases anteriores del siguiente
 modo:</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Claustro.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Claustro.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="nd">@JacksonXmlRootElement</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;claustro&quot;</span><span class="p">)</span>
 </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Claustro</span><span class="w"> </span><span class="p">{</span>
 
@@ -507,8 +507,8 @@ modo:</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Profesor</span><span class="w"> </span><span class="p">{</span>
 
 <span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
@@ -604,10 +604,8 @@ aributos de una clase, podríamos usar <code class="docutils literal notranslate
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Por hacer</p>
-<p>Cómo traducir fechas.</p>
-</div>
+<p>Para traducir <strong>tipos no primitivos</strong>, basta <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-no-primitivos"><span class="std std-ref">hacer exactamente lo mismo
+que con JSON</span></a>.</p>
 </section>
 <section id="lectura">
 <h2><span class="section-number">3.2.2. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>

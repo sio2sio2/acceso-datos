@@ -46,7 +46,7 @@
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../_static/copybutton.js?v=ffc2f2e8"></script>
+    <script src="../../_static/copybutton.js?v=677778c1"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -376,7 +376,7 @@ Como en aquel caso empezaremos por no complicar las cosas: las secuencias son
 arrays y los valores son directamente traducibles a un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>
 (es decir, representaremos la edad y no la fecha de nacimiento).</p>
 <section id="lectura">
-<h2><span class="section-number">2.2.2.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
+<span id="json-jackson-read"></span><h2><span class="section-number">2.2.2.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>El código es muy similar al practicado con <cite>GSON</cite>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
 <span class="hll"><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">();</span>
@@ -405,7 +405,7 @@ absolutamente indiferente: la traducción se hará de igual forma.</p>
 </div>
 </section>
 <section id="escritura">
-<h2><span class="section-number">2.2.2.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<span id="json-jackson-write"></span><h2><span class="section-number">2.2.2.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
 <p>Por su parte la escritura a un <abbr title="JavaScript Object Notation">JSON</abbr> desde un modelo de objetos tampoco tiene
 excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>

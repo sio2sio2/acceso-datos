@@ -65,3 +65,5 @@ todo_include_todos = True
 # Eliminamos los prompts de la copia
 copybutton_prompt_text = r"\$ |>>> |jshell> "
 copybutton_prompt_is_regexp = True
+# Permite :class:no-copybutton
+copybutton_selector = "div:not(.no-copybutton) > div.highlight > pre"

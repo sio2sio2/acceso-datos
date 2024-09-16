@@ -42,6 +42,7 @@ respecto a |JSON|:
   inmediatos de `claustro`. Dicho de otra forma, no nos encontramos con esto:
 
   .. code-block:: xml
+     :class: no-copybutton
 
      <claustro centro="...">
          <profesores>
@@ -57,6 +58,7 @@ respecto a |JSON|:
   sino con esto otro:
 
   .. code-block:: xml
+     :class: no-copybutton
 
      <claustro centro="...">
          <profesor id="p1">
@@ -99,6 +101,7 @@ Hemos utilizados anotaciones sobre las clases para:
    aributos de una clase, podríamos usar ``@JsonPropertyOrder``:
 
    .. code-block:: java
+      :class: no-copybutton
       
       @JsonPropertyOrder({"nombre", "apelativo", "departamento", "apellidos"})
       public class Profesor {
@@ -108,7 +111,8 @@ Hemos utilizados anotaciones sobre las clases para:
    Por supuesto, la anotación también es válida cuando se genera el formato
    |JSON|, pero no suele tener importancia.
 
-Por último queda generar la salida en el programa principal:
+Por último queda generar la salida en el programa principal, que es básicamente
+igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
 
 .. code-block:: java
 
@@ -156,6 +160,27 @@ que con JSON <json-jackson-no-primitivos>`.
 
 Lectura
 =======
+Habiendo definido las clases con anotaciones como en el apartado anterior, la
+lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson-read>`:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   Path archivo = Path.of(System.getProperty("user.home"), "claustro.xml");
+   ObjectMapper mapper = new XmlMapper();
+
+   try (
+      InputStream st = Files.newInputStream(ruta);
+      InputStreamReader sr = new InputStreamReader(st);
+   ) {
+      Claustro claustro = mapper.readValue(sr, Claustro.class);
+      System.out.println(claustro);
+   }
+   catch(IOException err) {
+      err.printStackTrace();
+   }
+
+.. todo:: Comprobar cómo funciona cuando plantilla sea un ``ArrayList``.
 
 .. https://www.baeldung.com/java-xml
 

@@ -28,3 +28,12 @@ Unidades del curso
    :maxdepth: 2
 
    98.apendices/index
+
+Ejercicios
+----------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   99.ejercicios/[0-9]*

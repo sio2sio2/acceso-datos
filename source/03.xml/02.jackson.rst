@@ -24,6 +24,8 @@ y esta otra ``Profesor``:
    :class: toggle
    :caption: Profesor.java
 
+.. _xml-jackson-write:
+
 Escritura
 =========
 Antes de comenzar a exponerla repasemos algunas diferencias significativas
@@ -155,8 +157,14 @@ También podríamos haber generado una cadena con la salida:
    }
 
 
+.. note:: Si `plantilla` fuera un ``ArrayList`` en vez de un array, el codigo
+   encargado de serializar en formato |XML| sería el mismo. Lo mismo puede
+   afirmarse en la lectura, que se verá a continnuación.
+
 Para traducir **tipos no primitivos**, basta :ref:`hacer exactamente lo mismo
 que con JSON <json-jackson-no-primitivos>`.
+
+.. _xml-jackson-read:
 
 Lectura
 =======
@@ -179,8 +187,6 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
    catch(IOException err) {
       err.printStackTrace();
    }
-
-.. todo:: Comprobar cómo funciona cuando plantilla sea un ``ArrayList``.
 
 .. https://www.baeldung.com/java-xml
 

@@ -279,7 +279,23 @@ Para comprobar si dos archivos son el mismo:
    Files.isSameFile(home, Path.of("."));  // true.
 
 Y varios otros métodos para consultar fechas, si es ejecutable, si está oculto,
-etc.
+etc. También es posible listar directorios sin recursividad:
+
+.. code-block:: java
+
+   Stream<Path> archivos = Files.list(home);
+   archivos.forEarch(System.out::println);
+
+o con ella:
+
+.. code-block:: java
+
+   Stream<Path> archivos = Files.walk(home, 3, FileVisitOption.FOLLOW_LINKS);
+   archivos.forEarch(System.out::println);
+
+En este caso, se devuelven todos los archivos dentro del directorio personal,
+hasta una profundidad de 3 y, si un enlace simbólico es un directorio, se entra
+dentro de él. Los dos últimos argumentos son opcionales.
 
 Manipulación
 ------------

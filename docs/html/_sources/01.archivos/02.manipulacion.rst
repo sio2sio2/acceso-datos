@@ -292,7 +292,7 @@ Para escribir en disco varios objetos "*Persona*", podemos hacer lo siguiente:
 
    Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "caca.bin");
    try (ObjectOutputStream st = new ObjectOutputStream(Files.newOutputStream(ruta))) {
-      st.writeObject(o);
+      st.writeObject(personas);
    }
 
 Y listo, tendremos en :file:`caca.bin` la lista de personas serializadas. 

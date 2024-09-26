@@ -123,12 +123,21 @@ o bien:
       // Tratamiento de cada línea.
    });
 
-o incluso:
+o bien:
 
 .. code-block:: java
 
    for(String line: br.lines().toList()) {
       // Tratamiento de cada línea.
+   }
+
+o, incluso, si no que quiere agotar el flujo de primeras:
+
+.. code-block:: java
+
+   // Convertimos el stream en un iterable.
+   for(String line: (Iterable<String>)  br.lines()::iterator) {
+      // Tratamiento de la línea
    }
 
 Finalmente, habría que cerrar el flujo:
@@ -155,7 +164,7 @@ Poniendo todo junto y usando `try para el tratamiento de errores y el autocierre
          // Tratamiento de cada línea.
       }
    }
-   catch (Exception err) {
+   catch (IOException err) {
       err.printStackTrace();
    }
 
@@ -276,6 +285,12 @@ Para ilustrar cómo se serializan objetos definamos un clase muy simple:
        public String toString() {
            return String.format("%s, %d", nombre, edad);
        }
+
+       @Override
+       public boolean equals(Object o) {
+           Persona otra = (Persona) o;
+           return edad == otra.edad && nombre.equals(otra.nombre);
+       }
    }
 
 Escritura
@@ -284,35 +299,46 @@ Para escribir en disco varios objetos "*Persona*", podemos hacer lo siguiente:
 
 .. code-block:: java
 
-   // Las listas ya son serializables.
-   List<Persona> personas = List.of(
+   Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "personas.bin");
+
+   // Con List es igual ya que ,como los arrays, es serializable.
+   Persona[] personas = new Persona[] {
       new Persona("Manolo", 15),
       new Persona("Pablo", 10)
-   );
+   };
 
-   Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "caca.bin");
-   try (ObjectOutputStream st = new ObjectOutputStream(Files.newOutputStream(ruta))) {
-      st.writeObject(personas);
+   try (
+      OutputStrean os = Files.newOutputStream(ruta);
+      ObjectOutputStream oss = new ObjectOutputStream(os)
+   ) {
+      oss.writeObject(personas);
    }
-
-Y listo, tendremos en :file:`caca.bin` la lista de personas serializadas. 
-
-Lectura
--------
-Para recuperar un objeto serializado, hay que hacer el proceso inverso:
-
-.. code-block:: java
-
-   try (ObjectInputStream st = new ObjectInputStream(Files.newInputStream(ruta))) {
-      Object o = st.readObject();
-
-      // Ahora podemos usar "o" como prefiramos:
-      ((List<Persona>) o).forEach(System.out::println);
-   }
-   catch (Exception err) {
+   catch(IOException err) {
       err.printStackTrace();
    }
 
+Y listo, tendremos en :file:`personas.bin` la lista de personas serializadas. 
+
+Lectura
+-------
+Para recuperar un objeto serializado, hay que hacer el proceso inverso. Para ilustrarlo añadamos el siguiente código detrás del anterior:
+
+.. code-block:: java
+
+   Persona[] personasLeidas = null;
+
+   try (
+      InputStream is = Files.newInputStream(ruta);
+      ObjectInputStream ois = new ObjectInputStream(is);
+   ) {
+      personasLeidas = (Persona[]) ois.readObject();
+   }
+   catch (IOException err) {
+      err.printStackTrace();
+   }
+
+   System.out.printf("¿Es el array leído el mismo que habíamos escrito? %b",
+      Arrays.equals(personas, personasLeidas));  // Debe ser true.
 
 .. |SGBD| replace:: :abbr:`SGBD (Sistemas Gestores de Bases de Datos)`
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`

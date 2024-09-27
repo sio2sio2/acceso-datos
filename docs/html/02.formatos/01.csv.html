@@ -204,6 +204,9 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -420,11 +423,11 @@ método <code class="docutils literal notranslate"><span class="pre">getRecords<
 Podemos acceder a cada elemento por separado (con el método <code class="docutils literal notranslate"><span class="pre">.get</span></code>), pero es
 a su vez también iterable, lo que hemos preferido usar en este caso.</p></li>
 <li><p>Al procesar el <abbr title="Comma-Separated Values">CSV</abbr> hemos declarado que el archivo cumple extrictamente el
-<span class="target" id="index-0"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4180.html"><strong>RFC 4180</strong></a> con la salvedad de que permite líneas vacías. <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html">CSVFormat</a>
+<span class="target" id="index-0"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4180.html"><strong>RFC 4180</strong></a> con la salvedad de que permite líneas vacías. <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html">CSVFormat</a>
 lista otras variantes del estándar predefinidas indicándo cuál es su
 definición. En cualquier caso, podemos definir nosotros mismos el formato:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 <span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define los nombres de las columnas.</span>
 <span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </pre></div>
@@ -438,7 +441,7 @@ que podremos acceder a los valores de los campos usando <code class="docutils li
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>En realidad, lo recomendable es que la primera línea del <abbr title="Comma-Separated Values">CSV</abbr> no
-sea valores, sino los nombres de las columnas, por lo que muy comunmente
+sean valores, sino los nombres de las columnas, por lo que muy comunmente
 conviene redefinir el formato así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
 <span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>

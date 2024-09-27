@@ -65,14 +65,14 @@ Este es la lectura más simple que podemos hacer:
   a su vez también iterable, lo que hemos preferido usar en este caso.
 * Al procesar el |CSV| hemos declarado que el archivo cumple extrictamente el
   :rfc:`4180` con la salvedad de que permite líneas vacías. `CSVFormat
-  <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html>`_
+  <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html>`_
   lista otras variantes del estándar predefinidas indicándo cuál es su
   definición. En cualquier caso, podemos definir nosotros mismos el formato:
 
   .. code-block:: java
 
      CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-         .setIgnoreSurroundingSpaces(false)
+         .setIgnoreSurroundingSpaces(true)
          .setHeaderName("Nombre", "Edad")  // Define los nombres de las columnas.
          .build();
 
@@ -84,7 +84,7 @@ Este es la lectura más simple que podemos hacer:
   (:code:`registro.get("Nombre")`).
 
   .. note:: En realidad, lo recomendable es que la primera línea del |CSV| no
-     sea valores, sino los nombres de las columnas, por lo que muy comunmente
+     sean valores, sino los nombres de las columnas, por lo que muy comunmente
      conviene redefinir el formato así:
 
      .. code-block:: java

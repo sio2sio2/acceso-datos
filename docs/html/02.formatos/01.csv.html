@@ -206,6 +206,7 @@
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
 </ul>
 
     </div>
@@ -444,9 +445,9 @@ que podremos acceder a los valores de los campos usando <code class="docutils li
 sean valores, sino los nombres de las columnas, por lo que muy comunmente
 conviene redefinir el formato así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">()</span><span class="w">        </span><span class="c1">// Respetamos los nombres incluidos.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">()</span><span class="w">  </span><span class="c1">// Saltamos la primera línea al leer.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setHeader</span><span class="p">()</span><span class="w">                </span><span class="c1">// Respetamos los nombres incluidos.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">  </span><span class="c1">// Saltamos la primera línea al leer.</span>
 <span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -471,7 +472,7 @@ conviene redefinir el formato así:</p>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">   </span><span class="n">CSVPrinter</span><span class="w"> </span><span class="n">printer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVPrinter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">formato</span><span class="p">);</span>
+<span class="w">   </span><span class="n">CSVPrinter</span><span class="w"> </span><span class="n">printer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVPrinter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">formato</span><span class="p">);</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">datos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="c1">//printer.printRecord(registro[0], registro[1]);</span>

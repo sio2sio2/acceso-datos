@@ -90,9 +90,9 @@ Este es la lectura más simple que podemos hacer:
      .. code-block:: java
 
         CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-            .setIgnoreSurroundingSpaces(false)
-            .setHeaderName()        // Respetamos los nombres incluidos.
-            .setSkipHeaderRecord()  // Saltamos la primera línea al leer.
+            .setIgnoreSurroundingSpaces(true)
+            .setHeader()                // Respetamos los nombres incluidos.
+            .setSkipHeaderRecord(true)  // Saltamos la primera línea al leer.
             .build();
 
 
@@ -116,7 +116,7 @@ La creación de archivos |CSV| también es bastante sencilla utilizando
 
    try (
       OutputStream st = Files.newOutputStream(ruta);
-      CSVPrinter printer = new CSVPrinter(new OutputStreamReader(st), formato);
+      CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(st), formato);
    ) {
       for(String[] registro: datos) {
          //printer.printRecord(registro[0], registro[1]);

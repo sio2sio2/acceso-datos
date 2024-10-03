@@ -308,7 +308,7 @@ Para escribir en disco varios objetos "*Persona*", podemos hacer lo siguiente:
    };
 
    try (
-      OutputStrean os = Files.newOutputStream(ruta);
+      OutputStream os = Files.newOutputStream(ruta);
       ObjectOutputStream oss = new ObjectOutputStream(os)
    ) {
       oss.writeObject(personas);

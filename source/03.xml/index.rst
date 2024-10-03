@@ -34,8 +34,6 @@ que puede validarse con el siguiente |DTD|:
    :class: toggle
 
 
-.. literalinclude::
-
 Vayamos con las estrategias antes enumeradas:
 
 .. toctree::

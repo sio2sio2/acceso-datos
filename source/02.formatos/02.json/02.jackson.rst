@@ -13,6 +13,9 @@ Como en aquel caso empezaremos por no complicar las cosas: las secuencias son
 arrays y los valores son directamente traducibles a un tipo primitivo de |JSON|
 (es decir, representaremos la edad y no la fecha de nacimiento).
 
+Para empezar necesitaremos la librería `jackson-databind
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind>`_.
+
 .. _json-jackson-read:
 
 Lectura
@@ -137,6 +140,24 @@ particular de fechas hay dos atajos:
      `jackson-annotations
      <https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations>`_.
 
+  .. warning:: Al usar esta anotación puede haber desajustes al serializar las fechas
+     como consecuencia de la zona horaria, por lo que habría que especificarla
+     en la propia anotación:
+
+     .. code-block:: java
+
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Europe/Madrid")
+        private Date nacimiento
+
+     o al definir el objeto de mapeo:
+
+     .. code-block:: java
+
+        mapper.setTimeZone(TimeZone.getDefault());
+
+  .. caution:: En las anotaciones deben usarse literales y constantes, por lo
+     que no puede usarse el método para obtener el huso horario del sistema.
+
 Sin embargo, ensayaremos una solución más general que ilustre cómo definir
 nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
 `jackson-core
@@ -181,7 +202,7 @@ Y ya sólo quedaría indicar el campo en que se va a usar este traductor:
    @JsonDeserialize(using=Traductor.DateDeserializer.class)
    private Date nacimiento;
 
-Y en cambio de que hubiera varios atributos `Date` en las clases implicadas y
+Y en caso de que hubiera varios atributos `Date` en las clases implicadas y
 todas se quieran traducir igual, podríamos ahorrarnos la anotación individual en
 cada uno de los atributos y hacer lo siguiente:
 

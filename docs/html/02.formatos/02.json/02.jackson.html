@@ -204,6 +204,10 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -375,6 +379,7 @@ el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para
 Como en aquel caso empezaremos por no complicar las cosas: las secuencias son
 arrays y los valores son directamente traducibles a un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>
 (es decir, representaremos la edad y no la fecha de nacimiento).</p>
+<p>Para empezar necesitaremos la librería <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind">jackson-databind</a>.</p>
 <section id="lectura">
 <span id="json-jackson-read"></span><h2><span class="section-number">2.2.2.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>El código es muy similar al practicado con <cite>GSON</cite>:</p>
@@ -522,6 +527,25 @@ que da soporte a fechas:</p>
 <p>En este segundo caso necesitamos el paquete aparte
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations">jackson-annotations</a>.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Al usar esta anotación puede haber desajustes al serializar las fechas
+como consecuencia de la zona horaria, por lo que habría que especificarla
+en la propia anotación:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonFormat</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">JsonFormat</span><span class="p">.</span><span class="na">Shape</span><span class="p">.</span><span class="na">STRING</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="o">=</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">timezone</span><span class="o">=</span><span class="s">&quot;Europe/Madrid&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="n">nacimiento</span>
+</pre></div>
+</div>
+<p>o al definir el objeto de mapeo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">.</span><span class="na">setTimeZone</span><span class="p">(</span><span class="n">TimeZone</span><span class="p">.</span><span class="na">getDefault</span><span class="p">());</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>En las anotaciones deben usarse literales y constantes, por lo
+que no puede usarse el método para obtener el huso horario del sistema.</p>
+</div>
 </li>
 </ul>
 <p>Sin embargo, ensayaremos una solución más general que ilustre cómo definir
@@ -563,7 +587,7 @@ nuestro propio traductor<a class="footnote-reference brackets" href="#id2" id="i
 <span class="kd">private</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Y en cambio de que hubiera varios atributos <cite>Date</cite> en las clases implicadas y
+<p>Y en caso de que hubiera varios atributos <cite>Date</cite> en las clases implicadas y
 todas se quieran traducir igual, podríamos ahorrarnos la anotación individual en
 cada uno de los atributos y hacer lo siguiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">();</span>

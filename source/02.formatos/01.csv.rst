@@ -95,7 +95,6 @@ Este es la lectura más simple que podemos hacer:
             .setSkipHeaderRecord(true)  // Saltamos la primera línea al leer.
             .build();
 
-
 Escritura
 =========
 La creación de archivos |CSV| también es bastante sencilla utilizando
@@ -128,21 +127,23 @@ La creación de archivos |CSV| también es bastante sencilla utilizando
       // Lo puede provocar la apertura del flujo o los lectores.
    }
 
-.. note:: No es necesario escribir registro a registro. Si disponemos los datos
+.. hint:: No es necesario escribir registro a registro. Si disponemos los datos
    en un flujo, una colección o una lista, podemos usar ``printRecords``:
 
    .. code-block:: java
 
       printer.printRecords(Arrays.stream(datos));
 
+.. note:: Los ``Enum`` no presentan ningún problema al ser almacenados o leídos.
 
 .. rubric:: Notas al pie
 
 .. [#] :java-nio:`Files <Files>` tiene también un método ``newBufferedReader``
    que devuelve directamente un lector de flujo, lo que nos permitiría
-   ahorrarnos un paso, pero hemos preferido usar obtener un flujo a partir del
-   fichero, para que el resto del código sea igual si la entrada no es un
-   fichero, sino de otra naturaleza (p.e. un servicio web).
+   ahorrarnos un paso, pero hemos preferido obtener un flujo a partir del
+   fichero, para que el resto del código fuera igual en caso de que la entrada
+   no fuera un fichero, sino de otra naturaleza (p.e. datos descargados de un
+   servicio web).
 
 .. [#] En realidad, la librería usando ``CSVFormat.DEFAULT`` no devuelve un
    error (como debería), sino que interpreta la línea a su manera, es decir,
@@ -157,6 +158,5 @@ La creación de archivos |CSV| también es bastante sencilla utilizando
    .. code-block:: java
 
        a,"b, c"
-
 
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`

@@ -485,13 +485,17 @@ conviene redefinir el formato así:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
 <p>No es necesario escribir registro a registro. Si disponemos los datos
 en un flujo, una colección o una lista, podemos usar <code class="docutils literal notranslate"><span class="pre">printRecords</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">printer</span><span class="p">.</span><span class="na">printRecords</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">datos</span><span class="p">));</span>
 </pre></div>
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Los <code class="docutils literal notranslate"><span class="pre">Enum</span></code> no presentan ningún problema al ser almacenados o leídos.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
@@ -499,9 +503,10 @@ en un flujo, una colección o una lista, podemos usar <code class="docutils lite
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p><a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a> tiene también un método <code class="docutils literal notranslate"><span class="pre">newBufferedReader</span></code>
 que devuelve directamente un lector de flujo, lo que nos permitiría
-ahorrarnos un paso, pero hemos preferido usar obtener un flujo a partir del
-fichero, para que el resto del código sea igual si la entrada no es un
-fichero, sino de otra naturaleza (p.e. un servicio web).</p>
+ahorrarnos un paso, pero hemos preferido obtener un flujo a partir del
+fichero, para que el resto del código fuera igual en caso de que la entrada
+no fuera un fichero, sino de otra naturaleza (p.e. datos descargados de un
+servicio web).</p>
 </aside>
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>

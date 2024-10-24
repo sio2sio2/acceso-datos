@@ -1,0 +1,38 @@
+.. _ej-xml:
+
+Ejercicios sobre formato |XML|
+==============================
+Tomando la solución facilitada por el profesor para los :ref:`préstamos de una biblioteca <lm:ej10-05>`:
+
+1. Utilice |JAXP| para leer la :download:`solución facilitada por el profesor
+   <files/biblioteca.xml>` y 
+
+   a. Genere una salida de texto que incluya:
+
+      * Un listado de autores con el número de libros suyos de que dispone la biblioteca.
+      * Un listado de lectores con el número de libros que ha pedido en préstamo.
+
+   #. Hago lo mismo que en el caso anterior, pero en vez de generar el listado
+      genere una salida |XML| que puede tener este formato:
+
+      .. code-block:: xml
+
+         <biblioteca nombre="el que sea">
+            <autores>
+               <autor nombre="Miguel de Cervantes" libros=5>
+               <!-- más autores -->
+            </autores>
+
+            <lectores>
+               <lector nombre="Perico de los palotes" peticiones=6>
+               <!-- más lectores -->
+            </lectores>
+         </biblioteca>
+
+   .. note:: No realice dos programas distintos. Resuelva ambos apartados con
+      un sólo programa que genere una u otra salida dependiendo de la
+      preferencia del usuario. Se deja libertad para decidir cómo el usuario
+      proporciona la información sobre el formato de salida.
+
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |JAXP| replace:: :abbr:`JAXP (Java API for XML Processing)`

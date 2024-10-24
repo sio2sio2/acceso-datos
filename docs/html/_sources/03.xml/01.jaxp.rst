@@ -123,6 +123,15 @@ hacer diversas pesquisas:
          }
       }
 
+  .. tip:: Pese a que, a priori, sólo podemos utilizar el `for` tradicional
+     para recorrfer NodeList_, podemos buscarnos las vueltas para convertirlo
+     en un flujo y poder usar con él técnicas de :ref:`Java funcional <funcional>`:
+
+     .. code-block:: Java
+
+        NodeList hijos = root.getChildNodes();
+        Stream<Node> streamNode = IntStream.range(0, hijos.getLength()).mapToObj(hijos::item);
+
 ``getAttributes()``
    devuelve los atributos del elemento en forma de `NamedNodeMap
    <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html>`_

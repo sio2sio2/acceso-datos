@@ -204,6 +204,10 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -444,7 +448,8 @@ cuidado con los documentos indentados)</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getParentNode()</span></code> o <code class="docutils literal notranslate"><span class="pre">getPreviousSibling()</span></code> o <code class="docutils literal notranslate"><span class="pre">getFollowingSibling()</span></code></dt><dd><p>devuelve el nodo padre o el hermano previo o el hermano siguiente.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">getChildNodes()</span></code></dt><dd><p>devuelve un objeto <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>  con
+<dt><code class="docutils literal notranslate"><span class="pre">getChildNodes()</span></code></dt><dd><blockquote>
+<div><p>devuelve un objeto <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>  con
 los nodos hijos. A pesar de su naturaleza no implementa la interfaz
 <a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable</a> y sólo presenta un método (<code class="docutils literal notranslate"><span class="pre">getLength()</span></code>)
 que devuelve la cantidad de hijos y un método <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> que
@@ -462,6 +467,17 @@ la colección, habrá que usar un <cite>for</cite> clásico:</p>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
+</div></blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Pese a que, a priori, sólo podemos utilizar el <cite>for</cite> tradicional
+para recorrfer <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>, podemos buscarnos las vueltas para convertirlo
+en un flujo y poder usar con él técnicas de <a class="reference internal" href="../98.apendices/01.funcional.html#funcional"><span class="std std-ref">Java funcional</span></a>:</p>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">hijos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">getChildNodes</span><span class="p">();</span>
+<span class="n">Stream</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span><span class="w"> </span><span class="n">streamNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IntStream</span><span class="p">.</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">hijos</span><span class="p">.</span><span class="na">getLength</span><span class="p">()).</span><span class="na">mapToObj</span><span class="p">(</span><span class="n">hijos</span><span class="p">::</span><span class="n">item</span><span class="p">);</span>
+</pre></div>
+</div>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getAttributes()</span></code></dt><dd><p>devuelve los atributos del elemento en forma de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a>

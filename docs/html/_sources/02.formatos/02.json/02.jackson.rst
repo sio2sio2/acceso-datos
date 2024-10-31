@@ -106,8 +106,14 @@ Al escribir, es indiferente si usamos arrays o listas.
 Tipos no primitivos
 ===================
 En el ejemplo anterior todos lo tipos de los objetos de Java tiene
-correspondencia con un tipo primitivo de |JSON|. Supongamos ahora que no es así
-y que de los alumnos se registra la fecha de nacimiento:
+correspondencia con un tipo primitivo de |JSON|, ya que las cadenas son cadenas,
+los números, números, y los arrays o ``ArrayList`` los traduce directamente
+Jackson como secuencias. Incluso si usamos los valores de una enumeración para
+codificarla en el |JSON|\ [#]_, la librería será capaz de traducir sin
+isntrucciones por nuestra parte.
+
+Pero supongamos ahora que no es así y que de los alumnos se registra la fecha de
+nacimiento:
 
 .. literalinclude:: files/grupos-nacimiento.json
    :class: toggle
@@ -222,6 +228,18 @@ cada uno de los atributos y hacer lo siguiente:
    mapper.registerModule(module);
 
 .. rubric:: Notas al pie
+
+.. [#] Es decir, que si se tiene:
+
+       .. code-block:: java
+
+          public enum Enumeracion {
+            UNO,
+            DOS;
+          }
+
+       se usan las cadenas *UNO* y *DOS* en el |JSON|. En caso, contrario,
+       habría que hacer un traductor como se expone bajoo este epígrafe.
 
 .. [#] ``SimpleDateFormat`` no es *thread-safe* por lo que habría que mejorar
    algo el código en caso de utilizarse hilos. Por ejemplo:

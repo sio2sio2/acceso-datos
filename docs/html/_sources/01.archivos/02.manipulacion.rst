@@ -29,7 +29,7 @@ clasificarla en estos tipos:
       cabe destacar:
 
       * Los producidos por la **serialización** directa de objetos.
-      * Los que responde a un formato específico para el cual, como en el caso
+      * Los que responden a un formato específico para el cual, como en el caso
         de archivos de texto, necesitaremos una biblioteca especializada para su
         tratamiento.
 
@@ -91,7 +91,7 @@ hacer lo siguiente:
    BufferedReader br = new BufferedReader(sr);
 
 .. note:: En las siguientes unidades, para el tratamiento de archivos en
-   distintos formatos de intercambio de información conocidos intentaramos
+   distintos formatos de intercambio de información conocidos intentaremos
    utilizar un método que nos permita convertir la entrada en un objeto
    `InputStream`, aunque pueda existir algún otro menos verborreico que permita
    utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
@@ -131,7 +131,7 @@ o bien:
       // Tratamiento de cada línea.
    }
 
-o, incluso, si no que quiere agotar el flujo de primeras:
+o, incluso, si no se quiere agotar el flujo de primeras:
 
 .. code-block:: java
 
@@ -245,7 +245,7 @@ secuencia de *bytes*, cuya lectura permite posteriormente recuperar los datos
 originales. Como los archivos son precisamente eso mismo, secuencias de *bytes*,
 es un mecanismo apropiado para almacenar datos en disco.
 
-Antes de dar un ejemplo, no obstante, en preciso establecer varias premisas:
+Antes de dar un ejemplo, no obstante, es preciso establecer varias premisas:
 
 * En cada archivo sólo podemos serializar un objeto, por lo que si queremos
   serializar varios tendremos que incluirlos dentro de una lista o una
@@ -301,7 +301,7 @@ Para escribir en disco varios objetos "*Persona*", podemos hacer lo siguiente:
 
    Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "personas.bin");
 
-   // Con List es igual ya que ,como los arrays, es serializable.
+   // Con List es igual ya que, como los arrays, es serializable.
    Persona[] personas = new Persona[] {
       new Persona("Manolo", 15),
       new Persona("Pablo", 10)

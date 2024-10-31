@@ -24,9 +24,9 @@ Variables de entorno
 Las :dfn:`variables de entorno` son variables definidas en el sistema operativo
 que heredan las aplicaciones que se ejecutan dentro de él, y que, cuando quieren
 realizarse tareas relacionadas con el propio sistema, es necesario consultar en
-tiempo de programación. Por ejemplo, si quisiéramos acceder un archivo que
+tiempo de programación. Por ejemplo, si quisiéramos acceder a un archivo que
 sabemos situado dentro del directorio personal del usuario, necesitamos conocer
-cuál esta ruta, para lo cual podemos consultar la *variable de entorno*
+cuál es esta ruta, para lo cual podemos consultar la *variable de entorno*
 correspondiente.
 
 Para acceder a  las variables de entorno *Java* dispone del método estático\
@@ -48,13 +48,13 @@ Para acceder a  las variables de entorno *Java* dispone del método estático\
       Map<String, String> entorno = System.getenv();
       entorno.get("HOME");  // /home/usuario, de nuevo.
 
-El **problema** crucial de consultar la variables de entorno es el de que el
+El **problema** crucial de consultar las variables de entorno es el de que el
 nombre cambia entre los distintos sistemas operativos\ [#]_ y, por tanto, si nos
 limitamos a usarlas tal como acabamos de ver, nuestro aplicación será
 dependiente del sistema en que se ejecute.
 
 Una alternativa es consultar las propiedades de nuestro entorno de *Java*,
-algunas de las cuales recoger los valores de las variables de entorno:
+algunas de las cuales recogen los valores de las variables de entorno:
 
 ``System.getProperty(String nombre_propiedad)``
    devuelve el valor de la propiedad que se indica en su argumento:
@@ -284,14 +284,14 @@ etc. También es posible listar directorios sin recursividad:
 .. code-block:: java
 
    Stream<Path> archivos = Files.list(home);
-   archivos.forEarch(System.out::println);
+   archivos.forEach(System.out::println);
 
 o con ella:
 
 .. code-block:: java
 
    Stream<Path> archivos = Files.walk(home, 3, FileVisitOption.FOLLOW_LINKS);
-   archivos.forEarch(System.out::println);
+   archivos.forEach(System.out::println);
 
 En este caso, se devuelven todos los archivos dentro del directorio personal,
 hasta una profundidad de 3 y, si un enlace simbólico es un directorio, se entra
@@ -310,7 +310,7 @@ Para **crear** un archivo:
 
    Files.createFile(home.resolve("caca.txt"));
 
-lo que creará el archivo vacío :file:`caca.txt` dentro de nuestro diretorio
+lo que creará el archivo vacío :file:`caca.txt` dentro de nuestro directorio
 natural con los permisos que determine la máscara del sistema. Podríamos haber
 definido otros permisos, pero para ello tendríamos que haber incluido argumentos
 adicionales (véase :java-nio:`FileAttribute <attribute/FileAttribute>`), pero no

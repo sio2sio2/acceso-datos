@@ -9,8 +9,6 @@ public class Profesor {
     @JacksonXmlProperty(isAttribute = true)
     private String casillero;
 
-    private static DateFormat df = new SimpleDateFormat("yyyy-dd-MM");
-
     private String apelativo;
     private String nombre;
     private String apellidos;

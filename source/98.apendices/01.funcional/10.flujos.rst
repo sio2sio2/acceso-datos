@@ -65,8 +65,17 @@ Algunos son:
    condición.
 
 ``forEach(Consumer<T> action)``
-   que aplica la acción a cada elemento del flujo consumiéndolo por
-   completo (como el equivalente para colecciones).
+   que aplica la acción a cada elemento del flujo consumiéndolo por completo
+   (como el equivalente para colecciones). Si prefiriésemos consumir el flujo
+   iterando con un bucle, podríamos interpretarlo como un un iterable\ [#]_:
+
+   .. code-block:: java
+
+      IntStream s = IntStream.range(0,3);
+      // s.forEach(System.out::println);
+      for(Integer i: (Iterable<Integer>) s::iterator) {
+         System.out.println(i)
+      }
 
 ``peek(Consumer<T> action)``
    que aplica la acción a cada elemento del flujo pero deja el flujo intacto
@@ -150,8 +159,8 @@ estáticos:
       s.toList(); // [1, 2, 3, 4]
 
 ``Stream.generate(Supplier<T> s)``
-   que genera un flujo infinito a partir de la función suministradora que se pasa como
-   argumento.
+   que genera un flujo infinito a partir de la función suministradora que se
+   pasa como argumento.
 
    .. code-block:: java
 
@@ -159,7 +168,16 @@ estáticos:
       Stream<Integer> s = Stream.generate(() -> n++);
       s.limit(3).toList();  // [0, 1, 2]
 
-``Stream.iterate(T seed, UnaryOperator<T> f)``
+   Si quiere limitarse la generación mediante una condición, puede aplicarse el
+   método ``.takeWhile`` ya citado:
+
+   .. code-block:: java
+
+      int n = 0;
+      Stream<Integer> s = Stream.generate(() -> n++);
+      s.takeWhile(i -> i<3);  // [0, 1, 2]
+
+``Stream.iterate(T seed, UnaryOperator<T> proximo)``
    que genera un flujo infinito de datos de manera que el elemento n-ésimo se
    obtiene de aplicarle la función al elemento anterior. El primer elemento
    devuelto es la propia semilla:
@@ -169,7 +187,24 @@ estáticos:
       Stream<Integer> s = Stream.iterate(0, (seed) -> ++seed;);
       s.limit(3).toList();  // [0, 1, 2]
 
+   Este último método también permite la inclusión de una condición:
+
+``Stream.iterate(T seed, Predicate<T> condición, UnaryOperator<T> proximo)``
+   que funciona como el anterior, pero incorporando la condición:
+
+   .. code-block:: java
+
+      Stream<Integer> s = Stream.iterate(0, i -> i < 3, i -> ++i;);
+      s.toList();  // [0, 1, 2]
+
 .. https://jenkov.com/tutorials/java-collections/streams.html
 .. https://www.sensedia.com.es/post/interfaces-funcionales-con-java-8
 
+.. rubric:: Notas al pie
 
+.. [#] La explicación de este código es que la interfaz Iterable requiere la
+   implementación de un método ``iterator`` que devuelve un objeto ``Iterator``.
+   Como los flujos tienen un método que hace esto mismo (y que se llama también
+   iterator), podemos pasar este método con el operador ``::``, de la misma
+   forma que actuábamos cuando explicamos las :ref:`interfaces funcionales
+   <functional-interface>`.

@@ -24,6 +24,10 @@ y esta otra ``Profesor``:
    :class: toggle
    :caption: Profesor.java
 
+.. caution:: Se ha definido el departamento como una cadena por simplificar el
+   código. En puridad, el departamento debería ser un Enum y, en ese caso,
+   habría que hacer :ref:`un traductor <json-jackson-no-primitivos>`.
+
 .. _xml-jackson-write:
 
 Escritura
@@ -91,15 +95,28 @@ modo:
 
 Hemos utilizados anotaciones sobre las clases para:
 
+.. rst-class:: simple
+
 - Que la etiqueta raíz sea `claustro` y no `Claustro`.
 - Que los atributos `centro` e `id` se transcriban como atributos |XML|, no como
   un nodos elemento.
+- Que la etiqueta sea `profesor` y no `plantilla`.
 - Que la lista de profesores este directamente incluida dentro de `claustro` y
   no dentro de un hijo de `claustro` (repásese la segunda diferencia
   significativa que se acaba de enumerar).
-- Que la etiqueta sea `profesor` y no `plantilla`.
 
-.. note:: Si quisieramos modificar el orden en que se vuelcan en el |XML| los
+  .. note:: En realidad, cuando no se prescinde del envoltorio, el elemento en
+     que se incluyen todos los componentes de la secuencia tiene el mismo nombre
+     que los propios componentes (``profesor`` en este caso). Si quisiéramos
+     cambiarlos, podríamos haber escrito:
+
+     .. code-block:: java
+
+        @JacksonXmlElementWrapper(localName = "profesores")
+        @JacksonXmlProperty(localName = "profesor")
+        private Profesor[] plantilla;
+
+.. tip:: Si quisieramos modificar el orden en que se vuelcan en el |XML| los
    aributos de una clase, podríamos usar ``@JsonPropertyOrder``:
 
    .. code-block:: java

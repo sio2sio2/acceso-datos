@@ -204,6 +204,11 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -408,8 +413,6 @@ existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code 
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">DateFormat</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-dd-MM&quot;</span><span class="p">);</span>
-
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
@@ -447,6 +450,12 @@ existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code 
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Se ha definido el departamento como una cadena por simplificar el
+código. En puridad, el departamento debería ser un Enum y, en ese caso,
+habría que hacer <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-no-primitivos"><span class="std std-ref">un traductor</span></a>.</p>
 </div>
 <section id="escritura">
 <span id="xml-jackson-write"></span><h2><span class="section-number">3.2.1. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
@@ -536,8 +545,6 @@ modo:</p>
 <span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">DateFormat</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-dd-MM&quot;</span><span class="p">);</span>
-
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
@@ -581,13 +588,26 @@ modo:</p>
 <li><p>Que la etiqueta raíz sea <cite>claustro</cite> y no <cite>Claustro</cite>.</p></li>
 <li><p>Que los atributos <cite>centro</cite> e <cite>id</cite> se transcriban como atributos <abbr title="eXtensible Markup Language">XML</abbr>, no como
 un nodos elemento.</p></li>
+<li><p>Que la etiqueta sea <cite>profesor</cite> y no <cite>plantilla</cite>.</p></li>
 <li><p>Que la lista de profesores este directamente incluida dentro de <cite>claustro</cite> y
 no dentro de un hijo de <cite>claustro</cite> (repásese la segunda diferencia
-significativa que se acaba de enumerar).</p></li>
-<li><p>Que la etiqueta sea <cite>profesor</cite> y no <cite>plantilla</cite>.</p></li>
-</ul>
+significativa que se acaba de enumerar).</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
+<p>En realidad, cuando no se prescinde del envoltorio, el elemento en
+que se incluyen todos los componentes de la secuencia tiene el mismo nombre
+que los propios componentes (<code class="docutils literal notranslate"><span class="pre">profesor</span></code> en este caso). Si quisiéramos
+cambiarlos, podríamos haber escrito:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesores&quot;</span><span class="p">)</span>
+<span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesor&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
 <p>Si quisieramos modificar el orden en que se vuelcan en el <abbr title="eXtensible Markup Language">XML</abbr> los
 aributos de una clase, podríamos usar <code class="docutils literal notranslate"><span class="pre">&#64;JsonPropertyOrder</span></code>:</p>
 <div class="no-copybutton highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonPropertyOrder</span><span class="p">({</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;apelativo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;departamento&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;apellidos&quot;</span><span class="p">})</span>

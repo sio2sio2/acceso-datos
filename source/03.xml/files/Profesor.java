@@ -4,8 +4,6 @@ public class Profesor {
     private String sustituye;
     private String casillero;
 
-    private static DateFormat df = new SimpleDateFormat("yyyy-dd-MM");
-
     private String apelativo;
     private String nombre;
     private String apellidos;

@@ -16,7 +16,7 @@ Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
 
    Path ruta = Path.of(System.getProperty("user.home"), "claustro.xml");
    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-   // La siguiente línea puede provocar un ParseConfiguracionException
+   // La siguiente línea puede provocar un ParseConfigurationException
    DocumentBuilder builder = factory.newDocumentBuilder();
 
    try (InputStream st = Files.newInputStream(ruta)) {
@@ -78,7 +78,7 @@ hacer diversas pesquisas:
 
 ``getTextContent()``
    devuelve el valor de texto del elemento\ [#]_, que es la concatenación de los nodos de
-   texto del propio elemmento y de todos sus descendientes. Obsérvese que para un
+   texto del propio elemento y de todos sus descendientes. Obsérvese que para un
    nodo así:
 
    .. code-block:: xml
@@ -172,7 +172,7 @@ ejemplo, Element_:
       Element p17 = xml.getElementById("p17"); // null, porque no estamos usando el DTD
 
 ``getAttributeNode(String name)`` o ``getAttribute(String name)``
-   devuelve el attributo (Attr_) o el valor del atributo cuyo nombre se
+   devuelve el atributo (Attr_) o el valor del atributo cuyo nombre se
    proporciona en el argumento.
 
 .. _jaxp-dtd:
@@ -308,7 +308,7 @@ Partamos de que ya tenemos un Document_ construido como queremos que quede
        StreamResult result = new StreamResult(sw);
        transformer.transform(source, result);
    }
-   catch(IOException | TrasnformerException err) {
+   catch(IOException | TransformerException err) {
       err.printStackTrace();
    }
 

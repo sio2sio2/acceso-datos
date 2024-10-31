@@ -207,6 +207,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
 </ul>
 
     </div>
@@ -382,7 +383,7 @@ soporte alguno.</p>
 <p>Comencemos por conocer cómo abrir un documento <abbr title="eXtensible Markup Language">XML</abbr> y acceder a sus nodos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
 <span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
-<span class="c1">// La siguiente línea puede provocar un ParseConfiguracionException</span>
+<span class="c1">// La siguiente línea puede provocar un ParseConfigurationException</span>
 <span class="n">DocumentBuilder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="na">newDocumentBuilder</span><span class="p">();</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
@@ -431,7 +432,7 @@ hacer diversas pesquisas:</p>
 devuelve cada tipo).</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getTextContent()</span></code></dt><dd><p>devuelve el valor de texto del elemento<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, que es la concatenación de los nodos de
-texto del propio elemmento y de todos sus descendientes. Obsérvese que para un
+texto del propio elemento y de todos sus descendientes. Obsérvese que para un
 nodo así:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;apelativo&gt;</span>Paco<span class="nt">&lt;/apelativo&gt;</span>
 </pre></div>
@@ -512,7 +513,7 @@ identificador, por lo que es necesario que el documento se haya validado.</p>
 </pre></div>
 </div>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">getAttributeNode(String</span> <span class="pre">name)</span></code> o <code class="docutils literal notranslate"><span class="pre">getAttribute(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve el attributo (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>) o el valor del atributo cuyo nombre se
+<dt><code class="docutils literal notranslate"><span class="pre">getAttributeNode(String</span> <span class="pre">name)</span></code> o <code class="docutils literal notranslate"><span class="pre">getAttribute(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve el atributo (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>) o el valor del atributo cuyo nombre se
 proporciona en el argumento.</p>
 </dd>
 </dl>
@@ -635,7 +636,7 @@ crearlo <em>ex novo</em>:</p>
 <span class="w">    </span><span class="n">StreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StreamResult</span><span class="p">(</span><span class="n">sw</span><span class="p">);</span>
 <span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">transform</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">TrasnformerException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">TransformerException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>

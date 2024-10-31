@@ -206,6 +206,8 @@
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
 </ul>
 
     </div>
@@ -403,7 +405,7 @@ que requieren forzosamente de algún método para su acceso. Entre ellos
 cabe destacar:</p>
 <ul class="simple">
 <li><p>Los producidos por la <strong>serialización</strong> directa de objetos.</p></li>
-<li><p>Los que responde a un formato específico para el cual, como en el caso
+<li><p>Los que responden a un formato específico para el cual, como en el caso
 de archivos de texto, necesitaremos una biblioteca especializada para su
 tratamiento.</p></li>
 </ul>
@@ -455,7 +457,7 @@ hacer lo siguiente:</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>En las siguientes unidades, para el tratamiento de archivos en
-distintos formatos de intercambio de información conocidos intentaramos
+distintos formatos de intercambio de información conocidos intentaremos
 utilizar un método que nos permita convertir la entrada en un objeto
 <cite>InputStream</cite>, aunque pueda existir algún otro menos verborreico que permita
 utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
@@ -490,7 +492,7 @@ UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>o, incluso, si no que quiere agotar el flujo de primeras:</p>
+<p>o, incluso, si no se quiere agotar el flujo de primeras:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Convertimos el stream en un iterable.</span>
 <span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="p">)</span><span class="w">  </span><span class="n">br</span><span class="p">.</span><span class="na">lines</span><span class="p">()::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Tratamiento de la línea</span>
@@ -586,7 +588,7 @@ concepto. La <em class="dfn">serialización</em> es el proceso de convertir dato
 secuencia de <em>bytes</em>, cuya lectura permite posteriormente recuperar los datos
 originales. Como los archivos son precisamente eso mismo, secuencias de <em>bytes</em>,
 es un mecanismo apropiado para almacenar datos en disco.</p>
-<p>Antes de dar un ejemplo, no obstante, en preciso establecer varias premisas:</p>
+<p>Antes de dar un ejemplo, no obstante, es preciso establecer varias premisas:</p>
 <ul class="simple">
 <li><p>En cada archivo sólo podemos serializar un objeto, por lo que si queremos
 serializar varios tendremos que incluirlos dentro de una lista o una
@@ -634,7 +636,7 @@ de datos.</p></li>
 <p>Para escribir en disco varios objetos «<em>Persona</em>», podemos hacer lo siguiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;personas.bin&quot;</span><span class="p">);</span>
 
-<span class="c1">// Con List es igual ya que ,como los arrays, es serializable.</span>
+<span class="c1">// Con List es igual ya que, como los arrays, es serializable.</span>
 <span class="n">Persona</span><span class="o">[]</span><span class="w"> </span><span class="n">personas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="s">&quot;Manolo&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">),</span>
 <span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="s">&quot;Pablo&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>

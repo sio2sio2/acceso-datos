@@ -207,6 +207,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
 </ul>
 
     </div>
@@ -460,8 +461,13 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 <section id="tipos-no-primitivos">
 <span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.2.3. </span>Tipos no primitivos<a class="headerlink" href="#tipos-no-primitivos" title="Link to this heading">#</a></h2>
 <p>En el ejemplo anterior todos lo tipos de los objetos de Java tiene
-correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>. Supongamos ahora que no es así
-y que de los alumnos se registra la fecha de nacimiento:</p>
+correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>, ya que las cadenas son cadenas,
+los números, números, y los arrays o <code class="docutils literal notranslate"><span class="pre">ArrayList</span></code> los traduce directamente
+Jackson como secuencias. Incluso si usamos los valores de una enumeración para
+codificarla en el <abbr title="JavaScript Object Notation">JSON</abbr><a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la librería será capaz de traducir sin
+isntrucciones por nuestra parte.</p>
+<p>Pero supongamos ahora que no es así y que de los alumnos se registra la fecha de
+nacimiento:</p>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
    <span class="p">{</span>
       <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
@@ -548,7 +554,7 @@ que no puede usarse el método para obtener el huso horario del sistema.</p>
 </div>
 </li>
 </ul>
-<div class="admonition-todo admonition" id="id1">
+<div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Por hacer</p>
 <p>Comprobar que debe incorporarse:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">.</span><span class="na">disable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">WRITE_DATES_AS_TIMESTAMPS</span><span class="p">);</span>
@@ -556,7 +562,7 @@ que no puede usarse el método para obtener el huso horario del sistema.</p>
 </div>
 </div>
 <p>Sin embargo, ensayaremos una solución más general que ilustre cómo definir
-nuestro propio traductor<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> (para la cual se necesita añadir la librería
+nuestro propio traductor<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> (para la cual se necesita añadir la librería
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core">jackson-core</a>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 
@@ -607,8 +613,20 @@ cada uno de los atributos y hacer lo siguiente:</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Es decir, que si se tiene:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Enumeracion</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">UNO</span><span class="p">,</span>
+<span class="w">  </span><span class="n">DOS</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>se usan las cadenas <em>UNO</em> y <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>. En caso, contrario,
+habría que hacer un traductor como se expone bajoo este epígrafe.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p><code class="docutils literal notranslate"><span class="pre">SimpleDateFormat</span></code> no es <em>thread-safe</em> por lo que habría que mejorar
 algo el código en caso de utilizarse hilos. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SimpleDateFormat</span><span class="o">&gt;</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span>

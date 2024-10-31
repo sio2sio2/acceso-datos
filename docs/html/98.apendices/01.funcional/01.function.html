@@ -204,6 +204,11 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -365,7 +370,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="interfaces-funcionales">
-<h1>Interfaces funcionales<a class="headerlink" href="#interfaces-funcionales" title="Link to this heading">#</a></h1>
+<span id="functional-interface"></span><h1>Interfaces funcionales<a class="headerlink" href="#interfaces-funcionales" title="Link to this heading">#</a></h1>
 <p><em>Java</em> no es un lenguaje de programación en que las funciones sean <a class="reference external" href="https://thatcsharpguy.github.io/tv/first-class-citizens/">ciudadanas
 de primera clase</a>,
 lo cual es indispensable para que un lenguaje pueda ser funcional. Para
@@ -416,7 +421,7 @@ el que tiene menos. Incluso el criterio podría ser mucho más extravagante.
 Consecuentemente, decidimos definir fuera de esta implementación el algoritmo
 para calcular el ganador<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> y pasárselo al constructor al crear la partida,
 para lo cual debemos definir la interfaz funcional adecuada:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Victoria</span><span class="o">.</span><span class="n">java</span>
+<div class="highlight-default notranslate" id="ejemplo-functinterf"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Victoria</span><span class="o">.</span><span class="n">java</span>
 <span class="nd">@FunctionalInterface</span>
 <span class="n">interface</span> <span class="n">Victoria</span> <span class="p">{</span>
     <span class="nb">int</span> <span class="n">comprobar</span><span class="p">(</span><span class="nb">int</span><span class="p">[]</span> <span class="n">puntos</span><span class="p">);</span>

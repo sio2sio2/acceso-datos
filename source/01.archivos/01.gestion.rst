@@ -206,6 +206,26 @@ Una vez que tenemos un objeto que implementa la interfaz :java-nio:`Path
    que devuelve la subruta que se forma tomando desde el elemento indicado con
    el primer argumento hasta el indicado con el segundo (sin incluir).
 
+``toUri()``
+   que convierte la ruta en una |URI| (o sea, comenzará por :file:`file:/`), lo
+   que nos permitirá tratar la lectura del archivo del mismo modo que si fuera
+   un enlace:
+
+   .. code-block:: java
+
+      URI uri = dir.toUri();
+      InputStream st = uri.toURL().openStream();
+      // etc.
+
+   .. seealso:: Más adelante trataremos la :ref:`lectura de archivos <iotext-r>`.
+
+   .. tip:: Si tenemos una |URI| que refiere un archivo local, podremos obtener
+      su ``Path`` con ``Path.of``:
+
+      .. code-block:: java
+
+         Path archivo = Path.of(uri);
+
 Por último, ``Path`` implemente la interfaz :java-lang:`Iterable`, así que
 podemos hacer construcciones como esta:
 
@@ -357,3 +377,4 @@ contenido, pero los dejamos para el siguiente epígrafe.
 
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |MIME| replace:: :abbr:`MIME (Multipurpose Internet Mail Extensions)`
+.. |URI| replace:: :abbr:`URI (Uniform Resource Identifier)`

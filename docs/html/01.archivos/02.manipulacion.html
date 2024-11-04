@@ -467,9 +467,15 @@ tratarlo.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Cuando establecemos el lector a partir del flujo de entrada, debemos
-indicar qué codificación se usa. Si no se especifica, se sobreentiende que es
-UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+indicar qué codificación se usa. Si no se especifica, se sobreentiende que
+la predeterminada de la <abbr title="Java Virtual Machine">JVM</abbr> que coincide con la del sistema operativo, que
+en los modernos suele ser UTF-8, de modo que a partir de ahora, no
+volveremos a indicarlo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.Charset</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span>
+
+<span class="n">Charset</span><span class="p">.</span><span class="na">defaultCharset</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
+<span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span><span class="w"> </span><span class="c1">// UTF-8</span>
 </pre></div>
 </div>
 </div>
@@ -550,10 +556,11 @@ opciones que modifiquen este comportamiento (véase
 <span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">,</span><span class="w"> </span><span class="n">StandardOpenOption</span><span class="p">.</span><span class="na">APPEND</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Por otro lado, para transformar la cadena en <em>bytes</em> es necesario especificar la
-codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
-aunque si no se indica se sobreentiende UTF-8, que es lo habitual en los
-sistemas modernos. Una alternativa, es utilizar un escritor de flujo:</p>
+<p>Por otro lado, para transformar la cadena en <em>bytes</em> es necesario especificar
+la codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
+aunque si no se indica se sobreentiende la predeterminada de la <abbr title="Java Virtual Machine">JVM</abbr> (muy
+probablemente UTF-8, que es lo habitual en los sistemas modernos). Una
+alternativa, es utilizar un escritor de flujo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>

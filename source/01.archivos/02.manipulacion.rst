@@ -99,12 +99,18 @@ hacer lo siguiente:
    tratarlo.
 
 .. note:: Cuando establecemos el lector a partir del flujo de entrada, debemos
-   indicar qué codificación se usa. Si no se especifica, se sobreentiende que es
-   UTF-8, de modo que a partir de ahora, no volveremos a indicarlo:
+   indicar qué codificación se usa. Si no se especifica, se sobreentiende que
+   la predeterminada de la |JVM| que coincide con la del sistema operativo, que
+   en los modernos suele ser UTF-8, de modo que a partir de ahora, no
+   volveremos a indicarlo:
 
    .. code-block:: java
 
-      InputStreamReader sr =  new InputStreamReader(st);
+      import java.nio.charset.Charset;
+      import java.nio.charset.StandardCharsets;
+
+      Charset.defaultCharset() == StandardCharsets.UTF_8; // true 
+      InputStreamReader sr =  new InputStreamReader(st); // UTF-8
 
 Al objeto resultado podemos tratarlo como prefiramos:
 
@@ -200,10 +206,11 @@ opciones que modifiquen este comportamiento (véase
    // Se añade contenido, por lo que se respeta el que pudiera haber.
    OutputStream st = Files.newOutputStream(archivo, StandardOpenOption.APPEND);
 
-Por otro lado, para transformar la cadena en *bytes* es necesario especificar la
-codificación usada (:java-lang:`StandardCharsets.UTF-8 <StandardCharsets>`),
-aunque si no se indica se sobreentiende UTF-8, que es lo habitual en los
-sistemas modernos. Una alternativa, es utilizar un escritor de flujo:
+Por otro lado, para transformar la cadena en *bytes* es necesario especificar
+la codificación usada (:java-lang:`StandardCharsets.UTF-8 <StandardCharsets>`),
+aunque si no se indica se sobreentiende la predeterminada de la |JVM| (muy
+probablemente UTF-8, que es lo habitual en los sistemas modernos). Una
+alternativa, es utilizar un escritor de flujo:
 
 .. code-block:: java
 
@@ -347,3 +354,4 @@ Para recuperar un objeto serializado, hay que hacer el proceso inverso. Para ilu
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+.. |JVM| replace:: :abbr:`JVM (Java Virtual Machine)`

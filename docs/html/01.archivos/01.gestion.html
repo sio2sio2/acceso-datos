@@ -545,6 +545,27 @@ argumento:</p>
 <dt><code class="docutils literal notranslate"><span class="pre">subPath(int</span> <span class="pre">idx1,</span> <span class="pre">int</span> <span class="pre">idx2)</span></code></dt><dd><p>que devuelve la subruta que se forma tomando desde el elemento indicado con
 el primer argumento hasta el indicado con el segundo (sin incluir).</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">toUri()</span></code></dt><dd><p>que convierte la ruta en una <abbr title="Uniform Resource Identifier">URI</abbr> (o sea, comenzará por <code class="file docutils literal notranslate"><span class="pre">file:/</span></code>), lo
+que nos permitirá tratar la lectura del archivo del mismo modo que si fuera
+un enlace:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">URI</span><span class="w"> </span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="na">toUri</span><span class="p">();</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uri</span><span class="p">.</span><span class="na">toURL</span><span class="p">().</span><span class="na">openStream</span><span class="p">();</span>
+<span class="c1">// etc.</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Más adelante trataremos la <a class="reference internal" href="02.manipulacion.html#iotext-r"><span class="std std-ref">lectura de archivos</span></a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Si tenemos una <abbr title="Uniform Resource Identifier">URI</abbr> que refiere un archivo local, podremos obtener
+su <code class="docutils literal notranslate"><span class="pre">Path</span></code> con <code class="docutils literal notranslate"><span class="pre">Path.of</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">uri</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</dd>
 </dl>
 <p>Por último, <code class="docutils literal notranslate"><span class="pre">Path</span></code> implemente la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">java.lang.Iterable</a>, así que
 podemos hacer construcciones como esta:</p>

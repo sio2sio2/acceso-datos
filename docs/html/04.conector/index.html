@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2. JSON &#8212; documentación de Acceso a datos - rolling</title>
+    <title>4. Conectores a bases de datos relacionales &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/translations.js?v=d190bf04"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '02.formatos/02.json';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/index';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="2.2.1. GSON" href="02.json/01.gson.html" />
-    <link rel="prev" title="2.1. CSV" href="01.csv.html" />
+    <link rel="next" title="Apéndices" href="../98.apendices/index.html" />
+    <link rel="prev" title="3.3. BaseX" href="../03.xml/03.basex.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -175,14 +175,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../01.archivos/02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">2. Formatos de información</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="02.json/01.gson.html">2.2.1. GSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="02.json/02.jackson.html">2.2.2. Jackson</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02.formatos/index.html">2. Formatos de información</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../02.formatos/02.json.html">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/01.gson.html">2.2.1. GSON</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/02.jackson.html">2.2.2. Jackson</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../03.xml/index.html">3. <abbr title="eXtensible Markup Language">XML</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -191,7 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../03.xml/03.basex.html">3.3. BaseX</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../04.conector/index.html">4. Conectores a bases de datos relacionales</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Conectores a bases de datos relacionales</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../98.apendices/index.html">Apéndices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -263,7 +263,7 @@
       
       
       
-      <li><a href="../_sources/02.formatos/02.json.rst" target="_blank"
+      <li><a href="../_sources/04.conector/index.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -334,7 +334,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -345,11 +347,28 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>JSON</h1>
+    <h1>Conectores a bases de datos relacionales</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#previo">4.1. Previo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.2. Conexión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion-de-sentencias">4.3. Ejecución de sentencias</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simples">4.3.1. Simples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-horas">4.5. Fechas y horas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -359,63 +378,57 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="json">
-<span id="id1"></span><h1><span class="section-number">2.2. </span><abbr title="JavaScript Object Notation">JSON</abbr><a class="headerlink" href="#json" title="Link to this heading">#</a></h1>
-<p><a class="reference external" href="https://sio2sio2.github.io/LM/01.intro/02a.serial.html#json" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">JSON</span></a> es otro formato de intercambios de datos ampliamente
-utilizado y, como en el caso de <abbr title="Comma-Separated Values">CSV</abbr>, necesitaremos una librería de terceros
-para la lectura y la escritura de este formato. Para ilustrar cómo manipular
-este formato tomaremos este ejemplo:</p>
-<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
-   <span class="p">{</span>
-      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
-         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Federico Arias Torres&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Inglés&quot;</span>
-      <span class="p">},</span>
-      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
-         <span class="p">{</span>
-            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Matías Sánchez Aguado&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">12</span>
-         <span class="p">},</span>
-         <span class="p">{</span>
-            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;María Bonet Periáñez&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">12</span>
-         <span class="p">}</span>
-      <span class="p">]</span>
-   <span class="p">},</span>
-   <span class="p">{</span>
-      <span class="s2">&quot;nivel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-      <span class="s2">&quot;etapa&quot;</span><span class="p">:</span> <span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;grupo&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;tutor&quot;</span><span class="p">:</span> <span class="p">{</span>
-         <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Gertrudis Avelladena Pérez&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;especialidad&quot;</span><span class="p">:</span> <span class="s2">&quot;Francés&quot;</span>
-      <span class="p">},</span>
-      <span class="s2">&quot;miembros&quot;</span><span class="p">:</span> <span class="p">[</span>
-         <span class="p">{</span>
-            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Marcela Venegas Pancorbo&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">13</span>
-         <span class="p">},</span>
-         <span class="p">{</span>
-            <span class="s2">&quot;nombre&quot;</span><span class="p">:</span> <span class="s2">&quot;Feliciano Martín Suárez&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edad&quot;</span><span class="p">:</span> <span class="mi">13</span>
-         <span class="p">}</span>
-      <span class="p">]</span>
-   <span class="p">}</span>
-<span class="p">]</span>
-</pre></div>
-</div>
-<p>La estrategia, sea cual sea la librería, es siempre hacer una traducción entre
-el modelo de objetos de <em>Java</em> y la representación de objetos de <abbr title="JavaScript Object Notation">JSON</abbr>.
-Analizaremos dos librerías:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="02.json/01.gson.html">2.2.1. GSON</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02.json/02.jackson.html">2.2.2. Jackson</a></li>
+  <section id="conectores-a-bases-de-datos-relacionales">
+<span id="conectores"></span><h1><span class="section-number">4. </span>Conectores a bases de datos relacionales<a class="headerlink" href="#conectores-a-bases-de-datos-relacionales" title="Link to this heading">#</a></h1>
+<p>Para el acceso a bases de datos relacionales hay dos estrategias:</p>
+<ol class="arabic simple">
+<li><p>El uso de conectores, en que el acceso a la base de datos se realiza mediante
+sentencias <abbr title="Structured Query Language">SQL</abbr> y la traducción del modelo relacional al modelo de objetos
+corre a cargo del programador.</p></li>
+<li><p>El uso de herramientas <abbr title="Object-Relational Mapping">ORM</abbr> en que la traducción entre ambos modelos corre a
+cargo de la propia herramienta siguiendo las orientaciones del programador.</p></li>
+</ol>
+<p>Podemos entender mejor estas dos estrategias, si las comparamos con estrategias
+ya vistas anteriormente para acceder a otros soportes de datos:</p>
+<ul class="simple">
+<li><p>La primera estrategia es la misma que sigue la librería <a class="reference external" href="https://commons.apache.org/proper/commons-csv/project-info.html">commons-csv</a> para leer
+y escribir <abbr title="Comma-Separated Values">CSV</abbr>.</p></li>
+<li><p>La segunda estrategia es la que sigue la <a class="reference external" href="https://github.com/FasterXML/jackson">librería Jackson</a> para leer y
+escribir distintos formatos.</p></li>
 </ul>
-</div>
+<p>En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
+unidad siguiente.</p>
+<p>Java proporciona para el acceso a bases de datos relacionales una <abbr title="Application Programming Interface">API</abbr> en su
+<abbr title="Java Development Kit">JDK</abbr> llamada <abbr title="Java DataBase Connectivity">JDBC</abbr>, lo que posibilita que el acceso sea idéntico sea cual sea
+el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que se decida utilizar. Esto no significa que el código sea
+independiente del motor subyacente, puesto que cada motor tiene sus
+particularidades que extienden el <abbr title="Structured Query Language">SQL</abbr> estándar y esta estrategia nos obliga a
+utilizarlo. Lo que en realidad es común son los métodos que proporciona Java
+para ejecutar sentencias en la base de datos.</p>
+<section id="previo">
+<h2><span class="section-number">4.1. </span>Previo<a class="headerlink" href="#previo" title="Link to this heading">#</a></h2>
+</section>
+<section id="conexion">
+<h2><span class="section-number">4.2. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
+</section>
+<section id="ejecucion-de-sentencias">
+<h2><span class="section-number">4.3. </span>Ejecución de sentencias<a class="headerlink" href="#ejecucion-de-sentencias" title="Link to this heading">#</a></h2>
+<section id="simples">
+<h3><span class="section-number">4.3.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h3>
+</section>
+<section id="parametrizadas">
+<h3><span class="section-number">4.3.2. </span>Parametrizadas<a class="headerlink" href="#parametrizadas" title="Link to this heading">#</a></h3>
+</section>
+</section>
+<section id="transacciones">
+<h2><span class="section-number">4.4. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h2>
+</section>
+<section id="fechas-y-horas">
+<h2><span class="section-number">4.5. </span>Fechas y horas<a class="headerlink" href="#fechas-y-horas" title="Link to this heading">#</a></h2>
+</section>
+<section id="extras">
+<h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -430,20 +443,20 @@ Analizaremos dos librerías:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="01.csv.html"
+       href="../03.xml/03.basex.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">2.1. </span><abbr title="Comma-Separated Values">CSV</abbr></p>
+        <p class="prev-next-title"><span class="section-number">3.3. </span>BaseX</p>
       </div>
     </a>
     <a class="right-next"
-       href="02.json/01.gson.html"
+       href="../98.apendices/index.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">2.2.1. </span>GSON</p>
+        <p class="prev-next-title">Apéndices</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -453,6 +466,30 @@ Analizaremos dos librerías:</p>
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#previo">4.1. Previo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.2. Conexión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion-de-sentencias">4.3. Ejecución de sentencias</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simples">4.3.1. Simples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-horas">4.5. Fechas y horas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

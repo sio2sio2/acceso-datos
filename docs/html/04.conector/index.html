@@ -357,14 +357,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#previo">4.1. Previo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aperitivo">4.1. Aperitivo</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.2. Conexión</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion-de-sentencias">4.3. Ejecución de sentencias</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simples">4.3.1. Simples</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.4.1. Manejo de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.4.2. Operaciones masivas</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-horas">4.5. Fechas y horas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
 </ul>
@@ -379,7 +383,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="conectores-a-bases-de-datos-relacionales">
-<span id="conectores"></span><h1><span class="section-number">4. </span>Conectores a bases de datos relacionales<a class="headerlink" href="#conectores-a-bases-de-datos-relacionales" title="Link to this heading">#</a></h1>
+<span id="conn"></span><h1><span class="section-number">4. </span>Conectores a bases de datos relacionales<a class="headerlink" href="#conectores-a-bases-de-datos-relacionales" title="Link to this heading">#</a></h1>
 <p>Para el acceso a bases de datos relacionales hay dos estrategias:</p>
 <ol class="arabic simple">
 <li><p>El uso de conectores, en que el acceso a la base de datos se realiza mediante
@@ -397,37 +401,244 @@ y escribir <abbr title="Comma-Separated Values">CSV</abbr>.</p></li>
 escribir distintos formatos.</p></li>
 </ul>
 <p>En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
-unidad siguiente.</p>
+<span class="xref std std-ref">unidad siguiente</span>.</p>
 <p>Java proporciona para el acceso a bases de datos relacionales una <abbr title="Application Programming Interface">API</abbr> en su
 <abbr title="Java Development Kit">JDK</abbr> llamada <abbr title="Java DataBase Connectivity">JDBC</abbr>, lo que posibilita que el acceso sea idéntico sea cual sea
 el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que se decida utilizar. Esto no significa que el código sea
 independiente del motor subyacente, puesto que cada motor tiene sus
-particularidades que extienden el <abbr title="Structured Query Language">SQL</abbr> estándar y esta estrategia nos obliga a
-utilizarlo. Lo que en realidad es común son los métodos que proporciona Java
-para ejecutar sentencias en la base de datos.</p>
-<section id="previo">
-<h2><span class="section-number">4.1. </span>Previo<a class="headerlink" href="#previo" title="Link to this heading">#</a></h2>
+particularidades que extienden el <abbr title="Structured Query Language">SQL</abbr> estándar y esta estrategia, al estar
+basada en la construcción de sentencias <abbr title="Structured Query Language">SQL</abbr>, nos obliga a utilizarlas. Lo que
+en realidad es común son los métodos que proporciona Java para ordenar la
+ejecución de las las sentencias al motor de la base de datos. Además de la
+<abbr title="Application Programming Interface">API</abbr>, necesitaremos para cada <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> un <em>driver</em> basado en la <abbr title="Application Programming Interface">API</abbr> que
+posibilite la conexión. Este <em>driver</em> sí que será una librería de terceros que
+deberemos incluir en nuestro proyecto.</p>
+<section id="aperitivo">
+<h2><span class="section-number">4.1. </span>Aperitivo<a class="headerlink" href="#aperitivo" title="Link to this heading">#</a></h2>
+<p>Para aprender y practicar el acceso con conectores, podemos escoger cualquier
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Utilizaremos en el caso de estos apuntes, <a class="reference external" href="https://sqlite.org/">SQLite</a> por varias razones:</p>
+<ul class="simple">
+<li><p>Comodidad, ya que a diferencia de otros (<a class="reference external" href="https://mariadb.org/">MariaDB</a>, <a class="reference external" href="https://www.oracle.com/es/database/">Oracle</a>, etc) no requiere
+un servidor: la base de datos es un archivo.</p></li>
+<li><p>Es una base de datos empotrada y se usa mucha en aplicaciones que necesitan
+organizar sus datos en una base de datos exclusiva en la que no
+concurrirán otros procesos.</p></li>
+</ul>
+<p>Con la excepción de las propias sentencias <abbr title="Structured Query Language">SQL</abbr> que pueden variar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> o
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, las explicaciones serán totalmente válidas. Antes, no obstante, es
+necesario que tengamos <strong>instalado el motor</strong>. En el caso de <strong>SQLite</strong>:</p>
+<ul id="rst-simple">
+<li><p>Las distribuciones de <em>Linux</em> suelen incluir un paquete por lo que su
+instalación es trivial.</p></li>
+<li><p>Para sistemas <em>Windows</em> la página oficial ofrece <a class="reference external" href="https://sqlite.org/download.html#win32">binarios precompilados</a>, pero no un instalador automático.
+La instalación, no obstante, es sencilla:</p>
+<p>a. Guardar los archivos suministrados dentro del <em>zip</em> en un lugar adecuado
+(p.e. <code class="file docutils literal notranslate"><span class="pre">C:Program</span> <span class="pre">FilesSQLite</span></code>).
+#. Añadir el directorio al <cite>PATH</cite> del sistema.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Procuramos escribir sentencias <abbr title="Structured Query Language">SQL</abbr> que cumplan el estándar para que
+el código sea lo más portable posible.</p>
+</div>
+<p>Además, necesitaremos importar en nuestro proyecto la librería propia de SQLite: <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>.</p>
+<p class="rubric">Ejercicio ilustrativo</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Por hacer</p>
+<p>Exponer el ejercicio que deseamos resolver.</p>
+</div>
 </section>
 <section id="conexion">
-<h2><span class="section-number">4.2. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
+<span id="conn-conexion"></span><h2><span class="section-number">4.2. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
+<p>Lo primero que debemos aprender es cómo abrir una conexión a la base de datos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
+
+<span class="c1">// Las bases de datos de SQLite son archivos.</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">dbPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test.db&quot;</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="n">dbPath</span><span class="p">);</span>
+
+<span class="c1">// Alternativa particular de SQLite: base de datos en memoria.</span>
+<span class="c1">//String dbUrl = String.format(&quot;%s%s&quot;, dbProtocol, &quot;:memory:&quot;);</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="c1">// Particular de SQLite: respetar la integredad referencial (opcional).</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Hemos logrado conectar a la base de datos&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Error de conexión. &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">err</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>En el código de ejemplo, hay tres claves fundamentales:</p>
+<ul>
+<li><p>La <abbr title="Uniform Resource Locator">URL</abbr> de conexión que se compone, a su vez de:</p>
+<ul class="simple">
+<li><p>El protocolo que identifica al <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></li>
+<li><p>La indicación de la base de datos a la que queremos conectar.</p></li>
+</ul>
+<p>Esta <abbr title="Uniform Resource Locator">URL</abbr> depende del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, así que tendremos que tener presente cuál
+estamos utilizando al construirla:</p>
+<div class="pst-scrollable-table-container"><table class="url-sql table">
+<thead>
+<tr class="row-odd"><th class="head"><p><abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></th>
+<th class="head"><p>Librería <abbr title="Java DataBase Connectivity">JDBC</abbr></p></th>
+<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SQLite</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a></p></td>
+<td><p><cite>jdbc:sqlite:&lt;ruta&gt;</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>MariaDB</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client">mariadb-java-client</a></p></td>
+<td><p><cite>jdbc:mariadb://[&lt;host&gt;[:&lt;port&gt;]]/&lt;base_datos&gt;</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>MySQL</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.mysql/mysql-connector-j">mysql-connector-j</a></p></td>
+<td><p><cite>jdbc:mysql://[&lt;host&gt;[:&lt;port&gt;]]/[base_datos]</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>PostgreSQL</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.postgresql/postgresql">postgresql</a></p></td>
+<td><p><cite>jdbc:postgresql://[&lt;host&gt;[:&lt;port&gt;]]/&lt;base_datos&gt;</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>Oracle</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11">ojdbc11</a></p></td>
+<td><p><cite>jdbc:oracle:thin:&#64;//&lt;host&gt;[:&lt;port&gt;]/&lt;SID/ServerName&gt;</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>SQL Server</p></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc">mssql-jdbc</a></p></td>
+<td><p><cite>jdbc:sqlserver://&lt;host&gt;[:&lt;port&gt;];databaseName=&lt;base_datos&gt;</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><p>El objeto de conexión, construido de esta manera para que se cierre automáticamente.</p></li>
+<li><p>Un objeto para generar sentencias <abbr title="Structured Query Language">SQL</abbr> del que hablaremos bajo el próximo epíepígrafe. También es necesario cerrarlo y, en este ejemplo, lo hemos creado simplemente para ilustrar cómo obligar a <em>SQLite</em> a respetar la integridad referencial (por defecto, no lo hace).</p></li>
+</ul>
+<p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base de datos para no hacer absolutamente nada. En los siguientes apartados veremos como leer y escribir datos.</p>
 </section>
 <section id="ejecucion-de-sentencias">
-<h2><span class="section-number">4.3. </span>Ejecución de sentencias<a class="headerlink" href="#ejecucion-de-sentencias" title="Link to this heading">#</a></h2>
+<span id="conn-statement"></span><h2><span class="section-number">4.3. </span>Ejecución de sentencias<a class="headerlink" href="#ejecucion-de-sentencias" title="Link to this heading">#</a></h2>
+<p>El acceso mediante conectores se basa en la ejecución de sentencias <abbr title="Structured Query Language">SQL</abbr> que
+pueden ser de dos tipos:</p>
+<ul class="simple">
+<li><p>Sentencias que modifican la base de datos.</p></li>
+<li><p>Sentencias que obtienen datos sin llevar a cabo modificación alguna.</p></li>
+</ul>
+<p>Para las primeras se usa el método <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code>, mientras que para las
+segundas el método <code class="docutils literal notranslate"><span class="pre">executeQuery</span></code>.</p>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Por hacer</p>
+<p>Hablar de <code class="docutils literal notranslate"><span class="pre">execute</span></code>.</p>
+</div>
 <section id="simples">
 <h3><span class="section-number">4.3.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h3>
+<p>Comencemos creado cuatro tablas:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
+
+<span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:memory:&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Base de datos en la memoria</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="c1">// Integridad referencial.</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Tabla Departamento.</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">      CREATE TABLE &quot;Departamento&quot; (</span>
+<span class="s">         &quot;idDepartamento&quot;  INTEGER PRIMARY KEY,</span>
+<span class="s">         &quot;nombre&quot;          VARCHAR(50)    NOT NULL</span>
+<span class="s">      );</span>
+<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Tabla Profesor.</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">      CREATE TABLE &quot;Profesor&quot; (</span>
+<span class="s">         &quot;idProfesor&quot;      INTEGER        PRIMARY KEY /* GENERATED BY DEFAULT AS IDENTITY */,</span>
+<span class="s">         &quot;apelativo&quot;       VARCHAR(50)    NOT NULL,</span>
+<span class="s">         &quot;nombre&quot;          VARCHAR(75)    NOT NULL,</span>
+<span class="s">         &quot;apellidos&quot;       VARCHAR(150)   NOT NULL</span>
+<span class="s">      );</span>
+<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Tabla Claustro.</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">      CREATE TABLE &quot;Claustro&quot; (</span>
+<span class="s">         &quot;idClaustro&quot;      INTEGER        PRIMARY KEY,</span>
+<span class="s">         &quot;centro&quot;          VARCHAR(100)   NOT NULL,</span>
+<span class="s">      );</span>
+<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Relación Profesor-Claustro.</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executaUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">      CREATE TABLE &quot;Trabaja&quot; (</span>
+<span class="s">         &quot;profesor&quot;        INTEGER,</span>
+<span class="s">         &quot;claustro&quot;        INTEGER,</span>
+<span class="s">         &quot;departamento&quot;    INTEGER,</span>
+<span class="s">         CONSTRAINT &quot;pk_tra&quot;     PRIMARY KEY(&quot;idProfesor&quot;, &quot;idClaustro&quot;),</span>
+<span class="s">         CONSTRAINT &quot;fk_tra_pro&quot; FOREIGN KEY(&quot;profesor&quot;) REFERENCES &quot;Profesor&quot;(&quot;idProfesor&quot;)</span>
+<span class="s">            ON DELETE CASCADE</span>
+<span class="s">            ON UPDATE CASCADE,</span>
+<span class="s">         CONSTRAINT &quot;fk_tra_cla&quot; FOREIGN KEY(&quot;claustro&quot;) REFERENCES &quot;Claustro&quot;(&quot;idClaustro&quot;)</span>
+<span class="s">            ON DELETE CASCADE</span>
+<span class="s">            ON UPDATE CASCADE,</span>
+<span class="s">         CONSTRAINT &quot;fk_est_dep&quot; FOREIGN KEY(&quot;departamento&quot;) REFERENCES &quot;Departamento&quot;(&quot;idDepartamento&quot;)</span>
+<span class="s">            ON DELETE NULL</span>
+<span class="s">            ON UPDATE CASCADE</span>
+<span class="s">      );</span>
+<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// Más sentencias que ya veremos.</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 <section id="parametrizadas">
-<h3><span class="section-number">4.3.2. </span>Parametrizadas<a class="headerlink" href="#parametrizadas" title="Link to this heading">#</a></h3>
+<span id="conn-prestatement"></span><h3><span class="section-number">4.3.2. </span>Parametrizadas<a class="headerlink" href="#parametrizadas" title="Link to this heading">#</a></h3>
 </section>
 </section>
 <section id="transacciones">
-<h2><span class="section-number">4.4. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h2>
+<span id="conn-transactions"></span><h2><span class="section-number">4.4. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h2>
+<section id="manejo-de-transacciones">
+<h3><span class="section-number">4.4.1. </span>Manejo de transacciones<a class="headerlink" href="#manejo-de-transacciones" title="Link to this heading">#</a></h3>
+</section>
+<section id="operaciones-masivas">
+<span id="conn-batch"></span><h3><span class="section-number">4.4.2. </span>Operaciones masivas<a class="headerlink" href="#operaciones-masivas" title="Link to this heading">#</a></h3>
+</section>
 </section>
 <section id="fechas-y-horas">
-<h2><span class="section-number">4.5. </span>Fechas y horas<a class="headerlink" href="#fechas-y-horas" title="Link to this heading">#</a></h2>
+<span id="conn-date"></span><h2><span class="section-number">4.5. </span>Fechas y horas<a class="headerlink" href="#fechas-y-horas" title="Link to this heading">#</a></h2>
 </section>
 <section id="extras">
-<h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
+<span id="conn-extra"></span><h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Se han supuesto (excepto para <strong>SQLite</strong> obviamente) conexiones
+<abbr title="Transmission Control Protocol">TCP</abbr>/<abbr title="Internet Protocol">IP</abbr>. Sin embargo, en sistemas <em>UNIX</em> el motor podría permitir
+conexiones a un <em>socket</em> local. Por ejemplo, una <abbr title="Uniform Resource Locator">URL</abbr> a socket local para
+MariaDB podría ser
+<code class="docutils literal notranslate"><span class="pre">jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock</span></code> o
+algo parecido.</p>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -476,14 +687,18 @@ para ejecutar sentencias en la base de datos.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#previo">4.1. Previo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aperitivo">4.1. Aperitivo</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.2. Conexión</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion-de-sentencias">4.3. Ejecución de sentencias</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simples">4.3.1. Simples</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.4.1. Manejo de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.4.2. Operaciones masivas</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-horas">4.5. Fechas y horas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
 </ul>

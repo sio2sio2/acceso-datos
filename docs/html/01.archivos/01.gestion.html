@@ -191,6 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../03.xml/03.basex.html">3.3. BaseX</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="../04.conector/index.html">4. Conectores a bases de datos relacionales</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../98.apendices/index.html">Apéndices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -404,7 +405,7 @@ tiempo de programación. Por ejemplo, si quisiéramos acceder a un archivo que
 sabemos situado dentro del directorio personal del usuario, necesitamos conocer
 cuál es esta ruta, para lo cual podemos consultar la <em>variable de entorno</em>
 correspondiente.</p>
-<p>Para acceder a  las variables de entorno <em>Java</em> dispone del método estático<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code> con o sin argumento.</p>
+<p>Para acceder a las variables de entorno, <em>Java</em> dispone del método estático<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code> con o sin argumento.</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">System.getenv(String</span> <span class="pre">nombre)</span></code></dt><dd><p>devuelve el valor de la variable de entorno o <code class="docutils literal notranslate"><span class="pre">null</span></code> si ésta no existe:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario en mi sistema.</span>
@@ -421,7 +422,7 @@ correspondiente.</p>
 </dl>
 <p>El <strong>problema</strong> crucial de consultar las variables de entorno es el de que el
 nombre cambia entre los distintos sistemas operativos<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> y, por tanto, si nos
-limitamos a usarlas tal como acabamos de ver, nuestro aplicación será
+limitamos a usarlas tal como acabamos de ver, nuestra aplicación será
 dependiente del sistema en que se ejecute.</p>
 <p>Una alternativa es consultar las propiedades de nuestro entorno de <em>Java</em>,
 algunas de las cuales recogen los valores de las variables de entorno:</p>

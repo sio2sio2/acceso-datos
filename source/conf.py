@@ -49,6 +49,7 @@ extlinks = {
     'java-lang': ('https://docs.oracle.com/javase/8/docs/api/java/lang/%s.html', 'java.lang.%s'),
     'java-function': ('https://docs.oracle.com/javase/8/docs/api/java/util/function/%s.html', 'java.util.function.%s'),
     'java-stream': ('https://docs.oracle.com/javase/8/docs/api/java/util/stream/%s.html', 'java.util.stream.%s'),
+    'java-sql': ('https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/%s.html', 'java.sql.%s'),
     'deb': ('https://packages.debian.org/stable/%s','%s'),
 }
 

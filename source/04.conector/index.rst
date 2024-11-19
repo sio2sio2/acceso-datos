@@ -49,7 +49,7 @@ Para aprender y practicar el acceso con conectores, podemos escoger cualquier
 
 Con la excepción de las propias sentencias |SQL| que pueden variar de |SGBD| o
 |SGBD|, las explicaciones serán totalmente válidas. Antes, no obstante, es
-necesario que tengamos **instalado el motor**. En el caso de **SQLite**:
+necesario que tengamos **instalado el motor**. En el caso de :program:`SQLite`:
 
 .. _rst-simple:
 
@@ -66,7 +66,7 @@ necesario que tengamos **instalado el motor**. En el caso de **SQLite**:
 .. note:: Procuramos escribir sentencias |SQL| que cumplan el estándar para que
    el código sea lo más portable posible.
 
-Además, necesitaremos importar en nuestro proyecto la librería propia de SQLite: sqlite-jdbc_.
+Además, necesitaremos importar en nuestro proyecto la librería propia de :program:`SQLite`: sqlite-jdbc_.
 
 .. rubric:: Ejercicio ilustrativo
 
@@ -77,6 +77,8 @@ Tomemos como base el :ref:`ejercicio ilustrativo con que introducimos XML
 + Un mismo profesor puede trabajar en varios claustro diferentes.
 + Si se da la anterior circunstancia, el profesor se adcribirá a un departamento
   por centro, pero no tiene que ser para todos los centros el mismo.
++ De igual modo, en un centro puede tener asignado uno o varios casilleros
+  distintos a los que tiene en otro.
 
 Esto podemos representarlo gráficamente con el siguente diagrama |E/R|:
 
@@ -86,10 +88,10 @@ Podemos traducir el anterior esquema al modelo relacional así:
 
 .. code-block:: none
 
-   Claustro(*idClaustro*, nombre)
+   Centro(*idCentro*, nombre)
    Profesor(*idProfesor*, casillero, sustituye, apelativo, apellidos, nombre)
    Departamento(*idDepartamento*, denominacion)
-   Trabaja(*idProfesor, idClaustro*, departamento)
+   Trabaja(*idProfesor, idCcentro*, departamento)
 
 .. _conn-conexion:
 
@@ -145,7 +147,7 @@ En el código de ejemplo, hay tres claves fundamentales:
 * El objeto de conexión, construido de esta manera para que se cierre automáticamente.
 * Un objeto para generar sentencias |SQL| del que hablaremos bajo el próximo
   epígrafe. También es necesario cerrarlo y, en este ejemplo, lo hemos creado
-  simplemente para ilustrar cómo obligar a *SQLite* a respetar la integridad
+  simplemente para ilustrar cómo obligar a :program:`SQLite` a respetar la integridad
   referencial (por defecto, no lo hace).
 
 Por supuesto, el código es *completamente inútil*: nos hemos conectado a la base
@@ -166,7 +168,10 @@ A partir de un objeto :java-sql:`Statement <Statement>`, para las primeras se
 usa el método ``executeUpdate``, mientras que para las segundas el método
 ``executeQuery``.
 
-.. todo:: Hablar de ``execute``.
+.. note:: Hay otro método, ``execute`` que sirve para ambos casos y que devuelve
+   ``true``, si devuelve resultados (segundo caso) o ``false``, si no lo hace.
+   De hecho, lo podríamos haber usado al crear las tablas, aunque hemos
+   preferido ``executeUpdate``.
 
 Simples
 -------
@@ -174,6 +179,10 @@ Comencemos creado cuatro tablas:
 
 .. literalinclude:: files/01.create.java
    :language: java
+
+.. todo:: Revisar para ver si se puede añadir una CTE recursiva para que un
+   sustituto salga en una vista definida sobre "Trabaja", aunque no aparezca en
+   la tabla.
 
 El código tiene dos aspectos:
 
@@ -307,6 +316,8 @@ establecidos todos sus valores, ejecutar la sentencia.
    hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
    <conn-batch>`, darle al menos una vuelta más.
 
+.. todo:: Mentar setObject...
+
 .. _conn-data:
 
 Datos
@@ -365,7 +376,7 @@ no es un tipo primitivo en Java, pero su uso es trivial:
 .. rubric:: SQLite
 
 Dado que hemos escogido este |SGBD| para desarrollar la unidad, nos conviene
-centrarnos en sus particularidades. La característica fundamental de **SQLite**
+centrarnos en sus particularidades. La característica fundamental de :program:`SQLite`
 es que tiene **tipado dinámico** y cuál sea el tipo que declaremos al crear la tabla
 es irrelevante, porque el sistema gestor aceptará el dato con independencia de
 su tipo. Por ejemplo:
@@ -380,8 +391,9 @@ su tipo. Por ejemplo:
       ("Manolo"),   // Consecuente con la definición: no da problemas.
       (4356);       // Inconsecuente, pero da igual: el dato se almacena como entero.
 
-De hecho, **SQLite** ni siquiera atiende a qué palabra usamos para definir el
-tipo y creará la tabla, incluso aunque nos inventemos el nombre del tipo:
+De hecho, :program:`SQLite` ni siquiera atiende a qué palabra usamos para
+definir el tipo y creará la tabla, incluso aunque nos inventemos el nombre del
+tipo:
 
 .. code-block:: sql
 
@@ -389,12 +401,12 @@ tipo y creará la tabla, incluso aunque nos inventemos el nombre del tipo:
       "nombre"    TIPOINVENTADO   // No da error.
    );
 
-Internamente, **SQLite** sólo dispone de datos de tipo texto, entero (de diverso
-tamaño), doble y BLOB; y dependiendo del valor que se suministre usará un tipo u
-otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto, ``INTEGER``,
-``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``, ``DOBLE`` y
-``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión de este
-último tipo).
+Internamente, :program:`SQLite` sólo dispone de datos de tipo texto, entero (de
+diverso tamaño), doble y BLOB; y dependiendo del valor que se suministre usará
+un tipo u otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto,
+``INTEGER``, ``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``,
+``DOBLE`` y ``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión
+de este último tipo).
 
 .. _conn-data-complex:
 
@@ -566,10 +578,76 @@ ARRAY y STRUCT
 ''''''''''''''
 El tipo de dato ``ARRAY`` es, simplemente, una secuencia de datos de un mismo
 tipo, o sea, lo que entenderíamos como *array* en cualquier lenguaje de
-programación; mientras que ``STRUCT`` es un tipo de dato que permite incluir
-como valor de un campo
+programación:
+
+.. code-block:: sql
+   :emphasize-lines: 6
+
+   CREATE TABLE "Trabaja" (
+      "profesor"        INTEGER,
+      "claustro"        INTEGER,
+      "departamento"    INTEGER,
+      -- Para poder asignar varios casilleros a un mismo profesor
+      "casillero"       INTEGER[]   NOT NULL,
+
+      /* Restricciones */
+   );
+
+``STRUCT``, en cambio, es un tipo de dato que permite incluir
+como valor de un campo una estructura de datos al modo de las estructuras *C* o
+los mapas de *Python* o *Java*:
+
+.. code-block:: Java
+
+   // No pueden definirse restricciones en la definición, así que estas
+   // (p.e. tipo_via debería incluir un CHECK con varios valores)
+   // debe definirse en la tabla en la que se incluya este tipo struct.
+   CREATE TYPE "domicilio" AS (
+      "tipo_via"       VARCHAR(40),
+      "nombre_via"     VARCHAR(150),
+      "numero"         INTEGER,
+      "bloque"         CHAR(1),
+      "escalera"       CHAR(1),
+      "piso"           INTEGER,
+      "letra"          CHAR(2)
+   );
 
 .. rubric:: SQLite
+
+:program:`SQLite` no soporta de forma nativa los datos complejos (ya explicamos
+al tratar los datos simples cómo funcionan en realidad los tipos en él). En
+particular:
+
+``DATE``\ /\ ``TIME``\ /\ ``TIMESTAMP``
+   Puede almacenarlos como una cadena ('2024-12-12'), un entero(el tiempo *UNIX*
+   1733961600) o un flotante (`fecha juliana
+   <https://es.wikipedia.org/wiki/Fecha_juliana>`_ usada en Astronomía). Para
+   darles soporte añade funciones específicas.
+
+   En el caso particular de |JDBC|, ``setDate`` almacenará la fecha como un
+   entero, lo cual nos es indiferente si leemos los campos con ``getDate``, pero
+   quizás no nos guste tanto, si la lectura la hacemos por otros medios (p.e.
+   usando directamente el cliente de :program:`SQLite` sin echar mano de funciones
+   específicas).
+   
+``BLOB``
+   Es el único dato complejo que realmente soporta :program:`SQLite`, así que no
+   tendremos problemas con él.
+
+``CLOB``
+   :program:`SQLite` no le da un tratamiento especial y se trata como cualquier
+   otra cadena, ya que internamente :program:`SQLite` sólo tiene un tipo para
+   datos que son cadenas. Sin embargo, ``setClob`` **no está implementado** para
+   él, por lo que tendremos que usar ``setString``.
+
+``JSON``
+   No tiene soporte nativo sino a través de funciones específicas. En cualquier
+   caso, |JDBC| tampoco lo tiene con lo que tendrá que usarse ``setString``
+   igual que para el resto de |SGBD|.
+
+``ARRAY``\ /\ ``STRUCT``
+   No tienen soporte en :program:`SQLite` y, además, los métodos ``setArray`` y
+   ``setStruct`` no están implementados para el *driver*.
 
 .. _conn-transactions:
 
@@ -701,7 +779,7 @@ Extras
 
 .. rubric:: Notas al pie
 
-.. [#] Se han supuesto (excepto para **SQLite** obviamente) conexiones
+.. [#] Se han supuesto (excepto para :program:`SQLite` obviamente) conexiones
    |TCP|/|IP|. Sin embargo, en sistemas *UNIX* el motor podría permitir
    conexiones a un *socket* local. Por ejemplo, una |URL| a socket local para
    MariaDB podría ser

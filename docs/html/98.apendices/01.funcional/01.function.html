@@ -598,7 +598,7 @@ llaves y la sentencia <code class="docutils literal notranslate"><span class="pr
 ilustrado arriba, Java dispone de algunas interfaces funcionales genéricas ya
 definidas que podemos usar:</p>
 <dl>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html">Function&lt;T, R&gt;</a></dt><dd><p>Permte la definición de funciones que toman un argumento de entrada (el
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Function.html">Function&lt;T, R&gt;</a></dt><dd><p>Permte la definición de funciones que toman un argumento de entrada (el
 genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y devuelven un valor (el genético <code class="docutils literal notranslate"><span class="pre">R</span></code>). Para la ejecución
 se requiere aplicar <code class="docutils literal notranslate"><span class="pre">apply</span></code>. Justamente nuestra interfaz funcional era de
 este tipo así que podríamos haber usado la predefinida en vez de definir una
@@ -660,26 +660,26 @@ nosotros. La única dificultad es que es una interfaz genérica:</p>
 </pre></div>
 </div>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/UnaryOperator.html">UnaryOperator&lt;T&gt;</a></dt><dd><p>Como el anterior, pero tanto el argumento como el valor devuelto deben ser
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/UnaryOperator.html">UnaryOperator&lt;T&gt;</a></dt><dd><p>Como el anterior, pero tanto el argumento como el valor devuelto deben ser
 del tipo <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiFunction.html">BiFunction&lt;T, U, R&gt;</a></dt><dd><p>La única diferencia con el primero es que toma dos argumentos como entrada
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/BiFunction.html">BiFunction&lt;T, U, R&gt;</a></dt><dd><p>La única diferencia con el primero es que toma dos argumentos como entrada
 (los genéricos <code class="docutils literal notranslate"><span class="pre">T</span></code> y <code class="docutils literal notranslate"><span class="pre">U</span></code>).</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BinaryOperator.html">BinaryOperator&lt;T&gt;</a></dt><dd><p>Como el anterior, pero los tres tipos deben iguales (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>).</p>
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/BinaryOperator.html">BinaryOperator&lt;T&gt;</a></dt><dd><p>Como el anterior, pero los tres tipos deben iguales (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>).</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html">Predicate&lt;T&gt;</a></dt><dd><p>Toma un argumento de entrada (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y devuelve un valor
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Predicate.html">Predicate&lt;T&gt;</a></dt><dd><p>Toma un argumento de entrada (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y devuelve un valor
 booleano. Para aplicarla debe ejecutarse el método <code class="docutils literal notranslate"><span class="pre">test</span></code> (no <code class="docutils literal notranslate"><span class="pre">apply</span></code>).</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiPredicate.html">BiPredicate&lt;T, U&gt;</a></dt><dd><p>Como el anterior, pero toma dos argumento de entrada.</p>
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/BiPredicate.html">BiPredicate&lt;T, U&gt;</a></dt><dd><p>Como el anterior, pero toma dos argumento de entrada.</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html">Consumer&lt;T&gt;</a></dt><dd><p>Toma un argumento de entrada (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y no devuelve ningún valor.
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Consumer.html">Consumer&lt;T&gt;</a></dt><dd><p>Toma un argumento de entrada (el genérico <code class="docutils literal notranslate"><span class="pre">T</span></code>) y no devuelve ningún valor.
 Para aplicarla debe ejecutarse el método <code class="docutils literal notranslate"><span class="pre">accept</span></code>.</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html">BiConsumer&lt;T, U&gt;</a></dt><dd><p>Toma dos argumentos de entrada (los genéricos <code class="docutils literal notranslate"><span class="pre">T</span></code> y <code class="docutils literal notranslate"><span class="pre">U</span></code>) y no devuelve
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/BiConsumer.html">BiConsumer&lt;T, U&gt;</a></dt><dd><p>Toma dos argumentos de entrada (los genéricos <code class="docutils literal notranslate"><span class="pre">T</span></code> y <code class="docutils literal notranslate"><span class="pre">U</span></code>) y no devuelve
 ningún valor.</p>
 </dd>
-<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html">Supplier&lt;T&gt;</a></dt><dd><p>No toma ningún argumento de entrada y devuelve un valor de tipo <code class="docutils literal notranslate"><span class="pre">T</span></code>. Para
+<dt><a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Supplier.html">Supplier&lt;T&gt;</a></dt><dd><p>No toma ningún argumento de entrada y devuelve un valor de tipo <code class="docutils literal notranslate"><span class="pre">T</span></code>. Para
 aplicarla debe ejecutarse el método <code class="docutils literal notranslate"><span class="pre">get</span></code>.</p>
 </dd>
 </dl>

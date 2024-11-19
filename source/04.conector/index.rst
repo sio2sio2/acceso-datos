@@ -280,7 +280,7 @@ muchos casos que se incluyan valores de variables en las propias sentencias
 (véase, sin ir más lejos, el :ref:`ejemplo de inserción bajo el epígrafe
 anterior <ej-insert-sin-par>`.). Por este motivo los conectores incluyen un
 mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
-:java-sql:`PreparedStatement <PreparedStatement>`:
+|PreparedStatement|:
 
 .. code-block:: java
    :emphasize-lines: 2-4, 7, 8
@@ -296,6 +296,8 @@ mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
        }
    }
 
+.. borrar esto)
+
 Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
 establecidos todos sus valores, ejecutar la sentencia.
@@ -304,6 +306,270 @@ establecidos todos sus valores, ejecutar la sentencia.
    repitiendo la ejecución de la misma sentencia con distintos valores y lo que
    hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
    <conn-batch>`, darle al menos una vuelta más.
+
+.. _conn-data:
+
+Datos
+=====
+Hasta ahora no nos hemos detenido en las particularidades de los tipos de
+datos, ya que los que muestran nuestro ejemplo son bastante simples. Sin
+embargo, la correspondencia entre tipos de datos de Java y de |SQL| no es
+exacta, por lo que |JDBC| implementa los métodos `setXXXX` de
+:java-sql:`PreparedStatement <PreparedStatement>` para guardar datos en la base
+de datos y los métodos `getXXXX` de :java-sql:`ResultSet <ResultSet>` para
+recuperarlos.
+
+En principio (aunque hay excepciones), podemos usar estos métodos y abstraernos
+de cómo implementa el |SGBD| el estándar |SQL| el tipo.
+
+.. _conn-data-simple:
+
+Datos simples
+-------------
+Por datos simples entendemos los que representan caracteres, enteros, números
+reales(flotantes o de precisión fija) o booleanos y tienen, por lo general, un
+equivalente propio de Java.
+
+.. table::
+   :class: tipos-sql
+
+   +-----------------+-------------------------+--------------------------------------+
+   | Tipo |SQL|      | Tipo Java\ [#]_         | Método |JDBC| de |PreparedStatement| |
+   +=================+=========================+======================================+
+   | | CHAR(n)       | :java-lang:`String`     | setString(int idx, String v)         |
+   | | VARCHAR(n)    |                         |                                      |
+   +-----------------+-------------------------+--------------------------------------+
+   | | SMALLINT      | | :java-lang:`Short`    | | setShort(int idx, short v)         |
+   | | INTEGER       | | :java-lang:`Integer`  | | setInt(int idx, int v)             |
+   | | BIGINT        | | :java-lang:`Long`     | | setLong(int idx, long v)           |
+   +-----------------+-------------------------+--------------------------------------+
+   | BOOLEAN         | :java-lang:`Boolean`    | | setBoolean(int idx, boolean v)     |
+   +-----------------+-------------------------+--------------------------------------+
+   | NUMERIC/DECIMAL | :java-lang:`BigDecimal` | | setBigDecimal(int idx, BigDecimal  |
+   +-----------------+-------------------------+--------------------------------------+
+   | | FLOAT         | | :java-lang:`Float`    | | setFloat(int idx, float v)         |
+   | | DOUBLE        | | :java-lang:`Double`   | | setDouble(int idx, double v)       |
+   +-----------------+-------------------------+--------------------------------------+
+
+.. note:: No hay más que sustituir `set` por `get` para obtener los métodos de
+   :java-sql:`PreparedStatement <PreparedStatement>` necesarios para guardar datos.
+
+Ejemplos de cómo obtener o escribir datos de este tipo ya se han dejado
+escritos en los ejemplos de apartados anteriores. Sólo :java-math:`BigDecimal`
+no es un tipo primitivo en Java, pero su uso es trivial:
+
+.. code-block:: java
+
+   BigDecimal comaFija = new BigDecimal("13.456");
+
+.. rubric:: SQLite
+
+Dado que hemos escogido este |SGBD| para desarrollar la unidad, nos conviene
+centrarnos en sus particularidades. La característica fundamental de **SQLite**
+es que tiene **tipado dinámico** y cuál sea el tipo que declaremos al crear la tabla
+es irrelevante, porque el sistema gestor aceptará el dato con independencia de
+su tipo. Por ejemplo:
+
+.. code-block:: sql
+
+   CREATE TABLE "Persona" (
+      "nombre"    VARCHAR(255);
+   );
+
+   INSERT INTO "Persona" VALUES
+      ("Manolo"),   // Consecuente con la definición: no da problemas.
+      (4356);       // Inconsecuente, pero da igual: el dato se almacena como entero.
+
+De hecho, **SQLite** ni siquiera atiende a qué palabra usamos para definir el
+tipo y creará la tabla, incluso aunque nos inventemos el nombre del tipo:
+
+.. code-block:: sql
+
+   CREATE TABLE "Persona" (
+      "nombre"    TIPOINVENTADO   // No da error.
+   );
+
+Internamente, **SQLite** sólo dispone de datos de tipo texto, entero (de diverso
+tamaño), doble y BLOB; y dependiendo del valor que se suministre usará un tipo u
+otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto, ``INTEGER``,
+``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``, ``DOBLE`` y
+``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión de este
+último tipo).
+
+.. _conn-data-complex:
+
+Datos complejos
+---------------
+Los datos complejos se caracterizan porque el paquete ``java.sql`` tiene
+definidos tipos específicos que se corresponden con los definidos en el estándar
+|SQL|.
+
+.. table::
+   :class: tipos-sql
+
+   +-----------------+--------------------------+-----------------------------------------------+
+   | Tipo |SQL|      | Tipo Java                | Método |JDBC| de |PreparedStatement|          |
+   +=================+==========================+===============================================+
+   | | DATE          | | :java-sql:`Date`       | | setDate(int idx, java.sql.Date v)           |
+   | | TIME          | | :java-sql:`Time`       | | setTime(int idx, java.sql.Time v)           |
+   | | TIMESTAMP     | | :java-sql:`Timestamp`  | | setTimestamp(int idx, java.sql.Timestamp v) |
+   +-----------------+--------------------------+-----------------------------------------------+
+   | BLOB            | | :java-sql:`Blob`       | | setBlob(int idx, java.sql.Blob v)           |
+   |                 | | |InputStream|          | | setBinaryStream(int idx, InputStream v)     |
+   +-----------------+--------------------------+-----------------------------------------------+
+   | CLOB            | | :java-sql:`Clob`       | | setClob(int idx, java.sql.Clob v)           |
+   |                 | | |Reader|               | | setCharacterStream(int idx, Reader v)       |
+   +-----------------+--------------------------+-----------------------------------------------+
+   | JSON            | :java-lang:`String`      | setString(int idx, String v)                  |
+   +-----------------+--------------------------+-----------------------------------------------+
+   | | ARRAY         | | :java-sql:`Array`      | | setArray(int idx, java.sql.Array v)         |
+   | | STRUCT        | | :java-sql:`Struct`     | | setStruct(int idx, java.sql.Struct v)       |
+   +-----------------+--------------------------+-----------------------------------------------+
+
+.. _conn-date:
+
+Fechas y tiempos
+''''''''''''''''
+El estándar |SQL| define cinco tipos de datos para la expresión de tiempos:
+
+1. ``DATE`` que sirve para definir fechas (p.e. \'2014-01-08\').
+#. ``TIME`` que sirve para definir horas con precisión de segundos (p.e.
+   \'08:30:21\'), aunque también podría incluirse precisión de hasta el
+   microsegundo, añadiendo decimales al segundo.
+#. ``TIMESTAMP`` que combina en un mismo tipo fecha y hora (p.e. \'2014-01-08
+   08:30:21\').
+#. ``TIMESTAMP WITH TIME ZONE`` que permite almacenar, además, el huso horario
+   (p.e. \'2014-01-08 08:30:21+01:00\').
+#. ``INTERVAL`` para almacenar periodos de tiempo (p.e. \'INTERVAL 2 DAYS\' o
+   \'INTERVAL 2 DAYS 10 HOURS\').
+
+A través de |JDBC| sólo se soportan directamente los tres primeros tipos y,
+además, se requiere saber cómo convertir entre :java-sql:`Date`,
+:java-sql:`Time`, :java-sql:`Timestamp` y los tipos con los que frecuentemente
+se trabaja en *Java*.
+
+.. code-block:: java
+
+   import java.time.LocalDate;
+   import java.time.LocalTime;
+   import java.time.LocalDateTime;
+   import java.sql.Date;
+   import java.sql.Time;
+   import java.sql.Timestamp;
+
+   java.util.Date udate = new java.util.Date(); // Almacena fecha y hora.
+
+   // Date --> Date
+   Date date = new Date(udate.getTime());
+
+   // Date --> Date
+   udate = new Date(date.getTime());
+
+   // Date --> Time
+   Time time = new Time(date.getTime());
+
+   // Time --> Date
+   date = new Date(time.getTime());
+
+   // Date --> Timestamp
+   Timestamp timestamp = new Timestamp(date.getTime());
+
+   // Timestamp --> Date
+   date = new Date(timestamp.getTime());
+
+   LocalDate localDate = LocalDate.now();
+
+   // LocalDate --> Date
+   date = Date.valueOf(localDate);
+
+   // Date --> LocalDate
+   localDate = date.toLocalDate();
+
+   LocalTime localTime = LocalTime.now();
+
+   // LocalTime --> Time
+   sqltime = Time.valueOf(localTime);
+
+   // Time --> Localtime
+   localTime = Time.toLocalTime();
+
+   LocalDateTime localDateTime = LocalDateTime.now();
+
+   // LocalDateTime --> Timestamp
+   timestamp = Timestamp.valueOf(localDateTime);
+
+   // Timestamp --> LocalDateTime
+   localDateTime = timestamp.toLocalDateTime();
+
+BLOB y CLOB
+'''''''''''
+Ambos tipos representan datos de tamaño considerable, ``BLOB`` un datos binarios
+(p.e. una imagen) y ``CLOB`` un conjunto de caracteres, o sea, un texto grande
+que el que se podrían almacenar con ``VARCHAR`` (cuyo límite depende del
+|SGBD|). Al margen de esa diferencia, explicado uno, explicado el otro.
+
+Por ejemplo, si tuviéramos un archivo con una foto que quisiéramos guardar en
+una base de datos podríamos hacer:
+
+.. code-block:: java
+   :emphasize-lines: 10, 12
+
+   try (
+      Connection conn = DriverManager.getConnection(dbUrl);
+   ) {
+      try(
+         PreparedStatement pstmt = conn.preparedStatement("""
+            INSERT INTO "Persona" ("nombre", "avatar") VALUES (?, ?);
+         """)
+      ) {
+         Path archivo = Path.of("ruta", "al", "archivo", "jpg");
+         try(InputStream st = Files.newInputStream(archivo)) {
+            pstmt.setString(1, "Manolito");
+            pstmt.setBinaryStream(2, st);
+            pstmt.executeUpdate();
+         }
+      }
+   }
+
+También podríamos querer guardar un archivo binaro ya cargado en memoria:
+
+.. code-block:: java
+
+   byte[] archivo = new byte[] {10, 20, 5, 50, 12, 221, 13}
+   Blob blob = conn.createBlob();
+   blob.setBytes(1, archivo); // Agregamos la secuencia de bytes al principio del Blob.
+
+   try (
+      Connection conn = DriverManager.getConnection(dbUrl);
+   ) {
+      try(
+         PreparedStatement pstmt = conn.preparedStatement("""
+            INSERT INTO "Persona" ("nombre", "avatar") VALUES (?, ?);
+         """)
+      ) {
+         pstmt.setString(1, "Manolito");
+         pstmt.setBlob(2, blob);
+         pstmt.executeUpdate();
+      }
+      finally {
+         blob.free();  // Vaciamos el blob para liberar la memoria.
+      }
+   }
+
+JSON
+''''
+Desde |SQL|\ :2023 el estándar soporta de forma nativa el tipo |JSON|. Sin
+embargo, |JDBC| aún no tiene soporte alguno para ello, así que el único modo de
+tratarlo es a través de :java-lang:`String`.
+
+ARRAY y STRUCT
+''''''''''''''
+El tipo de dato ``ARRAY`` es, simplemente, una secuencia de datos de un mismo
+tipo, o sea, lo que entenderíamos como *array* en cualquier lenguaje de
+programación; mientras que ``STRUCT`` es un tipo de dato que permite incluir
+como valor de un campo
+
+.. rubric:: SQLite
 
 .. _conn-transactions:
 
@@ -355,9 +621,11 @@ pertenezcan a una misma transacción debemos hacer lo siguiente:
       conn.setAutoCommit(true);
    }
 
-.. important:: En el ejemplo, las sentencias son una misma sentencia con distinto parámetros.
-   Evidentemente, las transacciones pueden estar constituidas por cualesquiera
-   sentencias.
+.. borrar esto)
+
+.. important:: En el ejemplo, las sentencias son una misma sentencia con
+   distinto parámetros.  Evidentemente, las transacciones pueden estar
+   constituidas por cualesquiera sentencias.
 
 .. _conn-batch:
 
@@ -393,47 +661,7 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
       conn.setAutoCommit(true);
    }
 
-.. _conn-data:
-
-Datos
-=====
-Hasta ahora no hemos profundizados en los tipos de datos concretos ya que los
-que muestran nuestro ejemplos son bastante simples. Sin embargo, la
-correspondencia entre tipos de datos de Java y de |SQL| no es exacta, por lo que
-|JDBC| implementa los métodos `setXXXX` de :java-sql:`PreparedStatement
-<PreparedStatement>`.
-
-Datos simples
--------------
-
-.. _conn-date:
-
-Fechas y tiempos
-----------------
-El estándar |SQL| define cinco tipos de datos para la expresión de tiempos:
-
-1. ``DATE`` que sirve para definir fechas (p.e. \'2014-01-08\').
-#. ``TIME`` que sirve para definir horas con precisión de segundos (p.e.
-   \'08:30:21\'), aunque también podría incluirse precisión de hasta el
-   microsegundo, añadiendo decimales al segundo.
-#. ``TIMESTAMP`` que combina en un mismo tipo fecha y hora (p.e. \'2014-01-08
-   08:30:21\').
-#. ``TIMESTAMP WITH TIME ZONE`` que permite almacenar, además, el huso horario
-   (p.e. \'2014-01-08 08:30:21+01:00\').
-#. ``INTERVAL`` para almacenar periodos de tiempo (p.e. \'INTERVAL 2 DAYS\' o
-   \'INTERVAL 2 DAYS 10 HOURS\').
-
-De los |SGBD| más utilizados el que implementa más fielmente el estándar es
-PostgreSQL_. SQLite_, que es el que hemos propuesto utilizando, es el que tiene un
-soporte más precario. De hecho, no implementa ninguno. Sin embargo:
-
-* En las definiciones de las tablas (``CREATE TABLE``), podremos usar todas las
-  las palabras reservadas vistas. Eso se debe a que **SQLite** no impone ninguna
-  restricción a los tipos, ya que usa tipado dinámico, y admite que se escriba
-  como tipo cualquier palabra, incluso una que inventemos. Él simplemente
-  almacenará el dato como ``TEXT``, ``INTEGER``, ``DOUBLE`` o ``BLOB``
-  dependiendo del valor que se le proporcione.
-* Para operar con los datos tendremos que usar funciones específicas.
+.. borrar esto)
 
 .. _conn-extra:
 
@@ -454,6 +682,10 @@ Extras
 .. |TCP| replace:: :abbr:`TCP (Transmission Control Protocol)`
 .. |IP| replace:: :abbr:`IP (Internet Protocol)`
 .. |E/R| replace:: :abbr:`E/R (Entidad/Relación)`
+.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+.. |Reader| replace:: :java-io:`Reader <Reader>`
+.. |PreparedStatement| replace:: :java-sql:`PreparedStatement <PreparedStatement>`
 
 .. _commons-csv: https://commons.apache.org/proper/commons-csv/project-info.html
 .. _librería Jackson: https://github.com/FasterXML/jackson
@@ -484,6 +716,8 @@ Extras
    forma parte del estándar. Desde |SQL|\ :2003, existe un modo de expresarlo:
    :code:`GENERATED [BY DEFAULT|ALWAYS] AS IDENTITY`. Sin embargo, SQLite_ no lo
    soporta y por eso lo hemos dejado comentado. En cambio, tiene un comportamento
-   curioso cuando se usa ``INTEGER`` para definir la clave primaria asume el
+   curioso: cuando se usa ``INTEGER`` para definir la clave primaria asume el
    comportamento de :code:`GENERATED BY DEFAULT AS IDENTITY` y cuando se usa
    ``INT`` la clave no es autoincremental.
+
+.. [#] Se han referido clases, pero también equivalen a tipos primitivos (``short`` en vez de :java-lang:`Short`.

@@ -402,11 +402,11 @@ programación.</p>
 </div>
 <p>Sin embargo, en su creación hay que establecer un tamaño determinado y no
 siempre es posible prever cuántos serán los elementos que contendrá como máximo.
-Para solucionar estos casos existe la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html">Collection&lt;E&gt;</a> que extiende <a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable&lt;E&gt;</a>.</p>
+Para solucionar estos casos existe la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Collection.html">Collection&lt;E&gt;</a> que extiende <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable&lt;E&gt;</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Para convertir una <em>array</em> existente en una lista puede usarse
-<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html">Arrays.asList</a>:</p>
+<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Arrays.html">Arrays.asList</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="p">};</span>
 <span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
 </pre></div>
@@ -414,10 +414,10 @@ Para solucionar estos casos existe la interfaz <a class="extlink-java-util refer
 </div>
 <section id="collection">
 <span id="java-collection"></span><h2>Collection<a class="headerlink" href="#collection" title="Link to this heading">#</a></h2>
-<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html">java.util.Collection</a> es una interfaz que representa un grupo de objetos, cada
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Collection.html">java.util.Collection</a> es una interfaz que representa un grupo de objetos, cada
 uno de los cuales se llama «elemento». Dependiendo de implementaciones más
-específicas los elementos podrán estar ordenador (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">java.util.List</a>) o
-desordenados (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">java.util.Set</a>).</p>
+específicas los elementos podrán estar ordenador (<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">java.util.List</a>) o
+desordenados (<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Set.html">java.util.Set</a>).</p>
 <img alt="../../_images/Collection.png" src="../../_images/Collection.png" />
 <section id="interfaz">
 <h3>Interfaz<a class="headerlink" href="#interfaz" title="Link to this heading">#</a></h3>
@@ -494,7 +494,7 @@ deberemos elegir la implementación más apropiada.</p>
 <section id="listas">
 <span id="java-list"></span><h4>Listas<a class="headerlink" href="#listas" title="Link to this heading">#</a></h4>
 <p>La naturaleza de algunas implementaciones es la de una secuencia ordenada de
-elementos a los cuales se puede acceder individualmente (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">java.util.List</a>). Por
+elementos a los cuales se puede acceder individualmente (<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">java.util.List</a>). Por
 eso se añaden métodos como:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">get(int</span> <span class="pre">i)</span></code></dt><dd><p>que permite obtener el elemento i-ésimo.</p>
@@ -508,7 +508,7 @@ del objeto que se proporciona como argumento.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">remove(int</span> <span class="pre">i)</span></code></dt><dd><p>que elimina el elemento i-ésimo.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">sort(Comparator&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que reordena los elementos utilizando el <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html">comparador</a> facilitado en el argumento.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">sort(Comparator&lt;E&gt;</span> <span class="pre">c)</span></code></dt><dd><p>que reordena los elementos utilizando el <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Comparator.html">comparador</a> facilitado en el argumento.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">subList(int</span> <span class="pre">i,</span> <span class="pre">int</span> <span class="pre">j)</span></code></dt><dd><p>que devuelve una lista con los elementos incluidos entre la posición «i» y la
 «j» (este último sin incluir).</p>
@@ -524,7 +524,7 @@ alterando la propia colección y no generando una nueva.</p>
 </dl>
 <p>Implementaciones particulares de las listas son:</p>
 <dl>
-<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html">ArrayList</a></dt><dd><p>se comporta, digámoslo así, como un array de dimensiones dinámicas, de manera
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">ArrayList</a></dt><dd><p>se comporta, digámoslo así, como un array de dimensiones dinámicas, de manera
 que, a diferencia de aquellos, podemos ir incrementando su tamaño a voluntad.
 En principio, tiene un tamaño suficiente para almacenar los elementos que
 contiene, pero si se añaden tantos que se vuelve insuficiente, se
@@ -542,11 +542,11 @@ redimensiona automáticamente.</p>
 <p class="admonition-title">Nota</p>
 <p>Obsérvese que no se ha definido la variable <cite>al</cite> como <cite>ArrayList</cite>,
 sino como <cite>List</cite>. Esto significa que tendremos disponibles los métodos
-definidos en la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">List</a>, pero no los que añade
+definidos en la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>, pero no los que añade
 la clase <cite>ArrayList</cite>.</p>
 </div>
 </dd>
-<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Stack.html">Stack</a></dt><dd><p>es la implementación de una <a class="reference external" href="https://es.wikipedia.org/wiki/Pila_(inform%C3%A1tica)">pila</a> y añade algunos
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Stack.html">Stack</a></dt><dd><p>es la implementación de una <a class="reference external" href="https://es.wikipedia.org/wiki/Pila_(inform%C3%A1tica)">pila</a> y añade algunos
 método propios de su uso como tal:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">push(E</span> <span class="pre">e)</span></code></dt><dd><p>que añade un elemento en lo alto de la pila (equivale a usar <code class="docutils literal notranslate"><span class="pre">add</span></code>).</p>
@@ -587,7 +587,7 @@ con una estructura <em>foreach</em>, debería definirse el método como:</p>
 </section>
 <section id="conjuntos">
 <h4>Conjuntos<a class="headerlink" href="#conjuntos" title="Link to this heading">#</a></h4>
-<p>Los conjuntos (<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">java.util.Set</a>) agrupan datos que no pueden repetirse por lo
+<p>Los conjuntos (<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Set.html">java.util.Set</a>) agrupan datos que no pueden repetirse por lo
 que:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">s</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// true, añadimos 1 al conjunto.</span>
@@ -597,12 +597,12 @@ que:</p>
 <p>Además, no tienen en principio orden, por lo que referirlos mediante un índice
 carece de sentido; y, en consecuencia, no añade como la interfaz <a class="reference internal" href="#java-list"><span class="std std-ref">List</span></a> métodos relacionados con la posición que ocupan los elementos.</p>
 <dl>
-<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html">HashSet</a></dt><dd><p>Es una clase para construir conjuntos tal y como los hemos descrito.</p>
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashSet.html">HashSet</a></dt><dd><p>Es una clase para construir conjuntos tal y como los hemos descrito.</p>
 </dd>
-<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/TreeSet.html">TreeSet</a></dt><dd><p>Es una clase que implementa la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html">SortedSet</a> y
+<dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/TreeSet.html">TreeSet</a></dt><dd><p>Es una clase que implementa la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/SortedSet.html">SortedSet</a> y
 que se diferencia de los conjuntos anteriores en que sí existe un orden: los
 elementos se ordenan según su orden natural si existiera (p.e. los enteros o
-las cadenas tienen definido un orden) o según el <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html">comparador</a> que se proporciona al crear el objeto:</p>
+las cadenas tienen definido un orden) o según el <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Comparator.html">comparador</a> que se proporciona al crear el objeto:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">SortedSet</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ts1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
 <span class="n">ts1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
@@ -641,7 +641,7 @@ nombre de <em>diccionarios</em>.</p>
 <img alt="../../_images/Map.png" src="../../_images/Map.png" />
 <section id="id1">
 <h3>Interfaz<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>La interfaz básica <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html">Map&lt;K, V&gt;</a> recoge los métodos comunes a
+<p>La interfaz básica <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Map.html">Map&lt;K, V&gt;</a> recoge los métodos comunes a
 todos los mapas:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">size()</span></code></dt><dd><p>que devuelve</p>
@@ -678,7 +678,7 @@ argumento.</p>
 <dt><code class="docutils literal notranslate"><span class="pre">keySet()</span></code></dt><dd><p>que devuelve un conjunto cuyos elementos son las claves del mapa.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">entrySet()</span></code></dt><dd><p>que devuelve un conjunto cuyos elementos son parejas clave-valor en la forma
-<a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html">Map.Entry</a>:</p>
+<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Map.Entry.html">Map.Entry</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;uno&quot;</span><span class="p">);</span>
 <span class="n">m</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dos&quot;</span><span class="p">);</span>
@@ -696,13 +696,13 @@ argumento.</p>
 <p>Citaremos dos implementaciones de esta interfaz:</p>
 <section id="hashmap">
 <h4>HashMap<a class="headerlink" href="#hashmap" title="Link to this heading">#</a></h4>
-<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html">HashMap&lt;K, V&gt;</a> es la implementación que permite la
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashMap.html">HashMap&lt;K, V&gt;</a> es la implementación que permite la
 creación de mapas tal y como los hemos explicado y que se asemejan a los de
 otros lenguajes como <em>Python</em>.</p>
 </section>
 <section id="treemap">
 <h4>TreeMap<a class="headerlink" href="#treemap" title="Link to this heading">#</a></h4>
-<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html">TreeMap&lt;K, V&gt;</a> es un mapa ordenado en el que sus claves se
+<p><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/TreeMap.html">TreeMap&lt;K, V&gt;</a> es un mapa ordenado en el que sus claves se
 ordenan según su orden natural o el comparador que facilitemos al construirlo
 como argumento del constructor:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Ordenado según el orden alfabético de sus claves (que son cadenas)</span>

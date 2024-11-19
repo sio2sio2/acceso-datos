@@ -42,14 +42,15 @@ html_theme_options = {
 }
 
 extlinks = {
-    'java-util': ('https://docs.oracle.com/javase/8/docs/api/java/util/%s.html', 'java.util.%s'),
-    'java-text': ('https://docs.oracle.com/javase/8/docs/api/java/text/%s.html', 'java.text.%s'),
-    'java-io': ('https://docs.oracle.com/javase/8/docs/api/java/io/%s.html', 'java.io.%s'),
-    'java-nio': ('https://docs.oracle.com/javase/8/docs/api/java/nio/file/%s.html', 'java.nio.file.%s'),
-    'java-lang': ('https://docs.oracle.com/javase/8/docs/api/java/lang/%s.html', 'java.lang.%s'),
-    'java-function': ('https://docs.oracle.com/javase/8/docs/api/java/util/function/%s.html', 'java.util.function.%s'),
-    'java-stream': ('https://docs.oracle.com/javase/8/docs/api/java/util/stream/%s.html', 'java.util.stream.%s'),
-    'java-sql': ('https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/%s.html', 'java.sql.%s'),
+      'java-util': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/%s.html', 'java.util.%s'),
+    'java-text': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/text/%s.html', 'java.text.%s'),
+    'java-io': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/%s.html', 'java.io.%s'),
+    'java-nio': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/%s.html', 'java.nio.file.%s'),
+    'java-lang': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/%s.html', '%s'),
+    'java-function': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/%s.html', 'java.util.function.%s'),
+    'java-stream': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/%s.html', 'java.util.stream.%s'),
+    'java-sql': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/%s.html', 'java.sql.%s'),
+    'java-math': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/math/%s.html', '%s'),
     'deb': ('https://packages.debian.org/stable/%s','%s'),
 }
 

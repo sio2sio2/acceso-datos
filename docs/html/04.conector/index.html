@@ -364,14 +364,20 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.4.1. Manejo de transacciones</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.4.2. Operaciones masivas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">4.4. Datos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-simples">4.4.1. Datos simples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-complejos">4.4.2. Datos complejos</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-tiempos">4.4.2.1. Fechas y tiempos</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blob-y-clob">4.4.2.2. BLOB y CLOB</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#json">4.4.2.3. JSON</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#array-y-struct">4.4.2.4. ARRAY y STRUCT</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">4.5. Datos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-simples">4.5.1. Datos simples</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-tiempos">4.5.2. Fechas y tiempos</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.5. Transacciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.5.1. Manejo de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.5.2. Operaciones masivas</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
@@ -504,7 +510,7 @@ estamos utilizando al construirla:</p>
 <thead>
 <tr class="row-odd"><th class="head"><p><abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></th>
 <th class="head"><p>Librería <abbr title="Java DataBase Connectivity">JDBC</abbr></p></th>
-<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
 </tr>
 </thead>
 <tbody>
@@ -554,7 +560,7 @@ pueden ser de dos tipos:</p>
 <li><p>Sentencias que modifican la base de datos.</p></li>
 <li><p>Sentencias que obtienen datos sin llevar a cabo modificación alguna.</p></li>
 </ul>
-<p>A partir de un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/Statement.html">Statement</a>, para las primeras se
+<p>A partir de un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a>, para las primeras se
 usa el método <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code>, mientras que para las segundas el método
 <code class="docutils literal notranslate"><span class="pre">executeQuery</span></code>.</p>
 <div class="admonition-todo admonition" id="id3">
@@ -654,13 +660,13 @@ usa el método <code class="docutils literal notranslate"><span class="pre">exec
 <p>El código tiene dos aspectos:</p>
 <ol class="arabic simple">
 <li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr> que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
-forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, así que no entraremos en
+forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id7" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, así que no entraremos en
 comentarlas.</p></li>
 <li><p>La ejecución de esas sentencias usando <abbr title="Java DataBase Connectivity">JDBC</abbr>. Obsérvese que:</p></li>
 </ol>
 <blockquote>
 <div><ul class="simple">
-<li><p>Usamos un único objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/Statement.html">Statement</a> para todas ellas,
+<li><p>Usamos un único objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a> para todas ellas,
 porque es lícito.</p></li>
 <li><p>Las ejecutamos usando el método <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code> puesto que su función es
 modificar el contenido de la base de datos, no obtener información.</p></li>
@@ -708,7 +714,7 @@ mejor.</p>
 </pre></div>
 </div>
 <p>Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
-objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que
+objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que
 obtenemos registros de él. En el ejemplo, nos hemos limitado a imprimirlos, pero
 si nuestro programa pretendiera hacer algo útil, tendríamos que trasladar esta
 información al modelo de objetos de Java, Por ejemplo, suponiendo que hubiéramos
@@ -778,7 +784,7 @@ muchos casos que se incluyan valores de variables en las propias sentencias
 (véase, sin ir más lejos, el <a class="reference internal" href="#ej-insert-sin-par"><span class="std std-ref">ejemplo de inserción bajo el epígrafe
 anterior</span></a>.). Por este motivo los conectores incluyen un
 mecanismo para parametrizar sentencias; y, en el caso de <abbr title="Java DataBase Connectivity">JDBC</abbr>, se hace uso de
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a>:</p>
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
 <span class="hll"><span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
 </span><span class="hll"><span class="s">      INSERT INTO &quot;Departamento&quot; (&quot;denominacion&quot;) VALUES (?);</span>
@@ -802,8 +808,345 @@ hemos hecho no es en absoluto eficiente. Necesitaremos <a class="reference inter
 </div>
 </section>
 </section>
+<section id="datos">
+<span id="conn-data"></span><h2><span class="section-number">4.4. </span>Datos<a class="headerlink" href="#datos" title="Link to this heading">#</a></h2>
+<p>Hasta ahora no nos hemos detenido en las particularidades de los tipos de
+datos, ya que los que muestran nuestro ejemplo son bastante simples. Sin
+embargo, la correspondencia entre tipos de datos de Java y de <abbr title="Structured Query Language">SQL</abbr> no es
+exacta, por lo que <abbr title="Java DataBase Connectivity">JDBC</abbr> implementa los métodos <cite>setXXXX</cite> de
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a> para guardar datos en la base
+de datos y los métodos <cite>getXXXX</cite> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> para
+recuperarlos.</p>
+<p>En principio (aunque hay excepciones), podemos usar estos métodos y abstraernos
+de cómo implementa el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el estándar <abbr title="Structured Query Language">SQL</abbr> el tipo.</p>
+<section id="datos-simples">
+<span id="conn-data-simple"></span><h3><span class="section-number">4.4.1. </span>Datos simples<a class="headerlink" href="#datos-simples" title="Link to this heading">#</a></h3>
+<p>Por datos simples entendemos los que representan caracteres, enteros, números
+reales(flotantes o de precisión fija) o booleanos y tienen, por lo general, un
+equivalente propio de Java.</p>
+<div class="pst-scrollable-table-container"><table class="tipos-sql table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo <abbr title="Structured Query Language">SQL</abbr></p></th>
+<th class="head"><p>Tipo Java<a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Método <abbr title="Java DataBase Connectivity">JDBC</abbr> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">CHAR(n)</div>
+<div class="line">VARCHAR(n)</div>
+</div>
+</td>
+<td><p><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a></p></td>
+<td><p>setString(int idx, String v)</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">SMALLINT</div>
+<div class="line">INTEGER</div>
+<div class="line">BIGINT</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Short.html">Short</a></div>
+<div class="line"><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Integer.html">Integer</a></div>
+<div class="line"><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Long.html">Long</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setShort(int idx, short v)</div>
+<div class="line">setInt(int idx, int v)</div>
+<div class="line">setLong(int idx, long v)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>BOOLEAN</p></td>
+<td><p><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Boolean.html">Boolean</a></p></td>
+<td><div class="line-block">
+<div class="line">setBoolean(int idx, boolean v)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>NUMERIC/DECIMAL</p></td>
+<td><p><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/BigDecimal.html">BigDecimal</a></p></td>
+<td><div class="line-block">
+<div class="line">setBigDecimal(int idx, BigDecimal</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">FLOAT</div>
+<div class="line">DOUBLE</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Float.html">Float</a></div>
+<div class="line"><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Double.html">Double</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setFloat(int idx, float v)</div>
+<div class="line">setDouble(int idx, double v)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>No hay más que sustituir <cite>set</cite> por <cite>get</cite> para obtener los métodos de
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a> necesarios para guardar datos.</p>
+</div>
+<p>Ejemplos de cómo obtener o escribir datos de este tipo ya se han dejado
+escritos en los ejemplos de apartados anteriores. Sólo <a class="extlink-java-math reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a>
+no es un tipo primitivo en Java, pero su uso es trivial:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">comaFija</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">&quot;13.456&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p class="rubric">SQLite</p>
+<p>Dado que hemos escogido este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> para desarrollar la unidad, nos conviene
+centrarnos en sus particularidades. La característica fundamental de <strong>SQLite</strong>
+es que tiene <strong>tipado dinámico</strong> y cuál sea el tipo que declaremos al crear la tabla
+es irrelevante, porque el sistema gestor aceptará el dato con independencia de
+su tipo. Por ejemplo:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="ss">&quot;Persona&quot;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="ss">&quot;nombre&quot;</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">);</span>
+<span class="p">);</span>
+
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="ss">&quot;Persona&quot;</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">   </span><span class="p">(</span><span class="ss">&quot;Manolo&quot;</span><span class="p">),</span><span class="w">   </span><span class="o">//</span><span class="w"> </span><span class="n">Consecuente</span><span class="w"> </span><span class="n">con</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">definición</span><span class="p">:</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="n">da</span><span class="w"> </span><span class="n">problemas</span><span class="p">.</span>
+<span class="w">   </span><span class="p">(</span><span class="mi">4356</span><span class="p">);</span><span class="w">       </span><span class="o">//</span><span class="w"> </span><span class="n">Inconsecuente</span><span class="p">,</span><span class="w"> </span><span class="n">pero</span><span class="w"> </span><span class="n">da</span><span class="w"> </span><span class="n">igual</span><span class="p">:</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="n">dato</span><span class="w"> </span><span class="n">se</span><span class="w"> </span><span class="n">almacena</span><span class="w"> </span><span class="n">como</span><span class="w"> </span><span class="n">entero</span><span class="p">.</span>
+</pre></div>
+</div>
+<p>De hecho, <strong>SQLite</strong> ni siquiera atiende a qué palabra usamos para definir el
+tipo y creará la tabla, incluso aunque nos inventemos el nombre del tipo:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="ss">&quot;Persona&quot;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="ss">&quot;nombre&quot;</span><span class="w">    </span><span class="n">TIPOINVENTADO</span><span class="w">   </span><span class="o">//</span><span class="w"> </span><span class="k">No</span><span class="w"> </span><span class="n">da</span><span class="w"> </span><span class="n">error</span><span class="p">.</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Internamente, <strong>SQLite</strong> sólo dispone de datos de tipo texto, entero (de diverso
+tamaño), doble y BLOB; y dependiendo del valor que se suministre usará un tipo u
+otro para el dato. Así, <code class="docutils literal notranslate"><span class="pre">CHAR</span></code> y <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> se asimilan a texto, <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code>,
+<code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">SMALLINT</span></code> y <code class="docutils literal notranslate"><span class="pre">BOOLEAN</span></code> a enteros, <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code>, <code class="docutils literal notranslate"><span class="pre">DOBLE</span></code> y
+<code class="docutils literal notranslate"><span class="pre">NUMERIC</span></code>/<code class="docutils literal notranslate"><span class="pre">DECIMAL</span></code> a dobles (por tanto, se perderá la precisión de este
+último tipo).</p>
+</section>
+<section id="datos-complejos">
+<span id="conn-data-complex"></span><h3><span class="section-number">4.4.2. </span>Datos complejos<a class="headerlink" href="#datos-complejos" title="Link to this heading">#</a></h3>
+<p>Los datos complejos se caracterizan porque el paquete <code class="docutils literal notranslate"><span class="pre">java.sql</span></code> tiene
+definidos tipos específicos que se corresponden con los definidos en el estándar
+<abbr title="Structured Query Language">SQL</abbr>.</p>
+<div class="pst-scrollable-table-container"><table class="tipos-sql table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo <abbr title="Structured Query Language">SQL</abbr></p></th>
+<th class="head"><p>Tipo Java</p></th>
+<th class="head"><p>Método <abbr title="Java DataBase Connectivity">JDBC</abbr> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">DATE</div>
+<div class="line">TIME</div>
+<div class="line">TIMESTAMP</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Date.html">java.sql.Date</a></div>
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Time.html">java.sql.Time</a></div>
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Timestamp.html">java.sql.Timestamp</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setDate(int idx, java.sql.Date v)</div>
+<div class="line">setTime(int idx, java.sql.Time v)</div>
+<div class="line">setTimestamp(int idx, java.sql.Timestamp v)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>BLOB</p></td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Blob.html">java.sql.Blob</a></div>
+<div class="line"><a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setBlob(int idx, java.sql.Blob v)</div>
+<div class="line">setBinaryStream(int idx, InputStream v)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>CLOB</p></td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Clob.html">java.sql.Clob</a></div>
+<div class="line"><a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/Reader.html">Reader</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setClob(int idx, java.sql.Clob v)</div>
+<div class="line">setCharacterStream(int idx, Reader v)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>JSON</p></td>
+<td><p><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a></p></td>
+<td><p>setString(int idx, String v)</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">ARRAY</div>
+<div class="line">STRUCT</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Array.html">java.sql.Array</a></div>
+<div class="line"><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Struct.html">java.sql.Struct</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">setArray(int idx, java.sql.Array v)</div>
+<div class="line">setStruct(int idx, java.sql.Struct v)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="fechas-y-tiempos">
+<span id="conn-date"></span><h4><span class="section-number">4.4.2.1. </span>Fechas y tiempos<a class="headerlink" href="#fechas-y-tiempos" title="Link to this heading">#</a></h4>
+<p>El estándar <abbr title="Structured Query Language">SQL</abbr> define cinco tipos de datos para la expresión de tiempos:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DATE</span></code> que sirve para definir fechas (p.e. '2014-01-08').</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TIME</span></code> que sirve para definir horas con precisión de segundos (p.e.
+'08:30:21'), aunque también podría incluirse precisión de hasta el
+microsegundo, añadiendo decimales al segundo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span></code> que combina en un mismo tipo fecha y hora (p.e. '2014-01-08
+08:30:21').</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span> <span class="pre">WITH</span> <span class="pre">TIME</span> <span class="pre">ZONE</span></code> que permite almacenar, además, el huso horario
+(p.e. '2014-01-08 08:30:21+01:00').</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> para almacenar periodos de tiempo (p.e. 'INTERVAL 2 DAYS' o
+'INTERVAL 2 DAYS 10 HOURS').</p></li>
+</ol>
+<p>A través de <abbr title="Java DataBase Connectivity">JDBC</abbr> sólo se soportan directamente los tres primeros tipos y,
+además, se requiere saber cómo convertir entre <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Date.html">java.sql.Date</a>,
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Time.html">java.sql.Time</a>, <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Timestamp.html">java.sql.Timestamp</a> y los tipos con los que frecuentemente
+se trabaja en <em>Java</em>.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDate</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalTime</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDateTime</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.Date</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.Time</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.Timestamp</span><span class="p">;</span>
+
+<span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Date</span><span class="w"> </span><span class="n">udate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Date</span><span class="p">();</span><span class="w"> </span><span class="c1">// Almacena fecha y hora.</span>
+
+<span class="c1">// Date --&gt; Date</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">(</span><span class="n">udate</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="c1">// Date --&gt; Date</span>
+<span class="n">udate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">(</span><span class="n">date</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="c1">// Date --&gt; Time</span>
+<span class="n">Time</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Time</span><span class="p">(</span><span class="n">date</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="c1">// Time --&gt; Date</span>
+<span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="c1">// Date --&gt; Timestamp</span>
+<span class="n">Timestamp</span><span class="w"> </span><span class="n">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Timestamp</span><span class="p">(</span><span class="n">date</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="c1">// Timestamp --&gt; Date</span>
+<span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">(</span><span class="n">timestamp</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+
+<span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+
+<span class="c1">// LocalDate --&gt; Date</span>
+<span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">localDate</span><span class="p">);</span>
+
+<span class="c1">// Date --&gt; LocalDate</span>
+<span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">date</span><span class="p">.</span><span class="na">toLocalDate</span><span class="p">();</span>
+
+<span class="n">LocalTime</span><span class="w"> </span><span class="n">localTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+
+<span class="c1">// LocalTime --&gt; Time</span>
+<span class="n">sqltime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Time</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">localTime</span><span class="p">);</span>
+
+<span class="c1">// Time --&gt; Localtime</span>
+<span class="n">localTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Time</span><span class="p">.</span><span class="na">toLocalTime</span><span class="p">();</span>
+
+<span class="n">LocalDateTime</span><span class="w"> </span><span class="n">localDateTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+
+<span class="c1">// LocalDateTime --&gt; Timestamp</span>
+<span class="n">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Timestamp</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">localDateTime</span><span class="p">);</span>
+
+<span class="c1">// Timestamp --&gt; LocalDateTime</span>
+<span class="n">localDateTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timestamp</span><span class="p">.</span><span class="na">toLocalDateTime</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="blob-y-clob">
+<h4><span class="section-number">4.4.2.2. </span>BLOB y CLOB<a class="headerlink" href="#blob-y-clob" title="Link to this heading">#</a></h4>
+<p>Ambos tipos representan datos de tamaño considerable, <code class="docutils literal notranslate"><span class="pre">BLOB</span></code> un datos binarios
+(p.e. una imagen) y <code class="docutils literal notranslate"><span class="pre">CLOB</span></code> un conjunto de caracteres, o sea, un texto grande
+que el que se podrían almacenar con <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> (cuyo límite depende del
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>). Al margen de esa diferencia, explicado uno, explicado el otro.</p>
+<p>Por ejemplo, si tuviéramos un archivo con una foto que quisiéramos guardar en
+una base de datos podríamos hacer:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span>
+<span class="w">      </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">preparedStatement</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">         INSERT INTO &quot;Persona&quot; (&quot;nombre&quot;, &quot;avatar&quot;) VALUES (?, ?);</span>
+<span class="s">      &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;ruta&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;al&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;archivo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jpg&quot;</span><span class="p">);</span>
+<span class="hll"><span class="w">      </span><span class="k">try</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">         </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manolito&quot;</span><span class="p">);</span>
+<span class="hll"><span class="w">         </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setBinaryStream</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">st</span><span class="p">);</span>
+</span><span class="w">         </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>También podríamos querer guardar un archivo binaro ya cargado en memoria:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">221</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">}</span>
+<span class="n">Blob</span><span class="w"> </span><span class="n">blob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createBlob</span><span class="p">();</span>
+<span class="n">blob</span><span class="p">.</span><span class="na">setBytes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">archivo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Agregamos la secuencia de bytes al principio del Blob.</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span>
+<span class="w">      </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">preparedStatement</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">         INSERT INTO &quot;Persona&quot; (&quot;nombre&quot;, &quot;avatar&quot;) VALUES (?, ?);</span>
+<span class="s">      &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manolito&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setBlob</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">blob</span><span class="p">);</span>
+<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">blob</span><span class="p">.</span><span class="na">free</span><span class="p">();</span><span class="w">  </span><span class="c1">// Vaciamos el blob para liberar la memoria.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="json">
+<h4><span class="section-number">4.4.2.3. </span>JSON<a class="headerlink" href="#json" title="Link to this heading">#</a></h4>
+<p>Desde <abbr title="Structured Query Language">SQL</abbr>:2023 el estándar soporta de forma nativa el tipo <abbr title="JavaScript Object Notation">JSON</abbr>. Sin
+embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> aún no tiene soporte alguno para ello, así que el único modo de
+tratarlo es a través de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a>.</p>
+</section>
+<section id="array-y-struct">
+<h4><span class="section-number">4.4.2.4. </span>ARRAY y STRUCT<a class="headerlink" href="#array-y-struct" title="Link to this heading">#</a></h4>
+<p class="rubric">SQLite</p>
+</section>
+</section>
+</section>
 <section id="transacciones">
-<span id="conn-transactions"></span><h2><span class="section-number">4.4. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h2>
+<span id="conn-transactions"></span><h2><span class="section-number">4.5. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h2>
 <p>Hasta ahora hemos obviado el concepto de transacción. Una <em class="dfn">transacción</em> es
 una operación sobre la base datos, no necesariamente atómica, que debe
 completarse o no hacerse en absoluto, es decir, si una <em>transacción</em> se
@@ -819,7 +1162,7 @@ venta, o no hacerlas en absoluto para que quede la venta pendiente. En cambio,
 si se hiciera una y no la otra, la base de datos quedaría en un estado
 inconsistente.</p>
 <section id="manejo-de-transacciones">
-<h3><span class="section-number">4.4.1. </span>Manejo de transacciones<a class="headerlink" href="#manejo-de-transacciones" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">4.5.1. </span>Manejo de transacciones<a class="headerlink" href="#manejo-de-transacciones" title="Link to this heading">#</a></h3>
 <p>En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
 <abbr title="Structured Query Language">SQL</abbr> constituye una transacción diferente. Si queremos que varias sentencias
 pertenezcan a una misma transacción debemos hacer lo siguiente:</p>
@@ -847,13 +1190,13 @@ pertenezcan a una misma transacción debemos hacer lo siguiente:</p>
 </div>
 <div class="admonition important">
 <p class="admonition-title">Importante</p>
-<p>En el ejemplo, las sentencias son una misma sentencia con distinto parámetros.
-Evidentemente, las transacciones pueden estar constituidas por cualesquiera
-sentencias.</p>
+<p>En el ejemplo, las sentencias son una misma sentencia con
+distinto parámetros.  Evidentemente, las transacciones pueden estar
+constituidas por cualesquiera sentencias.</p>
 </div>
 </section>
 <section id="operaciones-masivas">
-<span id="conn-batch"></span><h3><span class="section-number">4.4.2. </span>Operaciones masivas<a class="headerlink" href="#operaciones-masivas" title="Link to this heading">#</a></h3>
+<span id="conn-batch"></span><h3><span class="section-number">4.5.2. </span>Operaciones masivas<a class="headerlink" href="#operaciones-masivas" title="Link to this heading">#</a></h3>
 <p>En el caso de que tengamos que llevar a cabos muchas operaciones que comparten
 la misma sentencia y distintos parámetros (como en el ejemplo anterior
 precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
@@ -883,49 +1226,11 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
 </div>
 </section>
 </section>
-<section id="datos">
-<span id="conn-data"></span><h2><span class="section-number">4.5. </span>Datos<a class="headerlink" href="#datos" title="Link to this heading">#</a></h2>
-<p>Hasta ahora no hemos profundizados en los tipos de datos concretos ya que los
-que muestran nuestro ejemplos son bastante simples. Sin embargo, la
-correspondencia entre tipos de datos de Java y de <abbr title="Structured Query Language">SQL</abbr> no es exacta, por lo que
-<abbr title="Java DataBase Connectivity">JDBC</abbr> implementa los métodos <cite>setXXXX</cite> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a>.</p>
-<section id="datos-simples">
-<h3><span class="section-number">4.5.1. </span>Datos simples<a class="headerlink" href="#datos-simples" title="Link to this heading">#</a></h3>
-</section>
-<section id="fechas-y-tiempos">
-<span id="conn-date"></span><h3><span class="section-number">4.5.2. </span>Fechas y tiempos<a class="headerlink" href="#fechas-y-tiempos" title="Link to this heading">#</a></h3>
-<p>El estándar <abbr title="Structured Query Language">SQL</abbr> define cinco tipos de datos para la expresión de tiempos:</p>
-<ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">DATE</span></code> que sirve para definir fechas (p.e. '2014-01-08').</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TIME</span></code> que sirve para definir horas con precisión de segundos (p.e.
-'08:30:21'), aunque también podría incluirse precisión de hasta el
-microsegundo, añadiendo decimales al segundo.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span></code> que combina en un mismo tipo fecha y hora (p.e. '2014-01-08
-08:30:21').</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span> <span class="pre">WITH</span> <span class="pre">TIME</span> <span class="pre">ZONE</span></code> que permite almacenar, además, el huso horario
-(p.e. '2014-01-08 08:30:21+01:00').</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> para almacenar periodos de tiempo (p.e. 'INTERVAL 2 DAYS' o
-'INTERVAL 2 DAYS 10 HOURS').</p></li>
-</ol>
-<p>De los <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> más utilizados el que implementa más fielmente el estándar es
-<a class="reference external" href="https://mvnrepository.com/artifact/org.postgresql/postgresql">PostgreSQL</a>. <a class="reference external" href="https://sqlite.org/">SQLite</a>, que es el que hemos propuesto utilizando, es el que tiene un
-soporte más precario. De hecho, no implementa ninguno. Sin embargo:</p>
-<ul class="simple">
-<li><p>En las definiciones de las tablas (<code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code>), podremos usar todas las
-las palabras reservadas vistas. Eso se debe a que <strong>SQLite</strong> no impone ninguna
-restricción a los tipos, ya que usa tipado dinámico, y admite que se escriba
-como tipo cualquier palabra, incluso una que inventemos. Él simplemente
-almacenará el dato como <code class="docutils literal notranslate"><span class="pre">TEXT</span></code>, <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code>, <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> o <code class="docutils literal notranslate"><span class="pre">BLOB</span></code>
-dependiendo del valor que se le proporcione.</p></li>
-<li><p>Para operar con los datos tendremos que usar funciones específicas.</p></li>
-</ul>
-</section>
-</section>
 <section id="extras">
 <span id="conn-extra"></span><h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>Se han supuesto (excepto para <strong>SQLite</strong> obviamente) conexiones
 <abbr title="Transmission Control Protocol">TCP</abbr>/<abbr title="Internet Protocol">IP</abbr>. Sin embargo, en sistemas <em>UNIX</em> el motor podría permitir
@@ -934,7 +1239,7 @@ MariaDB podría ser
 <code class="docutils literal notranslate"><span class="pre">jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock</span></code> o
 algo parecido.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
 <p>Aunque haremos una excepción aclarando cómo están definidas las claves
 primarias en las tablas <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>, <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> y <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>.
@@ -944,9 +1249,13 @@ necesidad de que especifiquemos un valor. Eso se hace en <a class="reference ext
 forma parte del estándar. Desde <abbr title="Structured Query Language">SQL</abbr>:2003, existe un modo de expresarlo:
 <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">[BY</span> <span class="pre">DEFAULT|ALWAYS]</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code>. Sin embargo, <a class="reference external" href="https://sqlite.org/">SQLite</a> no lo
 soporta y por eso lo hemos dejado comentado. En cambio, tiene un comportamento
-curioso cuando se usa <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> para definir la clave primaria asume el
+curioso: cuando se usa <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> para definir la clave primaria asume el
 comportamento de <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY</span> <span class="pre">DEFAULT</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code> y cuando se usa
 <code class="docutils literal notranslate"><span class="pre">INT</span></code> la clave no es autoincremental.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
+<p>Se han referido clases, pero también equivalen a tipos primitivos (<code class="docutils literal notranslate"><span class="pre">short</span></code> en vez de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Short.html">Short</a>.</p>
 </aside>
 </aside>
 </section>
@@ -1004,14 +1313,20 @@ comportamento de <code class="code docutils literal notranslate"><span class="pr
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.3.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.4. Transacciones</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.4.1. Manejo de transacciones</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.4.2. Operaciones masivas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">4.4. Datos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-simples">4.4.1. Datos simples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-complejos">4.4.2. Datos complejos</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-tiempos">4.4.2.1. Fechas y tiempos</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blob-y-clob">4.4.2.2. BLOB y CLOB</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#json">4.4.2.3. JSON</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#array-y-struct">4.4.2.4. ARRAY y STRUCT</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos">4.5. Datos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-simples">4.5.1. Datos simples</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas-y-tiempos">4.5.2. Fechas y tiempos</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transacciones">4.5. Transacciones</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.5.1. Manejo de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.5.2. Operaciones masivas</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>

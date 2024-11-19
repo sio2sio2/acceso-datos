@@ -429,7 +429,7 @@ tipo con distintas técnicas.</p></li>
 modo de acceder a una parte concreta de la información: simplemente se abre el
 archivo y se genera un flujo. Para su manipulación (tanto lectura como
 escritura) basta con utilizar algunos de los métodos del ya mencionado
-<a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a>:</p>
+<a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">Files</a>:</p>
 <section id="lectura">
 <span id="iotext-r"></span><h3><span class="section-number">1.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
 <p>Hay varios métodos que pueden ayudarnos a leer un archivo, pero nos decantamos
@@ -449,7 +449,7 @@ extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> media
 </pre></div>
 </div>
 <p>En consecuencia, a partir de este punto podemos tratar estas tres entradas
-diferentes de un mismo modo (p.e. usando la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/javase/8/docs/api/java/util/Scanner.html">Scanner</a>). Si el archivo lo vamos a manejar por líneas lo más adecuado es
+diferentes de un mismo modo (p.e. usando la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Scanner.html">Scanner</a>). Si el archivo lo vamos a manejar por líneas lo más adecuado es
 hacer lo siguiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
 <span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
@@ -535,7 +535,7 @@ al que se puede aplicar <a class="reference internal" href="../98.apendices/01.f
 <span id="iotext-w"></span><h3><span class="section-number">1.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
 <p>En este tipo de archivos, obviamente, tenemos que escribir texto, o sea,
 cadenas, pero no directamente caracteres, sino bytes. Por lo demás, basta con
-utilizar otro método de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html">Files</a> para abrir un flujo de salida:</p>
+utilizar otro método de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">Files</a> para abrir un flujo de salida:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
@@ -552,13 +552,13 @@ utilizar otro método de <a class="extlink-java-nio reference external" href="ht
 suministrada sin respetar la que ya pudiera haber. Sin embargo, pueden añadirse
 a <code class="docutils literal notranslate"><span class="pre">Files.newOutputStream</span></code> argumentos adicionales para incluir una o varias
 opciones que modifiquen este comportamiento (véase
-<a class="extlink-java-nio reference external" href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/StandardOpenOption.html">StandardOpenOption</a>). Por ejemplo:</p>
+<a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/StandardOpenOption.html">StandardOpenOption</a>). Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Se añade contenido, por lo que se respeta el que pudiera haber.</span>
 <span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">,</span><span class="w"> </span><span class="n">StandardOpenOption</span><span class="p">.</span><span class="na">APPEND</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Por otro lado, para transformar la cadena en <em>bytes</em> es necesario especificar
-la codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/javase/8/docs/api/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
+la codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
 aunque si no se indica se sobreentiende la predeterminada de la <abbr title="Java Virtual Machine">JVM</abbr> (muy
 probablemente UTF-8, que es lo habitual en los sistemas modernos). Una
 alternativa, es utilizar un escritor de flujo:</p>
@@ -584,7 +584,7 @@ explícitamente.</p>
 <section id="serializacion-de-objetos">
 <span id="serialize"></span><h2><span class="section-number">1.2.2. </span>Serialización de objetos<a class="headerlink" href="#serializacion-de-objetos" title="Link to this heading">#</a></h2>
 <p>El otro mecanismo de acceso a archivos es el <em class="dfn">aleatorio</em>, implementado
-mediante la clase <a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/RandomAccessFile.html">java.io.RandomAccessFile</a> y gracias al cual se puede acceder
+mediante la clase <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/RandomAccessFile.html">java.io.RandomAccessFile</a> y gracias al cual se puede acceder
 a bytes concretos y avanzar o retroceder dentro de él, tanto para leer como para
 escribir.</p>
 <p>Este mecanismo nos permite escribir distintos tipos de datos e incluso objetos
@@ -602,7 +602,7 @@ es un mecanismo apropiado para almacenar datos en disco.</p>
 serializar varios tendremos que incluirlos dentro de una lista o una
 estructura parecida.</p></li>
 <li><p>Para que un objeto sea serializable debe implementar la interfaz
-<a class="extlink-java-io reference external" href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html">java.io.Serializable</a>.</p></li>
+<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/Serializable.html">java.io.Serializable</a>.</p></li>
 <li><p>Escribimos y leemos el archivo de una tacada. Esto es un problema si la
 cantidad de datos es grande, pero en ese caso, deberíamos haber usado una base
 de datos.</p></li>

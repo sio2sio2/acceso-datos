@@ -19,7 +19,34 @@ ya vistas anteriormente para acceder a otros soportes de datos:
 - La segunda estrategia es la que sigue la `librería Jackson`_ para leer y
   escribir distintos formatos.
 
-.. todo:: Ventajas e inconvenientes de cada cual.
+Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
+
+**Ventajas** de los conectores
+   a. Mayor control sobre las operaciones, al definirse manualmente, lo que
+      permite ajustar más la solución al problema concreto o utilizar
+      características avanzadas de |SQL|.
+   #. Al haber menos abstracción, suele ser una estrategia de mayor rendimiento.
+   #. Es una solución más fácilmente depurable.
+   #. Las sentencias |SQL| son independientes del lenguaje de programación en que
+      se escriba la aplicación, pese a lo cual habrá que traducir el código al
+      nuevo lenguaje.
+   #. Son más sencillos de usar que un |ORM|.
+   #. Los conectores suelen formar parte de las librerías básicas del lenguaje
+      por lo que no necesitaremos usar una librería de terceros (la librería
+      |ORM|) ni tendremos que reescribir el código si decidimos cambiar a un
+      |ORM| distinto.
+
+**Ventajas** de las herramientas |ORM|
+   a. Al proveer un mecanismo para traducir el modelo relacional al modelo de
+      datos del lenguaje de programación (modelo de objetos), son herramientas
+      más productivas.
+   #. El programador trata los datos directamente como objetos lo que hace el
+      código más sencillo y manipulable.
+   #. Generalmente, cambiar de |SGBD| es trivial, puesto que la herramienta
+      nos abstrae de sus particularidades. Su uso, por tanto, nos independencia
+      de cuál sea el |SGBD| que gestione los datos frente a los conectores que
+      usan sentencias |SQL|, generalmente dependientes de cuál es el |SGBD|. En
+      contrapartida, puede resultar muy trabajoso cambiar de |ORM|
 
 En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
 :ref:`unidad siguiente <orm>`.
@@ -71,12 +98,13 @@ Además, necesitaremos importar en nuestro proyecto la librería propia de :prog
 .. rubric:: Ejercicio ilustrativo
 
 Tomemos como base el :ref:`ejercicio ilustrativo con que introducimos XML
-<xml>`, aunque con algunos cambios:
+<xml>`, aunque con algunos cambios (generalizaciones):
 
 + Puede haber varios claustros.
 + Un mismo profesor puede trabajar en varios claustro diferentes.
-+ Si se da la anterior circunstancia, el profesor se adcribirá a un departamento
-  por centro, pero no tiene que ser para todos los centros el mismo.
++ Si se da la anterior circunstancia, el profesor se adcribirá a un
+  departamento\ [#]_ por centro, pero no tiene que ser para todos los centros el
+  mismo.
 + De igual modo, en un centro puede tener asignado uno o varios casilleros
   distintos a los que tiene en otro.
 
@@ -180,20 +208,32 @@ Comencemos creado cuatro tablas:
 .. literalinclude:: files/01.create.java
    :language: java
 
-.. todo:: Revisar para ver si se puede añadir una CTE recursiva para que un
-   sustituto salga en una vista definida sobre "Trabaja", aunque no aparezca en
-   la tabla.
-
 El código tiene dos aspectos:
 
 #. Las sentencias |SQL| que son sentencias |SQL| cuya comprensión no
    forma parte de los objetivos de esta unidad\ [#]_, así que no entraremos en
    comentarlas.
+
+   .. hint:: No obstante si conviene precisar que procuremos al escribirlas
+      ceñirnos al estándar lo más posible a fin de que sean lo más universales
+      posibles y nos sea menos costoso cambiar de |SGBD|. A este respecto:
+
+      + Dejamos de escribir los nombres de elementos de la base de datos
+        (tablas, columnas) entre comillas dobles, porque el estándar |SQL| lo
+        permite en caso de que los nombres no contengan caracteres 'raros'
+        (espacios, etc.) o no se tenga la intención de distinguir nombres
+        cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
+        *Persona* y otra distinta *persona* o *PERSONA*)\ [#]_.
+
+      + Escribimos para los tipos los nombres que define el estándar.
+
+      + Las cadenas se encierran entre comillas simples.
+
 #. La ejecución de esas sentencias usando |JDBC|. Obsérvese que:
 
-  + Usamos un único objeto :java-sql:`Statement <Statement>` para todas ellas,
-    porque es lícito.
-  + Las ejecutamos usando el método ``executeUpdate`` puesto que su función es
+  + Reaprovechamos el mismo objeto :java-sql:`Statement <Statement>` para
+    ejecutarlas todas.
+  + Las ejecutamos usando el método ``executeUpdate``, puesto que su función es
     modificar el contenido de la base de datos, no obtener información.
 
 Tampoco las sentencias de inserción devuelven resultados, por lo que también
@@ -204,16 +244,10 @@ podemos hacer:
 .. code-block:: java
 
       // Agregamos algunos departamentos.
-      stmt.executeUpdate("""
-          INSERT INTO "Departamento" ("denominacion") VALUES ('Informática');
-      """);
+      stmt.executeUpdate("INSERT INTO Departamento (denominacion) VALUES ('Informática')");
       for(String denominacion: new String[] {"Inglés", "Francés", "Tecnología"}) {
-          stmt.executeUpdate(String.format("""
-              INSERT INTO "Departamento" ("denominacion") VALUES ('%s');
-          """, denominacion));
-      }")
-
-.. borrar)))
+          stmt.executeUpdate(String.format("INSERT INTO Departamento (denominacion) VALUES ('%s');", denominacion));
+      }
 
 .. caution:: Aún estamos empezando y sabemos poco así que estas sentencias son
    torpes por dos razones:
@@ -229,18 +263,30 @@ podemos hacer:
    Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
    mejor.
 
+.. seealso:: Se proporcionan adicionalmente dos guiones para su uso directo con
+   :program:`SQLite`: :download:`sustituye.sql <files/sustituye.sql>`, que
+   implementa la solución desarrollada aquí y :download:`sustituto.sql
+   <files/sustituto.sql>` en que el campo *sustituye* se cambia por *sustituto*
+   para que su significado sea quién es el sustituto del profesor en vez de a
+   quién sustituye el profesor. En ambas soluciones, al código Java mostrado se
+   añaden algunos ``INSERT`` para agregar registros a la base de datos y se
+   define una |CTE| recursiva (totalmente compatible con el estándar |SQL|) para
+   que la propia base de datos nos cree una vista (*PlantillaFuncionamiento*)
+   que muestra cada profesor, a qué titular en último caso sustituye (o él mismo
+   si es titular) y si está activo o no. Esta vista es de enorme utilidad para
+   saber en dónde trabaja cada profesor, ya que la tabla *Trabaja* sólo contiene
+   profesores titulares.
+
 .. rubric:: Consultas
 
 Las consultas, en cambio, sí devuelven resultados, que deberán procesarse luego:
 
 .. code-block:: java
 
-   ResultSet rs = stmt.executeQuery("""
-        SELECT * FROM "Departamento";
-   """);
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento;");
 
    while(rs.next()) {
-        int id = rs.getInt("idDepartamento");
+        int id = rs.getInt("id_departamento");
         String denominacion = rs.getString("denominacion");
         System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
    }
@@ -248,11 +294,11 @@ Las consultas, en cambio, sí devuelven resultados, que deberán procesarse lueg
 .. borrar esto)
 
 Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
-objeto :java-sql:`ResultSet <ResultSet>` que se va consumiendo a medida que
-obtenemos registros de él. En el ejemplo, nos hemos limitado a imprimirlos, pero
-si nuestro programa pretendiera hacer algo útil, tendríamos que trasladar esta
-información al modelo de objetos de Java, Por ejemplo, suponiendo que hubiéramos
-definido una clase ``Departamento`` así:
+objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él.
+En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
+pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
+de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
+``Departamento`` así:
 
 .. literalinclude:: files/Departamento.java
    :language: java
@@ -261,21 +307,16 @@ podríamos hacer esto:
 
 .. code-block:: java
 
-   ResultSet rs = stmt.executeQuery("""
-        SELECT * FROM "Departamento";
-   """);
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
 
    List<Departamento> departamentos = new ArrayList<>(); 
 
    while(rs.next()) {
-        departamentos.add(new Departamento().cargarDatos(
-            rs.getInt("idDepartamento"),
-            rs.getString("denominacion")
-        ));
+        int id = rs.getInt("idDepartamento");
+        String denominacion = rs.getString("denominacion");
+        departamentos.add(new Departamento().cargarDatos(id, denominacion));
         System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
    }
-
-.. borrar esto)
 
 .. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
    relacional al modelo de objetos, tal como adelantamos en la introducción.
@@ -295,17 +336,13 @@ mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
    :emphasize-lines: 2-4, 7, 8
 
    try(
-      PreparedStatement pstmt = conn.prepareStatement("""
-         INSERT INTO "Departamento" ("denominacion") VALUES (?);
-      """)
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
    ) {
        for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
-           pstmt.setString(1, denominacion);  // Valor para el primer "?".
+           pstmt.setString(1, denominacion);  // 1: Valor para el primer "?".
            pstmt.executeUpdate();
        }
    }
-
-.. borrar esto)
 
 Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
@@ -316,22 +353,55 @@ establecidos todos sus valores, ejecutar la sentencia.
    hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
    <conn-batch>`, darle al menos una vuelta más.
 
-.. todo:: Mentar setObject...
+Obsérvese que al definir los valores de los parámetros de una consulta,
+necesitamos cambiar de método según sea el tipo del campo:
+
+.. code-block:: java
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)");
+   ) {
+         pstmt.setString(1, "Manolo");
+         pstmt.setString(2, "Manuel");
+         pstmt.setString(3, "Peñalba Pinzón");
+         pstmt.setNull(4, Types.INTEGER);
+         pstmt.executeUpdate();
+   }
+
+|JDBC| permite usar un método genérico (``setObject``) que se encargará de
+inferir el tipo |SQL| correcto a partir del tipo de *Java*:
+
+.. code-block:: java
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement("""
+         INSERT INTO "Profesor" ("apelativo", "nombre", "apellidos", "sustituye") VALUES
+            (?, ?, ?, ?);
+      """)
+   ) {
+         pstmt.setObject(1, "Manolo");
+         pstmt.setObject(2, "Manuel");
+         pstmt.setObject(3, "Peñalba Pinzón");
+         pstmt.setObject(4, null, Types.INTEGER);  // No se puede inferir entero a partir de null
+         pstmt.executeUpdate();
+   }
+
+El problema de ``setObject`` es que delegar la elección del tipo en el conector penaliza el
+rendimiento.
 
 .. _conn-data:
 
 Datos
 =====
-Hasta ahora no nos hemos detenido en las particularidades de los tipos de
-datos, ya que los que muestran nuestro ejemplo son bastante simples. Sin
-embargo, la correspondencia entre tipos de datos de Java y de |SQL| no es
-exacta, por lo que |JDBC| implementa los métodos `setXXXX` de
-:java-sql:`PreparedStatement <PreparedStatement>` para guardar datos en la base
-de datos y los métodos `getXXXX` de :java-sql:`ResultSet <ResultSet>` para
+Hasta ahora no nos hemos detenido en las particularidades de los tipos de datos,
+ya que los que muestran nuestro ejemplo son bastante simples. Sin embargo, la
+correspondencia entre tipos de datos de Java y de |SQL| no es exacta, por lo que
+|JDBC| implementa los métodos `setXXXX` de |PreparedStatement| para guardar
+datos en la base de datos y los métodos `getXXXX` de |ResultSet| para
 recuperarlos.
 
 En principio (aunque hay excepciones), podemos usar estos métodos y abstraernos
-de cómo implementa el |SGBD| el estándar |SQL| el tipo.
+de cómo implementa el tipo el |SGBD| el estándar |SQL|.
 
 .. _conn-data-simple:
 
@@ -363,7 +433,7 @@ equivalente propio de Java.
    +-----------------+-------------------------+--------------------------------------+
 
 .. note:: No hay más que sustituir `set` por `get` para obtener los métodos de
-   :java-sql:`PreparedStatement <PreparedStatement>` necesarios para guardar datos.
+   |PreparedStatement| necesarios para guardar datos.
 
 Ejemplos de cómo obtener o escribir datos de este tipo ya se han dejado
 escritos en los ejemplos de apartados anteriores. Sólo :java-math:`BigDecimal`
@@ -383,11 +453,11 @@ su tipo. Por ejemplo:
 
 .. code-block:: sql
 
-   CREATE TABLE "Persona" (
-      "nombre"    VARCHAR(255);
+   CREATE TABLE Persona (
+      nombre    VARCHAR(255);
    );
 
-   INSERT INTO "Persona" VALUES
+   INSERT INTO Persona VALUES
       ("Manolo"),   // Consecuente con la definición: no da problemas.
       (4356);       // Inconsecuente, pero da igual: el dato se almacena como entero.
 
@@ -397,8 +467,8 @@ tipo:
 
 .. code-block:: sql
 
-   CREATE TABLE "Persona" (
-      "nombre"    TIPOINVENTADO   // No da error.
+   CREATE TABLE Persona (
+      nombre    TIPOINVENTADO   // No da error.
    );
 
 Internamente, :program:`SQLite` sólo dispone de datos de tipo texto, entero (de
@@ -530,9 +600,7 @@ una base de datos podríamos hacer:
       Connection conn = DriverManager.getConnection(dbUrl);
    ) {
       try(
-         PreparedStatement pstmt = conn.preparedStatement("""
-            INSERT INTO "Persona" ("nombre", "avatar") VALUES (?, ?);
-         """)
+         PreparedStatement pstmt = conn.preparedStatement("INSERT INTO Persona (nombre, avatar) VALUES (?, ?)")
       ) {
          Path archivo = Path.of("ruta", "al", "archivo", "jpg");
          try(InputStream st = Files.newInputStream(archivo)) {
@@ -555,9 +623,7 @@ También podríamos querer guardar un archivo binaro ya cargado en memoria:
       Connection conn = DriverManager.getConnection(dbUrl);
    ) {
       try(
-         PreparedStatement pstmt = conn.preparedStatement("""
-            INSERT INTO "Persona" ("nombre", "avatar") VALUES (?, ?);
-         """)
+         PreparedStatement pstmt = conn.preparedStatement("INSERT INTO Persona (nombre, avatar) VALUES (?, ?)")
       ) {
          pstmt.setString(1, "Manolito");
          pstmt.setBlob(2, blob);
@@ -583,12 +649,12 @@ programación:
 .. code-block:: sql
    :emphasize-lines: 6
 
-   CREATE TABLE "Trabaja" (
-      "profesor"        INTEGER,
-      "claustro"        INTEGER,
-      "departamento"    INTEGER,
+   CREATE TABLE Trabaja (
+      profesor        INTEGER,
+      claustro        INTEGER,
+      departamento    INTEGER,
       -- Para poder asignar varios casilleros a un mismo profesor
-      "casillero"       INTEGER[]   NOT NULL,
+      casillero       INTEGER ARRAY   NOT NULL,
 
       /* Restricciones */
    );
@@ -597,19 +663,19 @@ programación:
 como valor de un campo una estructura de datos al modo de las estructuras *C* o
 los mapas de *Python* o *Java*:
 
-.. code-block:: Java
+.. code-block:: sql
 
    // No pueden definirse restricciones en la definición, así que estas
    // (p.e. tipo_via debería incluir un CHECK con varios valores)
    // debe definirse en la tabla en la que se incluya este tipo struct.
-   CREATE TYPE "domicilio" AS (
-      "tipo_via"       VARCHAR(40),
-      "nombre_via"     VARCHAR(150),
-      "numero"         INTEGER,
-      "bloque"         CHAR(1),
-      "escalera"       CHAR(1),
-      "piso"           INTEGER,
-      "letra"          CHAR(2)
+   CREATE TYPE domicilio AS (
+      tipo_via       VARCHAR(40),
+      nombre_via     VARCHAR(150),
+      numero         INTEGER,
+      bloque         CHAR(1),
+      escalera       CHAR(1),
+      piso           INTEGER,
+      letra          CHAR(2)
    );
 
 .. rubric:: SQLite
@@ -676,14 +742,12 @@ En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
 pertenezcan a una misma transacción debemos hacer lo siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 1, 12, 16, 19
+   :emphasize-lines: 1, 10, 14, 17
 
    conn.setAutoCommit(false);  // Evitamos que cada sentencia implique una transacción
 
    try(
-      PreparedStatement pstmt = conn.prepareStatement("""
-         INSERT INTO "Departamento" ("denominacion") VALUES (?);
-      """)
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
    ) {
        for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
            pstmt.setString(1, denominacion);
@@ -714,14 +778,12 @@ la misma sentencia y distintos parámetros (como en el ejemplo anterior
 precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 10, 13
+   :emphasize-lines: 8, 11
 
    conn.setAutoCommit(false);  // Todas las inserciones forman parte de una transacción
 
    try(
-      PreparedStatement pstmt = conn.prepareStatement("""
-         INSERT INTO "Departamento" ("denominacion") VALUES (?);
-      """)
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
    ) {
        for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
            pstmt.setString(1, denominacion);
@@ -739,15 +801,52 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
       conn.setAutoCommit(true);
    }
 
-.. borrar esto)
-
 .. _conn-extra:
 
 Extras
 ======
+|ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
+Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
+:ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
+paliarlo podemos definir una clase que haga la conversión (véase el :download:`codigo fuente <files/JdbcUtils.java>`):
 
-.. + setRegister
-   + Java funcional (Stream y for-each a partir de ResultSet).
+.. literalinclude:: files/JdbcUtils.java
+   :language: java
+   :start-at: public class
+
+Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
+modo:
+
+.. code-block:: java
+   :emphasize-lines: 3
+
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
+
+   Stream<Departamento> departamentos = JdbcUtils.resultSetToStream(rs, fila -> {
+      try {
+         int id = fila.getInt("id_departamento");
+         String denominacion = fila.getString("denominacion");
+         return new Departamento().cargarDatos(id, denominacion);
+      }
+      catch(SQLException err) {
+         err.printStackTrace();
+         return null;
+      }
+   });
+
+   //Tratamos el flujo como mejor estimemos oportuno.
+   for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
+      System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
+   }
+
+.. tip:: El método ``resultSetToStreamp`` permite no definir la función que
+   transforma la fila (el propio ``ResultSet``) en un objeto. En ese caso, se
+   obtendrá con cada elemento del flujo la propia fila:
+
+   .. code-block:: java
+
+      Stream<ResultSet> result = JdbcUtils.resultSetToStream(rs);
+
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`
@@ -761,9 +860,11 @@ Extras
 .. |IP| replace:: :abbr:`IP (Internet Protocol)`
 .. |E/R| replace:: :abbr:`E/R (Entidad/Relación)`
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |CTE| replace:: :abbr:`CTE (Common Table Expression)`
 .. |InputStream| replace:: :java-io:`InputStream <InputStream>`
 .. |Reader| replace:: :java-io:`Reader <Reader>`
 .. |PreparedStatement| replace:: :java-sql:`PreparedStatement <PreparedStatement>`
+.. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`
 
 .. _commons-csv: https://commons.apache.org/proper/commons-csv/project-info.html
 .. _librería Jackson: https://github.com/FasterXML/jackson
@@ -778,6 +879,19 @@ Extras
 .. _mssql-jdbc: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc
 
 .. rubric:: Notas al pie
+
+.. [#] En puridad, los profesores desempeñan puestos que se adscriben a
+   departamentos y a cada departamento pueden estar adscritos uno o varios
+   puestos, pero obviaremos esto para simplificar y nos limitaremos a afirmar
+   que trabajan para departamentos.
+
+.. [#] Según el estandar un nombre que no se encierra entre comillas dobles, se
+   sobreentiende escrito todo en mayúsculas. En particular, :program:`SQLite` se
+   salta el estándar en este aspecto y no hace esa distinción, incluso aunque
+   los nombres si se hayan entrecomillado. Otra razón que avala el que no
+   entrecomillemos es que :program:`MariaDB`/:program:`MySQL` exige que
+   cambiemos la configuración predeterminada para soportar el entrecomillado con
+   comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.
 
 .. [#] Se han supuesto (excepto para :program:`SQLite` obviamente) conexiones
    |TCP|/|IP|. Sin embargo, en sistemas *UNIX* el motor podría permitir

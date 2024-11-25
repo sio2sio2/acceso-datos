@@ -4,7 +4,7 @@
   * @return  Una lista con las sentencias separadadas.
   * @throws IOException
   */
- private List<String> splitSQL(InputStream st) throws IOException {
+ public List<String> splitSQL(InputStream st) throws IOException {
      Pattern beginPattern = Pattern.compile("\\b(BEGIN|CASE)\\b", Pattern.CASE_INSENSITIVE);
      Pattern endPattern = Pattern.compile("\\bEND\\b", Pattern.CASE_INSENSITIVE);
 

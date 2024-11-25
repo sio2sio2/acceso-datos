@@ -380,7 +380,14 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.5.2. Operaciones masivas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.6.1. Tratamiento funcional de las consultas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.6.2. <em>Pool</em> de conexiones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#metadatos">4.6.3. Metadatos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.6.4. Gestor de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.6.5. Cargar esquema desde archivo</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -394,7 +401,14 @@ document.write(`
                   
   <section id="conectores-a-bases-de-datos-relacionales">
 <span id="conn"></span><h1><span class="section-number">4. </span>Conectores a bases de datos relacionales<a class="headerlink" href="#conectores-a-bases-de-datos-relacionales" title="Link to this heading">#</a></h1>
-<p>Para el acceso a bases de datos relacionales hay dos estrategias:</p>
+<p>Las bases de datos relacionales son unos de los mecanismos más utilizados para
+el almacenamiento organizado de información. Su problema, al ser accedidas
+mediante aplicaciones es que basan su estructrura en el modelo relacional, que
+no es el modelo que usan los lenguajes de programación para manejar datos. En
+concreto, los más habituales, los lenguajes de <abbr title="Programación Orientada a Objetos">POO</abbr> manejan los datos haciendo
+uso del modelo de objetos por lo que existe una discrepación entre el modo en
+que tratan los datos los <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> relacionales y el modo en que los tratan los
+lenguajes. Para afrontarlo los lenguajes utilizan dos estrategias distintas:</p>
 <ol class="arabic simple">
 <li><p>El uso de conectores, en que el acceso a la base de datos se realiza mediante
 sentencias <abbr title="Structured Query Language">SQL</abbr> y la traducción del modelo relacional al modelo de objetos
@@ -451,7 +465,7 @@ independiente del motor subyacente, puesto que cada motor tiene sus
 particularidades que extienden el <abbr title="Structured Query Language">SQL</abbr> estándar y esta estrategia, al estar
 basada en la construcción de sentencias <abbr title="Structured Query Language">SQL</abbr>, nos obliga a utilizarlas. Lo que
 en realidad es común son los métodos que proporciona Java para ordenar la
-ejecución de las las sentencias al motor de la base de datos. Además de la
+ejecución de las sentencias al motor de la base de datos. Además de la
 <abbr title="Application Programming Interface">API</abbr>, necesitaremos para cada <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> un <em>driver</em> basado en la <abbr title="Application Programming Interface">API</abbr> que
 posibilite la conexión. Este <em>driver</em> sí que será una librería de terceros que
 deberemos incluir en nuestro proyecto.</p>
@@ -462,7 +476,7 @@ deberemos incluir en nuestro proyecto.</p>
 <ul class="simple">
 <li><p>Comodidad, ya que a diferencia de otros (<a class="reference external" href="https://mariadb.org/">MariaDB</a>, <a class="reference external" href="https://www.oracle.com/es/database/">Oracle</a>, etc) no requiere
 un servidor: la base de datos es un archivo.</p></li>
-<li><p>Es una base de datos empotrada y se usa mucha en aplicaciones que necesitan
+<li><p>Es una base de datos empotrada y se usa mucho en aplicaciones que necesitan
 organizar sus datos en una base de datos exclusiva en la que no
 concurrirán otros procesos.</p></li>
 </ul>
@@ -491,7 +505,7 @@ el código sea lo más portable posible.</p>
 <li><p>Puede haber varios claustros.</p></li>
 <li><p>Un mismo profesor puede trabajar en varios claustro diferentes.</p></li>
 <li><p>Si se da la anterior circunstancia, el profesor se adcribirá a un
-departamento<a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> por centro, pero no tiene que ser para todos los centros el
+departamento<a class="footnote-reference brackets" href="#id8" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> por centro, pero no tiene que ser para todos los centros el
 mismo.</p></li>
 <li><p>De igual modo, en un centro puede tener asignado uno o varios casilleros
 distintos a los que tiene en otro.</p></li>
@@ -519,7 +533,7 @@ Trabaja(*idProfesor, idCcentro*, departamento)
 <span class="c1">//String dbUrl = String.format(&quot;%s%s&quot;, dbProtocol, &quot;:memory:&quot;);</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="hll"><span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
+<span class="hll"><span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="cm">/* usuario */</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="cm">/* contraseña */</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Hemos logrado conectar a la base de datos&quot;</span><span class="p">);</span>
 <span class="p">}</span>
@@ -528,7 +542,7 @@ Trabaja(*idProfesor, idCcentro*, departamento)
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>En el código de ejemplo, hay tres claves fundamentales:</p>
+<p>En el código de ejemplo, hay dos claves fundamentales:</p>
 <ul>
 <li><p>La <abbr title="Uniform Resource Locator">URL</abbr> de conexión que se compone, a su vez de:</p>
 <ul class="simple">
@@ -541,7 +555,7 @@ estamos utilizando al construirla:</p>
 <thead>
 <tr class="row-odd"><th class="head"><p><abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></th>
 <th class="head"><p>Librería <abbr title="Java DataBase Connectivity">JDBC</abbr></p></th>
-<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id9" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></th>
 </tr>
 </thead>
 <tbody>
@@ -573,11 +587,19 @@ estamos utilizando al construirla:</p>
 </table>
 </div>
 </li>
-<li><p>El objeto de conexión, construido de esta manera para que se cierre automáticamente.</p></li>
-<li><p>Un objeto para generar sentencias <abbr title="Structured Query Language">SQL</abbr> del que hablaremos bajo el próximo
-epígrafe. También es necesario cerrarlo y, en este ejemplo, lo hemos creado
-simplemente para ilustrar cómo obligar a <strong class="program">SQLite</strong> a respetar la integridad
-referencial (por defecto, no lo hace).</p></li>
+<li><p>El objeto de conexión, creado con las estructura <em>try-with-resources</em>, para que se cierre automáticamente. Al crear el objeto
+es necesario facilitar la <abbr title="Uniform Resource Locator">URL</abbr>, y un usuario y una contraseña con permisos
+para realizar las operaciones que se desee llevar acabo.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Como <strong class="program">SQLite</strong> no define permisos para usuarios, sólo es
+necesaria la <abbr title="Uniform Resource Locator">URL</abbr>. Se ha dejado explícita esta falta de necesidad, pero
+podríamos haber definido el método ahorrándonos los dos argumentos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</li>
 </ul>
 <p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
@@ -597,9 +619,10 @@ usa el método <code class="docutils literal notranslate"><span class="pre">exec
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Hay otro método, <code class="docutils literal notranslate"><span class="pre">execute</span></code> que sirve para ambos casos y que devuelve
-<code class="docutils literal notranslate"><span class="pre">true</span></code>, si devuelve resultados (segundo caso) o <code class="docutils literal notranslate"><span class="pre">false</span></code>, si no lo hace.
-De hecho, lo podríamos haber usado al crear las tablas, aunque hemos
-preferido <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">true</span></code>, si hay resultados (segundo caso) o <code class="docutils literal notranslate"><span class="pre">false</span></code>, si no los hay.
+Como lo normal es que se sepa de antemano si la sentencia devuelve datos o no
+(p.e. un <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> devuelve datos; un <code class="docutils literal notranslate"><span class="pre">INSERT</span></code>, no), podemos prescindir de
+ella.</p>
 </div>
 <section id="simples">
 <h3><span class="section-number">4.3.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h3>
@@ -693,7 +716,7 @@ preferido <code class="docutils literal notranslate"><span class="pre">executeUp
 <p>El código tiene dos aspectos:</p>
 <ol class="arabic">
 <li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr> que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
-forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, así que no entraremos en
+forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id10" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, así que no entraremos en
 comentarlas.</p>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
@@ -706,7 +729,7 @@ posibles y nos sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases
 permite en caso de que los nombres no contengan caracteres “raros”
 (espacios, etc.) o no se tenga la intención de distinguir nombres
 cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
-<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
+<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id11" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
 <li><p>Escribimos para los tipos los nombres que define el estándar.</p></li>
 <li><p>Las cadenas se encierran entre comillas simples.</p></li>
 </ul>
@@ -911,7 +934,7 @@ equivalente propio de Java.</p>
 <div class="pst-scrollable-table-container"><table class="tipos-sql table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Tipo <abbr title="Structured Query Language">SQL</abbr></p></th>
-<th class="head"><p>Tipo Java<a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Tipo Java<a class="footnote-reference brackets" href="#id12" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p></th>
 <th class="head"><p>Método <abbr title="Java DataBase Connectivity">JDBC</abbr> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a></p></th>
 </tr>
 </thead>
@@ -1333,6 +1356,11 @@ pertenezcan a una misma transacción debemos hacer lo siguiente:</p>
 distinto parámetros.  Evidentemente, las transacciones pueden estar
 constituidas por cualesquiera sentencias.</p>
 </div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Más adelante se propone un mecanismo para gestionar
+<a class="reference internal" href="#conn-transaction-manager"><span class="std std-ref">transacciones con un bloque try-with-resources</span></a>.</p>
+</div>
 </section>
 <section id="operaciones-masivas">
 <span id="conn-batch"></span><h3><span class="section-number">4.5.2. </span>Operaciones masivas<a class="headerlink" href="#operaciones-masivas" title="Link to this heading">#</a></h3>
@@ -1365,6 +1393,9 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
 </section>
 <section id="extras">
 <span id="conn-extra"></span><h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
+<p>Arrinconamos bajo este epígrafe, algunos aspectos adiciones de los conectores:</p>
+<section id="tratamiento-funcional-de-las-consultas">
+<h3><span class="section-number">4.6.1. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h3>
 <p><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
@@ -1449,7 +1480,7 @@ modo:</p>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">});</span>
 
-<span class="c1">//Tratamos el flujo como mejor estimemos oportuno.</span>
+<span class="c1">//Tratamos el flujo como estimemos más oportuno.</span>
 <span class="k">for</span><span class="p">(</span><span class="n">Departamento</span><span class="w"> </span><span class="n">d</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">departamentos</span><span class="p">::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d -- Denominación: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getDenominacion</span><span class="p">()));</span>
 <span class="p">}</span>
@@ -1464,16 +1495,187 @@ obtendrá con cada elemento del flujo la propia fila:</p>
 </pre></div>
 </div>
 </div>
+</section>
+<section id="pool-de-conexiones">
+<h3><span class="section-number">4.6.2. </span><em>Pool</em> de conexiones<a class="headerlink" href="#pool-de-conexiones" title="Link to this heading">#</a></h3>
+<div class="admonition-todo admonition" id="id6">
+<p class="admonition-title">Por hacer</p>
+<p>Pool de conexiones…</p>
+</div>
+</section>
+<section id="metadatos">
+<h3><span class="section-number">4.6.3. </span>Metadatos<a class="headerlink" href="#metadatos" title="Link to this heading">#</a></h3>
+<div class="admonition-todo admonition" id="id7">
+<p class="admonition-title">Por hacer</p>
+<p>DatabaseMetaData y ResultSetMetaData.</p>
+</div>
+</section>
+<section id="gestor-de-transacciones">
+<span id="conn-transaction-manager"></span><h3><span class="section-number">4.6.4. </span>Gestor de transacciones<a class="headerlink" href="#gestor-de-transacciones" title="Link to this heading">#</a></h3>
+<p>Para facilitar la forma en que se gestionan las <a class="reference internal" href="#conn-transactions"><span class="std std-ref">transacciones ya
+estudiadas</span></a> podemos crear una clase que explote las
+posibilidades del bloque <a class="reference external" href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">edu.acceso.ej4_1.bd</span><span class="p">;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.Connection</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.SQLException</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TransactionManager</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">committed</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">TransactionManager</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">setConn</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConn</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setConn</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">commit</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">        </span><span class="n">committed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">committed</span><span class="p">)</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>La clase podría usarse del siguiente modo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Se supone que conn es una conexión ya abierta.</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">TransaccionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="c1">// Ejecutamos todas las sentencias que constituyen esta transacción</span>
+<span class="w">   </span><span class="c1">// ...</span>
+
+<span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Confirmamos en la base de datos.</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// No hay que hacer rollback, ya que se encarga el close().</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>Podemos incluir esta clase como una clase estática dentro de
+<code class="docutils literal notranslate"><span class="pre">JdbcUtils</span></code> para tener todos estos añadidos juntos.</p>
+</div>
+</section>
+<section id="cargar-esquema-desde-archivo">
+<h3><span class="section-number">4.6.5. </span>Cargar esquema desde archivo<a class="headerlink" href="#cargar-esquema-desde-archivo" title="Link to this heading">#</a></h3>
+<p>Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
+de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
+las sentencias necesarias se encuentren en un guión <abbr title="Structured Query Language">SQL</abbr> y el programa las lea
+de él, en vez de encontrarse incrustadas en el código.</p>
+<p>Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> no tiene definido un método que nos permita ejecutar un
+guión <abbr title="Structured Query Language">SQL</abbr> completo, así que la única forma de poner ejecutar sus sentencias,
+es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
+<ul>
+<li><p><cite>JSQLParser
+&lt;https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser&gt;</cite> que es
+capaz de procesar el código <abbr title="Structured Query Language">SQL</abbr> y, por tanto, reconocer los elementos de que
+se compone.</p></li>
+<li><p>Si el guión no es complejo y seguimos algunas premisas:</p>
+<ol class="loweralpha simple">
+<li><p>Los “;” que completan sentencias deben encontrarse a final de línea.</p></li>
+<li><p>No pueden usarse las palabras <code class="docutils literal notranslate"><span class="pre">begin</span></code> o <code class="docutils literal notranslate"><span class="pre">end</span></code> en comentarios, nombres,
+valores, etc.</p></li>
+<li><p>No pueden usarse bloques <code class="docutils literal notranslate"><span class="pre">IF</span></code> en aquellos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que los implementen
+(pero sí usarse el estándar <code class="docutils literal notranslate"><span class="pre">CASE</span></code>).</p></li>
+</ol>
+<p>podemos escribir una solución artesanal, que es la que proponemos.</p>
+</li>
+</ul>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="cm">/**</span>
+<span class="cm">  * Descompone un guión SQL en las sentencias de que se compone.</span>
+<span class="cm">  * @param st Entrada de la que se lee el guión</span>
+<span class="cm">  * @return  Una lista con las sentencias separadadas.</span>
+<span class="cm">  * @throws IOException</span>
+<span class="cm">  */</span>
+<span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">splitSQL</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="n">Pattern</span><span class="w"> </span><span class="n">beginPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\b(BEGIN|CASE)\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+<span class="w">     </span><span class="n">Pattern</span><span class="w"> </span><span class="n">endPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\bEND\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+
+<span class="w">     </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">         </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
+<span class="w">         </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
+<span class="w">     </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="kt">int</span><span class="w"> </span><span class="n">contador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">         </span><span class="k">while</span><span class="p">((</span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span>
+<span class="w">             </span><span class="k">if</span><span class="p">(</span><span class="n">linea</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">             </span><span class="n">Matcher</span><span class="w"> </span><span class="n">beginMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beginPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+<span class="w">             </span><span class="n">Matcher</span><span class="w"> </span><span class="n">endMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+
+<span class="w">             </span><span class="k">while</span><span class="p">(</span><span class="n">beginMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">++</span><span class="p">;</span>
+<span class="w">             </span><span class="k">while</span><span class="p">(</span><span class="n">endMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">--</span><span class="p">;</span>
+
+<span class="w">             </span><span class="n">sentencia</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+
+<span class="w">             </span><span class="k">if</span><span class="p">(</span><span class="n">contador</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                 </span><span class="n">sentencias</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">             </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">sentencias</span><span class="p">;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>Podemos incluir el método dentro de <code class="docutils literal notranslate"><span class="pre">JdbcUtils</span></code>.</p>
+</div>
+<p>¿Cómo podemos usar este método? Por ejemplo, así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">tablaExistente</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Profesor&quot;</span><span class="p">;</span>
+<span class="kd">final</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">guion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.dir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;loquesea.sql&quot;</span><span class="p">);</span>
+
+<span class="c1">// Ya hay una conexión &quot;conn&quot; abierta.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;SELECT 1 FROM &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tablaExistente</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// Si la tabla no existe, no hay esquema aún.</span>
+<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">guion</span><span class="p">);</span>
+<span class="w">      </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slitSQL</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
+<span class="w">      </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="p">:</span><span class="w"> </span><span class="n">sentencias</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="n">tm</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w"> </span><span class="c1">// O como se decida tratar el error.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id6" role="doc-footnote">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>En puridad, los profesores desempeñan puestos que se adscriben a
 departamentos y a cada departamento pueden estar adscritos uno o varios
 puestos, pero obviaremos esto para simplificar y nos limitaremos a afirmar
 que trabajan para departamentos.</p>
 </aside>
-<aside class="footnote brackets" id="id7" role="doc-footnote">
+<aside class="footnote brackets" id="id9" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Según el estandar un nombre que no se encierra entre comillas dobles, se
 sobreentiende escrito todo en mayúsculas. En particular, <strong class="program">SQLite</strong> se
@@ -1483,7 +1685,7 @@ entrecomillemos es que <strong class="program">MariaDB</strong>/<strong class="p
 cambiemos la configuración predeterminada para soportar el entrecomillado con
 comillas dobles, ya que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> entrecomilla con el acento grave.</p>
 </aside>
-<aside class="footnote brackets" id="id8" role="doc-footnote">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
 <p>Se han supuesto (excepto para <strong class="program">SQLite</strong> obviamente) conexiones
 <abbr title="Transmission Control Protocol">TCP</abbr>/<abbr title="Internet Protocol">IP</abbr>. Sin embargo, en sistemas <em>UNIX</em> el motor podría permitir
@@ -1492,7 +1694,7 @@ MariaDB podría ser
 <code class="docutils literal notranslate"><span class="pre">jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock</span></code> o
 algo parecido.</p>
 </aside>
-<aside class="footnote brackets" id="id9" role="doc-footnote">
+<aside class="footnote brackets" id="id11" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Aunque haremos una excepción aclarando cómo están definidas las claves
 primarias en las tablas <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>, <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> y <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>.
@@ -1506,11 +1708,12 @@ curioso: cuando se usa <code class="docutils literal notranslate"><span class="p
 comportamento de <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY</span> <span class="pre">DEFAULT</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code> y cuando se usa
 <code class="docutils literal notranslate"><span class="pre">INT</span></code> la clave no es autoincremental.</p>
 </aside>
-<aside class="footnote brackets" id="id10" role="doc-footnote">
+<aside class="footnote brackets" id="id12" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
 <p>Se han referido clases, pero también equivalen a tipos primitivos (<code class="docutils literal notranslate"><span class="pre">short</span></code> en vez de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Short.html">Short</a>.</p>
 </aside>
 </aside>
+</section>
 </section>
 </section>
 
@@ -1582,7 +1785,14 @@ comportamento de <code class="code docutils literal notranslate"><span class="pr
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.5.2. Operaciones masivas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extras">4.6. Extras</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.6.1. Tratamiento funcional de las consultas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.6.2. <em>Pool</em> de conexiones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#metadatos">4.6.3. Metadatos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.6.4. Gestor de transacciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.6.5. Cargar esquema desde archivo</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

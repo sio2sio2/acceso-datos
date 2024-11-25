@@ -2,14 +2,7 @@
 
 Conectores a bases de datos relacionales
 ****************************************
-Las bases de datos relacionales son unos de los mecanismos más utilizados para
-el almacenamiento organizado de información. Su problema, al ser accedidas
-mediante aplicaciones es que basan su estructrura en el modelo relacional, que
-no es el modelo que usan los lenguajes de programación para manejar datos. En
-concreto, los más habituales, los lenguajes de |POO| manejan los datos haciendo
-uso del modelo de objetos por lo que existe una discrepación entre el modo en
-que tratan los datos los |SGBD| relacionales y el modo en que los tratan los
-lenguajes. Para afrontarlo los lenguajes utilizan dos estrategias distintas:
+Para el acceso a bases de datos relacionales hay dos estrategias:
 
 #. El uso de conectores, en que el acceso a la base de datos se realiza mediante
    sentencias |SQL| y la traducción del modelo relacional al modelo de objetos
@@ -65,7 +58,7 @@ independiente del motor subyacente, puesto que cada motor tiene sus
 particularidades que extienden el |SQL| estándar y esta estrategia, al estar
 basada en la construcción de sentencias |SQL|, nos obliga a utilizarlas. Lo que
 en realidad es común son los métodos que proporciona Java para ordenar la
-ejecución de las sentencias al motor de la base de datos. Además de la
+ejecución de las las sentencias al motor de la base de datos. Además de la
 |API|, necesitaremos para cada |SGBD| un *driver* basado en la |API| que
 posibilite la conexión. Este *driver* sí que será una librería de terceros que
 deberemos incluir en nuestro proyecto.
@@ -77,7 +70,7 @@ Para aprender y practicar el acceso con conectores, podemos escoger cualquier
 
 + Comodidad, ya que a diferencia de otros (MariaDB_, Oracle_, etc) no requiere
   un servidor: la base de datos es un archivo.
-+ Es una base de datos empotrada y se usa mucho en aplicaciones que necesitan
++ Es una base de datos empotrada y se usa mucha en aplicaciones que necesitan
   organizar sus datos en una base de datos exclusiva en la que no
   concurrirán otros procesos.
 
@@ -147,7 +140,7 @@ Lo primero que debemos aprender es cómo abrir una conexión a la base de datos:
    //String dbUrl = String.format("%s%s", dbProtocol, ":memory:");
 
    try (
-      Connection conn = DriverManager.getConnection(dbUrl, /* usuario */ null, /* contraseña */, null);
+      Connection conn = DriverManager.getConnection(dbUrl);
    ) {
       System.out.println("Hemos logrado conectar a la base de datos");
    }
@@ -155,7 +148,7 @@ Lo primero que debemos aprender es cómo abrir una conexión a la base de datos:
       System.err.println("Error de conexión. " + err.getMessage());
    }
 
-En el código de ejemplo, hay dos claves fundamentales:
+En el código de ejemplo, hay tres claves fundamentales:
 
 * La |URL| de conexión que se compone, a su vez de:
 
@@ -179,17 +172,11 @@ En el código de ejemplo, hay dos claves fundamentales:
       SQL Server   `mssql-jdbc`_            `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
      ============ ======================== ==============================================================
 
-* El objeto de conexión, creado con las estructura *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
-  es necesario facilitar la |URL|, y un usuario y una contraseña con permisos
-  para realizar las operaciones que se desee llevar acabo.
-
-  .. note:: Como :program:`SQLite` no define permisos para usuarios, sólo es
-     necesaria la |URL|. Se ha dejado explícita esta falta de necesidad, pero
-     podríamos haber definido el método ahorrándonos los dos argumentos:
-
-     .. code-block:: java
-
-        Connection conn = DriverManager.getConnection(dbUrl);
+* El objeto de conexión, construido de esta manera para que se cierre automáticamente.
+* Un objeto para generar sentencias |SQL| del que hablaremos bajo el próximo
+  epígrafe. También es necesario cerrarlo y, en este ejemplo, lo hemos creado
+  simplemente para ilustrar cómo obligar a :program:`SQLite` a respetar la integridad
+  referencial (por defecto, no lo hace).
 
 Por supuesto, el código es *completamente inútil*: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
@@ -210,10 +197,9 @@ usa el método ``executeUpdate``, mientras que para las segundas el método
 ``executeQuery``.
 
 .. note:: Hay otro método, ``execute`` que sirve para ambos casos y que devuelve
-   ``true``, si hay resultados (segundo caso) o ``false``, si no los hay.
-   Como lo normal es que se sepa de antemano si la sentencia devuelve datos o no
-   (p.e. un ``SELECT`` devuelve datos; un ``INSERT``, no), podemos prescindir de
-   ella.
+   ``true``, si devuelve resultados (segundo caso) o ``false``, si no lo hace.
+   De hecho, lo podríamos haber usado al crear las tablas, aunque hemos
+   preferido ``executeUpdate``.
 
 Simples
 -------
@@ -783,9 +769,6 @@ pertenezcan a una misma transacción debemos hacer lo siguiente:
    distinto parámetros.  Evidentemente, las transacciones pueden estar
    constituidas por cualesquiera sentencias.
 
-.. seealso:: Más adelante se propone un mecanismo para gestionar
-   :ref:`transacciones con un bloque try-with-resources <conn-transaction-manager>`.
-
 .. _conn-batch:
 
 Operaciones masivas
@@ -822,10 +805,6 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
 
 Extras
 ======
-Arrinconamos bajo este epígrafe, algunos aspectos adiciones de los conectores:
-
-Tratamiento funcional de las consultas
---------------------------------------
 |ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 :ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
@@ -855,7 +834,7 @@ modo:
       }
    });
 
-   //Tratamos el flujo como estimemos más oportuno.
+   //Tratamos el flujo como mejor estimemos oportuno.
    for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
       System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
    }
@@ -868,20 +847,12 @@ modo:
 
       Stream<ResultSet> result = JdbcUtils.resultSetToStream(rs);
 
-*Pool* de conexiones
---------------------
-
-.. todo:: Pool de conexiones...
-
-Metadatos
----------
-
-.. todo:: DatabaseMetaData y ResultSetMetaData.
-
 .. _conn-transaction-manager:
 
 Gestor de transacciones
 -----------------------
+.. todo:: Añadir en transacciones una referencia a este apartado.
+
 Para facilitar la forma en que se gestionan las :ref:`transacciones ya
 estudiadas <conn-transactions>` podemos crear una clase que explote las
 posibilidades del bloque `try-with-resources
@@ -890,16 +861,13 @@ posibilidades del bloque `try-with-resources
 .. literalinclude:: files/TransactionManager.java
    :language: java
 
-La clase podría usarse del siguiente modo:
+La clase podría usarse del siguiente modo::
 
 .. code-block:: java
 
    // Se supone que conn es una conexión ya abierta.
    try (TransaccionManager tm = new TransactionManager(conn)) {
-
-      // Ejecutamos todas las sentencias que constituyen esta transacción
-      // ...
-
+      // Ejecutamos las sentencias de esta transacción.
       tm.commit(); // Confirmamos en la base de datos.
    }
    catch(SQLException err) {
@@ -907,7 +875,7 @@ La clase podría usarse del siguiente modo:
       err.printStackTrace();
    }
 
-.. hint:: Podemos incluir esta clase como una clase estática dentro de
+.. tip:: Podemos incluir esta clase como una clase estática dentro de
    ``JdbcUtils`` para tener todos estos añadidos juntos.
 
 Cargar esquema desde archivo
@@ -917,7 +885,7 @@ de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
 las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
 de él, en vez de encontrarse incrustadas en el código.
 
-Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
+Sin embargo, |JBDC| no tiene definido un método que nos permita ejecutar un
 guión |SQL| completo, así que la única forma de poner ejecutar sus sentencias,
 es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
@@ -931,8 +899,8 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
   a. Los ';' que completan sentencias deben encontrarse a final de línea.
   #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
      valores, etc.
-  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
-     (pero sí usarse el estándar ``CASE``).
+  #. No puede usarse ``IF`` en aquellos |SGBD| que lo implementen (pero sí el
+     estándar ``CASE``).
 
   podemos escribir una solución artesanal, que es la que proponemos.
 
@@ -968,7 +936,6 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
       }
    }
 
-.. |POO| replace:: :abbr:`POO (Programación Orientada a Objetos)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

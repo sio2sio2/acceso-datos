@@ -347,7 +347,7 @@ mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
 |PreparedStatement|:
 
 .. code-block:: java
-   :emphasize-lines: 2-4, 7, 8
+   :emphasize-lines: 2, 5
 
    try(
       PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
@@ -388,10 +388,7 @@ inferir el tipo |SQL| correcto a partir del tipo de *Java*:
 .. code-block:: java
 
    try(
-      PreparedStatement pstmt = conn.prepareStatement("""
-         INSERT INTO "Profesor" ("apelativo", "nombre", "apellidos", "sustituye") VALUES
-            (?, ?, ?, ?);
-      """)
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)")
    ) {
          pstmt.setObject(1, "Manolo");
          pstmt.setObject(2, "Manuel");
@@ -466,6 +463,7 @@ es irrelevante, porque el sistema gestor aceptará el dato con independencia de
 su tipo. Por ejemplo:
 
 .. code-block:: sql
+   :emphasize-lines: 7
 
    CREATE TABLE Persona (
       nombre    VARCHAR(255);
@@ -555,46 +553,46 @@ se trabaja en *Java*.
 
    java.util.Date udate = new java.util.Date(); // Almacena fecha y hora.
 
-   // Date --> Date
+   // Date --> Date (SQL)
    Date date = new Date(udate.getTime());
 
-   // Date --> Date
+   // Date (SQL) --> Date
    udate = new Date(date.getTime());
 
-   // Date --> Time
+   // Date --> Time (SQL)
    Time time = new Time(date.getTime());
 
-   // Time --> Date
+   // Time (SQL) --> Date
    date = new Date(time.getTime());
 
-   // Date --> Timestamp
+   // Date --> Timestamp (SQL)
    Timestamp timestamp = new Timestamp(date.getTime());
 
-   // Timestamp --> Date
+   // Timestamp (SQL) --> Date
    date = new Date(timestamp.getTime());
 
    LocalDate localDate = LocalDate.now();
 
-   // LocalDate --> Date
+   // LocalDate --> Date (SQL)
    date = Date.valueOf(localDate);
 
-   // Date --> LocalDate
+   // Date (SQL) --> LocalDate
    localDate = date.toLocalDate();
 
    LocalTime localTime = LocalTime.now();
 
-   // LocalTime --> Time
+   // LocalTime --> Time (SQL)
    sqltime = Time.valueOf(localTime);
 
-   // Time --> Localtime
+   // Time (SQL) --> Localtime
    localTime = Time.toLocalTime();
 
    LocalDateTime localDateTime = LocalDateTime.now();
 
-   // LocalDateTime --> Timestamp
+   // LocalDateTime --> Timestamp (SQL)
    timestamp = Timestamp.valueOf(localDateTime);
 
-   // Timestamp --> LocalDateTime
+   // Timestamp (SQL) --> LocalDateTime
    localDateTime = timestamp.toLocalDateTime();
 
 BLOB y CLOB

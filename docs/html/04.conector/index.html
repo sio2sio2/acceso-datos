@@ -786,18 +786,25 @@ profesores titulares.</p>
 </div>
 <p class="rubric">Consultas</p>
 <p>Las consultas, en cambio, sí devuelven resultados, que deberán procesarse luego:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento;&quot;</span><span class="p">);</span>
-
-<span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
-<span class="w">     </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
-<span class="w">     </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
-objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que obtenemos registros de él.
-En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
+objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que obtenemos registros de él.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> hay también que cerrarlo, aunque debería
+cerrarse automáticamente al cerrarse la sentencia que la originó. En
+cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja e
+sernos útil.</p>
+</div>
+<p>En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
 pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
 de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
 <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> así:</p>
@@ -838,15 +845,15 @@ de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
 </pre></div>
 </div>
 <p>podríamos hacer esto:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-
-<span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;idDepartamento&quot;</span><span class="p">);</span>
-<span class="w">     </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
-<span class="w">     </span><span class="n">departamentos</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
-<span class="w">     </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
+<span class="w">   </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;idDepartamento&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">departamentos</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -854,6 +861,21 @@ de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
 <p class="admonition-title">Importante</p>
 <p>Obsérvese que tiene que ser el programador el que traduzca el modelo
 relacional al modelo de objetos, tal como adelantamos en la introducción.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>El valor de un campo puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. Cuando se recupera una cadena
+(<code class="docutils literal notranslate"><span class="pre">.getString</span></code>) esto no es un problema, porque <code class="docutils literal notranslate"><span class="pre">String</span></code> puede ser
+<code class="docutils literal notranslate"><span class="pre">null</span></code>. En cambio, <code class="docutils literal notranslate"><span class="pre">getInt</span></code> es incapaz de devolver <code class="docutils literal notranslate"><span class="pre">null</span></code>, aunque el
+campo no tenga valor, y se verá obligado a devolver <strong>0</strong>. Esto no será un
+problema cuando <strong>0</strong> no sea un valor válido (como en el ejemplo, ya que a
+los identificadores no se les suele asignar valor <strong>0</strong>), pero, cuando sea un
+valor válido, debe existir una forma de distinguir el <strong>0</strong> del valor nulo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Suponiendo que se permita que el campo &quot;edad&quot; sea nulo.</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;edad&quot;</span><span class="p">);</span>
+<span class="hll"><span class="k">if</span><span class="p">(</span><span class="n">edad</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">wasNull</span><span class="p">())</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span></pre></div>
+</div>
 </div>
 </section>
 <section id="parametrizadas">
@@ -1396,8 +1418,9 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
 <p><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
-paliarlo podemos definir una clase que haga la conversión (véase el <a class="reference download internal" download="" href="../_downloads/d6d0c3e5a9b35fa70f3aab0c2d818f3e/JdbcUtils.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">JdbcUtils</span><span class="w"> </span><span class="p">{</span>
+paliarlo podemos definir una clase que haga la conversión (véase el
+<a class="reference download internal" download="" href="../_downloads/6f32a1f48ff60885e8f08b1b56524f92/FunctionalResultSet.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FunctionalResultSet</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Implementa un iterador a partir de un ResultSet.</span>
@@ -1438,12 +1461,38 @@ paliarlo podemos definir una clase que haga la conversión (véase el <a class="
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Como Function&lt;T, R&gt; pero permite propagar una SQLException.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="nd">@FunctionalInterface</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CheckedFunction</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">R</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Transforma el SQLEception que propaga una CheckedFunction en un RuntimeException, que es una excepción</span>
+<span class="cm">     * que no necesita ser declarada.</span>
+<span class="cm">     * @param &lt;T&gt; El tipo que devuelve CheckedFunction.</span>
+<span class="cm">     * @param checked Un &quot;función&quot; CheckedFunction.</span>
+<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por RuntimeException.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">checkedToUnchecked</span><span class="p">(</span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">checked</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">checked</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Genera un flujo con las filas generadas en un ResultSet.</span>
 <span class="cm">     * @param rs Los resutados de una consulta.</span>
 <span class="cm">     * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.</span>
 <span class="cm">     * @throws SQLException Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
@@ -1451,12 +1500,12 @@ paliarlo podemos definir una clase que haga la conversión (véase el <a class="
 <span class="cm">     * Genera un flujo de objetos derivados del resultado de una consulta.</span>
 <span class="cm">     * @param &lt;T&gt; La clase del objeto.</span>
 <span class="cm">     * @param rs  El objeto que representa los resultado de la consulta.</span>
-<span class="cm">     * @param mapper La función que permite transformar la fila en un objeto.</span>
+<span class="cm">     * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).</span>
 <span class="cm">     * @return El flujo de objetos.</span>
-<span class="cm">     * @throws SQLExceptionCuando Cuando se produce un error al realizar la consulta.</span>
+<span class="cm">     * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">mapper</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1465,7 +1514,7 @@ paliarlo podemos definir una clase que haga la conversión (véase el <a class="
 modo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">);</span>
 
-<span class="hll"><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FunctionalResultSet</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
 <span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
@@ -1485,10 +1534,10 @@ modo:</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
-<p>El método <code class="docutils literal notranslate"><span class="pre">resultSetToStreamp</span></code> permite no definir la función que
+<p>El método <code class="docutils literal notranslate"><span class="pre">resultSetToStream</span></code> permite no definir la función que
 transforma la fila (el propio <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code>) en un objeto. En ese caso, se
 obtendrá con cada elemento del flujo la propia fila:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FunctionalResultSet</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>

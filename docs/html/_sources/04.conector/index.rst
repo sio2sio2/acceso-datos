@@ -297,18 +297,22 @@ Las consultas, en cambio, sí devuelven resultados, que deberán procesarse lueg
 
 .. code-block:: java
 
-   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento;");
-
-   while(rs.next()) {
-        int id = rs.getInt("id_departamento");
-        String denominacion = rs.getString("denominacion");
-        System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento;")) {
+      while(rs.next()) {
+           int id = rs.getInt("id_departamento");
+           String denominacion = rs.getString("denominacion");
+           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+      }
    }
-
-.. borrar esto)
 
 Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
 objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él.
+
+.. note:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
+   cerrarse automáticamente al cerrarse la sentencia que la originó. En
+   cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja e
+   sernos útil.
+
 En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
 pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
 de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
@@ -321,19 +325,34 @@ podríamos hacer esto:
 
 .. code-block:: java
 
-   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento")) {
+      List<Departamento> departamentos = new ArrayList<>(); 
 
-   List<Departamento> departamentos = new ArrayList<>(); 
-
-   while(rs.next()) {
-        int id = rs.getInt("idDepartamento");
-        String denominacion = rs.getString("denominacion");
-        departamentos.add(new Departamento().cargarDatos(id, denominacion));
-        System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+      while(rs.next()) {
+           int id = rs.getInt("idDepartamento");
+           String denominacion = rs.getString("denominacion");
+           departamentos.add(new Departamento().cargarDatos(id, denominacion));
+           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+      }
    }
 
 .. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
    relacional al modelo de objetos, tal como adelantamos en la introducción.
+
+.. tip:: El valor de un campo puede ser ``NULL``. Cuando se recupera una cadena
+   (``.getString``) esto no es un problema, porque ``String`` puede ser
+   ``null``. En cambio, ``getInt`` es incapaz de devolver ``null``, aunque el
+   campo no tenga valor, y se verá obligado a devolver **0**. Esto no será un
+   problema cuando **0** no sea un valor válido (como en el ejemplo, ya que a
+   los identificadores no se les suele asignar valor **0**), pero, cuando sea un
+   valor válido, debe existir una forma de distinguir el **0** del valor nulo:
+
+   .. code-block:: java
+      :emphasize-lines: 3
+
+      // Suponiendo que se permita que el campo "edad" sea nulo.
+      Integer edad = rs.getInt("edad");
+      if(edad == 0 && rs.wasNull()) edad = null;
 
 .. _conn-preparedstatement:
 
@@ -828,9 +847,10 @@ Tratamiento funcional de las consultas
 |ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 :ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
-paliarlo podemos definir una clase que haga la conversión (véase el :download:`codigo fuente <files/JdbcUtils.java>`):
+paliarlo podemos definir una clase que haga la conversión (véase el
+:download:`codigo fuente <files/FunctionalResultSet.java>`):
 
-.. literalinclude:: files/JdbcUtils.java
+.. literalinclude:: files/FunctionalResultSet.java
    :language: java
    :start-at: public class
 
@@ -842,7 +862,7 @@ modo:
 
    ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
 
-   Stream<Departamento> departamentos = JdbcUtils.resultSetToStream(rs, fila -> {
+   Stream<Departamento> departamentos = FunctionalResultSet.resultSetToStream(rs, fila -> {
       try {
          int id = fila.getInt("id_departamento");
          String denominacion = fila.getString("denominacion");
@@ -859,13 +879,13 @@ modo:
       System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
    }
 
-.. tip:: El método ``resultSetToStreamp`` permite no definir la función que
+.. tip:: El método ``resultSetToStream`` permite no definir la función que
    transforma la fila (el propio ``ResultSet``) en un objeto. En ese caso, se
    obtendrá con cada elemento del flujo la propia fila:
 
    .. code-block:: java
 
-      Stream<ResultSet> result = JdbcUtils.resultSetToStream(rs);
+      Stream<ResultSet> result = FunctionalResultSet.resultSetToStream(rs);
 
 *Pool* de conexiones
 --------------------

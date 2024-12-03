@@ -17,7 +17,7 @@ y, dentro de ellas varias alternativas. Nos centraremos en tres:
    tratar |JSON|. También hay varias alternativas: nosotros trataremos
    *Jackson*, que :ref:`ya usamos para tratar JSON <json-jackson>`.
 
-#. El accesso a bases de datos |XML| como :ref:`BaseX <lm:basex>`.
+#. El acceso a bases de datos |XML| como :ref:`BaseX <lm:basex>`.
 
 Para los ejemplos ilustrativos utilizaremos este |XML|:
 

@@ -107,7 +107,7 @@ a ellos, esto es, cómo construir rutas, para lo cual usaremos :java-nio:`Path
 
    esto es, utilizar una ruta ya hecha que nos proporciona el propio Java y
    corregirla añadiendo los subdirectorios necesarios mediante la adición de
-   argumentos (tantos como subdirectarios requiramos).
+   argumentos (tantos como subdirectorios requiramos).
 
    .. tip:: Con el mismo fin también puede usarse el método estático ``get()``
       de :java-nio:`Paths <Paths>`:
@@ -344,7 +344,7 @@ Podemos también copiar, mover o borrar archivos:
    Path tmp = Path.of(System.getProperty("java.io.tmpdir"));
    Path caca = home.resolve("caca.txt");
    Files.copy(caca, tmp.resolve("caca.txt")); // Copia en /tmp/kk.txt
-   Files.move(caca, tmp.resolve("caca.txt")); // Error el destino ya existe.
+   Files.move(caca, tmp.resolve("caca.txt")); // Error, el destino ya existe.
    Files.move(caca, tmp.resolve("caca.txt"), StandardCopyOption.REPLACE_EXISTING);
    Files.delete(caca);
 

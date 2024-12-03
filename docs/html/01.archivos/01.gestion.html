@@ -468,7 +468,7 @@ hacer lo siguiente:</p>
 </div>
 <p>esto es, utilizar una ruta ya hecha que nos proporciona el propio Java y
 corregirla añadiendo los subdirectorios necesarios mediante la adición de
-argumentos (tantos como subdirectarios requiramos).</p>
+argumentos (tantos como subdirectorios requiramos).</p>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>Con el mismo fin también puede usarse el método estático <code class="docutils literal notranslate"><span class="pre">get()</span></code>
@@ -658,7 +658,7 @@ para crear un directorio.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">));</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">caca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
 <span class="n">Files</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Copia en /tmp/kk.txt</span>
-<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Error el destino ya existe.</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Error, el destino ya existe.</span>
 <span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">StandardCopyOption</span><span class="p">.</span><span class="na">REPLACE_EXISTING</span><span class="p">);</span>
 <span class="n">Files</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">caca</span><span class="p">);</span>
 </pre></div>

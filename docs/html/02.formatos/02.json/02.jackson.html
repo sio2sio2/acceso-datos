@@ -360,6 +360,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1. Lectura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.2.3. Tipos no primitivos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas">2.2.2.4. Fechas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.5. Traductor específico</a></li>
 </ul>
             </nav>
         </div>
@@ -378,7 +380,7 @@ document.write(`
 <p>Como <a class="reference internal" href="01.gson.html#json-gson"><span class="std std-ref">GSON</span></a>, nos permite hacer una conversión automática entre
 el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para lo cual podemos definir las clases para
 <cite>Tutor</cite>, <cite>Alumno</cite> y <cite>Grupo</cite> exactamente de <a class="reference internal" href="01.gson.html#gson-auto"><span class="std std-ref">la misma forma</span></a>.
-Como en aquel caso empezaremos por no complicar las cosas: las secuencias son
+Como en aquel caso, empezaremos por no complicar las cosas: las secuencias son
 arrays y los valores son directamente traducibles a un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>
 (es decir, representaremos la edad y no la fecha de nacimiento).</p>
 <p>Para empezar necesitaremos la librería <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind">jackson-databind</a>.</p>
@@ -461,12 +463,15 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 </section>
 <section id="tipos-no-primitivos">
 <span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.2.3. </span>Tipos no primitivos<a class="headerlink" href="#tipos-no-primitivos" title="Link to this heading">#</a></h2>
-<p>En el ejemplo anterior todos lo tipos de los objetos de Java tiene
+<p>En el ejemplo anterior todos los tipos de los objetos de Java tienen
 correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>, ya que las cadenas son cadenas,
 los números, números, y los arrays o <code class="docutils literal notranslate"><span class="pre">ArrayList</span></code> los traduce directamente
 Jackson como secuencias. Incluso si usamos los valores de una enumeración para
-codificarla en el <abbr title="JavaScript Object Notation">JSON</abbr><a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la librería será capaz de traducir sin
+codificarla en el <abbr title="JavaScript Object Notation">JSON</abbr><a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la librería será capaz de traducir sin
 instrucciones por nuestra parte.</p>
+</section>
+<section id="fechas">
+<h2><span class="section-number">2.2.2.4. </span>Fechas<a class="headerlink" href="#fechas" title="Link to this heading">#</a></h2>
 <p>Pero supongamos ahora que no es así y que de los alumnos se registra la fecha de
 nacimiento:</p>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
@@ -512,11 +517,13 @@ nacimiento:</p>
 </pre></div>
 </div>
 <p>y, por supuesto, se modifica la clase <code class="docutils literal notranslate"><span class="pre">Alumno</span></code> para que contenga un atributo
-<cite>nacimiento</cite>  de tipo <cite>Date</cite>  (véase <a class="reference internal" href="01.gson.html#json-alumno-nacimiento"><span class="std std-ref">la versión incluida en las
-explicaciones sobre GSON</span></a>).</p>
-<p>En este caso, habrá que definir un traductor específico para este campo: de
-<cite>Date</cite> a una cadena de la forma <em>yyyy-MM-dd</em> y viceversa. Para el caso
-particular de fechas hay dos atajos:</p>
+<cite>nacimiento</cite>  de tipo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> (véase <a class="reference internal" href="01.gson.html#json-alumno-nacimiento"><span class="std std-ref">la versión incluida
+en las explicaciones sobre GSON</span></a>).</p>
+<p class="rubric" id="json-jackson-date">Date</p>
+<p>La clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> del paquete <cite>java.util</cite> tiene soporte nativo en la librería,
+pero su traducción es un número entero que representa el <a class="reference external" href="https://es.wikipedia.org/wiki/Tiempo_Unix">tiempo UNIX</a>). Si esta representación no nos
+gusta y preferimos otra (p.e. “<cite>yyyy-MM-dd</cite>”), entonces tendremos que indicarlo
+y podemos usar dos estrategias:</p>
 <ul>
 <li><p>Especificar el formato de fechas en el objeto mapeador:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">.</span><span class="na">setDateFormat</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">));</span>
@@ -531,7 +538,7 @@ que da soporte a fechas:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>En este segundo caso necesitamos el paquete aparte
+<p>En este segundo caso, necesitamos importar el paquete aparte
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations">jackson-annotations</a>.</p>
 </div>
 <div class="admonition warning">
@@ -557,26 +564,65 @@ que no puede usarse el método para obtener el huso horario del sistema.</p>
 </ul>
 <div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Por hacer</p>
-<p>Comprobar que debe incorporarse:</p>
+<p>Comprobar si es preciso incorporar:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">.</span><span class="na">disable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">WRITE_DATES_AS_TIMESTAMPS</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<p>Sin embargo, ensayaremos una solución más general que ilustre cómo definir
-nuestro propio traductor<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> (para la cual se necesita añadir la librería
-<a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core">jackson-core</a>):</p>
+<p class="rubric" id="json-jackson-localdate">LocalDate</p>
+<p>Las clases más modernas incluidas en el paquete <cite>java.time</cite> no tienen soporte
+nativo en a librería y necesitan que se importe  el módulo
+<a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310">jackson-datatype-jsr310</a>.
+Hecho esto, la representación de estas clases se hará según la <a class="reference external" href="https://es.wikipedia.org/wiki/ISO_8601">ISO 8601</a> (que para una fecha <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a> es
+“<cite>yyyy-MM-dd</cite>”). Si se quieren otras representaciones, entonces habrá que
+informar a la librería y las estrategias cambia un poco respecto a <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a>:</p>
+<ul>
+<li><p>La anotación se hace exactamente igual que con <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonFormat</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">JsonFormat</span><span class="p">.</span><span class="na">Shape</span><span class="p">.</span><span class="na">STRING</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="o">=</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span>
+</pre></div>
+</div>
+</li>
+<li><p>En cambio, no hay un soporte directo equivalente al que proporcionaba
+el módulo <code class="docutils literal notranslate"><span class="pre">setDateFormat</span></code> y es un poco más complicado hacer algo semejante:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">);</span>
+
+<span class="n">SimpleModule</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleModule</span><span class="p">();</span>
+<span class="n">module</span><span class="p">.</span><span class="na">addSerializer</span><span class="p">(</span><span class="n">LocalDate</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LocalDateSerializer</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
+<span class="n">module</span><span class="p">.</span><span class="na">addDeserializer</span><span class="p">(</span><span class="n">LocalDate</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LocalDateDeserializer</span><span class="p">(</span><span class="n">pattern</span><span class="p">));</span>
+
+<span class="c1">// Se supone ya creado el mapper.</span>
+<span class="n">mapper</span><span class="p">.</span><span class="na">registerModule</span><span class="p">(</span><span class="n">module</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Por hacer</p>
+<p>Comprobar que no aporta nada a este respecto usar JavaTimeModule en
+vez de SimpleModule.</p>
+</div>
+</section>
+<section id="traductor-especifico">
+<h2><span class="section-number">2.2.2.5. </span>Traductor específico<a class="headerlink" href="#traductor-especifico" title="Link to this heading">#</a></h2>
+<p>La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
+de cualquier tipo que se nos pueda ocurrir, Basta con añadir, en principio, la
+librería <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core">jackson-core</a>)
+para poder hacer cualquier definición. Ilustrémoslo con la serialización y
+deserialización artesanal de una tipo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a>, aunque ya esté resuelto dentro de
+la propia librería. Sin embargo, nos sirve para ilustrarlo<a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
-
+<span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
+</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DateSerializer</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">JsonSerializer</span><span class="o">&lt;</span><span class="n">Date</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">        </span><span class="nd">@Override</span>
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="n">Date</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">JsonGenerator</span><span class="w"> </span><span class="n">gen</span><span class="p">,</span><span class="w"> </span><span class="n">SerializerProvider</span><span class="w"> </span><span class="n">sp</span><span class="p">)</span>
 <span class="w">            </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">JsonProcessingException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">gen</span><span class="p">.</span><span class="na">writeNull</span><span class="p">();</span>
-<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">gen</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="w">        </span><span class="p">}</span>
+<span class="hll"><span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">gen</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w">     </span><span class="c1">// Date --&gt; String</span>
+</span><span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DateDeserializer</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">JsonDeserializer</span><span class="o">&lt;</span><span class="n">Date</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -585,8 +631,8 @@ nuestro propio traductor<a class="footnote-reference brackets" href="#id5" id="i
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">JsonParser</span><span class="w"> </span><span class="n">parser</span><span class="p">,</span><span class="w"> </span><span class="n">DeserializationContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span>
 <span class="w">            </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">JsonProcessingException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                   </span><span class="k">return</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">.</span><span class="na">getText</span><span class="p">());</span>
-<span class="w">                </span><span class="p">}</span>
+<span class="hll"><span class="w">                   </span><span class="k">return</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">.</span><span class="na">getText</span><span class="p">());</span><span class="w">  </span><span class="c1">// String --&gt; Date</span>
+</span><span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">ParseException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                   </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
@@ -595,6 +641,9 @@ nuestro propio traductor<a class="footnote-reference brackets" href="#id5" id="i
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>En definitiva, al serializar tenemos que indicar cómo pasar del tipo a una
+cadena (que será la que se escriba en el <abbr title="JavaScript Object Notation">JSON</abbr>), y al deserializar cómo pasar
+de la cadena que aparece en el <abbr title="JavaScript Object Notation">JSON</abbr> al tipo de Java correspondiente.</p>
 <p>Y ya sólo quedaría indicar el campo en que se va a usar este traductor:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonSerialize</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">Traductor</span><span class="p">.</span><span class="na">DateSerializer</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 <span class="nd">@JsonDeserialize</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">Traductor</span><span class="p">.</span><span class="na">DateDeserializer</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
@@ -612,9 +661,17 @@ cada uno de los atributos y hacer lo siguiente:</p>
 <span class="n">mapper</span><span class="p">.</span><span class="na">registerModule</span><span class="p">(</span><span class="n">module</span><span class="p">);</span>
 </pre></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Obsérvese que el segundo mecanismo para <a class="reference internal" href="#json-jackson-localdate"><span class="std std-ref">convertir fechas
+LocalDate</span></a> es equivalente a este que indicamos
+ahora. Simplemente, la librería adicional <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310">jackson-datatype-jsr310</a> ya define
+clases serializadores y deserializadoras para las clases de <cite>java.time</cite> y nos
+limitamos a usarlas en vez de definirlas nosotros.</p>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Es decir, que si se tiene:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Enumeracion</span><span class="w"> </span><span class="p">{</span>
@@ -623,11 +680,11 @@ cada uno de los atributos y hacer lo siguiente:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>se usan las cadenas <em>UNO</em> y <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>. En caso, contrario,
-habría que hacer un traductor como se expone bajoo este epígrafe.</p>
+<p>se usan las cadenas <em>UNO</em> y <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>. En caso contrario,
+habría que hacer un traductor como se expone bajo este epígrafe.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
 <p><code class="docutils literal notranslate"><span class="pre">SimpleDateFormat</span></code> no es <em>thread-safe</em> por lo que habría que mejorar
 algo el código en caso de utilizarse hilos. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SimpleDateFormat</span><span class="o">&gt;</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span>
@@ -689,6 +746,8 @@ algo el código en caso de utilizarse hilos. Por ejemplo:</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1. Lectura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.2.3. Tipos no primitivos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas">2.2.2.4. Fechas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.5. Traductor específico</a></li>
 </ul>
   </nav></div>
 

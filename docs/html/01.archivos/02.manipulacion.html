@@ -419,7 +419,7 @@ tratamiento.</p></li>
 <li><p>Dedicaremos el resto de la unidad a ver cómo acceder a archivos de texto sin
 formato y binarios generados por <em>serialización</em>.</p></li>
 <li><p>En la siguiente unidad trataremos algunos formatos típicos de archivos de
-texto. No lo haremos lo propio con formatos de archivos binarios.</p></li>
+texto. No haremos lo propio con formatos de archivos binarios.</p></li>
 <li><p>El resto de las unidades se dedicarán al acceso a bases de datos de distinto
 tipo con distintas técnicas.</p></li>
 </ol>
@@ -513,7 +513,7 @@ volveremos a indicarlo:</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">lines()</span></code> devuelve un flujo por líneas (<code class="docutils literal notranslate"><span class="pre">Stream&lt;String&gt;</span></code>)
-al que se puede aplicar <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream"><span class="std std-ref">estrategias de programación funcional</span></a>.</p>
+al que se pueden aplicar <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream"><span class="std std-ref">estrategias de programación funcional</span></a>.</p>
 </div>
 <p>Poniendo todo junto y usando <a class="reference external" href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try para el tratamiento de errores y el autocierre</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.bashrc&quot;</span><span class="p">);</span>
@@ -588,7 +588,7 @@ mediante la clase <a class="extlink-java-io reference external" href="https://do
 a bytes concretos y avanzar o retroceder dentro de él, tanto para leer como para
 escribir.</p>
 <p>Este mecanismo nos permite escribir distintos tipos de datos e incluso objetos
-completos, pero es tedioso (véase <a class="reference external" href="`https://www.clasesdeinformaticaweb.com/java-desde-cero/randomaccessfile-en-java-archivos-de-acceso-aleatorio/">almacenar objetos en archivos de acceso
+completos, pero es tedioso (véase <a class="reference external" href="https://www.clasesdeinformaticaweb.com/java-desde-cero/randomaccessfile-en-java-archivos-de-acceso-aleatorio/">almacenar objetos en archivos de acceso
 aleatorio</a>).</p>
 <p>En vez de ello, sale más a cuenta <em>serializar</em> objetos y almacenarlos en disco
 para poderlos rescatar posteriormente. Eso sí, antes debemos definir el
@@ -607,7 +607,7 @@ estructura parecida.</p></li>
 cantidad de datos es grande, pero en ese caso, deberíamos haber usado una base
 de datos.</p></li>
 </ul>
-<p>Para ilustrar cómo se serializan objetos definamos un clase muy simple:</p>
+<p>Para ilustrar cómo se serializan objetos definamos una clase muy simple:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Persona</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
 </span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>

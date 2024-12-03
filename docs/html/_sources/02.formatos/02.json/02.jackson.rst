@@ -9,7 +9,7 @@ Otra librería muy utilizada y que tiene la ventaja de que también soporta
 Como :ref:`GSON <json-gson>`, nos permite hacer una conversión automática entre
 el modelo de objetos y |JSON| para lo cual podemos definir las clases para
 `Tutor`, `Alumno` y `Grupo` exactamente de :ref:`la misma forma <gson-auto>`.
-Como en aquel caso empezaremos por no complicar las cosas: las secuencias son
+Como en aquel caso, empezaremos por no complicar las cosas: las secuencias son
 arrays y los valores son directamente traducibles a un tipo primitivo de |JSON|
 (es decir, representaremos la edad y no la fecha de nacimiento).
 
@@ -105,13 +105,15 @@ Al escribir, es indiferente si usamos arrays o listas.
 
 Tipos no primitivos
 ===================
-En el ejemplo anterior todos lo tipos de los objetos de Java tiene
+En el ejemplo anterior todos los tipos de los objetos de Java tienen
 correspondencia con un tipo primitivo de |JSON|, ya que las cadenas son cadenas,
 los números, números, y los arrays o ``ArrayList`` los traduce directamente
 Jackson como secuencias. Incluso si usamos los valores de una enumeración para
 codificarla en el |JSON|\ [#]_, la librería será capaz de traducir sin
 instrucciones por nuestra parte.
 
+Fechas
+======
 Pero supongamos ahora que no es así y que de los alumnos se registra la fecha de
 nacimiento:
 
@@ -120,12 +122,18 @@ nacimiento:
    :emphasize-lines: 13,17,32,36
 
 y, por supuesto, se modifica la clase ``Alumno`` para que contenga un atributo
-`nacimiento`  de tipo `Date`  (véase :ref:`la versión incluida en las
-explicaciones sobre GSON <json-alumno-nacimiento>`).
+`nacimiento`  de tipo |Date| (véase :ref:`la versión incluida
+en las explicaciones sobre GSON <json-alumno-nacimiento>`).
 
-En este caso, habrá que definir un traductor específico para este campo: de
-`Date` a una cadena de la forma *yyyy-MM-dd* y viceversa. Para el caso
-particular de fechas hay dos atajos:
+.. _json-jackson-date:
+
+.. rubric:: Date
+
+La clase |Date| del paquete `java.util` tiene soporte nativo en la librería,
+pero su traducción es un número entero que representa el `tiempo UNIX
+<https://es.wikipedia.org/wiki/Tiempo_Unix>`_). Si esta representación no nos
+gusta y preferimos otra (p.e. '`yyyy-MM-dd`'), entonces tendremos que indicarlo
+y podemos usar dos estrategias:
 
 * Especificar el formato de fechas en el objeto mapeador:
 
@@ -142,7 +150,7 @@ particular de fechas hay dos atajos:
      @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
      private Date nacimiento
 
-  .. note:: En este segundo caso necesitamos el paquete aparte
+  .. note:: En este segundo caso, necesitamos importar el paquete aparte
      `jackson-annotations
      <https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations>`_.
 
@@ -164,18 +172,61 @@ particular de fechas hay dos atajos:
   .. caution:: En las anotaciones deben usarse literales y constantes, por lo
      que no puede usarse el método para obtener el huso horario del sistema.
 
-.. todo:: Comprobar que debe incorporarse:
+.. todo:: Comprobar si es preciso incorporar:
 
    .. code-block:: java
 
       mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-Sin embargo, ensayaremos una solución más general que ilustre cómo definir
-nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
-`jackson-core
-<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core>`_):
+.. _json-jackson-localdate:
+
+.. rubric:: LocalDate
+
+Las clases más modernas incluidas en el paquete `java.time` no tienen soporte
+nativo en a librería y necesitan que se importe  el módulo
+`jackson-datatype-jsr310
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310>`_.
+Hecho esto, la representación de estas clases se hará según la `ISO 8601
+<https://es.wikipedia.org/wiki/ISO_8601>`_ (que para una fecha |LocalDate| es
+'`yyyy-MM-dd`'). Si se quieren otras representaciones, entonces habrá que
+informar a la librería y las estrategias cambia un poco respecto a |Date|:
+
+* La anotación se hace exactamente igual que con |Date|:
+
+  .. code-block:: java
+
+     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+     private LocalDate nacimiento
+  
+* En cambio, no hay un soporte directo equivalente al que proporcionaba
+  el módulo ``setDateFormat`` y es un poco más complicado hacer algo semejante:
+
+  .. code-block:: java
+
+     DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+     SimpleModule module = new SimpleModule();  
+     module.addSerializer(LocalDate.class, new LocalDateSerializer(pattern))
+     module.addDeserializer(LocalDate.class, new LocalDateDeserializer(pattern));
+
+     // Se supone ya creado el mapper.
+     mapper.registerModule(module);
+
+.. todo:: Comprobar que no aporta nada a este respecto usar JavaTimeModule en
+   vez de SimpleModule.
+
+Traductor específico
+====================
+La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
+de cualquier tipo que se nos pueda ocurrir, Basta con añadir, en principio, la
+librería `jackson-core
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core>`_)
+para poder hacer cualquier definición. Ilustrémoslo con la serialización y
+deserialización artesanal de una tipo |Date|, aunque ya esté resuelto dentro de
+la propia librería. Sin embargo, nos sirve para ilustrarlo\ [#]_:
 
 .. code-block:: java
+   :emphasize-lines: 3, 11, 21
 
    public class Traductor {
        
@@ -187,7 +238,7 @@ nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
            public void serialize(Date value, JsonGenerator gen, SerializerProvider sp) 
                throws IOException, JsonProcessingException {
                    if(value == null) gen.writeNull();
-                   else gen.writeString(df.format(value));
+                   else gen.writeString(df.format(value));     // Date --> String
            }
        }
 
@@ -197,7 +248,7 @@ nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
            public Date deserialize(JsonParser parser, DeserializationContext context)
                throws IOException, JsonProcessingException {
                    try {
-                      return df.parse(parser.getText());
+                      return df.parse(parser.getText());  // String --> Date
                    }
                    catch(ParseException err) {
                       throw new RuntimeException(err);
@@ -205,6 +256,10 @@ nuestro propio traductor\ [#]_ (para la cual se necesita añadir la librería
            } 
        }
    }
+
+En definitiva, al serializar tenemos que indicar cómo pasar del tipo a una
+cadena (que será la que se escriba en el |JSON|), y al deserializar cómo pasar
+de la cadena que aparece en el |JSON| al tipo de Java correspondiente.
 
 Y ya sólo quedaría indicar el campo en que se va a usar este traductor:
 
@@ -227,6 +282,12 @@ cada uno de los atributos y hacer lo siguiente:
    module.addDeserializer(java.util.Date.class, new Traductor.DateDeserializer());
    mapper.registerModule(module);
 
+.. tip:: Obsérvese que el segundo mecanismo para :ref:`convertir fechas
+   LocalDate <json-jackson-localdate>` es equivalente a este que indicamos
+   ahora. Simplemente, la librería adicional `jackson-datatype-jsr310`_ ya define
+   clases serializadores y deserializadoras para las clases de `java.time` y nos
+   limitamos a usarlas en vez de definirlas nosotros.
+
 .. rubric:: Notas al pie
 
 .. [#] Es decir, que si se tiene:
@@ -238,8 +299,8 @@ cada uno de los atributos y hacer lo siguiente:
             DOS;
           }
 
-       se usan las cadenas *UNO* y *DOS* en el |JSON|. En caso, contrario,
-       habría que hacer un traductor como se expone bajoo este epígrafe.
+       se usan las cadenas *UNO* y *DOS* en el |JSON|. En caso contrario,
+       habría que hacer un traductor como se expone bajo este epígrafe.
 
 .. [#] ``SimpleDateFormat`` no es *thread-safe* por lo que habría que mejorar
    algo el código en caso de utilizarse hilos. Por ejemplo:
@@ -253,5 +314,6 @@ cada uno de los atributos y hacer lo siguiente:
    ``df.get().format``.
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
-
+.. |Date| replace:: :java-util:`Date <Date>`
+.. |LocalDate| replace:: :java-time:`LocalDate <LocalDate>`
 

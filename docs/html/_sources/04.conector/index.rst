@@ -842,15 +842,17 @@ Extras
 ======
 Arrinconamos bajo este epígrafe, algunos aspectos adiciones de los conectores:
 
+.. _conn-sqlutils:
+
 Tratamiento funcional de las consultas
 --------------------------------------
 |ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 :ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
 paliarlo podemos definir una clase que haga la conversión (véase el
-:download:`codigo fuente <files/FunctionalResultSet.java>`):
+:download:`codigo fuente <files/SqlUtils.java>`):
 
-.. literalinclude:: files/FunctionalResultSet.java
+.. literalinclude:: files/SqlUtils.java
    :language: java
    :start-at: public class
 
@@ -858,26 +860,41 @@ Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
 modo:
 
 .. code-block:: java
-   :emphasize-lines: 3
+   :emphasize-lines: 6-11
 
+   // No los cerramos, porque se encargara el cierre del flujo de hacerlo.
+   Statement stmt = conn.createStatement();
    ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
 
-   Stream<Departamento> departamentos = FunctionalResultSet.resultSetToStream(rs, fila -> {
-      try {
+   try ( // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
+      Stream<Departamento> departamentos = SqlUtils.resultSetToStream(stmt, rs, fila -> {
+         // Esta función puede generar un SQLException
          int id = fila.getInt("id_departamento");
          String denominacion = fila.getString("denominacion");
          return new Departamento().cargarDatos(id, denominacion);
+      });
+   ) {
+      //Tratamos el flujo como estimemos más oportuno.
+      for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
+         System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
       }
-      catch(SQLException err) {
-         err.printStackTrace();
-         return null;
-      }
-   });
-
-   //Tratamos el flujo como estimemos más oportuno.
-   for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
-      System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
    }
+
+.. warning:: Lo habitual es que la creación y ejecución de la sentencia y la
+   definición del flujo estén abstraidas en un método distinto a aquel en que se
+   utilizaran los elementos del flujo:
+
+   .. code-block:: java
+
+      // En DepartamentoDAO está abstraido todo el acceso a la base de datos.
+      try(Stream<Departamento> departamentos = DepartamentoDAO.get()) {
+         // Aquí usamos el flujo.
+      }
+
+   Es indispensable que en el método (``DepartamentoDAO.get``) se dejen abiertos
+   ``stmt`` y ``rs`` para permitir el acceso a los elementos del flujo, y que en
+   el código que hace uso de él, nos aseguremos de que dicho flujo se cierra a
+   fin de que se cierren los otros dos objetos que quedaron abiertos.
 
 .. tip:: El método ``resultSetToStream`` permite no definir la función que
    transforma la fila (el propio ``ResultSet``) en un objeto. En ese caso, se
@@ -885,7 +902,9 @@ modo:
 
    .. code-block:: java
 
-      Stream<ResultSet> result = FunctionalResultSet.resultSetToStream(rs);
+      try(Stream<ResultSet> result = SqlUtils.resultSetToStream(stmt, rs)) {
+         // Tratamiento del rs (sin usar next, porque ya avanza el solo)
+      }
 
 *Pool* de conexiones
 --------------------
@@ -926,9 +945,6 @@ La clase podría usarse del siguiente modo:
       err.printStackTrace();
    }
 
-.. hint:: Podemos incluir esta clase como una clase estática dentro de
-   ``JdbcUtils`` para tener todos estos añadidos juntos.
-
 Cargar esquema desde archivo
 ----------------------------
 Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
@@ -941,7 +957,7 @@ guión |SQL| completo, así que la única forma de poner ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
 + `JSQLParser
-  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>` que es
+  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>`_ que es
   capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
   se compone.
 
@@ -958,34 +974,8 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
 .. literalinclude:: files/splitSQL.java
    :language: java
 
-.. hint:: Podemos incluir el método dentro de ``JdbcUtils``.
-
-¿Cómo podemos usar este método? Por ejemplo, así:
-
-.. code-block:: java
-
-   final String tablaExistente = "Profesor";
-   final Path guion = Path.of(System.getProperty("user.dir"), "loquesea.sql");
-
-   // Ya hay una conexión "conn" abierta.
-   try(Statement stmt = conn.createStatement()) {
-      stmt.executeUpdate("SELECT 1 FROM " + tablaExistente);
-   }
-   catch(SQLException err) { // Si la tabla no existe, no hay esquema aún.
-      try (
-         InputStream st = Files.newInputStream(guion);
-         TransactionManager tm = new TransactionManager(conn)
-      ) {
-         List<String> sentencias = splitSQL(st);
-         for(String sentencia: sentencias) {
-            stmt.executeUpdate(sentencia);
-         }
-         tm.commit();
-      }
-      catch(SQLException err) {
-         err.printStackTrace(); // O como se decida tratar el error.
-      }
-   }
+.. hint:: Podemos añadir ambos métodos a la :ref:`clase SqlUtils
+   <conn-sqlutils>` ya propuesta.
 
 .. |POO| replace:: :abbr:`POO (Programación Orientada a Objetos)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`

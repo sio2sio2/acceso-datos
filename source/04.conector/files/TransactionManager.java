@@ -17,7 +17,10 @@ public class TransactionManager implements AutoCloseable {
         return conn;
     }
 
-    public void setConn(Connection conn) {
+    private void setConn(Connection conn) {
+        if(conn == null || conn.isClosed()) {
+            throw new SQLException("Conexión no activa");
+        }
         this.conn = conn;
     }
 

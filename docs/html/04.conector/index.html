@@ -1414,13 +1414,13 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
 <span id="conn-extra"></span><h2><span class="section-number">4.6. </span>Extras<a class="headerlink" href="#extras" title="Link to this heading">#</a></h2>
 <p>Arrinconamos bajo este epígrafe, algunos aspectos adiciones de los conectores:</p>
 <section id="tratamiento-funcional-de-las-consultas">
-<h3><span class="section-number">4.6.1. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h3>
+<span id="conn-sqlutils"></span><h3><span class="section-number">4.6.1. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h3>
 <p><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
 paliarlo podemos definir una clase que haga la conversión (véase el
-<a class="reference download internal" download="" href="../_downloads/6f32a1f48ff60885e8f08b1b56524f92/FunctionalResultSet.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FunctionalResultSet</span><span class="w"> </span><span class="p">{</span>
+<a class="reference download internal" download="" href="../_downloads/34aa125d2ea9c81778b352774cc712b4/SqlUtils.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SqlUtils</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Implementa un iterador a partir de un ResultSet.</span>
@@ -1440,6 +1440,7 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">hasNext</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">avanzar</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                   </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!!&quot;</span><span class="p">);</span>
 <span class="w">                    </span><span class="n">hasNextElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -1469,7 +1470,7 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Transforma el SQLEception que propaga una CheckedFunction en un RuntimeException, que es una excepción</span>
+<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un RuntimeException, que es una excepción</span>
 <span class="cm">     * que no necesita ser declarada.</span>
 <span class="cm">     * @param &lt;T&gt; El tipo que devuelve CheckedFunction.</span>
 <span class="cm">     * @param checked Un &quot;función&quot; CheckedFunction.</span>
@@ -1490,10 +1491,21 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="cm">     * Genera un flujo con las filas generadas en un ResultSet.</span>
 <span class="cm">     * @param rs Los resutados de una consulta.</span>
 <span class="cm">     * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.</span>
+<span class="cm">     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe</span>
+<span class="cm">     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.</span>
 <span class="cm">     * @throws SQLException Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">onClose</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">rs</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">                    </span><span class="n">stmt</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -1502,42 +1514,61 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="cm">     * @param rs  El objeto que representa los resultado de la consulta.</span>
 <span class="cm">     * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).</span>
 <span class="cm">     * @return El flujo de objetos.</span>
+<span class="cm">     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe</span>
+<span class="cm">     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.</span>
 <span class="cm">     * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
 modo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// No los cerramos, porque se encargara el cierre del flujo de hacerlo.</span>
+<span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">);</span>
 
-<span class="hll"><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FunctionalResultSet</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="c1">// try-with-resources para asegurarnos de liberar los recursos (stmt y rs)</span>
+<span class="hll"><span class="w">   </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">      </span><span class="c1">// Esta función puede generar un SQLException</span>
+</span><span class="hll"><span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
+</span><span class="hll"><span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
+</span><span class="hll"><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span>
+</span><span class="hll"><span class="w">   </span><span class="p">});</span>
+</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">//Tratamos el flujo como estimemos más oportuno.</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Departamento</span><span class="w"> </span><span class="n">d</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">departamentos</span><span class="p">::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d -- Denominación: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getDenominacion</span><span class="p">()));</span>
 <span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">});</span>
-
-<span class="c1">//Tratamos el flujo como estimemos más oportuno.</span>
-<span class="k">for</span><span class="p">(</span><span class="n">Departamento</span><span class="w"> </span><span class="n">d</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">departamentos</span><span class="p">::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d -- Denominación: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="na">getDenominacion</span><span class="p">()));</span>
 <span class="p">}</span>
 </pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Lo habitual es que la creación y ejecución de la sentencia y la
+definición del flujo estén abstraidas en un método distinto a aquel en que se
+utilizaran los elementos del flujo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// En DepartamentoDAO está abstraido todo el acceso a la base de datos.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DepartamentoDAO</span><span class="p">.</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Aquí usamos el flujo.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Es indispensable que en el método (<code class="docutils literal notranslate"><span class="pre">DepartamentoDAO.get</span></code>) se dejen abiertos
+<code class="docutils literal notranslate"><span class="pre">stmt</span></code> y <code class="docutils literal notranslate"><span class="pre">rs</span></code> para permitir el acceso a los elementos del flujo, y que en
+el código que hace uso de él, nos aseguremos de que dicho flujo se cierra a
+fin de que se cierren los otros dos objetos que quedaron abiertos.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">resultSetToStream</span></code> permite no definir la función que
 transforma la fila (el propio <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code>) en un objeto. En ese caso, se
 obtendrá con cada elemento del flujo la propia fila:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FunctionalResultSet</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">rs</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Tratamiento del rs (sin usar next, porque ya avanza el solo)</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -1580,7 +1611,10 @@ posibilidades del bloque <a class="reference external" href="https://docs.oracle
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setConn</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setConn</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SQLException</span><span class="p">(</span><span class="s">&quot;Conexión no activa&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
@@ -1612,11 +1646,6 @@ posibilidades del bloque <a class="reference external" href="https://docs.oracle
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition hint">
-<p class="admonition-title">Consejo</p>
-<p>Podemos incluir esta clase como una clase estática dentro de
-<code class="docutils literal notranslate"><span class="pre">JdbcUtils</span></code> para tener todos estos añadidos juntos.</p>
-</div>
 </section>
 <section id="cargar-esquema-desde-archivo">
 <h3><span class="section-number">4.6.5. </span>Cargar esquema desde archivo<a class="headerlink" href="#cargar-esquema-desde-archivo" title="Link to this heading">#</a></h3>
@@ -1628,8 +1657,7 @@ de él, en vez de encontrarse incrustadas en el código.</p>
 guión <abbr title="Structured Query Language">SQL</abbr> completo, así que la única forma de poner ejecutar sus sentencias,
 es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
 <ul>
-<li><p><cite>JSQLParser
-&lt;https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser&gt;</cite> que es
+<li><p><a class="reference external" href="https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser">JSQLParser</a> que es
 capaz de procesar el código <abbr title="Structured Query Language">SQL</abbr> y, por tanto, reconocer los elementos de que
 se compone.</p></li>
 <li><p>Si el guión no es complejo y seguimos algunas premisas:</p>
@@ -1643,74 +1671,69 @@ valores, etc.</p></li>
 <p>podemos escribir una solución artesanal, que es la que proponemos.</p>
 </li>
 </ul>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="cm">/**</span>
-<span class="cm">  * Descompone un guión SQL en las sentencias de que se compone.</span>
-<span class="cm">  * @param st Entrada de la que se lee el guión</span>
-<span class="cm">  * @return  Una lista con las sentencias separadadas.</span>
-<span class="cm">  * @throws IOException</span>
-<span class="cm">  */</span>
-<span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">splitSQL</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="n">Pattern</span><span class="w"> </span><span class="n">beginPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\b(BEGIN|CASE)\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
-<span class="w">     </span><span class="n">Pattern</span><span class="w"> </span><span class="n">endPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\bEND\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Descompone un guión SQL en las sentencias de que se compone.</span>
+<span class="cm"> * @param st Entrada de la que se lee el guión</span>
+<span class="cm"> * @return  Una lista con las sentencias separadadas.</span>
+<span class="cm"> * @throws IOException</span>
+<span class="cm"> */</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">splitSQL</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Pattern</span><span class="w"> </span><span class="n">beginPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\b(BEGIN|CASE)\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Pattern</span><span class="w"> </span><span class="n">endPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\bEND\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
 
-<span class="w">     </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">         </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
-<span class="w">         </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
-<span class="w">     </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
-<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
-<span class="w">         </span><span class="kt">int</span><span class="w"> </span><span class="n">contador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">         </span><span class="k">while</span><span class="p">((</span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">             </span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span>
-<span class="w">             </span><span class="k">if</span><span class="p">(</span><span class="n">linea</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">        </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">contador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">((</span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">linea</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
 
-<span class="w">             </span><span class="n">Matcher</span><span class="w"> </span><span class="n">beginMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beginPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
-<span class="w">             </span><span class="n">Matcher</span><span class="w"> </span><span class="n">endMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+<span class="w">            </span><span class="n">Matcher</span><span class="w"> </span><span class="n">beginMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beginPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+<span class="w">            </span><span class="n">Matcher</span><span class="w"> </span><span class="n">endMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
 
-<span class="w">             </span><span class="k">while</span><span class="p">(</span><span class="n">beginMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">++</span><span class="p">;</span>
-<span class="w">             </span><span class="k">while</span><span class="p">(</span><span class="n">endMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">--</span><span class="p">;</span>
+<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">beginMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">endMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">--</span><span class="p">;</span>
 
-<span class="w">             </span><span class="n">sentencia</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+<span class="w">            </span><span class="n">sentencia</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
 
-<span class="w">             </span><span class="k">if</span><span class="p">(</span><span class="n">contador</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                 </span><span class="n">sentencias</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
-<span class="w">                 </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
-<span class="w">             </span><span class="p">}</span>
-<span class="w">         </span><span class="p">}</span>
-<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">sentencias</span><span class="p">;</span>
-<span class="w">     </span><span class="p">}</span>
-<span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">contador</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">sentencias</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">                </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sentencias</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">executeSQL</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">       </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="p">:</span><span class="w"> </span><span class="n">splitSQL</span><span class="p">(</span><span class="n">st</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">       </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SQLException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
-<p>Podemos incluir el método dentro de <code class="docutils literal notranslate"><span class="pre">JdbcUtils</span></code>.</p>
-</div>
-<p>¿Cómo podemos usar este método? Por ejemplo, así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">tablaExistente</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Profesor&quot;</span><span class="p">;</span>
-<span class="kd">final</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">guion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.dir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;loquesea.sql&quot;</span><span class="p">);</span>
-
-<span class="c1">// Ya hay una conexión &quot;conn&quot; abierta.</span>
-<span class="k">try</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;SELECT 1 FROM &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tablaExistente</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// Si la tabla no existe, no hay esquema aún.</span>
-<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">      </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">guion</span><span class="p">);</span>
-<span class="w">      </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">splitSQL</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
-<span class="w">      </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="p">:</span><span class="w"> </span><span class="n">sentencias</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">      </span><span class="n">tm</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w"> </span><span class="c1">// O como se decida tratar el error.</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+<p>Podemos añadir ambos métodos a la <a class="reference internal" href="#conn-sqlutils"><span class="std std-ref">clase SqlUtils</span></a> ya propuesta.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">

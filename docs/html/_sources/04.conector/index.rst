@@ -416,8 +416,48 @@ inferir el tipo |SQL| correcto a partir del tipo de *Java*:
          pstmt.executeUpdate();
    }
 
-El problema de ``setObject`` es que delegar la elección del tipo en el conector penaliza el
-rendimiento.
+El uso de este método implica algunas cosas:
+
+a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
+   provoca una ligera sobrecarga y puede originar que la traducción no sea la
+   deseada. Lo segundo puede solucionarse añadiendo el tercer argumento:
+
+   .. code-block:: java
+
+      pstmt.setObject(1, "Manolo", Types.VARCHAR);
+
+#. El segundo argumento se pasa como ``Object`` y siempre habrá que
+   transformarlo al tipo requerido: esto implica una nimia sobrecarga también,
+   despreciable en la mayoría de los casos.
+
+#. Si no pasamos literales, sino una variable. la variable puede ser nula y
+   darnos problemas:
+
+   .. code-block:: java
+
+      Integer sustituye = null;
+      pstmt.setObject(4, sustituye); // ¿Cómo inferimos el tipo?
+
+   En este caso, se solucionaría añadiendo siempre el tercer argumento:
+
+   .. code-block:: java
+
+      Integer sustituye = null;
+      pstmt.setObject(4, sustituye, Types.INTEGER); // ¿Cómo inferimos el tipo?
+
+.. tip:: El código:
+
+   .. code-block:: java
+
+      // Supongamos que en 1 queremos indicar el identificador, no el apodo.
+      pstmt.setObject(1, id == 0?null:id, Types.INTEGER);
+
+   es más sucinto que este otro equivalente:
+
+   .. code-block:: java
+
+      if(id == 0) pstmt.setNull(1, Types.INTEGER);
+      else pstmt.setInt(1, id);
 
 .. _conn-data:
 
@@ -840,7 +880,7 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
 
 Extras
 ======
-Arrinconamos bajo este epígrafe, algunos aspectos adiciones de los conectores:
+Arrinconamos bajo este epígrafe algunos aspectos adiciones de los conectores:
 
 .. _conn-sqlutils:
 
@@ -908,6 +948,21 @@ modo:
 
 *Pool* de conexiones
 --------------------
+Abrir una conexión a la base de datos es un proceso costoso en recursos por lo
+que si prevemos que nuestra aplicación abrirá y cerrará varias conexiones es
+conveniente utilizar un :dfn:`pool de conexiones`, que no es más que un
+mecanismo que se encarga de administrar un grupo de conexiones a una base de
+datos a fin de que puedan ser reutilizadas por diferentes partes de una
+aplicación.
+
+Para utilizar este mecanismo tenemos dos vías:
+
++ Usar el mecanismo básico que proporciona |JDBC| y que puede servirnos cuando
+  no hya gran concurrencia ni necesitamos controlar todos los parámetros del
+  *pool*.
+
++ Usar una librería especializada como `HikariCP
+  <https://github.com/brettwooldridge/HikariCP>`_.
 
 .. todo:: Pool de conexiones...
 

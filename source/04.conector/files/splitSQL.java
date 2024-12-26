@@ -44,8 +44,9 @@ public static void executeSQL(Connection conn, InputStream st) throws SQLExcepti
        Statement stmt = conn.createStatement();
    ) {
        for(String sentencia: splitSQL(st)) {
-           stmt.executeUpdate(sentencia);
+           stmt.addBatch(sentencia);
        }
+       stmt.executeBatch();
        conn.commit();
    }
    catch(SQLException err) {

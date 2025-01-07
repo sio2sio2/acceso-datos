@@ -1,0 +1,153 @@
+.. _conn-extra:
+
+Extras
+******
+Arrinconamos bajo este epígrafe algunos aspectos adiciones de los conectores:
+
+
+Metadatos
+=========
+
+.. todo:: DatabaseMetaData y ResultSetMetaData.
+
+.. _conn-pool-extra:
+
+*Pool* de conexiones
+====================
+Ya tratamos cómo crear un :ref:`pool de conexiones <conn-pool>`. Si queremos
+simplificar la creación del pool y abstraernos de qué se usa para crearlo,
+podemos envolverlo en una clase básica parecida a esta:
+
+.. literalinclude:: files/PoolConnectionBuilder.java
+   :language: java
+   
+
+.. _conn-sqlutils:
+
+Tratamiento funcional de las consultas
+======================================
+|ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
+Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
+:ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
+paliarlo podemos definir una clase que haga la conversión (véase el
+:download:`codigo fuente <files/SqlUtils.java>`):
+
+.. literalinclude:: files/SqlUtils.java
+   :language: java
+   :start-at: public class
+
+Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
+modo:
+
+.. code-block:: java
+   :emphasize-lines: 6-11
+
+   // No los cerramos, porque se encargara el cierre del flujo de hacerlo.
+   Statement stmt = conn.createStatement();
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
+
+   try ( // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
+      Stream<Departamento> departamentos = SqlUtils.resultSetToStream(stmt, rs, fila -> {
+         // Esta función puede generar un SQLException
+         int id = fila.getInt("id_departamento");
+         String denominacion = fila.getString("denominacion");
+         return new Departamento().cargarDatos(id, denominacion);
+      });
+   ) {
+      //Tratamos el flujo como estimemos más oportuno.
+      for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
+         System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
+      }
+   }
+
+.. warning:: Lo habitual es que la creación y ejecución de la sentencia y la
+   definición del flujo estén abstraidas en un método distinto a aquel en que se
+   utilizaran los elementos del flujo:
+
+   .. code-block:: java
+
+      // En DepartamentoDAO está abstraido todo el acceso a la base de datos.
+      try(Stream<Departamento> departamentos = DepartamentoDAO.get()) {
+         // Aquí usamos el flujo.
+      }
+
+   Es indispensable que en el método (``DepartamentoDAO.get``) se dejen abiertos
+   ``stmt`` y ``rs`` para permitir el acceso a los elementos del flujo, y que en
+   el código que hace uso de él, nos aseguremos de que dicho flujo se cierra a
+   fin de que se cierren los otros dos objetos que quedaron abiertos.
+
+.. tip:: El método ``resultSetToStream`` permite no definir la función que
+   transforma la fila (el propio ``ResultSet``) en un objeto. En ese caso, se
+   obtendrá con cada elemento del flujo la propia fila:
+
+   .. code-block:: java
+
+      try(Stream<ResultSet> result = SqlUtils.resultSetToStream(stmt, rs)) {
+         // Tratamiento del rs (sin usar next, porque ya avanza el solo)
+      }
+
+.. _conn-transaction-manager:
+
+Gestor de transacciones
+=======================
+Para facilitar la forma en que se gestionan las :ref:`transacciones ya
+estudiadas <conn-transactions>` podemos crear una clase que explote las
+posibilidades del bloque `try-with-resources
+<https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html>`_:
+
+.. literalinclude:: files/TransactionManager.java
+   :language: java
+
+La clase podría usarse del siguiente modo:
+
+.. code-block:: java
+
+   // Se supone que conn es una conexión ya abierta.
+   try (TransaccionManager tm = new TransactionManager(conn)) {
+
+      // Ejecutamos todas las sentencias que constituyen esta transacción
+      // ...
+
+      tm.commit(); // Confirmamos en la base de datos.
+   }
+   catch(SQLException err) {
+      // No hay que hacer rollback, ya que se encarga el close().
+      err.printStackTrace();
+   }
+
+Cargar esquema desde archivo
+============================
+Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
+de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
+las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
+de él, en vez de encontrarse incrustadas en el código.
+
+Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
+guión |SQL| completo, así que la única forma de poner ejecutar sus sentencias,
+es descomponerlas primero. Para ello podemos optar por dos estrategias:
+
++ `JSQLParser
+  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>`_ que es
+  capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
+  se compone.
+
++ Si el guión no es complejo y seguimos algunas premisas:
+
+  a. Los ';' que completan sentencias deben encontrarse a final de línea.
+  #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
+     valores, etc.
+  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
+     (pero sí usarse el estándar ``CASE``).
+
+  podemos escribir una solución artesanal, que es la que proponemos.
+
+.. literalinclude:: files/splitSQL.java
+   :language: java
+
+.. hint:: Podemos añadir ambos métodos a la :ref:`clase SqlUtils
+   <conn-sqlutils>` ya propuesta.
+
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`

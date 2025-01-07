@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ejercicios sobre formato XML &#8212; documentación de Acceso a datos - rolling</title>
+    <title>4.3. Transacciones &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -55,10 +55,11 @@
     <script src="../_static/translations.js?v=d190bf04"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '99.ejercicios/03.xml';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/03.transacciones';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="prev" title="Ejercicios sobre formatos" href="02.formatos.html" />
+    <link rel="next" title="4.4. Pool de conexiones" href="04.pool.html" />
+    <link rel="prev" title="4.2. Datos" href="02.datos.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -168,7 +169,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../01.archivos/index.html">1. Tratamiento de archivos</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../01.archivos/01.gestion.html">1.1. Gestión de archivos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../01.archivos/02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
@@ -190,12 +191,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../03.xml/03.basex.html">3.3. BaseX</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../04.conector/index.html">4. Conectores a bases de datos relacionales</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/01.basico.html">4.1. Operaciones básicas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/10.extras.html">4.5. Extras</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">4. Conectores a bases de datos relacionales</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01.basico.html">4.1. Operaciones básicas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02.datos.html">4.2. Datos</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.3. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.extras.html">4.5. Extras</a></li>
 </ul>
 </details></li>
 </ul>
@@ -211,10 +212,10 @@
 </ul>
 </details></li>
 </ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="01.achivos.html">Ejercicios sobre archivos</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02.formatos.html">Ejercicios sobre formatos</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
 </ul>
 
     </div>
@@ -269,7 +270,7 @@
       
       
       
-      <li><a href="../_sources/99.ejercicios/03.xml.rst" target="_blank"
+      <li><a href="../_sources/04.conector/03.transacciones.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -340,7 +341,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -351,11 +354,20 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Ejercicios sobre formato XML</h1>
+    <h1>Transacciones</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.3.1. Manejo de transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.3.2. Operaciones masivas</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -365,50 +377,87 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="ejercicios-sobre-formato-xml">
-<span id="ej-xml"></span><h1>Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr><a class="headerlink" href="#ejercicios-sobre-formato-xml" title="Link to this heading">#</a></h1>
-<p>Tomando la solución facilitada por el profesor para los <a class="reference external" href="https://sio2sio2.github.io/LM/99.ejercicios/20.val.html#ej10-05" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">préstamos de una biblioteca</span></a>:</p>
-<ol class="arabic">
-<li><p>Utilice <abbr title="Java API for XML Processing">JAXP</abbr> para leer la <a class="reference download internal" download="" href="../_downloads/550cd64131ff6d6027d314f830e5b997/biblioteca.xml"><code class="xref download docutils literal notranslate"><span class="pre">solución</span> <span class="pre">facilitada</span> <span class="pre">por</span> <span class="pre">el</span> <span class="pre">profesor</span></code></a> y</p>
-<ol class="loweralpha">
-<li><p>Genere una salida de texto que incluya:</p>
+  <section id="transacciones">
+<span id="conn-transactions"></span><h1><span class="section-number">4.3. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h1>
+<p>Hasta ahora hemos obviado el concepto de transacción. Una <em class="dfn">transacción</em> es
+una operación sobre la base datos, no necesariamente atómica, que debe
+completarse o no hacerse en absoluto, es decir, si una <em>transacción</em> se
+compone de dos operaciones (sentencias <abbr title="Structured Query Language">SQL</abbr>), ambas operaciones deben
+realizarse.</p>
+<p>Por ejemplo, en una tienda la venta de un bolígrafo implica dos cosas:</p>
 <ul class="simple">
-<li><p>Un listado de autores con el número de libros suyos de que dispone la biblioteca.</p></li>
-<li><p>Un listado de lectores con el número de libros que ha pedido en préstamo.</p></li>
+<li><p>Ingresar el importe del bolígrafo.</p></li>
+<li><p>Eliminar el bolígrafo del almacén.</p></li>
 </ul>
-</li>
-<li><p>Hago lo mismo que en el caso anterior, pero en vez de generar el listado
-genere una salida <abbr title="eXtensible Markup Language">XML</abbr> que puede tener este formato:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;biblioteca</span><span class="w"> </span><span class="na">nombre=</span><span class="s">&quot;el que sea&quot;</span><span class="nt">&gt;</span>
-<span class="w">   </span><span class="nt">&lt;autores&gt;</span>
-<span class="w">      </span><span class="nt">&lt;autor</span><span class="w"> </span><span class="na">nombre=</span><span class="s">&quot;Miguel de Cervantes&quot;</span><span class="w"> </span><span class="na">libros=</span><span class="s">&quot;5&quot;</span><span class="nt">&gt;</span>
-<span class="w">      </span><span class="cm">&lt;!-- más autores --&gt;</span>
-<span class="w">   </span><span class="nt">&lt;/autores&gt;</span>
-
-<span class="w">   </span><span class="nt">&lt;lectores&gt;</span>
-<span class="w">      </span><span class="nt">&lt;lector</span><span class="w"> </span><span class="na">nombre=</span><span class="s">&quot;Perico de los palotes&quot;</span><span class="w"> </span><span class="na">peticiones=</span><span class="s">&quot;6&quot;</span><span class="nt">&gt;</span>
-<span class="w">      </span><span class="cm">&lt;!-- más lectores --&gt;</span>
-<span class="w">   </span><span class="nt">&lt;/lectores&gt;</span>
-<span class="nt">&lt;/biblioteca&gt;</span>
+<p>Ambas operaciones son indisolubles y hemos de hacerlas para que se complete la
+venta, o no hacerlas en absoluto para que quede la venta pendiente. En cambio,
+si se hiciera una y no la otra, la base de datos quedaría en un estado
+inconsistente.</p>
+<section id="manejo-de-transacciones">
+<h2><span class="section-number">4.3.1. </span>Manejo de transacciones<a class="headerlink" href="#manejo-de-transacciones" title="Link to this heading">#</a></h2>
+<p>En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
+<abbr title="Structured Query Language">SQL</abbr> constituye una transacción diferente. Si queremos que varias sentencias
+pertenezcan a una misma transacción debemos hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// Evitamos que cada sentencia implique una transacción</span>
+</span>
+<span class="k">try</span><span class="p">(</span>
+<span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (?)&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Informática&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="hll"><span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Después de ejecutar todas las sentencias, las confirmamos.</span>
+</span><span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="hll"><span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">  </span><span class="c1">// Hubo un problema, no ejecutamos ninguna inserción.</span>
+</span><span class="p">}</span>
+<span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class="p">}</span>
 </pre></div>
 </div>
-</li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>No realice dos programas distintos. Resuelva ambos apartados con
-un sólo programa que genere una u otra salida dependiendo de la
-preferencia del usuario. Se deja libertad para decidir cómo el usuario
-proporciona la información sobre el formato de salida.</p>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>En el ejemplo, las sentencias son una misma sentencia con
+distinto parámetros.  Evidentemente, las transacciones pueden estar
+constituidas por cualesquiera sentencias.</p>
 </div>
-</li>
-<li><p>Rehaga el ejercicio anterior usando <em>Jackson XML</em>.</p>
-</li>
-<li id="ej-xml-3"><p>Complete el <a class="reference internal" href="02.formatos.html#ej-formatos-4"><span class="std std-ref">ejercicio 4 de la relación anterior</span></a>
-añadiendo soporte para una salida <abbr title="eXtensible Markup Language">XML</abbr>. En esta salida el número de
-matrícula será un atributo, no un elemento. Como etiqueta del elemento raíz
-utilice el nombre «listado».</p></li>
-</ol>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Más adelante se propone un mecanismo para gestionar
+<a class="reference internal" href="10.extras.html#conn-transaction-manager"><span class="std std-ref">transacciones con un bloque try-with-resources</span></a>.</p>
+</div>
+</section>
+<section id="operaciones-masivas">
+<span id="conn-batch"></span><h2><span class="section-number">4.3.2. </span>Operaciones masivas<a class="headerlink" href="#operaciones-masivas" title="Link to this heading">#</a></h2>
+<p>En el caso de que tengamos que llevar a cabos muchas operaciones que comparten
+la misma sentencia y distintos parámetros (como en el ejemplo anterior
+precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// Todas las inserciones forman parte de una transacción</span>
+
+<span class="k">try</span><span class="p">(</span>
+<span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (?)&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Informática&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span>
+<span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">addBatch</span><span class="p">();</span><span class="w">  </span><span class="c1">// Añadimos la inserción al procedimiento.</span>
+</span><span class="w">    </span><span class="p">}</span>
+
+<span class="hll"><span class="w">    </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeBatch</span><span class="p">();</span><span class="w"> </span><span class="c1">// Ejecutamos todas las inserciones pendientes.</span>
+</span><span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Grabamos la transacción.</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">  </span><span class="c1">// Hubo un problema, no ejecutamos ninguna inserción.</span>
+<span class="p">}</span>
+<span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -423,13 +472,22 @@ utilice el nombre «listado».</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="02.formatos.html"
+       href="02.datos.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title">Ejercicios sobre formatos</p>
+        <p class="prev-next-title"><span class="section-number">4.2. </span>Datos</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="04.pool.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">4.4. </span><em>Pool</em> de conexiones</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -437,6 +495,22 @@ utilice el nombre «listado».</p></li>
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-de-transacciones">4.3.1. Manejo de transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operaciones-masivas">4.3.2. Operaciones masivas</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

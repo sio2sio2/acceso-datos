@@ -1,0 +1,390 @@
+Operaciones básicas
+*******************
+
+.. _conn-conexion:
+
+Conexión
+========
+Lo primero que debemos aprender es cómo abrir una conexión a la base de datos:
+
+.. code-block:: java
+   :emphasize-lines: 1, 5, 11
+
+   final String protocol = "jdbc:sqlite:";
+
+   // Las bases de datos de SQLite son archivos.
+   Path dbPath = Path.of(System.getProperty("java.io.tmpdir"), "test.db");
+   String dbUrl = String.format("%s%s", dbProtocol, dbPath);
+
+   // Alternativa particular de SQLite: base de datos en memoria.
+   //String dbUrl = String.format("%s%s", dbProtocol, ":memory:");
+
+   try (
+      Connection conn = DriverManager.getConnection(dbUrl, /* usuario */ null, /* contraseña */, null);
+   ) {
+      System.out.println("Hemos logrado conectar a la base de datos");
+   }
+   catch(SQLException err) {
+      System.err.println("Error de conexión. " + err.getMessage());
+   }
+
+En el código de ejemplo, hay dos claves fundamentales:
+
+* La |URL| de conexión que se compone, a su vez de:
+
+  - El protocolo que identifica al |SGBD|
+  - La indicación de la base de datos a la que queremos conectar.
+
+  Esta |URL| depende del |SGBD|, así que tendremos que tener presente cuál
+  estamos utilizando al construirla:
+
+  .. table::
+     :class: url-sql
+     :name: conn-drivers
+
+     ============ ======================== ==============================================================
+      |SGBD|       Librería |JDBC|          |URL|\ [#]_
+     ============ ======================== ==============================================================
+      SQLite       `sqlite-jdbc`_           `jdbc:sqlite:<ruta>`
+      MariaDB      `mariadb-java-client`_   `jdbc:mariadb://[<host>[:<port>]]/<base_datos>`
+      MySQL        `mysql-connector-j`_     `jdbc:mysql://[<host>[:<port>]]/[base_datos]`
+      PostgreSQL   postgresql_              `jdbc:postgresql://[<host>[:<port>]]/<base_datos>`
+      Oracle       ojdbc11_                 `jdbc:oracle:thin:@//<host>[:<port>]/<SID/ServerName>`
+      SQL Server   `mssql-jdbc`_            `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
+     ============ ======================== ==============================================================
+
+* El objeto de conexión, creado con las estructura *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
+  es necesario facilitar la |URL|, y un usuario y una contraseña con permisos
+  para realizar las operaciones que se desee llevar acabo.
+
+  .. note:: Como :program:`SQLite` no define permisos para usuarios, sólo es
+     necesaria la |URL|. Se ha dejado explícita esta falta de necesidad, pero
+     podríamos haber definido el método ahorrándonos los dos argumentos:
+
+     .. code-block:: java
+
+        Connection conn = DriverManager.getConnection(dbUrl);
+
+Por supuesto, el código es *completamente inútil*: nos hemos conectado a la base
+de datos para no hacer absolutamente nada. En los siguientes apartados veremos
+como leer y escribir datos.
+
+.. seealso:: La conexión a una base de datos es una operación costosa, por lo
+   que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
+   se penalizará. Para optimizarlo reaprovechando conexiones, existen los
+   :ref:`pools de conexiones <conn-pool>`.
+
+.. _conn-statement:
+
+Ejecución de sentencias
+=======================
+El acceso mediante conectores se basa en la ejecución de sentencias |SQL| que
+pueden ser de dos tipos:
+
++ Sentencias que modifican la base de datos.
++ Sentencias que obtienen datos sin llevar a cabo modificación alguna.
+
+A partir de un objeto :java-sql:`Statement <Statement>`, para las primeras se
+usa el método ``executeUpdate``, mientras que para las segundas el método
+``executeQuery``.
+
+.. note:: Hay otro método, ``execute`` que sirve para ambos casos y que devuelve
+   ``true``, si hay resultados (segundo caso) o ``false``, si no los hay.
+   Como lo normal es que se sepa de antemano si la sentencia devuelve datos o no
+   (p.e. un ``SELECT`` devuelve datos; un ``INSERT``, no), podemos prescindir de
+   ella.
+
+Simples
+-------
+Comencemos creado cuatro tablas:
+
+.. literalinclude:: files/01.create.java
+   :language: java
+
+El código tiene dos aspectos:
+
+#. Las sentencias |SQL| que son sentencias |SQL| cuya comprensión no
+   forma parte de los objetivos de esta unidad\ [#]_, así que no entraremos en
+   comentarlas.
+
+   .. hint:: No obstante si conviene precisar que procuremos al escribirlas
+      ceñirnos al estándar lo más posible a fin de que sean lo más universales
+      posibles y nos sea menos costoso cambiar de |SGBD|. A este respecto:
+
+      + Dejamos de escribir los nombres de elementos de la base de datos
+        (tablas, columnas) entre comillas dobles, porque el estándar |SQL| lo
+        permite en caso de que los nombres no contengan caracteres 'raros'
+        (espacios, etc.) o no se tenga la intención de distinguir nombres
+        cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
+        *Persona* y otra distinta *persona* o *PERSONA*)\ [#]_.
+
+      + Escribimos para los tipos los nombres que define el estándar.
+
+      + Las cadenas se encierran entre comillas simples.
+
+#. La ejecución de esas sentencias usando |JDBC|. Obsérvese que:
+
+  + Reaprovechamos el mismo objeto :java-sql:`Statement <Statement>` para
+    ejecutarlas todas.
+  + Las ejecutamos usando el método ``executeUpdate``, puesto que su función es
+    modificar el contenido de la base de datos, no obtener información.
+
+Tampoco las sentencias de inserción devuelven resultados, por lo que también
+podemos hacer:
+
+.. _ej-insert-sin-par:
+
+.. code-block:: java
+
+      // Agregamos algunos departamentos.
+      stmt.executeUpdate("INSERT INTO Departamento (denominacion) VALUES ('Informática')");
+      for(String denominacion: new String[] {"Inglés", "Francés", "Tecnología"}) {
+          stmt.executeUpdate(String.format("INSERT INTO Departamento (denominacion) VALUES ('%s');", denominacion));
+      }
+
+.. caution:: Aún estamos empezando y sabemos poco así que estas sentencias son
+   torpes por dos razones:
+
+   * Estamos ejecutando repetidamente (cuatro veces) la misma sentencia y no es
+     eficiente. Ya aprenderemos cómo hacer :ref:`operaciones masivas <conn-batch>`.
+   * Las sentencias usan valores almacenados en variables y hay que construirlas
+     incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
+     usado ``String.format``. Sin embargo, |JDBC| ya viene con un mecanismo
+     específico para realizar esta labor: las :ref:`sentencias parametrizadas
+     <conn-preparedstatement>`.
+
+   Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
+   mejor.
+
+.. seealso:: Se proporcionan adicionalmente dos guiones para su uso directo con
+   :program:`SQLite`: :download:`sustituye.sql <files/sustituye.sql>`, que
+   implementa la solución desarrollada aquí y :download:`sustituto.sql
+   <files/sustituto.sql>` en que el campo *sustituye* se cambia por *sustituto*
+   para que su significado sea quién es el sustituto del profesor en vez de a
+   quién sustituye el profesor. En ambas soluciones, al código Java mostrado se
+   añaden algunos ``INSERT`` para agregar registros a la base de datos y se
+   define una |CTE| recursiva (totalmente compatible con el estándar |SQL|) para
+   que la propia base de datos nos cree una vista (*PlantillaFuncionamiento*)
+   que muestra cada profesor, a qué titular en último caso sustituye (o él mismo
+   si es titular) y si está activo o no. Esta vista es de enorme utilidad para
+   saber en dónde trabaja cada profesor, ya que la tabla *Trabaja* sólo contiene
+   profesores titulares.
+
+.. rubric:: Consultas
+
+Las consultas, en cambio, sí devuelven resultados, que deberán procesarse luego:
+
+.. code-block:: java
+
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento;")) {
+      while(rs.next()) {
+           int id = rs.getInt("id_departamento");
+           String denominacion = rs.getString("denominacion");
+           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+      }
+   }
+
+Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
+objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él.
+
+.. note:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
+   cerrarse automáticamente al cerrarse la sentencia que la originó. En
+   cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja e
+   sernos útil.
+
+En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
+pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
+de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
+``Departamento`` así:
+
+.. literalinclude:: files/Departamento.java
+   :language: java
+
+podríamos hacer esto:
+
+.. code-block:: java
+
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento")) {
+      List<Departamento> departamentos = new ArrayList<>(); 
+
+      while(rs.next()) {
+           int id = rs.getInt("idDepartamento");
+           String denominacion = rs.getString("denominacion");
+           departamentos.add(new Departamento().cargarDatos(id, denominacion));
+           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
+      }
+   }
+
+.. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
+   relacional al modelo de objetos, tal como adelantamos en la introducción.
+
+.. tip:: El valor de un campo puede ser ``NULL``. Cuando se recupera una cadena
+   (``.getString``) esto no es un problema, porque ``String`` puede ser
+   ``null``. En cambio, ``getInt`` es incapaz de devolver ``null``, aunque el
+   campo no tenga valor, y se verá obligado a devolver **0**. Esto no será un
+   problema cuando **0** no sea un valor válido (como en el ejemplo, ya que a
+   los identificadores no se les suele asignar valor **0**), pero, cuando sea un
+   valor válido, debe existir una forma de distinguir el **0** del valor nulo:
+
+   .. code-block:: java
+      :emphasize-lines: 3
+
+      // Suponiendo que se permita que el campo "edad" sea nulo.
+      Integer edad = rs.getInt("edad");
+      if(edad == 0 && rs.wasNull()) edad = null;
+
+.. _conn-preparedstatement:
+
+Parametrizadas
+--------------
+Las sentencias, tanto las de manipulación como las de consultas, requieren en
+muchos casos que se incluyan valores de variables en las propias sentencias
+(véase, sin ir más lejos, el :ref:`ejemplo de inserción bajo el epígrafe
+anterior <ej-insert-sin-par>`.). Por este motivo los conectores incluyen un
+mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
+|PreparedStatement|:
+
+.. code-block:: java
+   :emphasize-lines: 2, 5
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
+   ) {
+       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
+           pstmt.setString(1, denominacion);  // 1: Valor para el primer "?".
+           pstmt.executeUpdate();
+       }
+   }
+
+Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
+valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
+establecidos todos sus valores, ejecutar la sentencia.
+
+.. caution:: Pero no hemos dado aún con la forma eficiente, ya que estamos
+   repitiendo la ejecución de la misma sentencia con distintos valores y lo que
+   hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
+   <conn-batch>`, darle al menos una vuelta más.
+
+Obsérvese que al definir los valores de los parámetros de una consulta,
+necesitamos cambiar de método según sea el tipo del campo:
+
+.. code-block:: java
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)");
+   ) {
+         pstmt.setString(1, "Manolo");
+         pstmt.setString(2, "Manuel");
+         pstmt.setString(3, "Peñalba Pinzón");
+         pstmt.setNull(4, Types.INTEGER);
+         pstmt.executeUpdate();
+   }
+
+|JDBC| permite usar un método genérico (``setObject``) que se encargará de
+inferir el tipo |SQL| correcto a partir del tipo de *Java*:
+
+.. code-block:: java
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)")
+   ) {
+         pstmt.setObject(1, "Manolo");
+         pstmt.setObject(2, "Manuel");
+         pstmt.setObject(3, "Peñalba Pinzón");
+         pstmt.setObject(4, null, Types.INTEGER);  // No se puede inferir entero a partir de null
+         pstmt.executeUpdate();
+   }
+
+El uso de este método implica algunas cosas:
+
+a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
+   provoca una ligera sobrecarga y puede originar que la traducción no sea la
+   deseada. Lo segundo puede solucionarse añadiendo el tercer argumento:
+
+   .. code-block:: java
+
+      pstmt.setObject(1, "Manolo", Types.VARCHAR);
+
+#. El segundo argumento se pasa como ``Object`` y siempre habrá que
+   transformarlo al tipo requerido: esto implica una nimia sobrecarga también,
+   despreciable en la mayoría de los casos.
+
+#. Si no pasamos literales, sino una variable. la variable puede ser nula y
+   darnos problemas:
+
+   .. code-block:: java
+
+      Integer sustituye = null;
+      pstmt.setObject(4, sustituye); // ¿Cómo inferimos el tipo?
+
+   En este caso, se solucionaría añadiendo siempre el tercer argumento:
+
+   .. code-block:: java
+
+      Integer sustituye = null;
+      pstmt.setObject(4, sustituye, Types.INTEGER); // ¿Cómo inferimos el tipo?
+
+.. tip:: El código:
+
+   .. code-block:: java
+
+      // Supongamos que en 1 queremos indicar el identificador, no el apodo.
+      pstmt.setObject(1, id == 0?null:id, Types.INTEGER);
+
+   es más sucinto que este otro equivalente:
+
+   .. code-block:: java
+
+      if(id == 0) pstmt.setNull(1, Types.INTEGER);
+      else pstmt.setInt(1, id);
+
+.. rubric:: Notas al pie
+
+.. [#] Según el estandar un nombre que no se encierra entre comillas dobles, se
+   sobreentiende escrito todo en mayúsculas. En particular, :program:`SQLite` se
+   salta el estándar en este aspecto y no hace esa distinción, incluso aunque
+   los nombres si se hayan entrecomillado. Otra razón que avala el que no
+   entrecomillemos es que :program:`MariaDB`/:program:`MySQL` exige que
+   cambiemos la configuración predeterminada para soportar el entrecomillado con
+   comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.
+
+.. [#] Se han supuesto (excepto para :program:`SQLite` obviamente) conexiones
+   |TCP|/|IP|. Sin embargo, en sistemas *UNIX* el motor podría permitir
+   conexiones a un *socket* local. Por ejemplo, una |URL| a socket local para
+   MariaDB podría ser
+   ``jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock`` o
+   algo parecido.
+
+.. [#] Aunque haremos una excepción aclarando cómo están definidas las claves
+   primarias en las tablas ``Claustro``, ``Departamento`` y ``Profesor``.
+   Nuestra intención es que sus identificadores se generen automáticamente sin
+   necesidad de que especifiquemos un valor. Eso se hace en SQLite_ con
+   *AUTOINCREMENT*, pero en otros motores se expresa de otro modo, ya que no
+   forma parte del estándar. Desde |SQL|\ :2003, existe un modo de expresarlo:
+   :code:`GENERATED [BY DEFAULT|ALWAYS] AS IDENTITY`. Sin embargo, SQLite_ no lo
+   soporta y por eso lo hemos dejado comentado. En cambio, tiene un comportamento
+   curioso: cuando se usa ``INTEGER`` para definir la clave primaria asume el
+   comportamento de :code:`GENERATED BY DEFAULT AS IDENTITY` y cuando se usa
+   ``INT`` la clave no se genera y hay que especificarla siempre explícitamente
+   (o sea, el comportamiento que esperaríamos al no haber incluido ninguna
+   fórmula adicional como :code:`AUTOINCREMENT` o :code:`GENERATED BY...`).
+
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+.. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |TCP| replace:: :abbr:`TCP (Transmission Control Protocol)`
+.. |IP| replace:: :abbr:`IP (Internet Protocol)`
+.. |CTE| replace:: :abbr:`CTE (Common Table Expression)`
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+.. |Reader| replace:: :java-io:`Reader <Reader>`
+.. |PreparedStatement| replace:: :java-sql:`PreparedStatement <PreparedStatement>`
+.. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`
+
+.. _SQLite: https://sqlite.org/
+.. _sqlite-jdbc: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+.. _mariadb-java-client: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+.. _mysql-connector-j: https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+.. _postgresql: https://mvnrepository.com/artifact/org.postgresql/postgresql
+.. _ojdbc11: https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
+.. _mssql-jdbc: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc

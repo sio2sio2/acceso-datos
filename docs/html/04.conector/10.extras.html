@@ -58,7 +58,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/10.extras';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Apéndices" href="../98.apendices/index.html" />
+    <link rel="next" title="4.6. Programación con conectores" href="15.dao.html" />
     <link rel="prev" title="4.4. Pool de conexiones" href="04.pool.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -197,6 +197,7 @@
 <li class="toctree-l2"><a class="reference internal" href="03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">4.5. Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.6. Programación con conectores</a></li>
 </ul>
 </details></li>
 </ul>
@@ -473,11 +474,13 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">hasNext</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">avanzar</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                   </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!!&quot;</span><span class="p">);</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!&quot;</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
 <span class="w">                    </span><span class="n">hasNextElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="n">avanzar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
@@ -503,11 +506,11 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un RuntimeException, que es una excepción</span>
+<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción</span>
 <span class="cm">     * que no necesita ser declarada.</span>
 <span class="cm">     * @param &lt;T&gt; El tipo que devuelve CheckedFunction.</span>
 <span class="cm">     * @param checked Un &quot;función&quot; CheckedFunction.</span>
-<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por RuntimeException.</span>
+<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por DataAccessException.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">checkedToUnchecked</span><span class="p">(</span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">checked</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -515,28 +518,30 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">checked</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">};</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Genera un flujo con las filas generadas en un ResultSet.</span>
+<span class="cm">     * @param ac  La sentencia que generó rs o la conexión sobre la que se</span>
+<span class="cm">     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de</span>
+<span class="cm">     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el</span>
+<span class="cm">     * 	          Stream resultante.</span>
 <span class="cm">     * @param rs Los resutados de una consulta.</span>
 <span class="cm">     * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.</span>
-<span class="cm">     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe</span>
-<span class="cm">     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.</span>
 <span class="cm">     * @throws SQLException Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">AutoCloseable</span><span class="w"> </span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
 <span class="w">            </span><span class="p">.</span><span class="na">onClose</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="n">rs</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">                    </span><span class="n">stmt</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">                    </span><span class="n">ac</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
-<span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
@@ -544,15 +549,17 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Genera un flujo de objetos derivados del resultado de una consulta.</span>
 <span class="cm">     * @param &lt;T&gt; La clase del objeto.</span>
+<span class="cm">     * @param ac  La sentencia que generó rs o la conexión sobre la que se</span>
+<span class="cm">     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de</span>
+<span class="cm">     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el</span>
+<span class="cm">     * 	          Stream resultante.</span>
 <span class="cm">     * @param rs  El objeto que representa los resultado de la consulta.</span>
 <span class="cm">     * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).</span>
 <span class="cm">     * @return El flujo de objetos.</span>
-<span class="cm">     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe</span>
-<span class="cm">     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.</span>
 <span class="cm">     * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">AutoCloseable</span><span class="w"> </span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -580,24 +587,45 @@ modo:</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Lo habitual es que la creación y ejecución de la sentencia y la
-definición del flujo estén abstraidas en un método distinto a aquel en que se
-utilizaran los elementos del flujo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// En DepartamentoDAO está abstraido todo el acceso a la base de datos.</span>
-<span class="k">try</span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DepartamentoDAO</span><span class="p">.</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Aquí usamos el flujo.</span>
+<p>El método es de ejecución perezosa, esto es, genera objetos a
+medida que se consumen. Esto implica que, mientras necesitemos obtener
+elementos del flujo, tanto el objeto de consulta como el de conexión deben
+permanecer abiertos, pues de no ser así, se cerrará también automáticamente
+el objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> y dejaremos de obtener filas. Por tanto:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="k">try</span><span class="p">(</span>
+<span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="w">   </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">;</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span>
+<span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="p">(</span><span class="n">Departamento</span><span class="w"> </span><span class="n">d</span><span class="p">:</span><span class="w"> </span><span class="n">departamento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Jamás obtendremos ningún departamento</span>
+<span class="w">   </span><span class="c1">// porque el objeto &quot;rs&quot; está cerrado.</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Es indispensable que en el método (<code class="docutils literal notranslate"><span class="pre">DepartamentoDAO.get</span></code>) se dejen abiertos
-<code class="docutils literal notranslate"><span class="pre">stmt</span></code> y <code class="docutils literal notranslate"><span class="pre">rs</span></code> para permitir el acceso a los elementos del flujo, y que en
-el código que hace uso de él, nos aseguremos de que dicho flujo se cierra a
-fin de que se cierren los otros dos objetos que quedaron abiertos.</p>
+<p>no funciona en absoluto. Es indispensable que no cerremos los objetos
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>, <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a> y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> para que el <code class="docutils literal notranslate"><span class="pre">Stream</span></code> pueda devolver
+objetos. ¿Cuándo entonces se cierran? De eso se encarga el propio flujo al
+cerrarse (véase la implementación). Por ese motivo el primer argumento que se
+pasa al método es la sentencia o la conexión, dependiendo de lo que más nos
+interese cerrar al terminar de consumir el flujo. Eso sí, debemos asegurarnos
+de cerrar el flujo al acabar con él, razón por la cual en el ejemplo
+ilustrativo de su uso hemos usado una sentencia <em>try-with-resources</em>.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">resultSetToStream</span></code> permite no definir la función que
-transforma la fila (el propio <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code>) en un objeto. En ese caso, se
+transforma la fila (el propio <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a>) en un objeto. En ese caso, se
 obtendrá con cada elemento del flujo la propia fila:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Tratamiento del rs (sin usar next, porque ya avanza el solo)</span>
@@ -754,7 +782,25 @@ valores, etc.</p></li>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
-<p>Podemos añadir ambos métodos a la <a class="reference internal" href="#conn-sqlutils"><span class="std std-ref">clase SqlUtils</span></a> ya propuesta.</p>
+<p>Podemos añadir ambos métodos a la <a class="reference internal" href="#conn-sqlutils"><span class="std std-ref">clase SqlUtils</span></a> ya propuesta. De hecho, hemos preparado un <cite>repositorio de
+Github &lt;https://github.com/sio2sio2/sqlutils&gt;</cite> listo para su uso:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- En pom.xml --&gt;</span>
+<span class="nt">&lt;repositories&gt;</span>
+<span class="w">     </span><span class="nt">&lt;repository&gt;</span>
+<span class="w">         </span><span class="nt">&lt;id&gt;</span>jitpack.io<span class="nt">&lt;/id&gt;</span>
+<span class="w">         </span><span class="nt">&lt;url&gt;</span>https://jitpack.io<span class="nt">&lt;/url&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/repository&gt;</span>
+<span class="w"> </span><span class="nt">&lt;/repositories&gt;</span>
+
+<span class="nt">&lt;dependencies&gt;</span>
+<span class="w">  </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;version&gt;</span>1.3.3<span class="nt">&lt;/version&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
 </div>
 </section>
 </section>
@@ -780,11 +826,11 @@ valores, etc.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="../98.apendices/index.html"
+       href="15.dao.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title">Apéndices</p>
+        <p class="prev-next-title"><span class="section-number">4.6. </span>Programación con conectores</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -833,7 +879,7 @@ Por José Miguel Sánchez Alés
 
   <p class="copyright">
     
-      © Copyright CC BY 4.0, 2024-2024, José Miguel Sánchez Alés.
+      © Copyright CC BY 4.0, 2024-2025, José Miguel Sánchez Alés.
       <br/>
     
   </p>

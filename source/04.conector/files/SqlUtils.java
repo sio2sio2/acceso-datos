@@ -1,25 +1,3 @@
-package edu.acceso.ej4_1.backend.sql.jdbcutils;
-
-import java.sql.Statement;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 /**
  * Clase que implementa algunos métodos estáticos adicionales a JDBC.
  */
@@ -43,11 +21,13 @@ public class SqlUtils {
         public boolean hasNext() {
             if(avanzar) {
                 try {
-                   if(rs.isClosed()) throw new RuntimeException("ResultSet is closed!!!!");
+                    if(rs.isClosed()) {
+                        throw new DataAccessException("ResultSet is closed!!!");
+                    }
                     hasNextElement = rs.next();
                 }
                 catch(SQLException err) {
-                    throw new RuntimeException(err);
+                    throw new DataAccessException(err);
                 }
                 finally {
                     avanzar = false;
@@ -73,11 +53,11 @@ public class SqlUtils {
     }
 
     /**
-     * Transforma el SQLException que propaga una CheckedFUnction en un RuntimeException, que es una excepción
+     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción
      * que no necesita ser declarada.
      * @param <T> El tipo que devuelve CheckedFunction.
      * @param checked Un "función" CheckedFunction.
-     * @return Una "función" que ha sustituido SQLException por RuntimeException.
+     * @return Una "función" que ha sustituido SQLException por DataAccessException.
      */
     public static <T> Function<ResultSet, T> checkedToUnchecked(CheckedFunction<ResultSet, T> checked) {
         return t -> {
@@ -85,28 +65,30 @@ public class SqlUtils {
                 return checked.apply(t);
             }
             catch(SQLException err) {
-                throw new RuntimeException(err);
+                throw new DataAccessException(err);
             }
         };
     }
 
     /**
      * Genera un flujo con las filas generadas en un ResultSet.
+     * @param ac  La sentencia que generó rs o la conexión sobre la que se
+     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de
+     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el
+     * 	          Stream resultante.
      * @param rs Los resutados de una consulta.
      * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.
-     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe
-     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.
      * @throws SQLException Cuando se produce un error al realizar la consulta.
      */
-    public static Stream<ResultSet> resultSetToStream(Statement stmt, ResultSet rs) {
+    public static Stream<ResultSet> resultSetToStream(AutoCloseable ac, ResultSet rs) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new ResultSetIterator(rs), Spliterator.ORDERED), false)
             .onClose(() -> {
                 try {
                     rs.close();
-                    stmt.close();
+                    ac.close();
                 }
-                catch(SQLException err) {
-                    throw new RuntimeException(err);
+                catch(Exception err) {
+                    throw new DataAccessException(err);
                 }
             });
     }
@@ -114,14 +96,16 @@ public class SqlUtils {
     /**
      * Genera un flujo de objetos derivados del resultado de una consulta.
      * @param <T> La clase del objeto.
+     * @param ac  La sentencia que generó rs o la conexión sobre la que se
+     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de
+     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el
+     * 	          Stream resultante.
      * @param rs  El objeto que representa los resultado de la consulta.
      * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).
      * @return El flujo de objetos.
-     *   El flujo se encarga de cerrar el Statement y el ResultSet asociados, por lo que no debe
-     *   cerrarlos al invocar el método y asegurarse de que el flujo se cierra al acabar de usarlo.
      * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.
      */
-    public static <T> Stream<T> resultSetToStream(Statement stmt, ResultSet rs, CheckedFunction<ResultSet, T> mapper) {
-        return resultSetToStream(stmt, rs).map(checkedToUnchecked(mapper));
+    public static <T> Stream<T> resultSetToStream(AutoCloseable ac, ResultSet rs, CheckedFunction<ResultSet, T> mapper) {
+        return resultSetToStream(ac, rs).map(checkedToUnchecked(mapper));
     }
 }

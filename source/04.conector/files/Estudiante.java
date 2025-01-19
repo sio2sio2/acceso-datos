@@ -8,7 +8,7 @@ import edu.acceso.sqlutils.annotations.Fk;
 
 
 /**
- * MOdela un estudiante.
+ * Modela un estudiante.
  */
 public class Estudiante implements Entity {
 
@@ -28,8 +28,7 @@ public class Estudiante implements Entity {
     /**
      * Centro al que está adscrito.
      */
-    @Fk
-    private Centro centro;
+    @Fk private Centro centro;
 
     public Estudiante() {
         super();

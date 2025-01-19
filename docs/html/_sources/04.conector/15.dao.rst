@@ -8,7 +8,11 @@ abstraer al resto del programa del acceso, de modo que logremos que manipule
 puramente objetos, aunque la información no esté almacenada según este modelo
 en la base de datos.
 
-Para lograr esta abstracción proponemos un patrón |DAO|, que separa por un lado los objetos del modelo de datos de nuestra aplicación y por otro los objetos que se encargan del acceso a la base de datos. Ilustrémoslo con un ejemplo muy sencillo: un conjunto de estudiantes que cursan estudios en centros de enseñanza:
+Para lograr esta abstracción proponemos un patrón |DAO|, que separa por un lado
+los objetos del modelo de datos de nuestra aplicación y por otro los objetos que
+se encargan del acceso a la base de datos. Ilustrémoslo con un ejemplo muy
+sencillo: un conjunto de estudiantes que cursan estudios en centros de
+enseñanza:
 
 .. image:: files/er-ec.png
 
@@ -20,8 +24,8 @@ que podemos codificar de este modo:
 .. literalinclude:: files/Estudiante.java
    :language: java
 
-.. seealso:: Puede encontrar el código completo del ejemplo ilustrativo en
-   `este repositorio de GitHub <https://github.com/josem-dam/ejemplo_conn>`_.
+.. seealso:: Puede encontrar el código completo del ejemplo ilustrativo en los
+   test de `este repositorio de GitHub <https://github.com/sio2sio2/sqlutils>`_.
 
 Como puede observarse, las dos definiciones son independientes del soporte de
 almacenamiento y responden únicamente a la lógica de la aplicación\ [#]_. Para
@@ -49,7 +53,8 @@ almacenamiento en el backend:
 .. literalinclude:: files/Crud.java
    :language: java
 
-.. note:: La interfaz está definida en sqlutils_, no en el ejemplo ilustrativo.
+.. note:: La interfaz está definida en sqlutils_, pero no forma parte del código
+   de prueba, sino de las utilidades.
 
 .. admonition:: Aclaración
 
@@ -73,27 +78,30 @@ Son precisas algunas aclaraciones:
   ``SqlUtils.resultToStream`` de sqlutils_. Por supuesto es posible también
   alterar la firma del método para devolver |List|\ [#]_.
 
-+ OPTIONAL: Comentar
++ La obtención de un objeto a partir de su identificador puede resultar
+  infructuosa, si tal objeto no existe en el almacenamiento. Por ese motivo se
+  ha preferido devolver :java-util:`Opcional <Optional>` en vez de directamente
+  el objeto.
+
++ Todas estas operaciones pueden provocar problemas de acceso
+  (típicamente |SQLException| si la base de datos es relacional), así que hemos
+  definido una excepción propia para abstraernos de cuál es la excepción propia
+  del soporte de almacenamiento.
 
 Esta, pues, es la interfaz que cumpliran todas las clases encargadas de
 comunicarse con la base de datos para extraer o guardar datos. Implementemos
 ahora la clase para extraer o guardar objetos ``Centro``:
 
-.. literalinclude:: files/Centro.java
+.. literalinclude:: files/CentroSqlite.java
    :language: java
 
-Este objeto ``CentroSqlite`` recibe al ser construido la fuente de datos (el
-|DataSource| ``ds``) y al realizar una operación, establece una conexión y
-construye sobre ella la sentencia. Esta pensada para que se haya creado en otra
-parte (una clase que mostraremos luego) un :ref:`pool de conexiones <conn-pool>`
-a la base de datos en cuestión. Esa es la razón por la que alegremente nos
-permitimos crear y cerrar objetos |Connection|.
-
-Como puede verse, la implementación de sus métodos consiste en poner en práctica
-lo aprendido en apartados anteriores: abrimos una conexión, construimos ls
-sentencia |SQL| apropiada y la ejecutamos para realizar la operación. Tan sólo
-tiene interés comentar el método que devuelve el ``Stream``, ya que por sus
-particularidades, ha obligado a obrar de modo distinto:
+Este objeto ``CentroSqlite`` implementa en particular la interfaz ``Crud`` para
+los objetos ``Centro`` y una base de datos SQLite. Si observamos la
+implementación de cualquiera de las operaciones |CRUD|, veremos que consiste en
+poner en práctica lo aprendido anteriormente: se abre una conexión, se construye
+ls sentencia |SQL| apropiada y se ejecuta para realizar la operación. Tan sólo
+el método que devuelve un ``Stream`` se sale un poco de esta regla por las
+particularidades del propio ``Stream``:
 
 .. code-block:: java
 
@@ -102,11 +110,11 @@ particularidades, ha obligado a obrar de modo distinto:
        final String sqlString = "SELECT * FROM Centro";
        
        try {
-           Connection conn = ds.getConnection();
+           Connection conn = cp.getConnection();
            Statement stmt = conn.createStatement();
            ResultSet rs = stmt.executeQuery(sqlString);
 
-           return SqlUtils.resultSetToStream(conn, rs, CentroSqlite::resultToCentro);
+           return SqlUtils.resultSetToStream(cp.isCloseable()?conn:stmt, rs, CentroSqlite::resultToCentro);
        }
        catch(SQLException err) {
            throw new DataAccessException(err);
@@ -118,11 +126,35 @@ conexión, ni la sentencia, ni el resultado, ya que de lo contrario no podremos
 obtener centros del ``Stream`` devuelto. Quien se encargará de cerrar finalmente
 todo será el propio flujo cuando se cierre, por lo que convendrá usar con él un
 *try-with-resources*. Además, el primer argumento que recibe
-``SqlUtils.resultToStream`` es la conexión, no la sentencia. Recordemos que el
-objeto de este primer argumento se pasa, no porque sea útil para construir el
-flujo, sino con la intención de poder cerrarlo cuando se cierre el flujo. Como
-en este caso abrimos una conexión exclusivamente para llevar a cabo esta
-operación, debemos cerrar la conexión, no simplemente el objeto |Statement|.
+``SqlUtils.resultToStream`` es aquello que debe cerrarse cuando se acaba de
+usar el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea
+la sentencia. Qué sea depende de cómo hayamos creado este objeto de
+comunicación con la base de datos; y esta es la última explicación que ha de
+darse sobre él.
+
+En principio, cada operación parece abrir una conexión propia y cerrarla al
+acabar (excepto este último método por la particularidad ya referida). Si se
+utiliza un :ref:`pool de conexiones <conn-pool>` y se facilita para la creación
+del objeto el |DataSource| correspondiente, esto no penaliza prácticamente
+el rendimiento y es muy cómodo. El problema de que cada operación abra y cierre
+su propio objeto |Connection| es que nos quedamos sin poder reunir en una misma
+transacción dos o más operaciones, ya que para que puedan formar parte de una,
+necesitan compartir la conexión.
+
+En consecuencia, si lo requiere la circunstancia (definir una transacción con
+varias operaciones), necesitamos poder crear estos objetos a partir de una
+conexión ya creada y que sus métodos la usen sin cerrarla. Para no duplicar
+código, hemos acudido a una argucia: un objeto ``ConnectionProvider`` que
+enmascara el hecho de que hayamos creado el objeto a partir de un |DataSource| o
+un |Connection| compartido y que deja sin cerrar la conexión, aunque se use una
+estructura *try-with-resources*, en caso de que estemos usando una conexión que
+queremos compartir entre objetos y métodos. Por esta razón, las conexiones se
+obtienen a partir de un atributo ``cp`` (definido en ``AbstractDao`` como un
+``ConnectionProvider``). Esta es también la razón por la que pasado a
+``SqlUtils.resultToStream`` a veces una conexión (cuando el propio método la
+creó a partir de un |DataSource|) y a veces una sentencia (cuando se usa una
+conexión preexistente)\ [#]_.
+
 
 Necesitamos también crear una clase para la persistencia de los objetos
 ``Estudiante``. La clase ``EstudianteSqlite`` es semejante a la anterior, pero
@@ -140,12 +172,11 @@ dificultad tenemos dos vías:
 
 La primera vía es sencilla, aunque menos eficiente: si nunca llegamos a usar el
 centro, habremos hecho una segunda consulta\ [#]_ inútil. La segunda vía es
-perezosa, pero tiene el inconveniente de que es muy difícil de implementar, ya
+perezosa, pero tiene el inconveniente de que es más difícil de implementar, ya
 que pasa por crear un objeto proxy que almacene inicialmente el identificador
 del centro e intercepte las llamadas al método ``.getCentro()`` para que haga la
 consulta con dicho identificador. En cualquier caso, tal implementación está
-hecha en sqlutils_ y exige únicamente que se marque con una anotación el campo
-como clave foránea (con ``@Fk``). Veamos cómo usar esta implementación:
+hecha en sqlutils_. Veamos cómo usar esta implementación:
 
 .. code-block:: java
 
@@ -163,9 +194,9 @@ como clave foránea (con ``@Fk``). Veamos cómo usar esta implementación:
        //if(IdCentro != null) centro = new CentroSqlite(ds).get(IdCentro).orElse(null);
 
        // Carga perezosa: proxy al que se le carga la clave foránea
-       FkLazyLoader<Estudiante> loader = new FkLazyLoader<>(estudiante);
-       loader.setFk("centro", idCentro, new CentroSqlite(ds));
-       estudiante = loader.createProxy();
+       estudiante = new FkLazyLoader<>(estudiante)
+                     .setFk("centro", idCentro, new CentroSqlite(cp));
+                     .createProxy();
 
        // Cargamos datos en el objeto y entregamos.
        return estudiante.cargarDatos(id, nombre, nacimiento, centro);
@@ -181,6 +212,8 @@ encargue de:
   vacía que la pueble con el esquema.
 + Que proporcione al resto de la aplicación los dos objetos |DAO| asociados a la
   persistencia de centros y estudiante.
+
+-- SEGUIR POR AQUÍ...
 
 Por tanto, esta clase para la conexión, sea cual sea el |SGBD|, tendrá que
 cumplir esta interfaz:
@@ -247,12 +280,18 @@ Hecho eso, relacionarnos con la base de datos está totalmente encapsulado:
 
 .. [#] Hemos incluido, eso sí, una anotación en el campo ``centro`` de
    ``Estudiante`` que lo identifica como clave foránea. Pero no deja de ser una
-   mera anotación. Esta anotación está definida en sqlutils_.
+   mera anotación que además no es indispensable. Esta anotación está definida en sqlutils_.
 
 .. [#] La ventaja de ``Stream`` es su evaluación perezosa; las desventajas son
    dos: nos veremos obligados a usar sqlutils_ y, además, se debe ser más
    cuidadoso al utilizarla ya que debemos asegurarnos de que quien cierra la
    conexión es el propio Stream.
+
+.. [#] De todos modos, en caso de que pasáramos la conexión cuando hemos creado
+   el objeto con una conexión, la conexión no se cerraría, porque la hemos
+   manipulado para que no sea así (recordemos que la manejamos a través de
+   ``ConnectionProvider`` y no directamente); y la sentencia quedaría sin cerrar
+   hasta que no se cerrara la conexión fuera del objeto.
 
 .. [#] En realidad, en vez de hacer una segunda consulta, podríamos hacer una
    consulta compuesta para obtener estudiante y centro.
@@ -260,10 +299,11 @@ Hecho eso, relacionarnos con la base de datos está totalmente encapsulado:
 .. _sqlutils: https://github.com/sio2sio2/sqlutils
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
-.. |List| replace:: :java-util:`List`.
+.. |List| replace:: :java-util:`List <List>`.
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`.
-.. |DataSource| replace:: :java-sql:`DataSource`.
-.. |Connection| replace:: :java-sql:`Connection`
-.. |Statement| replace:: :java-sql:`Statement`
-
+.. |DataSource| replace:: :java-sql:`DataSource <DataSource>`.
+.. |Connection| replace:: :java-sql:`Connection <Connection>`
+.. |Statement| replace:: :java-sql:`Statement <Statement>`
+.. |SQLException| replace:: :java-sql:`SQLException <SQLException>`

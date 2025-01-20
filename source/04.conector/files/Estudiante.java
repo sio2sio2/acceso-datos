@@ -1,12 +1,3 @@
-package edu.acceso.ejemplo_conn.modelo;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
-import edu.acceso.sqlutils.Entity;
-import edu.acceso.sqlutils.annotations.Fk;
-
-
 /**
  * Modela un estudiante.
  */

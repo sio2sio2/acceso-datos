@@ -1,7 +1,3 @@
-package edu.acceso.ejemplo_conn.modelo;
-
-import edu.acceso.sqlutils.Entity;
-
 /**
  * Modela un centro de enseñanza.
  */

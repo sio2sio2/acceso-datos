@@ -1,28 +1,8 @@
-package edu.acceso.ejemplo_conn.backend.sqlite;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
-import edu.acceso.ejemplo_conn.backend.Conexion;
-import edu.acceso.ejemplo_conn.modelo.Centro;
-import edu.acceso.ejemplo_conn.modelo.Estudiante;
-import edu.acceso.sqlutils.Crud;
-import edu.acceso.sqlutils.DataAccessException;
-import edu.acceso.sqlutils.SqlUtils;
-
 /**
  * Modela la conexión a una base de dato SQLite
  */
 public class ConexionSqlite implements Conexion {
-    final static Path esquema = Path.of(System.getProperty("user.dir"), "src", "main", "resources", "esquema.sql");
+    final static Path esquema = Path.of(System.getProperty("user.dir"), "src", "test", "resources", "esquema.sql");
     final static String protocol = "jdbc:sqlite:";
     final static short maxConn = 10;
     final static short minConn = 1;
@@ -36,7 +16,7 @@ public class ConexionSqlite implements Conexion {
      * distinto, sino que se devuelve el objeto que se creó anteriormente.
      * @param opciones Las opciones de conexión.
      */
-    public ConexionSqlite(Map<String, Object> opciones) {
+    public ConexionSqlite(Map<String, Object> opciones) throws DataAccessException {
         String path = (String) opciones.get("url");
         if(path == null) throw new IllegalArgumentException("No se ha fijado la url de la base de datos");
 
@@ -65,22 +45,37 @@ public class ConexionSqlite implements Conexion {
         return new EstudianteSqlite(ds);
     }
 
-    private void initDB() {
+    private void initDB() throws DataAccessException {
         try (Stream<Centro> centros = getCentroDao().get()) {
             centros.close();
         }
         // Si no podemos obtener la lista de los centros disponibles.
         // es porque aún no existe la base de datos.
         catch(DataAccessException err) {
-            try (InputStream st = Files.newInputStream(esquema)) {
-                SqlUtils.executeSQL(ds.getConnection(), st);
+            try (
+               Connection conn = ds.getConnection();
+               InputStream st = Files.newInputStream(esquema);
+            ) {
+                SqlUtils.executeSQL(conn, st);
             }
             catch(SQLException e) {
-                throw new DataAccessException("No puede crearse el esquema de la base de datos", e);
+                throw new DataAccessException("El esquema de la base de datos parece inválido o no puede procesarse", e);
             }
             catch(IOException e) {
                 throw new DataAccessException(String.format("No puede acceder al esquema: %s", esquema));
             }
+        }
+    }
+
+    @Override
+    public void transaccion(Transaccionable operaciones) throws DataAccessException {
+        try(Connection conn = ds.getConnection()) {
+            TransactionManager.transactionSQL(conn, c -> {
+                operaciones.run(new CentroSqlite(c), new EstudianteSqlite(c));
+            });
+        }
+        catch(SQLException err) {
+            throw new DataAccessException(err);
         }
     }
 }

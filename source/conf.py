@@ -50,6 +50,7 @@ extlinks = {
     'java-function': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/%s.html', 'java.util.function.%s'),
     'java-stream': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/%s.html', 'java.util.stream.%s'),
     'java-sql': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/%s.html', 'java.sql.%s'),
+    'javax-sql': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/%s.html', 'javax.sql.%s'),
     'java-math': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/math/%s.html', '%s'),
     'java-time': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/%s.html', '%s'),
     'deb': ('https://packages.debian.org/stable/%s','%s'),

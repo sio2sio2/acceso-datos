@@ -26,6 +26,8 @@ ya vistas anteriormente para acceder a otros soportes de datos:
 - La segunda estrategia es la que sigue la `librería Jackson`_ para leer y
   escribir distintos formatos.
 
+.. _conn-vs-orm:
+
 Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
 
 **Ventajas** de los conectores

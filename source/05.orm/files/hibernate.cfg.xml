@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Conexión a la base de datos -->
+        <property name="hibernate.connection.url">jdbc:sqlite::memory:</property>
+        <property name="hibernate.connection.username"><!-- Sin utilidad para SQLite (puede eliminarse) --></property>
+        <property name="hibernate.connection.password"><!-- Sin utilidad para SQLite (puede eliminarse) --></property>
+        <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
+        
+        <!-- Dialecto específico para SQLite -->
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLiteDialect</property>
+
+        <!-- Configuración de Hibernate -->
+        <property name="hibernate.hbm2ddl.auto">update</property> <!-- Política ante el esquema -->
+
+        <!-- Configuración de logs (útil para depuración) -->
+        <property name="hibernate.show_sql">true</property> <!-- Los logs muestran las sentencias SQL -->
+        <property name="hibernate.format_sql">true</property> <!-- El SQL se muestra formateado -->
+        <property name="hibernate.use_sql_comments">true</property> <!-- Comenta las sentencias SQL -->
+    </session-factory>
+</hibernate-configuration>

@@ -200,6 +200,7 @@
 <li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.6. Programación con conectores</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="../05.orm/index.html">5. Herramientas |ORM|</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../98.apendices/index.html">Apéndices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -217,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/01.achivos.html">Ejercicios sobre archivos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/02.formatos.html">Ejercicios sobre formatos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/03.xml.html">Ejercicios sobre formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../99.ejercicios/04.conectores.html">Ejercicios sobre conectores</a></li>
 </ul>
 
     </div>
@@ -419,32 +421,39 @@ estamos utilizando al construirla:</p>
 <thead>
 <tr class="row-odd"><th class="head"><p><abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></th>
 <th class="head"><p>Librería <abbr title="Java DataBase Connectivity">JDBC</abbr></p></th>
-<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Driver<a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p><abbr title="Uniform Resource Locator">URL</abbr><a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>SQLite</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a></p></td>
+<td><p>org.sqlite.JDBC</p></td>
 <td><p><cite>jdbc:sqlite:&lt;ruta&gt;</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>MariaDB</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client">mariadb-java-client</a></p></td>
+<td><p>org.mariadb.jdbc.Driver</p></td>
 <td><p><cite>jdbc:mariadb://[&lt;host&gt;[:&lt;port&gt;]]/&lt;base_datos&gt;</cite></p></td>
 </tr>
 <tr class="row-even"><td><p>MySQL</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.mysql/mysql-connector-j">mysql-connector-j</a></p></td>
+<td><p>com.mysql.cj.jdbc.Driver</p></td>
 <td><p><cite>jdbc:mysql://[&lt;host&gt;[:&lt;port&gt;]]/[base_datos]</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>PostgreSQL</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/org.postgresql/postgresql">postgresql</a></p></td>
+<td><p>org.postgresql.Driver</p></td>
 <td><p><cite>jdbc:postgresql://[&lt;host&gt;[:&lt;port&gt;]]/&lt;base_datos&gt;</cite></p></td>
 </tr>
 <tr class="row-even"><td><p>Oracle</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11">ojdbc11</a></p></td>
+<td><p>oracle.jdbc.OracleDriver</p></td>
 <td><p><cite>jdbc:oracle:thin:&#64;//&lt;host&gt;[:&lt;port&gt;]/&lt;SID/ServerName&gt;</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>SQL Server</p></td>
 <td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc">mssql-jdbc</a></p></td>
+<td><p>com.microsoft.sqlserver.jdbc.SQLServerDriver</p></td>
 <td><p><cite>jdbc:sqlserver://&lt;host&gt;[:&lt;port&gt;];databaseName=&lt;base_datos&gt;</cite></p></td>
 </tr>
 </tbody>
@@ -587,7 +596,7 @@ ella.</p>
 <p>El código tiene dos aspectos:</p>
 <ol class="arabic">
 <li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr> que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
-forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, así que no entraremos en
+forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, así que no entraremos en
 comentarlas.</p>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
@@ -600,7 +609,7 @@ posibles y nos sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases
 permite en caso de que los nombres no contengan caracteres “raros”
 (espacios, etc.) o no se tenga la intención de distinguir nombres
 cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
-<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p></li>
+<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
 <li><p>Escribimos para los tipos los nombres que define el estándar.</p></li>
 <li><p>Las cadenas se encierran entre comillas simples.</p></li>
 </ul>
@@ -842,7 +851,7 @@ darnos problemas:</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Según el estandar un nombre que no se encierra entre comillas dobles, se
 sobreentiende escrito todo en mayúsculas. En particular, <strong class="program">SQLite</strong> se
@@ -852,8 +861,15 @@ entrecomillemos es que <strong class="program">MariaDB</strong>/<strong class="p
 cambiemos la configuración predeterminada para soportar el entrecomillado con
 comillas dobles, ya que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> entrecomilla con el acento grave.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>En las versiones modernas de <abbr title="Java DataBase Connectivity">JDBC</abbr> no es necesario expresar el nombre
+del driver, ya que dispone de mecanismos parar inferir cuál es el driver
+adecuado a partir de la <abbr title="Uniform Resource Locator">URL</abbr> de conexión. En cambio, más adelante, al
+tratar <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">Hibernate</span></a>, sí lo necesitaremos.</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
 <p>Se han supuesto (excepto para <strong class="program">SQLite</strong> obviamente) conexiones
 <abbr title="Transmission Control Protocol">TCP</abbr>/<abbr title="Internet Protocol">IP</abbr>. Sin embargo, en sistemas <em>UNIX</em> el motor podría permitir
 conexiones a un <em>socket</em> local. Por ejemplo, una <abbr title="Uniform Resource Locator">URL</abbr> a socket local para
@@ -861,8 +877,8 @@ MariaDB podría ser
 <code class="docutils literal notranslate"><span class="pre">jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock</span></code> o
 algo parecido.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Aunque haremos una excepción aclarando cómo están definidas las claves
 primarias en las tablas <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>, <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> y <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>.
 Nuestra intención es que sus identificadores se generen automáticamente sin

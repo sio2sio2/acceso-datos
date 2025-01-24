@@ -42,16 +42,16 @@ En el código de ejemplo, hay dos claves fundamentales:
      :class: url-sql
      :name: conn-drivers
 
-     ============ ======================== ==============================================================
-      |SGBD|       Librería |JDBC|          |URL|\ [#]_
-     ============ ======================== ==============================================================
-      SQLite       `sqlite-jdbc`_           `jdbc:sqlite:<ruta>`
-      MariaDB      `mariadb-java-client`_   `jdbc:mariadb://[<host>[:<port>]]/<base_datos>`
-      MySQL        `mysql-connector-j`_     `jdbc:mysql://[<host>[:<port>]]/[base_datos]`
-      PostgreSQL   postgresql_              `jdbc:postgresql://[<host>[:<port>]]/<base_datos>`
-      Oracle       ojdbc11_                 `jdbc:oracle:thin:@//<host>[:<port>]/<SID/ServerName>`
-      SQL Server   `mssql-jdbc`_            `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
-     ============ ======================== ==============================================================
+     ============ ======================== ============================================== ==============================================================
+      |SGBD|       Librería |JDBC|          Driver\ [#]_                                   |URL|\ [#]_
+     ============ ======================== ============================================== ==============================================================
+      SQLite       `sqlite-jdbc`_           org.sqlite.JDBC                                `jdbc:sqlite:<ruta>`
+      MariaDB      `mariadb-java-client`_   org.mariadb.jdbc.Driver                        `jdbc:mariadb://[<host>[:<port>]]/<base_datos>`
+      MySQL        `mysql-connector-j`_     com.mysql.cj.jdbc.Driver                       `jdbc:mysql://[<host>[:<port>]]/[base_datos]`
+      PostgreSQL   postgresql_              org.postgresql.Driver                          `jdbc:postgresql://[<host>[:<port>]]/<base_datos>`
+      Oracle       ojdbc11_                 oracle.jdbc.OracleDriver                       `jdbc:oracle:thin:@//<host>[:<port>]/<SID/ServerName>`
+      SQL Server   `mssql-jdbc`_            com.microsoft.sqlserver.jdbc.SQLServerDriver   `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
+     ============ ======================== ============================================== ==============================================================
 
 * El objeto de conexión, creado con las estructura *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
   es necesario facilitar la |URL|, y un usuario y una contraseña con permisos
@@ -347,6 +347,11 @@ a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
    entrecomillemos es que :program:`MariaDB`/:program:`MySQL` exige que
    cambiemos la configuración predeterminada para soportar el entrecomillado con
    comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.
+
+.. [#] En las versiones modernas de |JDBC| no es necesario expresar el nombre
+   del driver, ya que dispone de mecanismos parar inferir cuál es el driver
+   adecuado a partir de la |URL| de conexión. En cambio, más adelante, al
+   tratar :ref:`Hibernate <orm>`, sí lo necesitaremos.
 
 .. [#] Se han supuesto (excepto para :program:`SQLite` obviamente) conexiones
    |TCP|/|IP|. Sin embargo, en sistemas *UNIX* el motor podría permitir

@@ -1,0 +1,137 @@
+.. _orm-bas:
+
+Operativa básica
+****************
+Una vez configurada, el uso básico de la herramienta se compone de cuatro elementos:
+
+#. :dfn:`Mapear objetos`, esto es, informar de cómo se hará la traducción de
+   las clases al modelo relacional.
+#. Registrar cada clase para que la tome en consideración Hibernate_.
+#. Crear la *fábrica* de sesiones, que nos permitirá operar con la base de datos.
+#. Realizar operaciones |CRUD|.
+
+.. _orm-bas-map:
+
+Mapeo
+=====
+Hibernate tiene dos métodos para indicar cómo se traducen las clases y
+atributos a campos y tablas: uno basado en archivos |XML| que no trataremos y otro
+basado en anotaciones del estándar |JPA|, que es una especificación, una |API|,
+para anotar datos relacionales; y que utilizan muchas otras herramientas |ORM| de Java:
+
+.. literalinclude:: files/Centro.java
+   :language: java
+   :start-at: @Entity
+
+En este ejemplo:
+
++ Anotamos la clase con ``@Entity`` y con ``@Table`` en caso de que la tabla en
+  la base de datos no tenga el mismo nombre que la clase.
++ El identificador se anota con ``@Id`` y dependiendo de cómo se genere podemos
+  añadir una anotación extra:
+
+  - Si es tarea del usuario definir el identificador, no añadimos ninguna.
+  - Si el identificador es autoincremental y no puede definirlo el usuario
+    (``GENERATED ALWAYS BY IDENTITY`` en el estándar |SQL|), se incluye la
+    anotación comentada en el código de más arriba.
+  - Si el identificador puede ser definido por el usuario y, si no lo hace, el
+    |SGBD| se encarga de adjudicar uno (``GENERATED AS DEFAULT BY IDENTITY``),
+    no hay manera de expresarlo con Hibernate_.
+
++ Los atributos que son campos se notan con ``@Column`` y pueden añadirse
+  parámetros afinar la definición (nombre del campo si no coincide con el del
+  atributo, restricciones adicionales, longitud si es una cadena). Un atributo
+  sin la anotación, no obstante, se añadirá a la tabla como campo, a menos que
+  sea ``static`` o ``transient``. Si se quiere forzar su exclusión, puede usarse
+  la anotación ``@Transient``.
+
++ Si el identificador no lo fija el usuario, puede ser buena idea restringir la
+  visibilidad de su *setter* (``protected``).
+
+.. _orm-bas-reg:
+
+Registro
+========
+Para registrar la clase para el mapeo hay que añadir a
+:file:`hibernate.cfg.xml` la línea:
+
+.. code-block:: xml
+
+   <!-- Clases mapeadas -->
+   <mapping class="edu.acceso.test_hibernate.modelo.Centro"/>
+
+.. note:: En caso de que la configuración no se hubiera hecho mediante
+   anotaciones, sino mediante un archivo |XML| el registro habría sido
+   ligeramente diferente:
+
+   .. code-block:: xml
+
+      <mapping resource="Centro.hbm.xml"/>
+   
+.. _orm-bas-conn:
+
+Conexión
+========
+Registrada y anotada la clase, ya podemos realizar una conexión muy básica para
+ilustrar cómo operar con la base de datos:
+
+.. code-block:: java
+
+   Configuration config = new Configuration().configure("hibernate.cfg.xml");
+
+   try(SessionFactory sf = config.buildSessionFactory()) {
+       Transaction tr = null;
+
+       // Operación de inserción.
+       try(Session sesion = sf.openSession()) {
+           tr = sesion.beginTransaction();
+           Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+           sesion.persist(centro);
+           tr.commit();
+       }
+       catch(Exception e) {
+           if(tr != null) tr.rollback();
+       }
+
+       // Operaciones de lectura y modificación.
+       try(Session sesion = sf.openSession()) {
+           tr = sesion.beginTransaction();
+           Centro centro = sesion.find(Centro.class, 11004866);
+           System.out.println(centro);
+           centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
+           tr.commit();  // Hacemos persistente el cambio anterior.
+       }
+       catch(Exception e) {
+           if(tr != null) tr.rollback();
+       }
+   }
+
+Como puede verse:
+
+* A partir de la configuración, debemos crear una fábrica de sesiones. Este es
+  un proceso costoso, así que deberíamos evitar crear más de una\ [#]_. El código no
+  es realista, ya que muy probablemente en una aplicación se requiera obtener y
+  crear objetos en distintos archivos, con lo que la estructura
+  *try-with-resources* no podremos usarla. Sin embargo, nos sirve para ilustrar
+  este ejemplo tan simple.
+
+* Las operaciones deben englobarse dentro de sesiones y de transacciones, aunque
+  en el caso de operaciones de lectura las transacciones no son indispensables.
+
+* Las transacciones no se cierra explícitamente, sino que se consideran acabadas
+  al realizar una confirmación (*commit*) o un rechazo (*rollback*).
+
+.. rubric:: Notas al pie
+
+.. [#] Más adelante sugerimos :ref:`cómo crear una fábrica que asegure su
+   unicidad <orm-conn>`.
+
+.. _Hibernate: https://www.hibernate.org
+
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

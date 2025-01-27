@@ -26,6 +26,9 @@ El |ORM| más utilizado en Java es Hibernate_ y a su uso dedicaremos esta unidad
 
    [0-9]*
 
+.. seealso:: Puede consultar también la `pequeña guía oficial
+   <https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html>`_.
+
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 
 .. _MyBatis: https://mybatis.org/mybatis-3/es/

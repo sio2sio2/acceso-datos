@@ -1,0 +1,67 @@
+.. _orm-conn:
+
+Conexión
+========
+Tras haber configurado Hibernate_, lo primero es construir una fábrica de
+sesiones a partir de la cual creemos las sesiones que nos permiten conectarnos a
+la base de datos. Así pues, está fábrica es el punto de acceso para interacturar
+con el |ORM| y lo habitual (aplicación que accede a una única base de datos) es
+que la fábrica sea única y que, sin embargo, debemos utilizarla a lo largo de
+todos los archivos que componen la aplicación.
+
+En consecuencia, es conveniente crear una clase que facilite su uso y asegure
+que no creamos más de una\ [#]_:
+
+.. literalinclude:: files/HibernateFactory.java
+   :language: java
+   :start-at: public class
+
+La clase:
+
+* Implementa el `patrón Singleton`_, de modo que, mientras no se cierre el
+  objeto, siempre se devuelve el mismo objeto, lo que equivale a que siempre se
+  maneja la misma fábrica de sesiones.
+* Sólo es necesario pasar la configuración, cuando se crea de forma efectiva
+  el objeto.
+* Dado que lo más habitual con la fábrica es crear sesiones, se implementa un
+  método que lo hace, sin necesidad de obtener la fábrica.
+* Si se cierra el objeto, entonces sí se podrá crear otro.
+
+De este modo:
+
+.. code-block:: java
+
+   public static main(String[] args) throws Exception {
+     // Crea la fábrica de sesiones
+      try(HibernateFactory hf = HibernateFactory.getInstance("hibernate.cfg.xml")) {
+         operaciones();
+      }
+   }
+
+   private static operaciones() {
+     // ¡Ojo! No hay que cerrarlo.
+     Hibernate hf = HibernateFactory.getInstance(); // Devuelve el mismo objeto.
+     Transaction tr = null;
+
+     try(Session sesion = hf.openSession()) {
+        tr = sesion.beginTransaction();
+
+        // Hago operaciones CRUD.
+        tr.commit();
+     }
+     catch(Exception e) {
+        if(tr != null) tr.rollback();
+     }
+   }
+
+.. rubric:: Notas al pie
+
+.. [#] ``HibernateFactory`` no puede extender ``SessionFactory`` y ocultar su
+   constructor para controlar la creación de objetos y forzar a que siempre se
+   cree el mismo objeto, porque ésta última es una clase abstracta.
+
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+
+.. _Hibernate: https://www.hibernate.org
+.. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
+

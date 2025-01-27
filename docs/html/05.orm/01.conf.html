@@ -58,7 +58,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/01.conf';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Apéndices" href="../98.apendices/index.html" />
+    <link rel="next" title="5.2. Operativa básica" href="02.basico.html" />
     <link rel="prev" title="5. Herramientas ORM" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -202,6 +202,10 @@
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.1. Configuración</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05.crud.html">5.5. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a></li>
 </ul>
 </details></li>
 </ul>
@@ -376,12 +380,14 @@ document.write(`
 <span id="orm-conf"></span><h1><span class="section-number">5.1. </span>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h1>
 <p>El primer paso esa saber cómo configurar nuestro la aplicación para que haga uso
 de <a class="reference external" href="https://www.hibernate.org">Hibernate</a>. Para ello necesitamos utilizar las librerías:</p>
-<ul class="simple">
+<ol class="loweralpha simple">
 <li><p><a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a>, que es el <abbr title="Object-Relational Mapping">ORM</abbr> en sí.</p></li>
+<li><p>En caso de que el <abbr title="Object-Relational Mapping">ORM</abbr> no tenga soporte nativo para el dialecto del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>,
+una librería externa que lo proporcione.</p></li>
 <li><p>Los controladores <abbr title="Java DataBase Connectivity">JDBC</abbr> de la base de datos que queramos utilizar. Por
 ejemplo, <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>, si deseamos usar <a class="reference external" href="https://sqlite.org">SQLite</a>.</p></li>
 <li><p>Adicionalmente, un sistema de log con <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-api">slf4j-api</a> y <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-simple">slf4j-simple</a>.</p></li>
-</ul>
+</ol>
 <p>De este modo, las dependencias en Maven podrían quedar así:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
 
@@ -389,10 +395,16 @@ ejemplo, <a class="reference external" href="https://mvnrepository.com/artifact/
 <span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta3<span class="nt">&lt;/version&gt;</span>
-<span class="w">         </span><span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 
-<span class="w">     </span><span class="cm">&lt;!-- Driver para SQLite --&gt;</span>
+<span class="w">     </span><span class="cm">&lt;!-- Dialecto proporcionado por la comunidad --&gt;</span>
+<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-community-dialects<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">         </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta3<span class="nt">&lt;/version&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">     </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
 <span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
@@ -432,7 +444,7 @@ parámetros de funcionamiento:</p>
 <span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.connection.driver_class&quot;</span><span class="nt">&gt;</span>org.sqlite.JDBC<span class="nt">&lt;/property&gt;</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="cm">&lt;!-- Dialecto específico para SQLite --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.dialect&quot;</span><span class="nt">&gt;</span>org.hibernate.dialect.SQLiteDialect<span class="nt">&lt;/property&gt;</span>
+<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.dialect&quot;</span><span class="nt">&gt;</span>org.hibernate.community.dialect.SQLiteDialect<span class="nt">&lt;/property&gt;</span>
 
 <span class="w">        </span><span class="cm">&lt;!-- Configuración de Hibernate --&gt;</span>
 <span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.hbm2ddl.auto&quot;</span><span class="nt">&gt;</span>update<span class="nt">&lt;/property&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Política ante el esquema --&gt;</span>
@@ -448,10 +460,11 @@ parámetros de funcionamiento:</p>
 <p>En un proyecto Maven deberemos guardar esta configuración en el directorio
 <code class="file docutils literal notranslate"><span class="pre">resources/</span></code>. Sobre este archivo de configuración es recomendable hacer
 algunos comentarios:</p>
-<p>La <em>url</em>, el <em>driver</em> y dialecto específico depende de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que
+<ul>
+<li><p>La <em>url</em>, el <em>driver</em> y dialecto específico dependen de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que
 utilicemos. La enumeración de los más utilizados la tenemos en <a class="reference internal" href="../04.conector/01.basico.html#conn-drivers"><span class="std std-ref">una tabla
-de la unidad anterior</span></a>, pero necesitamos añadir a ella los
-dialectos específicos de <a class="reference external" href="https://www.hibernate.org">Hibernate</a>:</p>
+de la unidad anterior</span></a>, pero necesitamos añadir a ella cómo se
+llaman los dialectos específicos de <a class="reference external" href="https://www.hibernate.org">Hibernate</a>:</p>
 <div class="pst-scrollable-table-container"><table class="url-sql table">
 <thead>
 <tr class="row-odd"><th class="head"><p><abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr></p></th>
@@ -460,7 +473,7 @@ dialectos específicos de <a class="reference external" href="https://www.hibern
 </thead>
 <tbody>
 <tr class="row-even"><td><p>SQLite</p></td>
-<td><p>org.hibernate.dialect.SQLiteDialect</p></td>
+<td><p>org.hibernate.community.dialect.SQLiteDialect<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>MariaDB</p></td>
 <td><p>org.hibernate.dialect.MariaDBDialect</p></td>
@@ -480,6 +493,66 @@ dialectos específicos de <a class="reference external" href="https://www.hibern
 </tbody>
 </table>
 </div>
+</li>
+<li><p>La propiedad <code class="docutils literal notranslate"><span class="pre">hibernate.hbm2ddl.auto</span></code> define cómo actuará la aplicación al
+comparar el esquema definido en las clases con el existente en la base de
+datos, y puede tener cuatro valores:</p>
+<div class="pst-scrollable-table-container"><table class="table" id="hdbm2ddl-auto">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Valor</p></th>
+<th class="head" rowspan="2"><p>Descripción</p></th>
+<th class="head" colspan="2"><p>Efecto</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Sin esquema previo</p></th>
+<th class="head"><p>Con esquema previo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>validate</p></td>
+<td><p>Comprueba el esquema</p></td>
+<td><p>Error</p></td>
+<td><p>Error si no son iguales</p></td>
+</tr>
+<tr class="row-even"><td><p>update</p></td>
+<td><p>Actualiza el esquema</p></td>
+<td><p>Crea el esquema</p></td>
+<td><p>Actualiza y conserva datos</p></td>
+</tr>
+<tr class="row-odd"><td><p>create</p></td>
+<td><p>Crea el esquema</p></td>
+<td><p>Crea el esquema</p></td>
+<td><p>Lo crea de nuevo
+(pérdida de datos)</p></td>
+</tr>
+<tr class="row-even"><td><p>create-drop</p></td>
+<td><p>Crea el esquema y lo
+desecha al cerrar.</p></td>
+<td colspan="2"><p>Como el anterior en ambos casos, pero se pierde
+todo al cerrar la sesión de Hibernate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><p>Las tres últimas propiedades se refieren al registro y son útiles a efectos de
+depuración: se registran las sentencias <abbr title="Structured Query Language">SQL</abbr> que genera el <abbr title="Object-Relational Mapping">ORM</abbr> (en el nivel
+<em>DEBUG</em>), tales sentencias se formatean para que resulten más legibles y,
+además, se acompañan de comentarios.</p></li>
+</ul>
+<p>Con todo esto ya tendríamos preparado Hibernate para usarlo en nuestra
+aplicación.</p>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Por hacer</p>
+<p>Configuración para múltiples bases de datos (dejar aquí comentario y
+desarrollar bajo un epígrafe posterior de configuración avanzada).</p>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>No es dialecto nativo de Hibernate, sino proporcionado por la comunidad.</p>
+</aside>
+</aside>
 </section>
 
 
@@ -503,11 +576,11 @@ dialectos específicos de <a class="reference external" href="https://www.hibern
       </div>
     </a>
     <a class="right-next"
-       href="../98.apendices/index.html"
+       href="02.basico.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title">Apéndices</p>
+        <p class="prev-next-title"><span class="section-number">5.2. </span>Operativa básica</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -1,0 +1,117 @@
+.. _orm-mapping:
+
+Mapeo
+*****
+El :dfn:`mapeo` consiste en definir cómo se hará la traducción entre las clases
+del modelo de objetos (de *Java*, en este caso) y las entidades del modelo
+relacional. En esta traducción las clases se corresponde con las tablas, las
+instancias con los registros y los atributos con los campos.
+
+En Hibernate_, la definición del *mapeo* puede realizarse con anotaciones
+siguiendo el estándar |JPA|. Bajo este epígrafe aprenderemos fundamentalmente:
+
+- Cómo marcar los atributos para que se incorporen a los campos de la tabla.
+- Cómo marcar que los atributos representan relaciones entre tablas.
+
+Anotaciones básicas
+===================
+Ya introdujimos las anotaciones más básicas al presentar el :ref:`ejemplo de
+anotación de la clase Centro <orm-bas-map>`:
+
+.. literalinclude:: files/Centro.java
+   :language: java
+   :start-at: @Entity
+
+Y convendría leer lo explicado allí para no repetirlo. Ahora bien: podemos
+ampliar nuestro conocimientos sobre las anotaciones válidas:
+
+``@Column``/``@Transient``
+   Por lo general, todos los atributos de la clase, aunque no estén anotados en
+   absoluto, se consideran campo de la tabla correspondiente. Las excepciones
+   son:
+
+   - Los campos estáticos (``static``), ya que no forman parte del objeto.
+   - Los campos con el modificador ``transient``.
+   - Los atributos sin *getter* o al menos con un *getter* que no sea accesible
+     (``private``)\ [#]_.
+   - Los atributos cuyo tipo no se sepa traducir.
+   - Los atributos que se heredan de una clase base que no se anotó con
+     ``@Entity``.
+
+   La anotación ``@Column`` fuerza a que un atributo se traduzca a campo y
+   además permite añadir información sobre la traducción mediante parámetros:
+
+   + ``name`` permite indicar un nombre para el campo distinto al nombre del atributo.
+   + ``nullable``, si puede contener valores nulos.
+   + ``unique``, si su valor debe ser único.
+   + ``length``, la longitud de la cadena.
+   + ``precision`` y ``scale`` para tipos como :java-util:`BigDecimal
+     <BigDecimal>` permiten indicar el número total de dígitos y el de dígitos
+     decimales respectivamente.
+   + ``insertable``, indica si el campo debe incluirse en las sentencias
+     ``INSERT``.
+   + ``updatable``, indica si el campo debe incluirse en las sentencias
+     ``UPDATE``.
+   + ``columnDefinition`` sirve para indicar directamente la definición |SQL|
+     del campo.
+
+   La anotación ``@Transient`` evita que el atributo se mapee como campo.
+
+``@Id``/``@GeneratedValue``
+
+``@Lob``
+
+``@Temporal``
+   Es útil cuando se usa el tipo antiguo :java-util:`Date <Date>` para indicar
+   si se quiere almacenar en la base de datos, sólo la hora
+   (``TemporalType.TIME``) , sólo la fecha (``TemporalType.DATE``) o tanto la
+   fecha como la hora (``TemporalType.TIMESTAMP``):
+
+   .. code-block:: java
+
+      @Temporal(TemporalType.DATE)  // Sólo almacena la fecha.
+      private Date nacimiento;
+
+
+   Para tipos modernos como :java-time:`LocalDate <LocalDate>`,
+   :java-time:`LocalTime <LocalTime>` o :java-time:`LocalDateTime
+   <LocalDateTime>` es absolutamente innecesaria la anotación.
+
+``@Version``
+   Sirve para identificar el atributo como un campo que controla la versión del
+   registro, de modo que se actualiza el valor cada vez que se actualiza. Por
+   ejemplo:
+
+   .. code-block:: java
+
+      @Version
+      private int version;
+
+   El atributo debe ser numérico, o si se desea almacenar la fecha en vez de
+   un número de versión, un tipo de fecha. Por ejemplo:
+
+   .. code-block:: java
+
+      @Version
+      private LocalDateTime actualizacion;
+
+``@Enumerated``
+
+``@Embeddable``/``@Embedded``
+
+``@Convert``
+
+Relaciones
+==========
+
+.. rubric:: Notas al pie
+
+.. [#]  Esto, sin embargo, es así porque por defecto el acceso es por
+   propiedades (a través del *getter*) y no por atributos. Se puede el
+   comportamiento añadiendo la anotación ``@Access(AccessType.FIELD)`` a la
+   clase.
+
+
+.. |JPA| replace:: :abbr:`JPA (Java Persisten API)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. _Hibernate: https://www.hibernate.org

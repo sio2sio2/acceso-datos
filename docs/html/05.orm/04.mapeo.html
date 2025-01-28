@@ -502,10 +502,25 @@ del campo.</p></li>
 </ul>
 <p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code> evita que el atributo se mapee como campo.</p>
 </dd>
-</dl>
-<p><code class="docutils literal notranslate"><span class="pre">&#64;Id</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;GeneratedValue</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">&#64;Lob</span></code></p>
-<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Id</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;GeneratedValue</span></code></dt><dd><p>Como ya hemos visto, la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Id</span></code> sirve para marcar un atributo como
+identificador; y <code class="docutils literal notranslate"><span class="pre">&#64;GeneratedValue</span></code> para indicar cómo se generan
+automáticamente sus valores. Lo más socorrido es:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Id</span>
+<span class="nd">@GeneratedValue</span><span class="p">(</span><span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GenerationType</span><span class="p">.</span><span class="na">IDENTITY</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span>
+</pre></div>
+</div>
+<p>que equivale a indicar que el campo identificador es autoincremental
+(<code class="docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">ALWAYS</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code>). Si no usamos la segunda anotación el
+campo requerirá siempre que el usuario establezca el valor.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Lob</span></code></dt><dd><p>Se utiliza para campos que contiene cantidades apreciables de datos (<code class="docutils literal notranslate"><span class="pre">BLOB</span></code>
+o <code class="docutils literal notranslate"><span class="pre">CLOB</span></code>) en el estándar:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Lob</span>
+<span class="kd">private</span><span class="w"> </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">foto</span><span class="p">;</span>
+</pre></div>
+</div>
+</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Temporal</span></code></dt><dd><p>Es útil cuando se usa el tipo antiguo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> para indicar
 si se quiere almacenar en la base de datos, sólo la hora
 (<code class="docutils literal notranslate"><span class="pre">TemporalType.TIME</span></code>) , sólo la fecha (<code class="docutils literal notranslate"><span class="pre">TemporalType.DATE</span></code>) o tanto la
@@ -527,17 +542,249 @@ ejemplo:</p>
 <p>El atributo debe ser numérico, o si se desea almacenar la fecha en vez de
 un número de versión, un tipo de fecha. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Version</span>
+<span class="nd">@Column</span><span class="p">(</span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">actualizacion</span><span class="p">;</span>
 </pre></div>
 </div>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Enumerated</span></code></dt><dd><p>Permite indicar cómo almacenar un campo <code class="docutils literal notranslate"><span class="pre">enum</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Enumerated</span><span class="p">(</span><span class="n">EnumType</span><span class="p">.</span><span class="na">STRING</span><span class="p">)</span>
+<span class="nd">@Column</span><span class="p">(</span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span>
+</pre></div>
+</div>
+<p>En este caso, el tipo se guardará como una cadena en la base de datos. Otra
+opción habría sido <code class="docutils literal notranslate"><span class="pre">EnumType.ORDINAL</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Embeddable</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Embedded</span></code></dt><dd><p>Ambas trabajan <em>en comandita</em> y permiten empotrar un objeto completo como
+campo de una tabla. Por ejemplo, si añadiéramos un campo <em>dirección</em> a la
+definición de <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, podríamos hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Embeddable</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Direccion</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">calle</span><span class="p">;</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">numero</span><span class="p">;</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">localidad</span><span class="p">;</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">codigoPostal</span><span class="p">;</span>
+
+<span class="w">   </span><span class="c1">// ... getters y setters ...</span>
+<span class="p">}</span>
+
+<span class="c1">// ...</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// ...</span>
+
+<span class="w">   </span><span class="nd">@Embedded</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">Direccion</span><span class="w"> </span><span class="n">direccion</span><span class="p">;</span>
+
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Al traducirse, no se crea una tabla <em>Direccion</em>, sino que los atributos de
+<code class="docutils literal notranslate"><span class="pre">Direccion</span></code> pasarán a añadirse como atributos de la tabla <em>Centro</em>. Para
+controlar con qué nombre de columna se traducen es necesario:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Embedded</span>
+<span class="nd">@AttributeOverrides</span><span class="p">({</span>
+<span class="w">   </span><span class="nd">@AttributeOverride</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;calle&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;d_calle&quot;</span><span class="p">)),</span>
+<span class="w">   </span><span class="nd">@AttributeOverride</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;numero&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;d_numero&quot;</span><span class="p">))</span>
+<span class="p">})</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Direccion</span><span class="w"> </span><span class="n">direccion</span><span class="p">;</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Convert</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Converter</span></code></dt><dd><p>Permite definir exactamente la traducción de un atributo a campo y viceversa.
+Para llevar a cabo esta traducción debe definirse una clase que implemente la
+interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteConverter</span></code>. Por ejemplo, imaginemos que el tipo
+<code class="docutils literal notranslate"><span class="pre">Titularidad</span></code> lo hubiéramos definido así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">PUBLICA</span><span class="p">(</span><span class="s">&quot;Pública&quot;</span><span class="p">),</span>
+<span class="w">   </span><span class="n">PRIVADA</span><span class="p">(</span><span class="s">&quot;Privada&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+
+<span class="w">   </span><span class="n">Titularidad</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="nf">fromNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">values</span><span class="p">())</span>
+<span class="w">         </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">getNombre</span><span class="p">().</span><span class="na">toLowerCase</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">nombre</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">()))</span>
+<span class="w">         </span><span class="p">.</span><span class="na">findFirst</span><span class="p">.</span><span class="na">orElse</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>y que pretendiéramos almacenar en la base de datos el <em>nombre</em> («Pública» o
+«Privada»). En ese caso tendríamos que definir un convesor así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TitularidadConverter</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AttributeConverter</span><span class="o">&lt;</span><span class="n">Titularidad</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">     </span><span class="nd">@Override</span>
+<span class="w">     </span><span class="kd">public</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="nf">convertToEntityAttribute</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+<span class="w">     </span><span class="p">}</span>
+
+<span class="w">     </span><span class="nd">@Override</span>
+<span class="w">     </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">convertToDatabaseColumn</span><span class="p">(</span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">titularidad</span><span class="p">.</span><span class="na">getNombre</span><span class="p">();</span>
+<span class="w">     </span><span class="p">}</span>
+
+<span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>De esto modo podríamos anotar el atributo así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Convert</span><span class="p">(</span><span class="n">converter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TitularidadConverter</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>También es posible anotar la clase conversora:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Converter</span><span class="p">(</span><span class="n">autoPlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TitularidadConverter</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AttributeConverter</span><span class="o">&lt;</span><span class="n">Titularidad</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// ... Implementación ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Y el conversor se aplicará automáticamente a todos los atributos de tipo
+<code class="docutils literal notranslate"><span class="pre">Titularidad</span></code> sin  necesidad de anotar los atributos individualmente.</p>
+</dd>
 </dl>
-<p><code class="docutils literal notranslate"><span class="pre">&#64;Enumerated</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">&#64;Embeddable</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Embedded</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">&#64;Convert</span></code></p>
 </section>
 <section id="relaciones">
 <h2><span class="section-number">5.4.2. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
+<p>Las relaciones entre las entidades también se significan mediante anotaciones.
+Hay tres tipos de relaciones binarias en el modelo relacional:</p>
+<dl class="simple">
+<dt><strong>Relación 1:1</strong></dt><dd><p>En este caso, el campo se puede colocar en cualquiera de las dos tablas.
+Para significar este tipo relaciones se usa la notación <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code>.</p>
+</dd>
+<dt><strong>Relación 1:N</strong></dt><dd><p>En este caso, el campo se coloca en la tabla cuyos registros se relacionan
+con uno y sólo un registro de la otra tabla. Para significarla se usan las
+anotaciones <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code>, ya veremos por qué ambas.</p>
+</dd>
+<dt><strong>Relación N:M</strong></dt><dd><p>En el modelo relacional esta relación se traduce en un tabla aparte. Para
+significarla se usa la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
+</dd>
+</dl>
+<p>Un detalle muy importante que debemos tener presente al anotar es que la
+relación entre clases debe reflejarse en ambos extremos, esto es, en las dos
+clases. Por eso, la relación <strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em> provoca que
+definamos así la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Estudiante</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Id</span>
+<span class="w">    </span><span class="nd">@GeneratedValue</span><span class="p">(</span><span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GenerationType</span><span class="p">.</span><span class="na">IDENTITY</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Column</span><span class="p">(</span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@ManyToOne</span>
+</span><span class="hll"><span class="w">    </span><span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="c1">// El campo se llama id_centro en la BD.</span>
+</span><span class="hll"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Estudiante</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="nf">cargarDatos</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setNacimiento</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setCentro</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Estudiante</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cargarDatos</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="nf">getId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="nf">getNacimiento</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNacimiento</span><span class="p">(</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">getCentro</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCentro</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s (%s, % d años)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">getCentro</span><span class="p">().</span><span class="na">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">ChronoUnit</span><span class="p">.</span><span class="na">YEARS</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">getNacimiento</span><span class="p">(),</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Recuerde registrar en la configuración esta nueva clase:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;mapping</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;edu.acceso.test_hibernate.modelo.Estudiante&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>Es de reseñar es esta definición:</p>
+<ul class="simple">
+<li><p>Cómo se ha definido la relación.</p></li>
+<li><p>Que este atributo, como los demás, tiene <em>setter</em> y <em>getter</em>.</p></li>
+<li><p>Que el constructor con argumentos y <code class="docutils literal notranslate"><span class="pre">cargarDatos</span></code> no fijan ningún
+identificador, ya que éste lo establece la base de datos al guardar el objeto.</p></li>
+</ul>
+<p>Ahora bien, hemos dicho que tenemos que anotar los dos extremos de la relación,
+así que deberemos añadir un campo a la clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code> que sea una lista de
+estudiantes, ya que en un centro hay muchos estudiantes:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;centro&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">//Ya está mapeado.</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Como se ve, expresamos que este campo ya está mapeado por el atributo <code class="docutils literal notranslate"><span class="pre">centro</span></code>
+de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Además, deberemos definirle un <em>getter</em> para poder
+acceder a su valor. El <em>setter</em>, en cambio, no es indispel <em>setter</em>, en cambio,
+no es indispensable.</p>
+<p>Una relación <strong>1:1</strong> se define de forma análoga. Por ejemplo, si introdujéramos
+una clase <code class="docutils literal notranslate"><span class="pre">Direccion</span></code>, cada uno de cuyos objetos se asocia a un objeto
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code> la relación sería <strong>1:1</strong> y podríamos definirla así en <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToOne</span>
+<span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;direccion_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Direccion</span><span class="w"> </span><span class="n">direccion</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Este sería el extremo en donde que tendría representación en la base de datos.
+En el otro extremo de la relación, la clase <code class="docutils literal notranslate"><span class="pre">Direccion</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToOne</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;direccion&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>La adición de <em>setters</em> y <em>getters</em> a las clases es la misma que la indicada en
+a relación <strong>1:N</strong>.</p>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">

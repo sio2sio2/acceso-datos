@@ -58,8 +58,28 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
    La anotación ``@Transient`` evita que el atributo se mapee como campo.
 
 ``@Id``/``@GeneratedValue``
+   Como ya hemos visto, la anotación ``@Id`` sirve para marcar un atributo como
+   identificador; y ``@GeneratedValue`` para indicar cómo se generan
+   automáticamente sus valores. Lo más socorrido es:
+
+   .. code-block:: java
+
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id
+
+   que equivale a indicar que el campo identificador es autoincremental
+   (``GENERATED ALWAYS AS IDENTITY``). Si no usamos la segunda anotación el
+   campo requerirá siempre que el usuario establezca el valor.
 
 ``@Lob``
+   Se utiliza para campos que contiene cantidades apreciables de datos (``BLOB``
+   o ``CLOB``) en el estándar:
+
+   .. code-block:: java
+
+      @Lob
+      private byte[] foto;
 
 ``@Temporal``
    Es útil cuando se usa el tipo antiguo :java-util:`Date <Date>` para indicar
@@ -93,16 +113,204 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
    .. code-block:: java
 
       @Version
+      @Column(nullable = false)
       private LocalDateTime actualizacion;
 
 ``@Enumerated``
+   Permite indicar cómo almacenar un campo ``enum``:
+
+   .. code-block:: java
+
+      @Enumerated(EnumType.STRING)
+      @Column(nullable = false)
+      private Titularidad titularidad
+
+   En este caso, el tipo se guardará como una cadena en la base de datos. Otra
+   opción habría sido ``EnumType.ORDINAL``.
 
 ``@Embeddable``/``@Embedded``
+   Ambas trabajan *en comandita* y permiten empotrar un objeto completo como
+   campo de una tabla. Por ejemplo, si añadiéramos un campo *dirección* a la
+   definición de ``Centro``, podríamos hacer lo siguiente:
 
-``@Convert``
+   .. code-block:: java
+
+      @Embeddable
+      public class Direccion {
+         private String calle;
+         private String numero;
+         private String localidad;
+         private Integer codigoPostal;
+
+         // ... getters y setters ...
+      }
+
+      // ...
+
+      public class Centro {
+         // ...
+
+         @Embedded
+         private Direccion direccion;
+
+         // ...
+      }
+
+   Al traducirse, no se crea una tabla *Direccion*, sino que los atributos de
+   ``Direccion`` pasarán a añadirse como atributos de la tabla *Centro*. Para
+   controlar con qué nombre de columna se traducen es necesario:
+
+   .. code-block:: java
+
+      @Embedded
+      @AttributeOverrides({
+         @AttributeOverride(name = "calle", column = @Column(name = "d_calle")),
+         @AttributeOverride(name = "numero", column = @Column(name = "d_numero"))
+      })
+      private Direccion direccion;
+
+``@Convert``/``@Converter``
+   Permite definir exactamente la traducción de un atributo a campo y viceversa.
+   Para llevar a cabo esta traducción debe definirse una clase que implemente la
+   interfaz ``AttibuteConverter``. Por ejemplo, imaginemos que el tipo
+   ``Titularidad`` lo hubiéramos definido así:
+
+   .. code-block:: java
+
+      public enum Titularidad {
+         PUBLICA("Pública"),
+         PRIVADA("Privada");
+
+         private String nombre;
+
+         Titularidad(String nombre) {
+            this.nombre = nombre;
+         }
+
+         public String getNombre() {
+            return nombre;
+         }
+
+         public static Titularidad fromNombre(String nombre) {
+            return Arrays.stream(Titularidad.values())
+               .filter(t -> t.getNombre().toLowerCase().equals(nombre.toLowerCase()))
+               .findFirst.orElse(null);
+         }
+      }
+
+   y que pretendiéramos almacenar en la base de datos el *nombre* ("Pública" o
+   "Privada"). En ese caso tendríamos que definir un convesor así:
+
+   .. code-block:: java
+
+      public class TitularidadConverter implements AttributeConverter<Titularidad, String> {
+
+           @Override
+           public Titularidad convertToEntityAttribute(String nombre) {
+               return Titularidad.fromNombre(nombre);
+           }
+
+           @Override
+           public String convertToDatabaseColumn(Titularidad titularidad) {
+               return titularidad == null?null:titularidad.getNombre();
+           }
+           
+       }
+
+   De esto modo podríamos anotar el atributo así:
+
+   .. code-block:: java
+
+      @Convert(converter = TitularidadConverter.class)
+      private Titularidad titularidad;
+    
+   También es posible anotar la clase conversora:
+
+   .. code-block:: java
+
+      @Converter(autoPlay = true)
+      public class TitularidadConverter implements AttributeConverter<Titularidad, String> {
+         // ... Implementación ...
+      }
+
+   Y el conversor se aplicará automáticamente a todos los atributos de tipo
+   ``Titularidad`` sin  necesidad de anotar los atributos individualmente.
 
 Relaciones
 ==========
+Las relaciones entre las entidades también se significan mediante anotaciones.
+Hay tres tipos de relaciones binarias en el modelo relacional:
+
+**Relación 1:1**
+   En este caso, el campo se puede colocar en cualquiera de las dos tablas.
+   Para significar este tipo relaciones se usa la notación ``@OneToOne``.
+
+**Relación 1:N**
+   En este caso, el campo se coloca en la tabla cuyos registros se relacionan
+   con uno y sólo un registro de la otra tabla. Para significarla se usan las
+   anotaciones ``@OneToMany`` y ``@ManyToOne``, ya veremos por qué ambas.
+
+**Relación N:M**
+   En el modelo relacional esta relación se traduce en un tabla aparte. Para
+   significarla se usa la anotación ``@ManyToMany``.
+
+Un detalle muy importante que debemos tener presente al anotar es que la
+relación entre clases debe reflejarse en ambos extremos, esto es, en las dos
+clases. Por eso, la relación **1:N** entre *Centro* y *Estudiante* provoca que
+definamos así la clase ``Estudiante``:
+
+.. literalinclude:: files/Estudiante.java
+   :language: java
+   :start-at: @Entity
+   :emphasize-lines: 13-15
+
+.. caution:: Recuerde registrar en la configuración esta nueva clase:
+
+   .. code-block:: xml
+
+      <mapping class="edu.acceso.test_hibernate.modelo.Estudiante"/>
+
+Es de reseñar es esta definición:
+
++ Cómo se ha definido la relación.
++ Que este atributo, como los demás, tiene *setter* y *getter*.
++ Que el constructor con argumentos y ``cargarDatos`` no fijan ningún
+  identificador, ya que éste lo establece la base de datos al guardar el objeto.
+
+Ahora bien, hemos dicho que tenemos que anotar los dos extremos de la relación,
+así que deberemos añadir un campo a la clase ``Centro`` que sea una lista de
+estudiantes, ya que en un centro hay muchos estudiantes:
+
+.. code-block:: java
+
+   @OneToMany(mappedBy = "centro")  //Ya está mapeado.
+   private List<Estudiante> estudiantes;
+
+Como se ve, expresamos que este campo ya está mapeado por el atributo ``centro``
+de la clase ``Estudiante``. Además, deberemos definirle un *getter* para poder
+acceder a su valor. El *setter*, en cambio, no es indispel *setter*, en cambio,
+no es indispensable.
+
+Una relación **1:1** se define de forma análoga. Por ejemplo, si introdujéramos
+una clase ``Direccion``, cada uno de cuyos objetos se asocia a un objeto
+``Centro`` la relación sería **1:1** y podríamos definirla así en ``Centro``:
+
+.. code-block:: java
+
+   @OneToOne
+   @JoinColumn(name = "direccion_id", nullable = false)
+   private Direccion direccion;
+
+Este sería el extremo en donde que tendría representación en la base de datos.
+En el otro extremo de la relación, la clase ``Direccion``:
+
+.. code-block:: java
+
+   @OneToOne(mappedBy = "direccion")
+   private Centro centro;
+
+La adición de *setters* y *getters* a las clases es la misma que la indicada en
+a relación **1:N**.
 
 .. rubric:: Notas al pie
 

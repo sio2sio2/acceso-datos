@@ -16,7 +16,8 @@ una estrategia frente a la otra <conn-vs-orm>`, no abundaremos más en ello.
 
 .. todo:: Investigar el enfoque de MyBatis_.
 
-El |ORM| más utilizado en Java es Hibernate_ y a su uso dedicaremos esta unidad.
+El |ORM| más utilizado en Java es Hibernate_ y a su uso dedicaremos esta unidad
+utilizando el :ref:`ejemplo ilustrativo sobre centros y profesores <conn-er-ec>`.
 
 .. rubric:: Contenidos
 

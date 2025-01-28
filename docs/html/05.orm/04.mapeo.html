@@ -657,22 +657,16 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 <h2><span class="section-number">5.4.2. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
 <p>Las relaciones entre las entidades también se significan mediante anotaciones.
 Hay tres tipos de relaciones binarias en el modelo relacional:</p>
-<dl class="simple">
-<dt><strong>Relación 1:1</strong></dt><dd><p>En este caso, el campo se puede colocar en cualquiera de las dos tablas.
-Para significar este tipo relaciones se usa la notación <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code>.</p>
-</dd>
-<dt><strong>Relación 1:N</strong></dt><dd><p>En este caso, el campo se coloca en la tabla cuyos registros se relacionan
-con uno y sólo un registro de la otra tabla. Para significarla se usan las
-anotaciones <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code>, ya veremos por qué ambas.</p>
-</dd>
-<dt><strong>Relación N:M</strong></dt><dd><p>En el modelo relacional esta relación se traduce en un tabla aparte. Para
-significarla se usa la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
-</dd>
-</dl>
-<p>Un detalle muy importante que debemos tener presente al anotar es que la
-relación entre clases debe reflejarse en ambos extremos, esto es, en las dos
-clases. Por eso, la relación <strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em> provoca que
-definamos así la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
+<dl>
+<dt><strong>Relación 1:N</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code></dt><dd><p>Se produce cuando una registro de la primera tabla se relaciona con muchos
+registros de la segunda, pero al contrario los registros de la segunda sólo
+se relacionan con uno de la primera. Se resuelve colocando un campo en la
+tabla cuyos registros se relacionan con uno y sólo un registro de la otra
+tabla. Para significarla se usan las anotaciones <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y
+<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code>, ya que –y esto es de suma importancia– al anotar la
+relación entre clases, ésta debe reflejarse en ambos extremos, esto es, en
+las dos clases. Por eso, la relación <strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em>
+provoca que definamos así la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Estudiante</span><span class="w"> </span><span class="p">{</span>
 
@@ -769,28 +763,81 @@ estudiantes, ya que en un centro hay muchos estudiantes:</p>
 de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Además, deberemos definirle un <em>getter</em> para poder
 acceder a su valor. El <em>setter</em>, en cambio, no es indispel <em>setter</em>, en cambio,
 no es indispensable.</p>
-<p>Una relación <strong>1:1</strong> se define de forma análoga. Por ejemplo, si introdujéramos
-una clase <code class="docutils literal notranslate"><span class="pre">Direccion</span></code>, cada uno de cuyos objetos se asocia a un objeto
-<code class="docutils literal notranslate"><span class="pre">Centro</span></code> la relación sería <strong>1:1</strong> y podríamos definirla así en <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
+</dd>
+<dt><strong>Relación 1:1</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code></dt><dd><p>Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
+ninguno) registro de la otra tabla. Se resuelve colocando el campo en cualquiera
+de las dos tablas. Para significar este tipo relaciones se usa la notación
+<code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code>. Para definir con <a class="reference external" href="https://www.hibernate.org">Hibernate</a> tal relación hemos de obrar de
+manera análoga a como hicimos con la relación <strong>1:N</strong>. Para ilustrarlo,
+supongamos que añadimos un campo <code class="docutils literal notranslate"><span class="pre">dirección</span></code> a la clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code> de tipo
+<code class="docutils literal notranslate"><span class="pre">Direccion</span></code> y queremos que en la base de datos los campos que componen la
+dirección se mantengan en una tabla independiente (a diferencia de lo que
+propusimos al explicar la <a class="reference internal" href="#orm-ann-embedded"><span class="std std-ref">anotación &#64;Embedded</span></a>). En
+este caso, la relación <strong>1:1</strong> se expresaría añadiendo a <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToOne</span>
 <span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;direccion_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">Direccion</span><span class="w"> </span><span class="n">direccion</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Este sería el extremo en donde que tendría representación en la base de datos.
-En el otro extremo de la relación, la clase <code class="docutils literal notranslate"><span class="pre">Direccion</span></code>:</p>
+<p>Y, además, deberíamos definir el <em>getter</em> y el <em>setter</em> correspondientes.
+Éste sería el extremo que tendría representación en la base de datos.
+En el otro extremo de la relación, la clase <code class="docutils literal notranslate"><span class="pre">Direccion</span></code> debería añadir:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToOne</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;direccion&quot;</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>La adición de <em>setters</em> y <em>getters</em> a las clases es la misma que la indicada en
-a relación <strong>1:N</strong>.</p>
+<p>más al menos el <em>getter</em> correspondiente.</p>
+</dd>
+<dt><strong>Relación N:M</strong>:</dt><dd><p>La relación sopone que un registro de una tabla se relaciona con muchos de la
+otra, y viceversa; y supone en el modelo relacional la aparición de una
+tercera tabla. En nuestro ejemplo, podríamos introducir este tipo de
+relación, si ampliáramos la base de datos para que incluyera profesores y los
+quisiéramos relacionar con estudiantes, ya que los estudiantes tienen varios
+profesores; y cada profesor imparte sus enseñanzas a varios estudiantes. Por
+tanto, la relación entre las tablas <em>Profesor</em> y <em>Estudiante</em> es una relación
+<strong>N:M</strong>. Para implementar en <a class="reference external" href="https://www.hibernate.org">Hibernate</a> estas relaciones, han de distinguirse
+dos casos:</p>
+<ol class="loweralpha">
+<li><p>La relación no tiene atributos propios: <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
+<p>En este caso, puede expresarse la relación <strong>N:M</strong> directamente con
+la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code> y como en el caso anterior, habrá que
+expresarla en los dos extremos (las dos clases). En cuál hagamos
+propiamente la definición y en cuál indiquemos que se relaciona con la
+otra (a través de <code class="docutils literal notranslate"><span class="pre">mappedBy</span></code>) es cosa nuestro y dependerá más bien de
+qué nos resulte más natural. Así podríamos añadir a <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToMany</span>
+<span class="nd">@JoinTable</span><span class="p">(</span>
+<span class="w">   </span><span class="n">name</span><span class="o">=</span><span class="s">&quot;Estudiante_Profesor&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// Nombre de la tabla adicional</span>
+<span class="w">   </span><span class="n">joinColums</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_estudiante&quot;</span><span class="p">),</span>
+<span class="w">   </span><span class="n">inverseJoinColums</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_profesor&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Profesor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">profesores</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>y a <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesores&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Deberemos crear los <em>getters</em> para ambos atributos, pero no son necesarios
+los <em>setters</em>.</p>
+</li>
+<li><p>La relación tiene atributos propios: <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code>.</p>
+<p>En tal caso, el único modo de poder añadir los atributos es crear una
+clase adicional que añada los atributos, y descomponer la relación <strong>N:M</strong>
+en dos relaciones <strong>1:N</strong>, de ahí que las anotaciones apropiadas sean
+<code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code>. No entraremos en detalle, porque ya hemos
+resuelto cómo expresar una relación <strong>1:N</strong>.</p>
+</li>
+</ol>
+</dd>
+</dl>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Esto, sin embargo, es así porque por defecto el acceso es por
-propiedades (a través del <em>getter</em>) y no por atributos. Se puede el
+<p>Esto, sin embargo, es así, porque por defecto el acceso es por
+propiedades (a través del <em>getter</em>) y no por atributos. Se puede alterar el
 comportamiento añadiendo la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Access(AccessType.FIELD)</span></code> a la
 clase.</p>
 </aside>

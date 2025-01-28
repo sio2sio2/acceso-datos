@@ -84,25 +84,29 @@ ilustrar cómo operar con la base de datos:
 
        // Operación de inserción.
        try(Session sesion = sf.openSession()) {
-           tr = sesion.beginTransaction();
-           Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
-           sesion.persist(centro);
-           tr.commit();
-       }
-       catch(Exception e) {
-           if(tr != null) tr.rollback();
+          try {
+              tr = sesion.beginTransaction();
+              Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+              sesion.persist(centro);
+              tr.commit();
+          }
+          catch(Exception e) {
+              if(tr != null) tr.rollback();
+          }
        }
 
        // Operaciones de lectura y modificación.
        try(Session sesion = sf.openSession()) {
-           tr = sesion.beginTransaction();
-           Centro centro = sesion.find(Centro.class, 11004866);
-           System.out.println(centro);
-           centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
-           tr.commit();  // Hacemos persistente el cambio anterior.
-       }
-       catch(Exception e) {
-           if(tr != null) tr.rollback();
+          try {
+             tr = sesion.beginTransaction();
+             Centro centro = sesion.find(Centro.class, 11004866);
+             System.out.println(centro);
+             centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
+             tr.commit();  // Hacemos persistente el cambio anterior.
+          }
+          catch(Exception e) {
+             if(tr != null) tr.rollback();
+          }
        }
    }
 

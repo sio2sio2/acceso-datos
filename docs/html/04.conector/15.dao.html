@@ -659,10 +659,7 @@ soporte de almacenamiento.</p></li>
 <p>Esta, pues, es la interfaz que cumplirán todas las clases encargadas de
 comunicarse con la base de datos para extraer o guardar datos. Implementemos
 ahora la clase para extraer o guardar objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
-<span class="cm"> * Modela para un Centro las operaciones de acceso a una base de datos SQLite.</span>
-<span class="cm"> */</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Constructor de la clase.</span>
@@ -938,32 +935,59 @@ hecha en <a class="reference external" href="https://github.com/sio2sio2/sqlutil
 </div>
 <p>Con lo hecho hasta ahora, tenemos definidas las clases del modelo y las clases
 que permiten hacer persistentes los objetos de dichas clases (<abbr title="Data Access Object">DAO</abbr>). Éstas
-últimas relacionan la aplicación con la base de datos, de modo que el acceso a
-estas se hará exclusivamente a través de ellas. En la aplicación, por tanto,
-jamás haremos referencia a un objeto <code class="docutils literal notranslate"><span class="pre">Connection</span></code> o prepararemos una sentencia
-<abbr title="Structured Query Language">SQL</abbr>. Eso sí, necesitamos también una clase que gestione la conexión a la base de datos y que se encargue de:</p>
+últimas relacionan la aplicación con la base de datos, por lo que la
+persistencia debería hacerse a través de ellas sin jamás hacer referencia a un
+objeto <code class="docutils literal notranslate"><span class="pre">Connection</span></code> o prepararemos una sentencia <abbr title="Structured Query Language">SQL</abbr>. Así, pues, para la
+persistencia de un objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> debería utilizar un objeto de la clase
+<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y para la persistencia de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>, un objeto de
+la clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code>.</p>
+<p>Sin embargo para simplificar el uso, las utilidades definen una clase llamada
+<code class="docutils literal notranslate"><span class="pre">Dao</span></code> que permite registrar las clases <abbr title="Data Access Object">DAO</abbr> que se utilizarán a través de
+ella, y usar esta única clase para hacer persistentes todos los objetos, sean de
+la clase que sean (en nuestro ejemplo, centros y estudiantes). Dicho de otra
+forma, si <code class="docutils literal notranslate"><span class="pre">ds</span></code> es un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, en vez de:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definió así en algún sitio.</span>
+<span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudianteDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+
+<span class="c1">// Y me permite operar:</span>
+<span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">11004866</span><span class="p">);</span>
+<span class="n">Estudiante</span><span class="w"> </span><span class="n">perico</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>haré esto otro:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definirá en algún sitio</span>
+<span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dao</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="c1">// Y operaré siempre a través de él.</span>
+<span class="n">dao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span><span class="w">  </span><span class="c1">// Hay que decir si quiero centros o estudiantes.</span>
+<span class="n">Estudiante</span><span class="w"> </span><span class="n">perico</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">   </span><span class="c1">// Ídem.</span>
+</pre></div>
+</div>
+<p>Finalmente, necesitamos también una clase que gestione la conexión a la base de
+datos y que se encargue de:</p>
 <ol class="arabic simple">
 <li><p>Crear el pool de conexiones con el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> apropiado.</p></li>
 <li><p>Realizar labores de inicialización como, por ejemplo, cuando la base de datos
 está vacía, poblarla con el esquema.</p></li>
-<li><p>Proporcionar al resto de la aplicación los dos objetos <abbr title="Data Access Object">DAO</abbr> asociados a la
-persistencia de centros y estudiantes.</p></li>
+<li><p>Proporcionar al resto el objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> que facilita la persistencia de
+centros y estudiantes.</p></li>
 <li><p>Habilitar algún mecanismo sencillo para que dos o más operaciones de
 almacenamiento se realicen en una misma transacción.</p></li>
 </ol>
-<p>Por tanto, esta clase para la conexión, sea cual sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, tendrá que
-cumplir esta interfaz<a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Conexion</span><span class="w"> </span><span class="p">{</span>
+<p>Por ello, las utilidades definen una interfaz que deben cumplir todas estas
+clases de conexión<a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DaoConnection</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="nd">@FunctionalInterface</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Transaccionable</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="p">,</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DaoTransactionable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getCentroDao</span><span class="p">();</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getEstudianteDao</span><span class="p">();</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaccion</span><span class="p">(</span><span class="n">Transaccionable</span><span class="w"> </span><span class="n">operaciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Dao</span><span class="w"> </span><span class="nf">getDao</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">DaoTransactionable</span><span class="w"> </span><span class="n">operaciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>

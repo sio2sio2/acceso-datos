@@ -109,6 +109,7 @@ ahora la clase para extraer o guardar objetos ``Centro``:
 
 .. literalinclude:: files/CentroSqlite.java
    :language: java
+   :start-at: public class
 
 Este objeto ``CentroSqlite`` implementa en particular la interfaz ``Crud`` para
 los objetos ``Centro`` y una base de datos SQLite. Si observamos la
@@ -217,26 +218,64 @@ hecha en sqlutils_. Veamos cómo usar esta implementación:
 
 Con lo hecho hasta ahora, tenemos definidas las clases del modelo y las clases
 que permiten hacer persistentes los objetos de dichas clases (|DAO|). Éstas
-últimas relacionan la aplicación con la base de datos, de modo que el acceso a
-estas se hará exclusivamente a través de ellas. En la aplicación, por tanto,
-jamás haremos referencia a un objeto ``Connection`` o prepararemos una sentencia
-|SQL|. Eso sí, necesitamos también una clase que gestione la conexión a la base de datos y que se encargue de:
+últimas relacionan la aplicación con la base de datos, por lo que la
+persistencia debería hacerse a través de ellas sin jamás hacer referencia a un
+objeto ``Connection`` o prepararemos una sentencia |SQL|. Así, pues, para la
+persistencia de un objeto ``Centro`` debería utilizar un objeto de la clase
+``CentroSqlite`` y para la persistencia de la clase ``Estudiante``, un objeto de
+la clase ``EstudianteSqlite``.
+
+Sin embargo para simplificar el uso, las utilidades definen una clase llamada
+``Dao`` que permite registrar las clases |DAO| que se utilizarán a través de
+ella, y usar esta única clase para hacer persistentes todos los objetos, sean de
+la clase que sean (en nuestro ejemplo, centros y estudiantes). Dicho de otra
+forma, si ``ds`` es un |DataSource|, en vez de:
+
+.. code-block:: java
+
+   // Esto se definió así en algún sitio.
+   Crud<Centro> centroDao = new CentroSqlite(ds);
+   Crud<Estudiante> estudianteDao = new EstudianteSqlite(ds);
+
+   // Y me permite operar:
+   centroDao.insert(centro);
+   Centro castillo = centroDao.get(11004866);
+   Estudiante perico = estudianteDao.get(1);
+
+haré esto otro:
+
+.. code-block:: java
+
+   // Esto se definirá en algún sitio
+   Dao dao = new Dao(ds, CentroSqlite.class, EstudianteSqlite.class);
+
+   // Y operaré siempre a través de este único objeto:
+   dao.insert(centro);
+   Centro castillo = dao.get(Centro.class, 11004866);  // Hay que decir si quiero centros o estudiantes.
+   Estudiante perico = dao.get(Estudiante.class, 1);   // Ídem.
+
+
+Finalmente, necesitamos también una clase que gestione la conexión a la base de
+datos y que se encargue de:
 
 .. _rst-class: simple
 
 #. Crear el pool de conexiones con el |DataSource| apropiado.
 #. Realizar labores de inicialización como, por ejemplo, cuando la base de datos
    está vacía, poblarla con el esquema.
-#. Proporcionar al resto de la aplicación los dos objetos |DAO| asociados a la
-   persistencia de centros y estudiantes.
+#. Proporcionar al resto el objeto ``Dao`` que facilita la persistencia de
+   centros y estudiantes.
 #. Habilitar algún mecanismo sencillo para que dos o más operaciones de
    almacenamiento se realicen en una misma transacción.
 
-Por tanto, esta clase para la conexión, sea cual sea el |SGBD|, tendrá que
-cumplir esta interfaz\ [#]_:
+Por ello, las utilidades definen una interfaz que deben cumplir todas estas
+clases de conexión\ [#]_:
 
-.. literalinclude:: files/Conexion.java
+.. literalinclude:: files/DaoConnection.java
    :language: java
+   :start-at: public interface
+
+**SEGUIR POR AQUÍ**
 
 De la interfaz sólo exige aclaración el modo escogido para generar
 transacciones. Dado que debemos cumplir el principio de operar siempre a través

@@ -351,7 +351,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,6 +369,15 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-operaciones-de-insercion">5.5.1. CREATE: Operaciones de inserción</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-operaciones-de-lectura">5.5.2. READ: Operaciones de lectura</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -378,6 +389,49 @@ document.write(`
                   
   <section id="operaciones-crud">
 <span id="orm-crud"></span><h1><span class="section-number">5.5. </span>Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="headerlink" href="#operaciones-crud" title="Link to this heading">#</a></h1>
+<p>Ya hemos discutido cómo <a class="reference internal" href="03.conexion.html#orm-conn"><span class="std std-ref">conectar y abrir sesiones de un modo eficiente</span></a> e incluso <a class="reference internal" href="03.conexion.html#orm-uso-sf"><span class="std std-ref">hemos ilustrado cómo hacer uso de nuestra
+estrategia</span></a>. Toca ahora profundizar en cómo realizar operaciones de
+persistencia con la base de datos.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Hemos preferido acatar la terminología emanada del acrónimo <abbr title="Create, Read, Update, Delete">CRUD</abbr>,
+por lo que incluimos cada uno de los términos en los epígrafes. Tenga
+presente, pues, que <em>CREATE</em> hace referencia a &quot;crear&quot; datos en la base de
+datos, esto es, añadir o insertar datos; y no con crear el esquema (<code class="docutils literal notranslate"><span class="pre">`CREATE</span>
+<span class="pre">TABLE</span></code>, etc). De hecho, no hemos de preocuparnos por el esquema, ya que éste
+es capaz de generarse sólo a partir de las clases anotadas.</p>
+</div>
+<section id="create-operaciones-de-insercion">
+<h2><span class="section-number">5.5.1. </span>CREATE: Operaciones de inserción<a class="headerlink" href="#create-operaciones-de-insercion" title="Link to this heading">#</a></h2>
+<p>Para agregar objetos (o sea, registros) a la base de datos, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> utiliza
+el método <code class="docutils literal notranslate"><span class="pre">.persist</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Supongamos que el objeto ya se instanció antes y se creó.</span>
+<span class="n">HibernateFactory</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
+<span class="w">      </span><span class="c1">// Supongamos que nuestra base de datos no tiene direcciones de centro</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span>
+<span class="w">         </span><span class="mi">11004866</span><span class="p">,</span>
+<span class="w">         </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span>
+<span class="w">      </span><span class="p">);</span>
+<span class="hll"><span class="w">      </span><span class="n">sesion</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span>
+</span><span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="read-operaciones-de-lectura">
+<h2><span class="section-number">5.5.2. </span>READ: Operaciones de lectura<a class="headerlink" href="#read-operaciones-de-lectura" title="Link to this heading">#</a></h2>
+<p>Para</p>
+</section>
 </section>
 
 
@@ -415,6 +469,22 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-operaciones-de-insercion">5.5.1. CREATE: Operaciones de inserción</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-operaciones-de-lectura">5.5.2. READ: Operaciones de lectura</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

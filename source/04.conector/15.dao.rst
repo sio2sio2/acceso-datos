@@ -15,11 +15,13 @@ las particularidades del acceso a datos estén reducidas a un paquete dentro de
 la aplicación (p.ej. llamado *backend*), fuera del cual no haya otra cosa que
 objetos.
 
-.. caution:: A continuación se glosa una posible solución, no con la intención
-   de que se tome como definitiva, sino con el propósito de que se entienda a
-   qué resultado debe llegarse: abstraer completamente la lógica del programa
-   del soporte de datos, de modo que, si éste cambia, se reprograme sin que
-   cambie en absoluto la lógica.
+.. caution:: La solución que se propone aquí y cuyo código se encuentra completo
+   en los test de `este repositorio de GitHub
+   <https://github.com/sio2sio2/sqlutils>`_ es más bien una prueba de concepto y
+   tiene el propósito lograr abstraer al programa de los detalles de la
+   conexión, de manera que la persistencia se pueda manejar exclusivamente con
+   objetos. Precisamente, esa la labor de las :ref:`herramientas ORM <orm>` y
+   esas son las que deberíamos usar si quisiéramos crear una aplicación real.
 
 Para lograr esta abstracción proponemos un patrón |DAO|, que separa por un lado
 los objetos del modelo de datos de nuestra aplicación y por otro los objetos que
@@ -38,9 +40,6 @@ que podemos codificar de este modo:
 .. literalinclude:: files/Estudiante.java
    :language: java
 
-.. seealso:: Puede encontrar el código completo del ejemplo ilustrativo en los
-   test de `este repositorio de GitHub <https://github.com/sio2sio2/sqlutils>`_.
-
 Como puede observarse, las dos definiciones son independientes del soporte de
 almacenamiento y responden únicamente a la lógica de la aplicación\ [#]_. Para
 simplicar las cosas obligamos a que todas estas clases incluyan un campo
@@ -54,27 +53,56 @@ identificador, de ahí que implementen una interfaz ``Entity``:
    }
 
 Si estas clases son ajenas a su persistencia, ¿cómo entonces se escribe o
-recupera información de la base de datos? Esto es así, porque definiremos otras
-clases, una por cada una de las clases del modelo, dedicadas a ello. Por tanto,
-deberemos crear una para almacenar y recuperar centros y, otra para almacenar y
-recuperar estudiantes.
+recupera información sobre ellas en la base de datos? El patrón consiste en
+crear por cada una otra clase que se encargue de esa labor. Por tanto:
 
-En principio, para todos los objetos hay que implementar las mismas operaciones
-de almacenamiento: inserción, recuperación, borrado y almacenamiento; así que
-podemos definir una interfaz que cumplan todas estas clases relacionadas con el
-almacenamiento en el backend:
+.. table::
+   :name: clase-dao
+
+   ============ ==================
+     Clase       Clase |DAO|
+   ============ ==================
+    Centro       CentroSqlite
+    Estudiante   EstudianteSqlite
+   ============ ==================
+
+Estas clases encargadas de la conversión entre el modelo de objetos (la
+definición de la clase en la aplicación) y el modelo relacional (su
+persistencia en la base de datos) dependen de cuál sea el |SGBD| concreto, ya
+que ninguno implementa exactamente igual el lenguaje |SQL|\ [#]_.  La idea es
+que cada vez que haya que consultar la base de datos, se usen estas clases y el
+resto del código de nuestra aplicación quede libre de sentencias |SQL|, objetos
+|Connection| y demás particularidades de la persistencia. Por ejemplo, obtener
+un centro se podrá hacer así\ [#]_:
+
+.. code-block::  java
+
+   // ds es un DataSource.
+   var centroDao = new CentroSqlite(ds);
+   Centro centro = centroDao.get(11004866);
+
+Como para todos los objetos, en principio, hay que implementar las mismas
+operaciones de persistencia, esto es, las operaciones |CRUD|, podemos definir
+una interfaz que cumplan todas estas clases relacionadas con el almacenamiento
+en el backend:
 
 .. literalinclude:: files/Crud.java
    :language: java
-
-.. note:: La interfaz está definida en sqlutils_, pero no forma parte del código
-   de prueba, sino de las utilidades.
 
 .. admonition:: Aclaración
 
    Esta interfaz no tiene por qué ser definida exactamente así: podrían defirnir
    otra que satisfaga también la necesidad de implementar las cuatro operaciones
    básicas. 
+
+.. note:: Estas operaciones son universales y no exclusivas del ejemplo
+   ilustrativo que nos proponemos resolver. Por ese motivo la hemos incluido
+   como parte de la librería sqlutils_. De hecho, se ha hecho un esfuerzo por
+   generalizar todo lo que no depende de la particularidad del ejemplo, de ahí
+   que haya mucho código dentro de la librería que utilice clases genéricas y
+   reflexión. Crear una solución particular que cumpla los mismos principios de
+   abstracción para el resto de la aplicación, no es en exceso complicado y
+   puede resultar un ejercico pedagógicamente muyl útil.
 
 Son precisas algunas aclaraciones:
 
@@ -104,20 +132,19 @@ Son precisas algunas aclaraciones:
   soporte de almacenamiento.
 
 Esta, pues, es la interfaz que cumplirán todas las clases encargadas de
-comunicarse con la base de datos para extraer o guardar datos. Implementemos
-ahora la clase para extraer o guardar objetos ``Centro``:
+comunicarse con la base de datos para extraer o guardar datos. La implementación
+de ``CentroSqlite`` para almacenar objetos ``Centros`` es esta:
 
 .. literalinclude:: files/CentroSqlite.java
    :language: java
    :start-at: public class
 
-Este objeto ``CentroSqlite`` implementa en particular la interfaz ``Crud`` para
-los objetos ``Centro`` y una base de datos SQLite. Si observamos la
-implementación de cualquiera de las operaciones |CRUD|, veremos que consiste en
-poner en práctica lo aprendido anteriormente: se abre una conexión, se construye
-ls sentencia |SQL| apropiada y se ejecuta para realizar la operación. Tan sólo
-el método que devuelve un ``Stream`` se sale un poco de esta regla por las
-particularidades del propio ``Stream``:
+Si observamos la implementación de cualquiera de las operaciones |CRUD|, veremos
+que consiste en poner en práctica lo aprendido anteriormente: se abre una
+conexión, se construye ls sentencia |SQL| apropiada y se ejecuta para realizar
+la operación. Tan sólo el método que devuelve un ``Stream`` se sale un poco de
+esta regla por las particularidades del propio ``Stream`` (que no existirían si
+hubiéramos decidido devolver ``List``):
 
 .. code-block:: java
 
@@ -135,62 +162,68 @@ particularidades del propio ``Stream``:
        catch(SQLException err) {
            throw new DataAccessException(err);
        }
+
+       // No cerramos la conexión.
    }
 
 Obsérvese que en este método, a diferencia de los anteriores, no cerramos la
 conexión, ni la sentencia, ni el resultado, ya que de lo contrario no podremos
-obtener centros del ``Stream`` devuelto. Quien se encargará de cerrar finalmente
-todo será el propio flujo cuando se cierre, por lo que convendrá usar con él un
+obtener centros del ``Stream`` devuelto, ya que la evaluación es perezosa y se
+van obteniendo registros de ``ResultSet`` a medida que se van consumiento los
+objetos del ``Stream``. Quien se encargará de cerrar finalmente todo será el
+propio flujo cuando se cierre, por lo que convendrá usar con él un
 *try-with-resources*. Además, el primer argumento que recibe
-``SqlUtils.resultToStream`` es aquello que debe cerrarse cuando se acaba de
-usar el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea
-la sentencia. Qué sea depende de cómo hayamos creado este objeto de
-comunicación con la base de datos: más adelante daremos las explicaciones.
+``SqlUtils.resultToStream`` es aquello que debe cerrarse cuando se acaba de usar
+el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea la
+sentencia. Qué sea depende de cómo hayamos creado este objeto de comunicación
+con la base de datos: más adelante daremos las explicaciones.
 
 En principio, cada operación parece abrir una conexión propia y cerrarla al
 acabar (excepto este último método por la particularidad ya referida). Si se
 utiliza un :ref:`pool de conexiones <conn-pool>` y se facilita para la creación
-del objeto el |DataSource| correspondiente, esto no penaliza prácticamente
-el rendimiento y es muy cómodo. El problema de que cada operación abra y cierre
-su propio objeto |Connection| es que nos quedamos sin poder reunir en una misma
-transacción dos o más operaciones, ya que las operaciones que constituyen una
-transacción deben compartir la conexión.
+del objeto ``CentroSqlite`` el |DataSource| correspondiente, esto no penaliza
+prácticamente el rendimiento y es muy cómodo. El problema de que cada operación
+abra y cierre su propio objeto |Connection| es que nos quedamos sin poder reunir
+en una misma transacción dos o más operaciones, ya que las operaciones que
+constituyen una transacción deben compartir la misma conexión.
 
-En consecuencia, si lo requiere la circunstancia (definir una transacción con
-varias operaciones), necesitamos poder crear estos objetos a partir de una
-conexión ya existente y que sus métodos la usen sin cerrarla. Para no duplicar
-código, hemos acudido a una argucia: un objeto ``ConnectionProvider`` que
-enmascara el hecho de que hayamos creado el objeto a partir de un |DataSource| o
-un |Connection| compartido, en cuyo último caso no hay que cerrarlo, aun cuando
-estemos usando una estructura *try-with-resources*, y aparentemente se cierre.
-Por esta razón, las conexiones se obtienen a partir de un atributo ``cp``
-(definido en ``AbstractDao`` como un ``ConnectionProvider``).  Esta es también
-la razón por la que se pasa a ``SqlUtils.resultToStream`` a veces una conexión
-(cuando la conexion la creó el propio método a partir de un |DataSource|) y a
-veces una sentencia (cuando se usa una conexión preexistente que no debe
-cerrarse)\ [#]_.
+En consecuencia, si lo requiere la circunstancia, necesitamos poder crear estos
+objetos a partir de una conexión ya existente y que sus métodos la utilicen sin
+cerrarla. Para no duplicar código, hemos acudido a una argucia: un objeto
+``ConnectionProvider`` que enmascara el hecho de que hayamos creado el objeto a
+partir de un |DataSource| o un |Connection| compartido, en cuyo último caso no
+hay que cerrar jamás al acabar la operación, aun cuando en el método que la
+implementa usemos una estructura *try-with-resources*.  Por esta razón, las
+conexiones se obtienen a partir de un atributo ``cp`` (definido en
+``AbstractDao`` como un ``ConnectionProvider``).  Esta es también la razón por
+la que se pasa a ``SqlUtils.resultToStream`` a veces una conexión (cuando la
+conexion la creó el propio método a partir de un |DataSource|) y a veces una
+sentencia (cuando se usa una conexión preexistente que no debe cerrarse)\ [#]_.
 
 Necesitamos también crear una clase para la persistencia de los objetos
-``Estudiante``. La clase ``EstudianteSqlite`` es semejante a la anterior, pero
-hay una gran diferencia: uno de los atributos de ``Estudiante`` es un centro, lo
-que supone que en la base de datos el campo es una clave foránea (un entero) que
+``Estudiante``. La clase ``EstudianteSqlite`` es análoga a la anterior, pero hay
+una gran diferencia: uno de los atributos de ``Estudiante`` es un centro, lo que
+supone que en la base de datos el campo es una clave foránea (un entero) que
 hace referencia al registro de otra tabla. El problema de esta circunstancia se
 produce cuando deseemos generar un objeto ``Estudiante`` a partir de una
 operación de lectura (``.get`` en nuestra interfaz), ya que la consulta nos
 devolverá el identificador del centro, no el centro en sí. Para abordar esta
 dificultad tenemos dos vías:
 
-+ Obtener automáticamente también el centro asociado al obtener el estudiante.
-+ No hacerlo y posponer su obtención hasta que sea realmente necesario: cuando
-  en la aplicación se ejecute el método ``.getCentro()``.
+#. Obtener automáticamente también el centro asociado al obtener el estudiante.
+#. No hacerlo y posponer su obtención hasta que sea realmente necesario: cuando
+   en la aplicación se ejecute el método ``.getCentro()``.
 
 La primera vía es sencilla, aunque menos eficiente: si nunca llegamos a usar el
 centro, habremos hecho una segunda consulta\ [#]_ inútil. La segunda vía es
 perezosa, pero tiene el inconveniente de que es más difícil de implementar, ya
 que pasa por crear un objeto proxy que almacene inicialmente el identificador
-del centro e intercepte las llamadas al método ``.getCentro()`` para que haga la
-consulta con dicho identificador. En cualquier caso, tal implementación está
-hecha en sqlutils_. Veamos cómo usar esta implementación:
+del centro e intercepte las llamadas al método ``.getCentro()``. La primera vez
+que se use, hará la consulta con dicho identificador para obtener de forma
+efectiva el objeto ``Centro`` y asignará el valor del atributo, para que las
+veces sucesivas se devuelva el atributo sin hacer consulta . En cualquier caso,
+tal implementación está hecha en sqlutils_, así que sólo tenemos que ver cómo
+usarla:
 
 .. code-block:: java
 
@@ -216,16 +249,7 @@ hecha en sqlutils_. Veamos cómo usar esta implementación:
        return estudiante.cargarDatos(id, nombre, nacimiento, centro);
    }
 
-Con lo hecho hasta ahora, tenemos definidas las clases del modelo y las clases
-que permiten hacer persistentes los objetos de dichas clases (|DAO|). Éstas
-últimas relacionan la aplicación con la base de datos, por lo que la
-persistencia debería hacerse a través de ellas sin jamás hacer referencia a un
-objeto ``Connection`` o prepararemos una sentencia |SQL|. Así, pues, para la
-persistencia de un objeto ``Centro`` debería utilizar un objeto de la clase
-``CentroSqlite`` y para la persistencia de la clase ``Estudiante``, un objeto de
-la clase ``EstudianteSqlite``.
-
-Sin embargo para simplificar el uso, las utilidades definen una clase llamada
+Sin embargo, para simplificar su uso las utilidades definen una clase llamada
 ``Dao`` que permite registrar las clases |DAO| que se utilizarán a través de
 ella, y usar esta única clase para hacer persistentes todos los objetos, sean de
 la clase que sean (en nuestro ejemplo, centros y estudiantes). Dicho de otra
@@ -234,8 +258,8 @@ forma, si ``ds`` es un |DataSource|, en vez de:
 .. code-block:: java
 
    // Esto se definió así en algún sitio.
-   Crud<Centro> centroDao = new CentroSqlite(ds);
-   Crud<Estudiante> estudianteDao = new EstudianteSqlite(ds);
+   var centroDao = new CentroSqlite(ds);
+   var estudianteDao = new EstudianteSqlite(ds);
 
    // Y me permite operar:
    centroDao.insert(centro);
@@ -249,120 +273,152 @@ haré esto otro:
    // Esto se definirá en algún sitio
    Dao dao = new Dao(ds, CentroSqlite.class, EstudianteSqlite.class);
 
-   // Y operaré siempre a través de este único objeto:
+   // Usamos dao con centros y estudiantes
    dao.insert(centro);
    Centro castillo = dao.get(Centro.class, 11004866);  // Hay que decir si quiero centros o estudiantes.
    Estudiante perico = dao.get(Estudiante.class, 1);   // Ídem.
 
-
-Finalmente, necesitamos también una clase que gestione la conexión a la base de
-datos y que se encargue de:
+Por ahora hemos fijado cómo hacer operaciones |CRUD|, pero no hemos dicho nada
+sobre cómo preparar y establecer la conexión a la base de datos. Para ello
+existe una clase *abstracta* en la librería llamada ``DaoConnection`` que deberá
+extender la clase ``ConexionSqlite``. Las labores de esta clase son:
 
 .. _rst-class: simple
 
-#. Crear el pool de conexiones con el |DataSource| apropiado.
-#. Realizar labores de inicialización como, por ejemplo, cuando la base de datos
-   está vacía, poblarla con el esquema.
-#. Proporcionar al resto el objeto ``Dao`` que facilita la persistencia de
-   centros y estudiantes.
-#. Habilitar algún mecanismo sencillo para que dos o más operaciones de
-   almacenamiento se realicen en una misma transacción.
+#. Crear el pool de conexiones, lo que nos facilitará un |DataSource| con el que
+   crear objetos |Connection|.
+#. Poblar la base de datos cuando no existe o no tiene esquema.
+#. Registrar las clases |DAO| (``CentroSqlite`` y ``EstudianteSqlite``) para que
+   sepa cómo se realizar las operaciones |CRUD|.
+#. Proporcionar un objeto ``Dao`` para que la aplicación pueda hacer
+   persistentes los objetos.
+#. Proporcionar un método para que varias operaciones puedan constituir una
+   misma transacción.
 
-Por ello, las utilidades definen una interfaz que deben cumplir todas estas
-clases de conexión\ [#]_:
+**Pool de conexiones**
+   Como es obvio que por cada acceso a una base de datos sólo debería crearse un
+   *pool*, la clase abstracta se asegura de que así sea cuando se intenta crear
+   el objeto con las mismas opciones que una vez anterior. En la clase derivada
+   ``ConexionSqlite`` sólo nos tenemos que preocupar de definir:
 
-.. literalinclude:: files/DaoConnection.java
-   :language: java
-   :start-at: public interface
+   + Cómo se crea el *pool* generando el objeto |DataSource|. Esto se
+     hace sobreescribiendo el método ``.createDataSource``.
+   + Cómo se distingue un acceso de otro implementando ``.generateKey``. Por
+     ejemplo, en una base de datos SQlite cada acceso se distingue por la |URL|
+     de conexión; en cambio en una base de datos MariaDB también hay
+     credenciales, por lo que la clave para distinguir accesos deberá generarse
+     combinando |URL| y usuario.
 
-**SEGUIR POR AQUÍ**
+   Como en Java los constructores de la subclase no se heredan implícitamente,
+   también debemos implementar trivialmente el constructor en
+   ``ConexionSqlite``.
 
-De la interfaz sólo exige aclaración el modo escogido para generar
-transacciones. Dado que debemos cumplir el principio de operar siempre a través
-de objetos |DAO|, hemos diseñado las transacciones para que se escriban así:
+**Crear el esquema**
+   ``DaoConnection`` da libertad para:
 
-.. _conn-transaccion-impl:
+   #. No pasar en absoluto ningún mecanismo para crear el esquema en la base de
+      datos.
+   #. Proporcionar un :java-nio:`Path` con el archivo que contiene las
+      sentencias |SQL|.
+   #. Definir nosotros mismos las sentencias de inicialización.
 
-.. code-block:: java
+   Por esa razón, la clase abstracta define tres constructores. En nuestro
+   ejemplo, nos hemos centrado en la segunda posibilidad, así que sólo hemos
+   implementado el segundo constructor en ``ConexionSqlite``.
 
-   try {
-      transaccion( (centroDao, estudianteDao) -> {
-         // Estos objetos DAO usan la misma conexión
-         // para realizar todas las operaciones y, además,
-         // todas están en la misma transacción, p.ej.
-         estudianteDao.insert(estudiante1);
-         estudianteDao.insert(estudiante2);
-      });
-   }
-   catch(DataAccessException err) {
-      // Tratamiento del error (el rollback está ya hecho).
-   }
+**Registro de clases DAO**
+   Es necesario pasarlas como argumentos del constructor.
 
-La implementación particular para una conexión queda así:
+**Facilitar el objeto Dao**
+   Dado que se registran las clases |DAO| en el momento de la construcción, la
+   clase es capaz de proporcionar a través de ``.getDao()`` un objeto único para
+   la persistencia. Este objeto construye los objetos |DAO| (``CentroSqlite`` y
+   ``EstudianteSqlite`` en el ejemplo) usando un |DataSource|, por lo que cada
+   operación usa una conexión distinta y no es posible a través de él incluir
+   varias en una misma transacción.
+
+**Transacciones**
+   Dada las limitaciones del objeto anterior, ``DaoConnection`` proporciona un
+   método llamado `.transaction` que admite como argumento un |Consumer| (una
+   variante en realidad) que facilita un objeto ``Dao`` construido no con un
+   |DataSource|, sino con un |Connection|. Esto posibilita que las operaciones
+   incluidas en el ``Consumer`` formen parte todas de una misma transacción.
+
+A pesar de todo ello, la implementación particular de ``ConexionSqlite`` es
+bastante sencilla, ya que lo demás se encuentra en la clase abstracta general:
 
 .. literalinclude:: files/ConexionSqlite.java
    :language: java
+   :start-at: public class
 
-La implementación es sencilla de entender: se crea un pool de conexiones al
-crear el objeto, se puebla la base de datos en caso de no existir previamente;
-y, con los métodos correspondientes, se devuelven instancias de las clases
-``CentroSqlite`` y ``EstudianteSqlite`` a las que se ha pasado el |DataSource|
-para su construcción. Por tanto, los objetos |DAO| generados no podrán usarse
-para crear transacciones con varias operaciones. Dos apostillas requiere, no
-obstante, el código:
+Por último, podría darse el caso de que quisiéramos que nuestra aplicación
+soportara distintos |SGBD|, lo que obliga a escoger la clase de conexión en
+tiempo de ejecución. La solución es usar un patrón **Factory** y crear los
+objetos de conexión no directamente, sino a través de una clase que lo
+implemente: ``BackendFactory``. Por ese motivo, la obtención del objeto que
+implemente la conexión debe ser como sigue:
 
-+ El |DataSource| para el pool de conexiones se crea con ayuda de una clase
-  abstracta ``AbstractDsCache`` que va almacenando los *pools* de conexiones ya
-  creados en una caché y, si ya se creó uno para las mismas ``opciones``, en vez
-  de crear uno nuevo, devuelve el correspondiente ya creado. Como en el caso de
-  SQLite no hay credenciales, la base de datos sólo está determinada por su
-  |URL|, así que la clave que sirve para cachear el objeto |DataSource| se
-  genera exclusivamente con ella.
+.. code-block:: java
 
-+ Cómo logramos escribir transacciones del modo que :ref:`se dejó escrito arriba
-  <conn-transaccion-impl>`:
+   // "base" es la cadena que identifica el SGBD (p.e. sqlite o SQLite)
+   // "esquema" es un Path al script SQL que define el esquema
+   // "opciones" es un Map<String, Object> con los parámetros de conexión.
 
-  .. code-block:: java
+   DaoConnection conexion = new BackendFactory()
+       // Registramos todos los tipos de bases de datos soportados
+       .register("SQLITE", ConexionSqlite.class)
+       .register("MARIADB", null) // No hay soporte por ahora, pero se prevé.
+       // Escogemos el conector adecuado e indicamos las clases DAO.
+       .createConnection(base, opciones, esquema, CentroSqlite.class, EstteSqlite.class);
 
-     @Override
-     public void transaccion(Transaccionable operaciones) throws DataAccessException {
-         try(Connection conn = ds.getConnection()) {
-             TransactionManager.transactionSQL(conn, c -> {
-                 operaciones.run(new CentroSqlite(c), new EstudianteSqlite(c));
-             });
-         }
-         catch(SQLException err) {
-             throw new DataAccessException(err);
-         }
-     }
+.. note:: Para las cadenas que identifican los |SGBD| no se hacen distinciones
+   entre mayúsculas y minúsculas de ahí que aunque ``base`` sea *sqlite*
+   concuerde con *SQLITE*.
 
-  Básicamente, crea un conexión y dos objetos |DAO| que usan esa misma conexión,
-  por lo que todas las operaciones hechas con ambos podrán formar parte de una
-  transacción. Estos dos objetos son los que recibe como argumento la
-  :ref:`función lambda que debe escribirse en el código del programa
-  <conn-transaccion-impl>`. Gracias a ``transactionSQL`` de sqlutils_, todas las
-  operaciones incluidas en esta función lambda, forman parte de una misma
-  transacción.
+Una vez tenemos un objeto de conexión, podemos obtener el ``Dao`` que facilita
+la realización de las operaciones |CRUD|:
 
-.. warning:: Como el método ``transaccion`` crea su propia conexión, no es
-   anidable.  Es una limitación que se podría intentar subsanar, implementando
-   de otro modo las transacciones (puesto que ``transactionSQL`` sí es
-   compatible con la anidación).
+.. code-block:: java
 
-Como nuestra aplicación puede manejar varios |SGBD| distintos, tendremos que
-realizar implementaciones análogas para todos ellos e implementar un `patrón
-Factory <https://www.arquitecturajava.com/patron-factory-para-que-sirve/>`_ que
-escoja el tipo adecuado de conexión.
+   Dao dao = conexion.getDao();
 
-Hecho eso, la relación con la base de datos está totalmente encapsulada como
-puede verse `en las pruebas de uso que incluye Test.java
-<https://github.com/sio2sio2/sqlutils/blob/main/src/test/java/edu/acceso/sqlutils/Test.java>`_.
+Y a partir de ahora podremos obtener y almacenar centros y estudiantes a través
+de este objeto. Si en algún momento, necesitáramos crear una transacción:
+
+.. code-block:: java
+   :name: conn-transaccion-impl
+
+   try {
+      transaccion( tao -> {
+         // Todas las operaciones hechas con tao,
+         // forman parte de una misma transacción.
+         tao.insert(estudiante1);
+         tao.insert(estudiante2);
+      });
+   }
+   catch(DataAccessException err) {
+      System.err.println("He fracasado miserablemente");
+   }
+
+Tanto el *commit* como el *rollback* son implícitos y no tenemos que
+preocduparnos por ellos.
+
+.. warning:: El método ``transaction`` crea su propia conexión y no puede
+   heredar una ya existente, así que no es anidable.
+   Es una limitación que se podría intentar subsanar, implementando
+   de otro modo las transacciones (el más ``transactionSQL`` del que deriva, sí
+   lo es, pero no está enfocado a usar el patrón |DAO|).
 
 .. rubric:: Notas al pie
 
 .. [#] Hemos incluido, eso sí, una anotación en el campo ``centro`` de
    ``Estudiante`` que lo identifica como clave foránea. Pero no deja de ser una
    mera anotación que además no es indispensable. Esta anotación está definida en sqlutils_.
+
+.. [#] Es probable, no obstante, que si las operaciones son sencillas, podamos
+   escribir unas clases comunes a los dialectos |SQL| más conocidos.
+
+.. [#] Luego veremos que haremos una abstracción más y ni siquiera haremos esto.
 
 .. [#] La ventaja de ``Stream`` es su evaluación perezosa; las desventajas son
    dos: nos veremos obligados a usar sqlutils_ y, además, se debe ser más
@@ -378,11 +434,8 @@ puede verse `en las pruebas de uso que incluye Test.java
 .. [#] En realidad, en vez de hacer una segunda consulta, podríamos hacer una
    consulta compuesta para obtener estudiante y centro.
 
-.. [#] En realidad, la interfaz satisface los dos últimos requisitos. Los dos
-   primeros deben resolverse automáticamente al crear el objeto, así que no son
-   necesarios métodos: se implementarán a través del constructor.
-
 .. _sqlutils: https://github.com/sio2sio2/sqlutils
+.. _Singleton: https://es.wikipedia.org/wiki/Singleton
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
@@ -394,3 +447,4 @@ puede verse `en las pruebas de uso que incluye Test.java
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
 .. |SQLException| replace:: :java-sql:`SQLException <SQLException>`
+.. |Consumer| replace:: :java-function:`Consumer <Consumer>`

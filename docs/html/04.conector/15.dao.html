@@ -391,11 +391,12 @@ la aplicación (p.ej. llamado <em>backend</em>), fuera del cual no haya otra cos
 objetos.</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
-<p>A continuación se glosa una posible solución, no con la intención
-de que se tome como definitiva, sino con el propósito de que se entienda a
-qué resultado debe llegarse: abstraer completamente la lógica del programa
-del soporte de datos, de modo que, si éste cambia, se reprograme sin que
-cambie en absoluto la lógica.</p>
+<p>La solución que se propone aquí y cuyo código se encuentra completo
+en los test de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">este repositorio de GitHub</a> es más bien una prueba de concepto y
+tiene el propósito lograr abstraer al programa de los detalles de la
+conexión, de manera que la persistencia se pueda manejar exclusivamente con
+objetos. Precisamente, esa la labor de las <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">herramientas ORM</span></a> y
+esas son las que deberíamos usar si quisiéramos crear una aplicación real.</p>
 </div>
 <p>Para lograr esta abstracción proponemos un patrón <abbr title="Data Access Object">DAO</abbr>, que separa por un lado
 los objetos del modelo de datos de nuestra aplicación y por otro los objetos que
@@ -572,13 +573,8 @@ enseñanza:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition seealso">
-<p class="admonition-title">Ver también</p>
-<p>Puede encontrar el código completo del ejemplo ilustrativo en los
-test de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">este repositorio de GitHub</a>.</p>
-</div>
 <p>Como puede observarse, las dos definiciones son independientes del soporte de
-almacenamiento y responden únicamente a la lógica de la aplicación<a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Para
+almacenamiento y responden únicamente a la lógica de la aplicación<a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Para
 simplicar las cosas obligamos a que todas estas clases incluyan un campo
 identificador, de ahí que implementen una interfaz <code class="docutils literal notranslate"><span class="pre">Entity</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Entity</span><span class="w"> </span><span class="p">{</span>
@@ -588,14 +584,41 @@ identificador, de ahí que implementen una interfaz <code class="docutils litera
 </pre></div>
 </div>
 <p>Si estas clases son ajenas a su persistencia, ¿cómo entonces se escribe o
-recupera información de la base de datos? Esto es así, porque definiremos otras
-clases, una por cada una de las clases del modelo, dedicadas a ello. Por tanto,
-deberemos crear una para almacenar y recuperar centros y, otra para almacenar y
-recuperar estudiantes.</p>
-<p>En principio, para todos los objetos hay que implementar las mismas operaciones
-de almacenamiento: inserción, recuperación, borrado y almacenamiento; así que
-podemos definir una interfaz que cumplan todas estas clases relacionadas con el
-almacenamiento en el backend:</p>
+recupera información sobre ellas en la base de datos? El patrón consiste en
+crear por cada una otra clase que se encargue de esa labor. Por tanto:</p>
+<div class="pst-scrollable-table-container"><table class="table" id="clase-dao">
+<thead>
+<tr class="row-odd"><th class="head"><p>Clase</p></th>
+<th class="head"><p>Clase <abbr title="Data Access Object">DAO</abbr></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Centro</p></td>
+<td><p>CentroSqlite</p></td>
+</tr>
+<tr class="row-odd"><td><p>Estudiante</p></td>
+<td><p>EstudianteSqlite</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Estas clases encargadas de la conversión entre el modelo de objetos (la
+definición de la clase en la aplicación) y el modelo relacional (su
+persistencia en la base de datos) dependen de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> concreto, ya
+que ninguno implementa exactamente igual el lenguaje <abbr title="Structured Query Language">SQL</abbr><a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.  La idea es
+que cada vez que haya que consultar la base de datos, se usen estas clases y el
+resto del código de nuestra aplicación quede libre de sentencias <abbr title="Structured Query Language">SQL</abbr>, objetos
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> y demás particularidades de la persistencia. Por ejemplo, obtener
+un centro se podrá hacer así<a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// ds es un DataSource.</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">11004866</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Como para todos los objetos, en principio, hay que implementar las mismas
+operaciones de persistencia, esto es, las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, podemos definir
+una interfaz que cumplan todas estas clases relacionadas con el almacenamiento
+en el backend:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Crud</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Entity</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
@@ -622,16 +645,22 @@ almacenamiento en el backend:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>La interfaz está definida en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>, pero no forma parte del código
-de prueba, sino de las utilidades.</p>
-</div>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
 <p>Esta interfaz no tiene por qué ser definida exactamente así: podrían defirnir
 otra que satisfaga también la necesidad de implementar las cuatro operaciones
 básicas.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Estas operaciones son universales y no exclusivas del ejemplo
+ilustrativo que nos proponemos resolver. Por ese motivo la hemos incluido
+como parte de la librería <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>. De hecho, se ha hecho un esfuerzo por
+generalizar todo lo que no depende de la particularidad del ejemplo, de ahí
+que haya mucho código dentro de la librería que utilice clases genéricas y
+reflexión. Crear una solución particular que cumpla los mismos principios de
+abstracción para el resto de la aplicación, no es en exceso complicado y
+puede resultar un ejercico pedagógicamente muyl útil.</p>
 </div>
 <p>Son precisas algunas aclaraciones:</p>
 <ul class="simple">
@@ -646,7 +675,7 @@ implementar algo más eficiente, si así lo estimamos oportuno.</p></li>
 <li><p>Hemos preferido que la obtención de todos los objetos de una misma clase se
 haga mediante un flujo para lo cual podemos usar el método
 <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>. Por supuesto es posible también
-alterar la firma del método para devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.<a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
+alterar la firma del método para devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.<a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
 <li><p>La obtención de un objeto a partir de su identificador puede resultar
 infructuosa, si tal objeto no existe en el almacenamiento. Por ese motivo se
 ha preferido devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Optional.html">Opcional</a> en vez de directamente
@@ -657,8 +686,8 @@ excepción propia para abstraernos de cuál es la excepción particular del
 soporte de almacenamiento.</p></li>
 </ul>
 <p>Esta, pues, es la interfaz que cumplirán todas las clases encargadas de
-comunicarse con la base de datos para extraer o guardar datos. Implementemos
-ahora la clase para extraer o guardar objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
+comunicarse con la base de datos para extraer o guardar datos. La implementación
+de <code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> para almacenar objetos <code class="docutils literal notranslate"><span class="pre">Centros</span></code> es esta:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -835,13 +864,12 @@ ahora la clase para extraer o guardar objetos <code class="docutils literal notr
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Este objeto <code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> implementa en particular la interfaz <code class="docutils literal notranslate"><span class="pre">Crud</span></code> para
-los objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code> y una base de datos SQLite. Si observamos la
-implementación de cualquiera de las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, veremos que consiste en
-poner en práctica lo aprendido anteriormente: se abre una conexión, se construye
-ls sentencia <abbr title="Structured Query Language">SQL</abbr> apropiada y se ejecuta para realizar la operación. Tan sólo
-el método que devuelve un <code class="docutils literal notranslate"><span class="pre">Stream</span></code> se sale un poco de esta regla por las
-particularidades del propio <code class="docutils literal notranslate"><span class="pre">Stream</span></code>:</p>
+<p>Si observamos la implementación de cualquiera de las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, veremos
+que consiste en poner en práctica lo aprendido anteriormente: se abre una
+conexión, se construye ls sentencia <abbr title="Structured Query Language">SQL</abbr> apropiada y se ejecuta para realizar
+la operación. Tan sólo el método que devuelve un <code class="docutils literal notranslate"><span class="pre">Stream</span></code> se sale un poco de
+esta regla por las particularidades del propio <code class="docutils literal notranslate"><span class="pre">Stream</span></code> (que no existirían si
+hubiéramos decidido devolver <code class="docutils literal notranslate"><span class="pre">List</span></code>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
 <span class="kd">public</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
@@ -856,60 +884,66 @@ particularidades del propio <code class="docutils literal notranslate"><span cla
 <span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// No cerramos la conexión.</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Obsérvese que en este método, a diferencia de los anteriores, no cerramos la
 conexión, ni la sentencia, ni el resultado, ya que de lo contrario no podremos
-obtener centros del <code class="docutils literal notranslate"><span class="pre">Stream</span></code> devuelto. Quien se encargará de cerrar finalmente
-todo será el propio flujo cuando se cierre, por lo que convendrá usar con él un
+obtener centros del <code class="docutils literal notranslate"><span class="pre">Stream</span></code> devuelto, ya que la evaluación es perezosa y se
+van obteniendo registros de <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code> a medida que se van consumiento los
+objetos del <code class="docutils literal notranslate"><span class="pre">Stream</span></code>. Quien se encargará de cerrar finalmente todo será el
+propio flujo cuando se cierre, por lo que convendrá usar con él un
 <em>try-with-resources</em>. Además, el primer argumento que recibe
-<code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> es aquello que debe cerrarse cuando se acaba de
-usar el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea
-la sentencia. Qué sea depende de cómo hayamos creado este objeto de
-comunicación con la base de datos: más adelante daremos las explicaciones.</p>
+<code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> es aquello que debe cerrarse cuando se acaba de usar
+el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea la
+sentencia. Qué sea depende de cómo hayamos creado este objeto de comunicación
+con la base de datos: más adelante daremos las explicaciones.</p>
 <p>En principio, cada operación parece abrir una conexión propia y cerrarla al
 acabar (excepto este último método por la particularidad ya referida). Si se
 utiliza un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a> y se facilita para la creación
-del objeto el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> correspondiente, esto no penaliza prácticamente
-el rendimiento y es muy cómodo. El problema de que cada operación abra y cierre
-su propio objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> es que nos quedamos sin poder reunir en una misma
-transacción dos o más operaciones, ya que las operaciones que constituyen una
-transacción deben compartir la conexión.</p>
-<p>En consecuencia, si lo requiere la circunstancia (definir una transacción con
-varias operaciones), necesitamos poder crear estos objetos a partir de una
-conexión ya existente y que sus métodos la usen sin cerrarla. Para no duplicar
-código, hemos acudido a una argucia: un objeto <code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code> que
-enmascara el hecho de que hayamos creado el objeto a partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> o
-un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> compartido, en cuyo último caso no hay que cerrarlo, aun cuando
-estemos usando una estructura <em>try-with-resources</em>, y aparentemente se cierre.
-Por esta razón, las conexiones se obtienen a partir de un atributo <code class="docutils literal notranslate"><span class="pre">cp</span></code>
-(definido en <code class="docutils literal notranslate"><span class="pre">AbstractDao</span></code> como un <code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code>).  Esta es también
-la razón por la que se pasa a <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> a veces una conexión
-(cuando la conexion la creó el propio método a partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>) y a
-veces una sentencia (cuando se usa una conexión preexistente que no debe
-cerrarse)<a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+del objeto <code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> correspondiente, esto no penaliza
+prácticamente el rendimiento y es muy cómodo. El problema de que cada operación
+abra y cierre su propio objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> es que nos quedamos sin poder reunir
+en una misma transacción dos o más operaciones, ya que las operaciones que
+constituyen una transacción deben compartir la misma conexión.</p>
+<p>En consecuencia, si lo requiere la circunstancia, necesitamos poder crear estos
+objetos a partir de una conexión ya existente y que sus métodos la utilicen sin
+cerrarla. Para no duplicar código, hemos acudido a una argucia: un objeto
+<code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code> que enmascara el hecho de que hayamos creado el objeto a
+partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> o un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> compartido, en cuyo último caso no
+hay que cerrar jamás al acabar la operación, aun cuando en el método que la
+implementa usemos una estructura <em>try-with-resources</em>.  Por esta razón, las
+conexiones se obtienen a partir de un atributo <code class="docutils literal notranslate"><span class="pre">cp</span></code> (definido en
+<code class="docutils literal notranslate"><span class="pre">AbstractDao</span></code> como un <code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code>).  Esta es también la razón por
+la que se pasa a <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> a veces una conexión (cuando la
+conexion la creó el propio método a partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>) y a veces una
+sentencia (cuando se usa una conexión preexistente que no debe cerrarse)<a class="footnote-reference brackets" href="#id11" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
 <p>Necesitamos también crear una clase para la persistencia de los objetos
-<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. La clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> es semejante a la anterior, pero
-hay una gran diferencia: uno de los atributos de <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es un centro, lo
-que supone que en la base de datos el campo es una clave foránea (un entero) que
+<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. La clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> es análoga a la anterior, pero hay
+una gran diferencia: uno de los atributos de <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es un centro, lo que
+supone que en la base de datos el campo es una clave foránea (un entero) que
 hace referencia al registro de otra tabla. El problema de esta circunstancia se
 produce cuando deseemos generar un objeto <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> a partir de una
 operación de lectura (<code class="docutils literal notranslate"><span class="pre">.get</span></code> en nuestra interfaz), ya que la consulta nos
 devolverá el identificador del centro, no el centro en sí. Para abordar esta
 dificultad tenemos dos vías:</p>
-<ul class="simple">
+<ol class="arabic simple">
 <li><p>Obtener automáticamente también el centro asociado al obtener el estudiante.</p></li>
 <li><p>No hacerlo y posponer su obtención hasta que sea realmente necesario: cuando
 en la aplicación se ejecute el método <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code>.</p></li>
-</ul>
+</ol>
 <p>La primera vía es sencilla, aunque menos eficiente: si nunca llegamos a usar el
-centro, habremos hecho una segunda consulta<a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> inútil. La segunda vía es
+centro, habremos hecho una segunda consulta<a class="footnote-reference brackets" href="#id12" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> inútil. La segunda vía es
 perezosa, pero tiene el inconveniente de que es más difícil de implementar, ya
 que pasa por crear un objeto proxy que almacene inicialmente el identificador
-del centro e intercepte las llamadas al método <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code> para que haga la
-consulta con dicho identificador. En cualquier caso, tal implementación está
-hecha en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>. Veamos cómo usar esta implementación:</p>
+del centro e intercepte las llamadas al método <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code>. La primera vez
+que se use, hará la consulta con dicho identificador para obtener de forma
+efectiva el objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> y asignará el valor del atributo, para que las
+veces sucesivas se devuelva el atributo sin hacer consulta . En cualquier caso,
+tal implementación está hecha en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>, así que sólo tenemos que ver cómo
+usarla:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="nf">resultToEstudiante</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_estudiante&quot;</span><span class="p">);</span>
 <span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
@@ -933,22 +967,14 @@ hecha en <a class="reference external" href="https://github.com/sio2sio2/sqlutil
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Con lo hecho hasta ahora, tenemos definidas las clases del modelo y las clases
-que permiten hacer persistentes los objetos de dichas clases (<abbr title="Data Access Object">DAO</abbr>). Éstas
-últimas relacionan la aplicación con la base de datos, por lo que la
-persistencia debería hacerse a través de ellas sin jamás hacer referencia a un
-objeto <code class="docutils literal notranslate"><span class="pre">Connection</span></code> o prepararemos una sentencia <abbr title="Structured Query Language">SQL</abbr>. Así, pues, para la
-persistencia de un objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> debería utilizar un objeto de la clase
-<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y para la persistencia de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>, un objeto de
-la clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code>.</p>
-<p>Sin embargo para simplificar el uso, las utilidades definen una clase llamada
+<p>Sin embargo, para simplificar su uso las utilidades definen una clase llamada
 <code class="docutils literal notranslate"><span class="pre">Dao</span></code> que permite registrar las clases <abbr title="Data Access Object">DAO</abbr> que se utilizarán a través de
 ella, y usar esta única clase para hacer persistentes todos los objetos, sean de
 la clase que sean (en nuestro ejemplo, centros y estudiantes). Dicho de otra
 forma, si <code class="docutils literal notranslate"><span class="pre">ds</span></code> es un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, en vez de:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definió así en algún sitio.</span>
-<span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-<span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudianteDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">estudianteDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
 
 <span class="c1">// Y me permite operar:</span>
 <span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
@@ -960,102 +986,98 @@ forma, si <code class="docutils literal notranslate"><span class="pre">ds</span>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definirá en algún sitio</span>
 <span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dao</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 
-<span class="c1">// Y operaré siempre a través de él.</span>
+<span class="c1">// Usamos dao con centros y estudiantes</span>
 <span class="n">dao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
 <span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span><span class="w">  </span><span class="c1">// Hay que decir si quiero centros o estudiantes.</span>
 <span class="n">Estudiante</span><span class="w"> </span><span class="n">perico</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">   </span><span class="c1">// Ídem.</span>
 </pre></div>
 </div>
-<p>Finalmente, necesitamos también una clase que gestione la conexión a la base de
-datos y que se encargue de:</p>
+<p>Por ahora hemos fijado cómo hacer operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, pero no hemos dicho nada
+sobre cómo preparar y establecer la conexión a la base de datos. Para ello
+existe una clase <em>abstracta</em> en la librería llamada <code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> que deberá
+extender la clase <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>. Las labores de esta clase son:</p>
 <ol class="arabic simple">
-<li><p>Crear el pool de conexiones con el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> apropiado.</p></li>
-<li><p>Realizar labores de inicialización como, por ejemplo, cuando la base de datos
-está vacía, poblarla con el esquema.</p></li>
-<li><p>Proporcionar al resto el objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> que facilita la persistencia de
-centros y estudiantes.</p></li>
-<li><p>Habilitar algún mecanismo sencillo para que dos o más operaciones de
-almacenamiento se realicen en una misma transacción.</p></li>
+<li><p>Crear el pool de conexiones, lo que nos facilitará un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> con el que
+crear objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p></li>
+<li><p>Poblar la base de datos cuando no existe o no tiene esquema.</p></li>
+<li><p>Registrar las clases <abbr title="Data Access Object">DAO</abbr> (<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code>) para que
+sepa cómo se realizar las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>.</p></li>
+<li><p>Proporcionar un objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> para que la aplicación pueda hacer
+persistentes los objetos.</p></li>
+<li><p>Proporcionar un método para que varias operaciones puedan constituir una
+misma transacción.</p></li>
 </ol>
-<p>Por ello, las utilidades definen una interfaz que deben cumplir todas estas
-clases de conexión<a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DaoConnection</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="nd">@FunctionalInterface</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DaoTransactionable</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Dao</span><span class="w"> </span><span class="nf">getDao</span><span class="p">();</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">DaoTransactionable</span><span class="w"> </span><span class="n">operaciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>De la interfaz sólo exige aclaración el modo escogido para generar
-transacciones. Dado que debemos cumplir el principio de operar siempre a través
-de objetos <abbr title="Data Access Object">DAO</abbr>, hemos diseñado las transacciones para que se escriban así:</p>
-<div class="highlight-java notranslate" id="conn-transaccion-impl"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">transaccion</span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="n">centroDao</span><span class="p">,</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Estos objetos DAO usan la misma conexión</span>
-<span class="w">      </span><span class="c1">// para realizar todas las operaciones y, además,</span>
-<span class="w">      </span><span class="c1">// todas están en la misma transacción, p.ej.</span>
-<span class="w">      </span><span class="n">estudianteDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante1</span><span class="p">);</span>
-<span class="w">      </span><span class="n">estudianteDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante2</span><span class="p">);</span>
-<span class="w">   </span><span class="p">});</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Tratamiento del error (el rollback está ya hecho).</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>La implementación particular para una conexión queda así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.backend.sqlite</span><span class="p">;</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.InputStream</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.file.Files</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.file.Path</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.Connection</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.SQLException</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.stream.Stream</span><span class="p">;</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">javax.sql.DataSource</span><span class="p">;</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">com.zaxxer.hikari.HikariConfig</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">com.zaxxer.hikari.HikariDataSource</span><span class="p">;</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.SqlUtils</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.backend.AbstractDsCache</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.backend.Conexion</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.dao.Crud</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.errors.DataAccessException</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.modelo.Centro</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.modelo.Estudiante</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.transaction.TransactionManager</span><span class="p">;</span>
-
-<span class="cm">/**</span>
-<span class="cm"> * Modela la conexión a una base de dato SQLite</span>
-<span class="cm"> */</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConexionSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractDsCache</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Conexion</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">esquema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.dir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;src&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;resources&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;esquema.sql&quot;</span><span class="p">);</span>
+<dl>
+<dt><strong>Pool de conexiones</strong></dt><dd><p>Como es obvio que por cada acceso a una base de datos sólo debería crearse un
+<em>pool</em>, la clase abstracta se asegura de que así sea cuando se intenta crear
+el objeto con las mismas opciones que una vez anterior. En la clase derivada
+<code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code> sólo nos tenemos que preocupar de definir:</p>
+<ul class="simple">
+<li><p>Cómo se crea el <em>pool</em> generando el objeto <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>. Esto se
+hace sobreescribiendo el método <code class="docutils literal notranslate"><span class="pre">.createDataSource</span></code>.</p></li>
+<li><p>Cómo se distingue un acceso de otro implementando <code class="docutils literal notranslate"><span class="pre">.generateKey</span></code>. Por
+ejemplo, en una base de datos SQlite cada acceso se distingue por la <abbr title="Uniform Resource Locator">URL</abbr>
+de conexión; en cambio en una base de datos MariaDB también hay
+credenciales, por lo que la clave para distinguir accesos deberá generarse
+combinando <abbr title="Uniform Resource Locator">URL</abbr> y usuario.</p></li>
+</ul>
+<p>Como en Java los constructores de la subclase no se heredan implícitamente,
+también debemos implementar trivialmente el constructor en
+<code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>.</p>
+</dd>
+<dt><strong>Crear el esquema</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> da libertad para:</p>
+<ol class="arabic simple">
+<li><p>No pasar en absoluto ningún mecanismo para crear el esquema en la base de
+datos.</p></li>
+<li><p>Proporcionar un <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">java.nio.file.Path</a> con el archivo que contiene las
+sentencias <abbr title="Structured Query Language">SQL</abbr>.</p></li>
+<li><p>Definir nosotros mismos las sentencias de inicialización.</p></li>
+</ol>
+<p>Por esa razón, la clase abstracta define tres constructores. En nuestro
+ejemplo, nos hemos centrado en la segunda posibilidad, así que sólo hemos
+implementado el segundo constructor en <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>.</p>
+</dd>
+<dt><strong>Registro de clases DAO</strong></dt><dd><p>Es necesario pasarlas como argumentos del constructor.</p>
+</dd>
+<dt><strong>Facilitar el objeto Dao</strong></dt><dd><p>Dado que se registran las clases <abbr title="Data Access Object">DAO</abbr> en el momento de la construcción, la
+clase es capaz de proporcionar a través de <code class="docutils literal notranslate"><span class="pre">.getDao()</span></code> un objeto único para
+la persistencia. Este objeto construye los objetos <abbr title="Data Access Object">DAO</abbr> (<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y
+<code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> en el ejemplo) usando un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, por lo que cada
+operación usa una conexión distinta y no es posible a través de él incluir
+varias en una misma transacción.</p>
+</dd>
+<dt><strong>Transacciones</strong></dt><dd><p>Dada las limitaciones del objeto anterior, <code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> proporciona un
+método llamado <cite>.transaction</cite> que admite como argumento un <a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Consumer.html">Consumer</a> (una
+variante en realidad) que facilita un objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> construido no con un
+<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, sino con un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>. Esto posibilita que las operaciones
+incluidas en el <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> formen parte todas de una misma transacción.</p>
+</dd>
+</dl>
+<p>A pesar de todo ello, la implementación particular de <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code> es
+bastante sencilla, ya que lo demás se encuentra en la clase abstracta general:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConexionSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DaoConnection</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">maxConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">minConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Constructor de la conexión.</span>
 <span class="cm">     * Si la url+username+password coincide con una que ya se haya utilizado, no se crea un objeto</span>
 <span class="cm">     * distinto, sino que se devuelve el objeto que se creó anteriormente.</span>
 <span class="cm">     * @param opciones Las opciones de conexión.</span>
+<span class="cm">     * @param scriptSql El archivo con el guión SQL que crea el esquema en la base de datos.</span>
+<span class="cm">     * @param daoClasses Las clases DAO que se usarán con la conexión para hacer persistentes los objetos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConexionSqlite</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">HikariDataSource</span><span class="p">)</span><span class="w"> </span><span class="n">getDataSource</span><span class="p">(</span><span class="n">opciones</span><span class="p">);</span>
-<span class="w">        </span><span class="n">initDB</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConexionSqlite</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">scriptSql</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">daoClasses</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">scriptSql</span><span class="p">,</span><span class="w"> </span><span class="n">daoClasses</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="c1">// No he implementados los otros dos constructores posibles, porque no los usaré.</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Crea el pool de conexiones.</span>
+<span class="cm">     * @param opciones Las opciones para crear el pool.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="nf">createDataSource</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">);</span>
@@ -1074,140 +1096,108 @@ de objetos <abbr title="Data Access Object">DAO</abbr>, hemos diseñado las tran
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Define cómo se diferencias unas conexiones de otras.</span>
+<span class="cm">     * En el caso de SQLite, sólo por la URL, ya que no hay credenciales.</span>
+<span class="cm">     * @param opciones Las opciones de conexión.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">generateKey</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getCentroDao</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getEstudianteDao</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">initDB</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getCentroDao</span><span class="p">().</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">centros</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="c1">// Si no podemos obtener la lista de los centros disponibles.</span>
-<span class="w">        </span><span class="c1">// es porque aún no existe la base de datos.</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">                </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">                </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">esquema</span><span class="p">);</span>
-<span class="w">            </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">executeSQL</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">st</span><span class="p">);</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;No puede crearse el esquema de la base de datos&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;No puede acceder al esquema: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">esquema</span><span class="p">));</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaccion</span><span class="p">(</span><span class="n">Transaccionable</span><span class="w"> </span><span class="n">operaciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">transactionSQL</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="n">operaciones</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">c</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">c</span><span class="p">));</span>
-<span class="w">            </span><span class="p">});</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>La implementación es sencilla de entender: se crea un pool de conexiones al
-crear el objeto, se puebla la base de datos en caso de no existir previamente;
-y, con los métodos correspondientes, se devuelven instancias de las clases
-<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> a las que se ha pasado el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>
-para su construcción. Por tanto, los objetos <abbr title="Data Access Object">DAO</abbr> generados no podrán usarse
-para crear transacciones con varias operaciones. Dos apostillas requiere, no
-obstante, el código:</p>
-<ul>
-<li><p>El <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> para el pool de conexiones se crea con ayuda de una clase
-abstracta <code class="docutils literal notranslate"><span class="pre">AbstractDsCache</span></code> que va almacenando los <em>pools</em> de conexiones ya
-creados en una caché y, si ya se creó uno para las mismas <code class="docutils literal notranslate"><span class="pre">opciones</span></code>, en vez
-de crear uno nuevo, devuelve el correspondiente ya creado. Como en el caso de
-SQLite no hay credenciales, la base de datos sólo está determinada por su
-<abbr title="Uniform Resource Locator">URL</abbr>, así que la clave que sirve para cachear el objeto <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> se
-genera exclusivamente con ella.</p></li>
-<li><p>Cómo logramos escribir transacciones del modo que <a class="reference internal" href="#conn-transaccion-impl"><span class="std std-ref">se dejó escrito arriba</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
-<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaccion</span><span class="p">(</span><span class="n">Transaccionable</span><span class="w"> </span><span class="n">operaciones</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">transactionSQL</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">operaciones</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">c</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">c</span><span class="p">));</span>
-<span class="w">        </span><span class="p">});</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
+<p>Por último, podría darse el caso de que quisiéramos que nuestra aplicación
+soportara distintos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, lo que obliga a escoger la clase de conexión en
+tiempo de ejecución. La solución es usar un patrón <strong>Factory</strong> y crear los
+objetos de conexión no directamente, sino a través de una clase que lo
+implemente: <code class="docutils literal notranslate"><span class="pre">BackendFactory</span></code>. Por ese motivo, la obtención del objeto que
+implemente la conexión debe ser como sigue:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// &quot;base&quot; es la cadena que identifica el SGBD (p.e. sqlite o SQLite)</span>
+<span class="c1">// &quot;esquema&quot; es un Path al script SQL que define el esquema</span>
+<span class="c1">// &quot;opciones&quot; es un Map&lt;String, Object&gt; con los parámetros de conexión.</span>
+
+<span class="n">DaoConnection</span><span class="w"> </span><span class="n">conexion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BackendFactory</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">// Registramos todos los tipos de bases de datos soportados</span>
+<span class="w">    </span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;SQLITE&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ConexionSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;MARIADB&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="c1">// No hay soporte por ahora, pero se prevé.</span>
+<span class="w">    </span><span class="c1">// Escogemos el conector adecuado e indicamos las clases DAO.</span>
+<span class="w">    </span><span class="p">.</span><span class="na">createConnection</span><span class="p">(</span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">esquema</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">EstteSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Para las cadenas que identifican los <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> no se hacen distinciones
+entre mayúsculas y minúsculas de ahí que aunque <code class="docutils literal notranslate"><span class="pre">base</span></code> sea <em>sqlite</em>
+concuerde con <em>SQLITE</em>.</p>
+</div>
+<p>Una vez tenemos un objeto de conexión, podemos obtener el <code class="docutils literal notranslate"><span class="pre">Dao</span></code> que facilita
+la realización de las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conexion</span><span class="p">.</span><span class="na">getDao</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Y a partir de ahora podremos obtener y almacenar centros y estudiantes a través
+de este objeto. Si en algún momento, necesitáramos crear una transacción:</p>
+<div class="highlight-java notranslate" id="conn-transaccion-impl"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">transaccion</span><span class="p">(</span><span class="w"> </span><span class="n">tao</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Todas las operaciones hechas con tao,</span>
+<span class="w">      </span><span class="c1">// forman parte de una misma transacción.</span>
+<span class="w">      </span><span class="n">tao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante1</span><span class="p">);</span>
+<span class="w">      </span><span class="n">tao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante2</span><span class="p">);</span>
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;He fracasado miserablemente&quot;</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Básicamente, crea un conexión y dos objetos <abbr title="Data Access Object">DAO</abbr> que usan esa misma conexión,
-por lo que todas las operaciones hechas con ambos podrán formar parte de una
-transacción. Estos dos objetos son los que recibe como argumento la
-<a class="reference internal" href="#conn-transaccion-impl"><span class="std std-ref">función lambda que debe escribirse en el código del programa</span></a>. Gracias a <code class="docutils literal notranslate"><span class="pre">transactionSQL</span></code> de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>, todas las
-operaciones incluidas en esta función lambda, forman parte de una misma
-transacción.</p>
-</li>
-</ul>
+<p>Tanto el <em>commit</em> como el <em>rollback</em> son implícitos y no tenemos que
+preocduparnos por ellos.</p>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Como el método <code class="docutils literal notranslate"><span class="pre">transaccion</span></code> crea su propia conexión, no es
-anidable.  Es una limitación que se podría intentar subsanar, implementando
-de otro modo las transacciones (puesto que <code class="docutils literal notranslate"><span class="pre">transactionSQL</span></code> sí es
-compatible con la anidación).</p>
+<p>El método <code class="docutils literal notranslate"><span class="pre">transaction</span></code> crea su propia conexión y no puede
+heredar una ya existente, así que no es anidable.
+Es una limitación que se podría intentar subsanar, implementando
+de otro modo las transacciones (el más <code class="docutils literal notranslate"><span class="pre">transactionSQL</span></code> del que deriva, sí
+lo es, pero no está enfocado a usar el patrón <abbr title="Data Access Object">DAO</abbr>).</p>
 </div>
-<p>Como nuestra aplicación puede manejar varios <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> distintos, tendremos que
-realizar implementaciones análogas para todos ellos e implementar un <a class="reference external" href="https://www.arquitecturajava.com/patron-factory-para-que-sirve/">patrón
-Factory</a> que
-escoja el tipo adecuado de conexión.</p>
-<p>Hecho eso, la relación con la base de datos está totalmente encapsulada como
-puede verse <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/test/java/edu/acceso/sqlutils/Test.java">en las pruebas de uso que incluye Test.java</a>.</p>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id6" role="doc-footnote">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Hemos incluido, eso sí, una anotación en el campo <code class="docutils literal notranslate"><span class="pre">centro</span></code> de
 <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que lo identifica como clave foránea. Pero no deja de ser una
 mera anotación que además no es indispensable. Esta anotación está definida en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id7" role="doc-footnote">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Es probable, no obstante, que si las operaciones son sencillas, podamos
+escribir unas clases comunes a los dialectos <abbr title="Structured Query Language">SQL</abbr> más conocidos.</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Luego veremos que haremos una abstracción más y ni siquiera haremos esto.</p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>La ventaja de <code class="docutils literal notranslate"><span class="pre">Stream</span></code> es su evaluación perezosa; las desventajas son
 dos: nos veremos obligados a usar <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> y, además, se debe ser más
 cuidadoso al utilizarla ya que debemos asegurarnos de que quien cierra la
 conexión es el propio Stream.</p>
 </aside>
-<aside class="footnote brackets" id="id8" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
 <p>De todos modos, en caso de que pasáramos la conexión cuando hemos creado
 el objeto con una conexión, la conexión no se cerraría, porque la hemos
 manipulado para que no sea así (recordemos que la manejamos a través de
 <code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code> y no directamente); y la sentencia quedaría sin cerrar
 hasta que no se cerrara la conexión fuera del objeto.</p>
 </aside>
-<aside class="footnote brackets" id="id9" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
 <p>En realidad, en vez de hacer una segunda consulta, podríamos hacer una
 consulta compuesta para obtener estudiante y centro.</p>
-</aside>
-<aside class="footnote brackets" id="id10" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
-<p>En realidad, la interfaz satisface los dos últimos requisitos. Los dos
-primeros deben resolverse automáticamente al crear el objeto, así que no son
-necesarios métodos: se implementarán a través del constructor.</p>
 </aside>
 </aside>
 </section>

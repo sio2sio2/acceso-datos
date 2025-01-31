@@ -447,7 +447,7 @@ método que lo hace, sin necesidad de obtener la fábrica.</p></li>
 <li><p>Si se cierra el objeto, entonces sí se podrá crear otro.</p></li>
 </ul>
 <p>De este modo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate" id="orm-uso-sf"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Crea la fábrica de sesiones</span>
 <span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">HibernateFactory</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;hibernate.cfg.xml&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">operaciones</span><span class="p">();</span>
@@ -455,19 +455,22 @@ método que lo hace, sin necesidad de obtener la fábrica.</p></li>
 <span class="p">}</span>
 
 <span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">operaciones</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// ¡Ojo! No hay que cerrarlo.</span>
-<span class="w">  </span><span class="n">Hibernate</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w"> </span><span class="c1">// Devuelve el mismo objeto.</span>
-<span class="w">  </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">   </span><span class="c1">// ¡Ojo! No hay que cerrarlo.</span>
+<span class="w">   </span><span class="n">Hibernate</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w"> </span><span class="c1">// Devuelve el mismo objeto.</span>
+<span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 
-<span class="w">  </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
 
-<span class="w">     </span><span class="c1">// Hago operaciones CRUD.</span>
-<span class="w">     </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">  </span><span class="p">}</span>
+<span class="w">         </span><span class="c1">// Hago operaciones CRUD.</span>
+
+<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>

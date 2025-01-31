@@ -1,50 +1,42 @@
 package edu.acceso.sqlutils.backend.sqlite;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import edu.acceso.sqlutils.SqlUtils;
-import edu.acceso.sqlutils.backend.AbstractDsCache;
-import edu.acceso.sqlutils.backend.Conexion;
-import edu.acceso.sqlutils.dao.Crud;
+import edu.acceso.sqlutils.dao.DaoConnection;
 import edu.acceso.sqlutils.errors.DataAccessException;
-import edu.acceso.sqlutils.modelo.Centro;
-import edu.acceso.sqlutils.modelo.Estudiante;
-import edu.acceso.sqlutils.transaction.TransactionManager;
 
 /**
  * Modela la conexión a una base de dato SQLite
  */
-public class ConexionSqlite extends AbstractDsCache implements Conexion {
-    final static Path esquema = Path.of(System.getProperty("user.dir"), "src", "test", "resources", "esquema.sql");
+public class ConexionSqlite extends DaoConnection {
     final static String protocol = "jdbc:sqlite:";
     final static short maxConn = 10;
     final static short minConn = 1;
-
-    private final HikariDataSource ds;
 
     /**
      * Constructor de la conexión.
      * Si la url+username+password coincide con una que ya se haya utilizado, no se crea un objeto
      * distinto, sino que se devuelve el objeto que se creó anteriormente.
      * @param opciones Las opciones de conexión.
+     * @param scriptSql El archivo con el guión SQL que crea el esquema en la base de datos.
+     * @param daoClasses Las clases DAO que se usarán con la conexión para hacer persistentes los objetos.
      */
-    public ConexionSqlite(Map<String, Object> opciones) throws DataAccessException {
-        ds = (HikariDataSource) getDataSource(opciones);
-        initDB();
+    public ConexionSqlite(Map<String, Object> opciones, Path scriptSql, Class<?> ... daoClasses) throws DataAccessException {
+        super(opciones, scriptSql, daoClasses);
     }
 
+    // No he implementados los otros dos constructores posibles, porque no los usaré.
+
+    /**
+     * Crea el pool de conexiones.
+     * @param opciones Las opciones para crear el pool.
+     */
     @Override
     protected DataSource createDataSource(Map<String, Object> opciones) {
         String path = (String) opciones.get("url");
@@ -63,52 +55,13 @@ public class ConexionSqlite extends AbstractDsCache implements Conexion {
         return new HikariDataSource(hconfig);
     }
 
+    /**
+     * Define cómo se diferencias unas conexiones de otras.
+     * En el caso de SQLite, sólo por la URL, ya que no hay credenciales.
+     * @param opciones Las opciones de conexión.
+     */
     @Override
     protected String generateKey(Map<String, Object> opciones) {
         return (String) opciones.get("url");
-    }
-
-    @Override
-    public Crud<Centro> getCentroDao() {
-        return new CentroSqlite(ds);
-    }
-
-    @Override
-    public Crud<Estudiante> getEstudianteDao() {
-        return new EstudianteSqlite(ds);
-    }
-
-    private void initDB() throws DataAccessException {
-        try (Stream<Centro> centros = getCentroDao().get()) {
-            centros.close();
-        }
-        // Si no podemos obtener la lista de los centros disponibles.
-        // es porque aún no existe la base de datos.
-        catch(DataAccessException err) {
-            try (
-                Connection conn = ds.getConnection();
-                InputStream st = Files.newInputStream(esquema);
-            ) {
-                SqlUtils.executeSQL(conn, st);
-            }
-            catch(SQLException e) {
-                throw new DataAccessException("No puede crearse el esquema de la base de datos", e);
-            }
-            catch(IOException e) {
-                throw new DataAccessException(String.format("No puede acceder al esquema: %s", esquema));
-            }
-        }
-    }
-
-    @Override
-    public void transaccion(Transaccionable operaciones) throws DataAccessException {
-        try(Connection conn = ds.getConnection()) {
-            TransactionManager.transactionSQL(conn, c -> {
-                operaciones.run(new CentroSqlite(c), new EstudianteSqlite(c));
-            });
-        }
-        catch(SQLException err) {
-            throw new DataAccessException(err);
-        }
     }
 }

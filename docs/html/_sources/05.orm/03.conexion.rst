@@ -30,6 +30,7 @@ La clase:
 De este modo:
 
 .. code-block:: java
+   :name: orm-uso-sf
 
    public static main(String[] args) throws Exception {
      // Crea la fábrica de sesiones
@@ -39,19 +40,22 @@ De este modo:
    }
 
    private static operaciones() {
-     // ¡Ojo! No hay que cerrarlo.
-     Hibernate hf = HibernateFactory.getInstance(); // Devuelve el mismo objeto.
-     Transaction tr = null;
+      // ¡Ojo! No hay que cerrarlo.
+      Hibernate hf = HibernateFactory.getInstance(); // Devuelve el mismo objeto.
+      Transaction tr = null;
 
-     try(Session sesion = hf.openSession()) {
-        tr = sesion.beginTransaction();
+      try(Session sesion = hf.openSession()) {
+         try {
+            tr = sesion.beginTransaction();
 
-        // Hago operaciones CRUD.
-        tr.commit();
-     }
-     catch(Exception e) {
-        if(tr != null) tr.rollback();
-     }
+            // Hago operaciones CRUD.
+
+            tr.commit();
+         }
+         catch(Exception e) {
+            if(tr != null) tr.rollback();
+         }
+      }
    }
 
 .. rubric:: Notas al pie

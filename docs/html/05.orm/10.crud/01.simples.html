@@ -396,8 +396,24 @@ document.write(`
                   
   <section id="simples">
 <span id="orm-simple-crud"></span><h1><span class="section-number">5.6.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h1>
+<p>Antes de comenzar a desglosar las cuatro operacioness <abbr title="Create, Read, Update, Delete">CRUD</abbr> básicas, es
+necesario introducir otro concepto, el de <em class="dfn">vinculación a la sesión</em>: un
+objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
+la sesión activa, lo cual ocurre cuando:</p>
+<ul class="simple">
+<li><p>Lo hemos obtenido previamente de la base de datos en esa misma sesión.</p></li>
+<li><p>Hemos usando con él un método que supone su vinculación:</p>
+<ul>
+<li><p><cite>.persist</cite>, que agrega un nuevo objeto a la base de datos y, por su propia
+naturaleza se usa con un objeto creado <em>ex novo</em> y, por tanto, no vinculado.</p></li>
+<li><p><cite>.merge</cite>, que expresamente vincula un objeto a la base de datos, existiera
+en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto <em>ex
+novo</em>).</p></li>
+</ul>
+</li>
+</ul>
 <section id="create">
-<h2><span class="section-number">5.6.1.1. </span>CREATE<a class="headerlink" href="#create" title="Link to this heading">#</a></h2>
+<span id="orm-crud-create"></span><h2><span class="section-number">5.6.1.1. </span>CREATE<a class="headerlink" href="#create" title="Link to this heading">#</a></h2>
 <p>Para agregar objetos (o sea, registros) a la base de datos, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> utiliza
 el método <code class="docutils literal notranslate"><span class="pre">.persist</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Supongamos que el objeto ya se instanció antes y se creó.</span>
@@ -413,8 +429,9 @@ el método <code class="docutils literal notranslate"><span class="pre">.persist
 <span class="w">         </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span>
 <span class="w">      </span><span class="p">);</span>
-<span class="hll"><span class="w">      </span><span class="n">sesion</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span>
-</span><span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="hll"><span class="w">      </span><span class="n">sesion</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Vincula y agrega.</span>
+</span><span class="w">      </span><span class="c1">// Guardamos los cambios y cerramos la sesión.</span>
+<span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">;</span>
@@ -422,10 +439,14 @@ el método <code class="docutils literal notranslate"><span class="pre">.persist
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Obsérvese cómo se ha manejado la transacción.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Una vez vinculado, podríamos en esta misma sesión realizar otras
+operaciones que exigen que el objeto esté vinculado (como <a class="reference internal" href="#orm-crud-update"><span class="std std-ref">actualizar</span></a> o <a class="reference internal" href="#orm-crud-delete"><span class="std std-ref">eliminar</span></a>).</p>
+</div>
 </section>
 <section id="read">
-<h2><span class="section-number">5.6.1.2. </span>READ<a class="headerlink" href="#read" title="Link to this heading">#</a></h2>
+<span id="orm-crud-read"></span><h2><span class="section-number">5.6.1.2. </span>READ<a class="headerlink" href="#read" title="Link to this heading">#</a></h2>
 <p>La operación de lectura más sencilla es obtener un objeto a partir de su
 identificador, para lo cual se usa el método <code class="docutils literal notranslate"><span class="pre">.find</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -445,13 +466,13 @@ Criteria</span></a>.</p>
 </div>
 </section>
 <section id="update">
-<h2><span class="section-number">5.6.1.3. </span>UPDATE<a class="headerlink" href="#update" title="Link to this heading">#</a></h2>
-<p>Para actualizar objetos <strong>vinculados</strong> a la sesión podemos usar sus <em>setters</em>:</p>
+<span id="orm-crud-update"></span><h2><span class="section-number">5.6.1.3. </span>UPDATE<a class="headerlink" href="#update" title="Link to this heading">#</a></h2>
+<p>Para actualizar objetos <strong>vinculados</strong> a la sesión se usan sus <em>setters</em>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado.</span>
 <span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;I.E.S. Castillo de Luna&quot;</span><span class="p">);</span>
 <span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Guardamos cambios.</span>
 <span class="w">   </span><span class="p">}</span>
@@ -485,22 +506,29 @@ actualizaciones con los <em>setters</em>, si lo vinculamos con <code class="docu
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>En caso de que no exista ningún objeto en la base de datos con el
-identificador del objeto que se usa como argumento, éste se agregará.</p>
+<p>En caso de que no exista ningún objeto en la base de datos con el identificador
+del objeto que se usa como argumento, éste se agregará (tiene el mismo efecto
+que <code class="docutils literal notranslate"><span class="pre">.persist</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En esta operación es irrelevante hacer cambios y luego vincular que
+vincular y luego hacer cambios: los cambios se reflejarán en la base de datos
+al confirmarlos.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
 <p>Evite cambiar el identificador del objeto.</p>
 </div>
 </section>
 <section id="delete">
-<h2><span class="section-number">5.6.1.4. </span>DELETE<a class="headerlink" href="#delete" title="Link to this heading">#</a></h2>
+<span id="orm-crud-delete"></span><h2><span class="section-number">5.6.1.4. </span>DELETE<a class="headerlink" href="#delete" title="Link to this heading">#</a></h2>
 <p>Para borrar un objeto <strong>vinculado</strong> a la sesión debe usarse el método
 <code class="docutils literal notranslate"><span class="pre">.remove</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado</span>
 <span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span>
 <span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Guardamos cambios.</span>
 <span class="w">   </span><span class="p">}</span>

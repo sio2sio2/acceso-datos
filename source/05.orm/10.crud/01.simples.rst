@@ -2,6 +2,21 @@
 
 Simples
 *******
+Antes de comenzar a desglosar las cuatro operacioness |CRUD| básicas, es
+necesario introducir otro concepto, el de :dfn:`vinculación a la sesión`: un
+objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
+la sesión activa, lo cual ocurre cuando:
+
++ Lo hemos obtenido previamente de la base de datos en esa misma sesión.
++ Hemos usando con él un método que supone su vinculación:
+
+  * `.persist`, que agrega un nuevo objeto a la base de datos y, por su propia
+    naturaleza se usa con un objeto creado *ex novo* y, por tanto, no vinculado.
+  * `.merge`, que expresamente vincula un objeto a la base de datos, existiera
+    en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto *ex
+    novo*).
+
+.. _orm-crud-create:
 
 CREATE
 ======
@@ -24,7 +39,8 @@ el método ``.persist``:
             "IES Castillo de Luna",
             Centro.Titularidad.PUBLICA
          );
-         sesion.persist(castillo);
+         sesion.persist(castillo); // Vincula y agrega.
+         // Guardamos los cambios y cerramos la sesión.
          tr.commit();
       }
       catch(Exception err) {
@@ -32,7 +48,11 @@ el método ``.persist``:
       }
    }
 
-Obsérvese cómo se ha manejado la transacción.
+.. note:: Una vez vinculado, podríamos en esta misma sesión realizar otras
+   operaciones que exigen que el objeto esté vinculado (como :ref:`actualizar
+   <orm-crud-update>` o :ref:`eliminar <orm-crud-delete>`).
+
+.. _orm-crud-read:
 
 READ
 ====
@@ -54,9 +74,11 @@ identificador, para lo cual se usa el método ``.find``:
 .. seealso:: La obtención de todos los objetos requiere el :ref:`uso de HLQ o
    Criteria <orm-avanz-crud>`.
 
+.. _orm-crud-update:
+
 UPDATE
 ======
-Para actualizar objetos **vinculados** a la sesión podemos usar sus *setters*:
+Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
 
 .. code-block:: java
 
@@ -64,7 +86,7 @@ Para actualizar objetos **vinculados** a la sesión podemos usar sus *setters*:
       Transaction tr = null 
       try {
          tr = sesion.beginTransaction();
-         Centro castillo = find.persist(1L);
+         Centro castillo = find.persist(1L);  // Objeto vinculado.
          castillo.setNombre("I.E.S. Castillo de Luna");
          tr.commit(); // Guardamos cambios.
       }
@@ -99,10 +121,17 @@ actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
       }
    }
 
-En caso de que no exista ningún objeto en la base de datos con el
-identificador del objeto que se usa como argumento, éste se agregará.
+En caso de que no exista ningún objeto en la base de datos con el identificador
+del objeto que se usa como argumento, éste se agregará (tiene el mismo efecto
+que ``.persist``).
+
+.. note:: En esta operación es irrelevante hacer cambios y luego vincular que
+   vincular y luego hacer cambios: los cambios se reflejarán en la base de datos
+   al confirmarlos.
 
 .. warning:: Evite cambiar el identificador del objeto.
+
+.. _orm-crud-delete:
 
 DELETE
 ======
@@ -115,7 +144,7 @@ Para borrar un objeto **vinculado** a la sesión debe usarse el método
       Transaction tr = null 
       try {
          tr = sesion.beginTransaction();
-         Centro castillo = find.persist(1L);
+         Centro castillo = find.persist(1L);  // Objeto vinculado
          castillo.remove(castillo);
          tr.commit(); // Guardamos cambios.
       }

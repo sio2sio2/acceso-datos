@@ -1,0 +1,133 @@
+.. _orm-simple-crud:
+
+Simples
+*******
+
+CREATE
+======
+Para agregar objetos (o sea, registros) a la base de datos, Hibernate_ utiliza
+el método ``.persist``:
+
+.. code-block:: java
+   :emphasize-lines: 14
+
+   // Supongamos que el objeto ya se instanció antes y se creó.
+   HibernateFactory hf = HibernateFactory.getInstance();
+   Transaction tr = null;
+
+   try(Session sesion = hf.openSession()) {
+      try {
+         tr = sesion.beginTransaction();
+         // Supongamos que nuestra base de datos no tiene direcciones de centro
+         Centro castillo = new Centro(
+            11004866,
+            "IES Castillo de Luna",
+            Centro.Titularidad.PUBLICA
+         );
+         sesion.persist(castillo);
+         tr.commit();
+      }
+      catch(Exception err) {
+         if(tr != null) tr.rollback;
+      }
+   }
+
+Obsérvese cómo se ha manejado la transacción.
+
+READ
+====
+La operación de lectura más sencilla es obtener un objeto a partir de su
+identificador, para lo cual se usa el método ``.find``:
+
+.. code-block:: java
+   :emphasize-lines: 3
+
+   try(Session sesion = hf.openSession()) {
+      // No es necesaria transacción, puesto que no se escribe.
+      Centro castillo = find.persist(1L);
+      System.out.println(castillo == null?"El centro no existe":castillo);
+   }
+   catch(HibernateException err) {
+      e.printStackTrace();
+   }
+
+.. seealso:: La obtención de todos los objetos requiere el :ref:`uso de HLQ o
+   Criteria <orm-avanz-crud>`.
+
+UPDATE
+======
+Para actualizar objetos **vinculados** a la sesión podemos usar sus *setters*:
+
+.. code-block:: java
+
+   try(Session sesion = hf.openSession()) {
+      Transaction tr = null 
+      try {
+         tr = sesion.beginTransaction();
+         Centro castillo = find.persist(1L);
+         castillo.setNombre("I.E.S. Castillo de Luna");
+         tr.commit(); // Guardamos cambios.
+      }
+      catch(RuntimeException err) {
+         if(tr != null) tr.rollback();
+         e.printStackTrace();
+      }
+   }
+
+En cambio, si el objeto no está vinculado, aún podremos hacer las
+actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
+
+.. code-block:: java
+
+   Centro castillo = null;
+   try(Session sesion = hf.openSession()) {
+      Centro castillo = find.persist(1L);
+   }
+
+   try(Session sesion = hf.openSession()) {
+      Transaction tr = null 
+      try {
+         tr = sesion.beginTransaction();
+         // castillo no está ligado a esta sesión.
+         castillo.setNombre("I.E.S. Castillo de Luna");
+         sesion.merge(castillo);  // Vincula el objeto a la sesión.
+         tr.commit(); // Guardamos cambios.
+      }
+      catch(RuntimeException err) {
+         if(tr != null) tr.rollback();
+         e.printStackTrace();
+      }
+   }
+
+En caso de que no exista ningún objeto en la base de datos con el
+identificador del objeto que se usa como argumento, éste se agregará.
+
+.. warning:: Evite cambiar el identificador del objeto.
+
+DELETE
+======
+Para borrar un objeto **vinculado** a la sesión debe usarse el método
+``.remove``:
+
+.. code-block:: java
+
+   try(Session sesion = hf.openSession()) {
+      Transaction tr = null 
+      try {
+         tr = sesion.beginTransaction();
+         Centro castillo = find.persist(1L);
+         castillo.remove(castillo);
+         tr.commit(); // Guardamos cambios.
+      }
+      catch(RuntimeException err) {
+         if(tr != null) tr.rollback();
+         e.printStackTrace();
+      }
+   }
+
+Si el objeto no está vinculado, podremos vincularlo usando **previamente**
+``.merge``.
+
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. _Hibernate: https://www.hibernate.org
+

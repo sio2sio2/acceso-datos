@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.3. Conexión &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.6. Operaciones CRUD &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/translations.js?v=d190bf04"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/03.conexion';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/10.crud';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.4. Mapeo" href="04.mapeo.html" />
-    <link rel="prev" title="5.2. Operativa básica" href="02.basico.html" />
+    <link rel="next" title="5.6.1. Simples" href="10.crud/01.simples.html" />
+    <link rel="prev" title="5.5. Transacciones" href="08.transaction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -203,10 +203,10 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.3. Conexión</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a></li>
 </ul>
@@ -285,7 +285,7 @@
       
       
       
-      <li><a href="../_sources/05.orm/03.conexion.rst" target="_blank"
+      <li><a href="../_sources/05.orm/10.crud.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -367,7 +367,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Conexión</h1>
+    <h1>Operaciones CRUD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -381,113 +381,32 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="conexion">
-<span id="orm-conn"></span><h1><span class="section-number">5.3. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h1>
-<p>Tras haber configurado <a class="reference external" href="https://www.hibernate.org">Hibernate</a>, lo primero es construir una fábrica de
-sesiones a partir de la cual creemos las sesiones que nos permiten conectarnos a
-la base de datos. Así pues, está fábrica es el punto de acceso para interacturar
-con el <abbr title="Object-Relational Mapping">ORM</abbr> y lo habitual (aplicación que accede a una única base de datos) es
-que la fábrica sea única y que, sin embargo, debemos utilizarla a lo largo de
-todos los archivos que componen la aplicación.</p>
-<p>En consecuencia, es conveniente crear una clase que facilite su uso y asegure
-que no creamos más de una<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HibernateFactory</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">SessionFactory</span><span class="w"> </span><span class="n">sf</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">HibernateFactory</span><span class="p">(</span><span class="n">Configuration</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">config</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;La configuración no puede ser nula&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">sf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">buildSessionFactory</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">getInstance</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Configuration</span><span class="p">().</span><span class="na">configure</span><span class="p">(</span><span class="n">filename</span><span class="p">));</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">Configuration</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;No hay fábrica creada, por lo que debe proporcionar una configuración&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">SessionFactory</span><span class="w"> </span><span class="nf">getSessionFactory</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sf</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="nf">openSession</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sf</span><span class="p">.</span><span class="na">openSession</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">sf</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">        </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+  <section id="operaciones-crud">
+<span id="orm-crud"></span><h1><span class="section-number">5.6. </span>Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="headerlink" href="#operaciones-crud" title="Link to this heading">#</a></h1>
+<p>Ya hemos discutido cómo <a class="reference internal" href="03.conexion.html#orm-conn"><span class="std std-ref">conectar y abrir sesiones de un modo eficiente</span></a> e incluso <a class="reference internal" href="03.conexion.html#orm-uso-sf"><span class="std std-ref">hemos ilustrado cómo hacer uso de esta estrategia</span></a>. Toca ahora profundizar en cómo realizar operaciones de
+persistencia con la base de datos.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Hemos preferido acatar la terminología emanada del acrónimo <abbr title="Create, Read, Update, Delete">CRUD</abbr>,
+por lo que incluimos cada uno de los términos en los epígrafes. Tenga
+presente, pues, que <em>CREATE</em> hace referencia a &quot;crear&quot; datos en la base de
+datos, esto es, añadir o insertar datos; y no con crear el esquema (<code class="docutils literal notranslate"><span class="pre">`CREATE</span>
+<span class="pre">TABLE</span></code>, etc). De hecho, no hemos de preocuparnos por el esquema, ya que éste
+es capaz de generarse sólo a partir de las clases anotadas.</p>
 </div>
-<p>La clase:</p>
-<ul class="simple">
-<li><p>Implementa el <a class="reference external" href="https://es.wikipedia.org/wiki/Singleton">patrón Singleton</a>, de modo que, mientras no se cierre, siempre
-se devuelve el mismo objeto, lo que equivale a que siempre se maneja la misma
-fábrica de sesiones.</p></li>
-<li><p>Sólo es necesario pasar la configuración, cuando se crea de forma efectiva
-el objeto.</p></li>
-<li><p>Dado que lo más habitual con la fábrica es crear sesiones, se implementa un
-método que lo hace, sin necesidad de obtener la fábrica.</p></li>
-<li><p>Si se cierra el objeto, entonces sí se podrá crear otro.</p></li>
+<p class="rubric">Contenidos</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="10.crud/01.simples.html#create">5.6.1.1. CREATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.crud/01.simples.html#read">5.6.1.2. READ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.crud/01.simples.html#update">5.6.1.3. UPDATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.crud/01.simples.html#delete">5.6.1.4. DELETE</a></li>
 </ul>
-<p>De este modo:</p>
-<div class="highlight-java notranslate" id="orm-uso-sf"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// Crea la fábrica de sesiones</span>
-<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">HibernateFactory</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;hibernate.cfg.xml&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">operaciones</span><span class="p">();</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">operaciones</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// ¡Ojo! No hay que cerrarlo.</span>
-<span class="w">   </span><span class="n">Hibernate</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w"> </span><span class="c1">// Devuelve el mismo objeto.</span>
-<span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-
-<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
-
-<span class="w">         </span><span class="c1">// Hago operaciones CRUD.</span>
-
-<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">      </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a></li>
+</ul>
 </div>
-<p class="rubric">Notas al pie</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p><code class="docutils literal notranslate"><span class="pre">HibernateFactory</span></code> no puede extender <code class="docutils literal notranslate"><span class="pre">SessionFactory</span></code> y ocultar su
-constructor para controlar la creación de objetos y forzar a que siempre se
-cree el mismo objeto, porque ésta última es una clase abstracta.</p>
-</aside>
-</aside>
 </section>
 
 
@@ -502,20 +421,20 @@ cree el mismo objeto, porque ésta última es una clase abstracta.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="02.basico.html"
+       href="08.transaction.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.2. </span>Operativa básica</p>
+        <p class="prev-next-title"><span class="section-number">5.5. </span>Transacciones</p>
       </div>
     </a>
     <a class="right-next"
-       href="04.mapeo.html"
+       href="10.crud/01.simples.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.4. </span>Mapeo</p>
+        <p class="prev-next-title"><span class="section-number">5.6.1. </span>Simples</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

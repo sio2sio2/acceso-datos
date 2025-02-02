@@ -1,0 +1,90 @@
+.. _orm-transaction:
+
+Transacciones
+*************
+Ya se ilustró en el ejemplo para ilustrar el uso básico de Hibernate_ cómo se
+realizan transacciones:
+
+.. code-block:: java
+   :emphasize-lines: 5, 12, 15
+
+   // Operación de inserción.
+   try(Session sesion = sf.openSession()) {
+      Transaction tr = null;
+      try {
+          tr = sesion.beginTransaction();
+          Centro centro = new Centro(
+             11004866,
+             "IES Castillo de Luna",
+             Centro.Titularidad.PUBLICA
+          );
+          sesion.persist(centro);
+          tr.commit();
+      }
+      catch(Exception e) {
+          if(tr != null) tr.rollback();
+      }
+   }
+   
+Tuvimos que introducirlas tan temprano porque en Hibernate_ es obligado iniciar
+una transacción y confirmala y desecharla explícitamente cuando se realiza
+alguna operación que implica cambios en la base de datos.
+
+Ciertamente la sintaxis es algo farragosa, por lo que podríamos definir un
+método en ``HibernateFactory`` que simplificara su creación:
+
+.. code-block:: java
+
+   public void transaction(Consumer<Session> action) {
+      Transaction tr = null;
+      try(Session session = openSession()) {
+         try {
+            tr = session.beginTransaction();
+            action.accept(session);
+            tr.commit();
+         }
+         catch(RuntimeException err) {
+            if(tr != null) tr.rollback();
+            throws e;
+         }
+      }
+   }
+
+.. admonition:: Aclaración
+
+   ``HibernateException`` es una clase derivada de ``RuntimeException``.
+
+Con este método, la gestión de transacciones es más cómoda:
+
+.. code-block:: java
+
+   HibernateFactory hf = HibernateFactory.getInstance("hibernate.cfg.xml");
+
+   hf.transaction(sesion -> {
+      Centro castillo = new Centro(
+         11004866,
+         "IES Castillo de Luna",
+         Centro.Titularidad.PUBLICA
+      );
+      sesion.persist(castillo);
+   });
+
+Pero a costa de que los objetos creados dentro de la expresión lambda, no son
+visibles fuera de ella (*castillo* en el ejemplo).
+
+Hay otros métodos que están asociados a la transacción:
+
+``.flush()``
+   Es un método de la **transacción** que hace persistentes los cambios obrados
+   hasta ese momento, pero que a diferencia de ``.commit()`` no cierra la
+   transacción.
+
+``session.clear()``
+   Desvincula todos los objetos asociados a la sesión. Un efecto colateral es
+   que ninguno de los cambios que haya sufrido, se aplicará al hacer un *commit*
+   (o un *flush*).
+
+``session.evicto(Object entity)``
+   Desvincula el objeto proporcionado como argumento de la sesión.
+
+.. _Hibernate: https://www.hibernate.org

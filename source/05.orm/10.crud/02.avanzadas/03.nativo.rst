@@ -2,6 +2,43 @@
 
 |SQL| nativo
 ============
+La última opción para realizar consultas avanzadas es, directamente usar
+sentencias |SQL|, pero tiene el problema de su dependencia del |SGBD|, por lo
+que sólo debería usarse como método complementario a :ref:`HQL <orm-hql>` o
+:ref:`Criteria API <orm-criteria>` cuando no es posible usar alguno de estos
+últimos medios porque la consulta es demasiado compleja y no las pueden expresar
+o están involucradas vistas o funciones almacenadas.
+
+Sabiendo |SQL| (y las particularidades del |SGBD|) son sencillas de realizar:
+
+.. code-block:: java
+
+   Query query = sesion.createNativeQuery(
+      "SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron"
+   ).setParameter("patron", "J%");
+
+   List<Object[]> resultados = query.getResultList();
+
+.. note:: En este caso, como usamos |SQL| directamente, los nombres que aparecen
+   en la sentencia son nombres de tablas y columnas.
+
+.. tip:: Puede usarse ``Tuple.class`` como segundo argumento al crear la
+   consulta para obtener una lista de tuplas en vez de ``Object[]``.
+
+En caso, de que el resultado coincida con un objeto, podemos indicarle a
+Hibernate_ que construya el objeto:
+
+.. code-block:: java
+
+   Query query = sesion.createNativeQuery(
+      "SELECT * FROM Estudiante WHERE nombre LIKE :patron",
+      Estudiante.class
+   ).setParameter("patron", "J%");
+
+   List<Estudiante> resultados = query.getResultList();
 
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+
+.. _Hibernate: https://www.hibernate.org/

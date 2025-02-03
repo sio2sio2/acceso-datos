@@ -211,7 +211,7 @@
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../02.avanzadas.html">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="02.criteria.html">5.6.2.2. Criteria API</a></li>
-<li class="toctree-l4"><a class="reference internal" href="03.nativo.html">5.6.2.3. |SQL| nativo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
 </ul>
@@ -227,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../98.apendices/01.funcional/10.flujos.html">Flujos</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../98.apendices/10.logging.html">Sistema de registros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../98.apendices/99.ide.html">Entorno de desarrollo</a></li>
 </ul>
 </details></li>
@@ -434,6 +435,12 @@ Recordemos que el lenguaje hace referencia a objetos y atributos.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;SELECT e.nombre, e.nacimiento FROM Estudiante e&quot;</span>
 <span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+
+<span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">fila</span><span class="p">:</span><span class="w"> </span><span class="n">campos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">fila</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+<span class="w">   </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LocalDate</span><span class="p">)</span><span class="w"> </span><span class="n">fila</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -442,6 +449,24 @@ Recordemos que el lenguaje hace referencia a objetos y atributos.</p>
 (<code class="docutils literal notranslate"><span class="pre">Estudiante.class</span></code>, <code class="docutils literal notranslate"><span class="pre">String.class</span></code> y <code class="docutils literal notranslate"><span class="pre">Object[].class</span></code>
 respectivamente). Obsérvese también que los campos mencionados son
 atributos de estudiantes, no nombres de columnas.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Cuando se obtiene varias columnas, en vez de obtener un
+<code class="docutils literal notranslate"><span class="pre">Object[].class</span></code> se puede pedir la obtención de  <code class="docutils literal notranslate"><span class="pre">Tuple</span></code>, que hace más
+amable la obtención posterior de los campos individules:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e.nombre, e.nacimiento FROM Estudiante e&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>
+<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+
+<span class="k">for</span><span class="p">(</span><span class="n">Tuple</span><span class="w"> </span><span class="n">tupla</span><span class="p">:</span><span class="w"> </span><span class="n">campos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupla</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupla</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </section>
 <section id="condiciones">

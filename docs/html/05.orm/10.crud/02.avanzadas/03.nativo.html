@@ -227,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../98.apendices/01.funcional/10.flujos.html">Flujos</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../98.apendices/10.logging.html">Sistema de registros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../98.apendices/99.ide.html">Entorno de desarrollo</a></li>
 </ul>
 </details></li>
@@ -388,6 +389,40 @@ document.write(`
                   
   <section id="sql-nativo">
 <span id="orm-sql-nativo"></span><h1><span class="section-number">5.6.2.3. </span><abbr title="Structured Query Language">SQL</abbr> nativo<a class="headerlink" href="#sql-nativo" title="Link to this heading">#</a></h1>
+<p>La última opción para realizar consultas avanzadas es, directamente usar
+sentencias <abbr title="Structured Query Language">SQL</abbr>, pero tiene el problema de su dependencia del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, por lo
+que sólo debería usarse como método complementario a <a class="reference internal" href="01.hql.html#orm-hql"><span class="std std-ref">HQL</span></a> o
+<a class="reference internal" href="02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a> cuando no es posible usar alguno de estos
+últimos medios porque la consulta es demasiado compleja y no las pueden expresar
+o están involucradas vistas o funciones almacenadas.</p>
+<p>Sabiendo <abbr title="Structured Query Language">SQL</abbr> (y las particularidades del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>) son sencillas de realizar:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createNativeQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron&quot;</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">resultados</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En este caso, como usamos <abbr title="Structured Query Language">SQL</abbr> directamente, los nombres que aparecen
+en la sentencia son nombres de tablas y columnas.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Puede usarse <code class="docutils literal notranslate"><span class="pre">Tuple.class</span></code> como segundo argumento al crear la
+consulta para obtener una lista de tuplas en vez de <code class="docutils literal notranslate"><span class="pre">Object[]</span></code>.</p>
+</div>
+<p>En caso, de que el resultado coincida con un objeto, podemos indicarle a
+<a class="reference external" href="https://www.hibernate.org/">Hibernate</a> que construya el objeto:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createNativeQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT * FROM Estudiante WHERE nombre LIKE :patron&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resultados</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+</pre></div>
+</div>
 </section>
 
 

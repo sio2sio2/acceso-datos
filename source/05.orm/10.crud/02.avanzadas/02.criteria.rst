@@ -2,3 +2,162 @@
 
 Criteria API
 ************
+*Criteria API* es un mecanismo alternativo a |HQL| para escribir consultas, que
+es más verborreico, pero en compensación facilita la construcción dinámica de
+las consultas en tiempo de ejecución, ya que no se basa en una cadena, sino en
+la aplicación de métodos a objetos.
+
+Lo primero antes de construir la consulta es crear un objeto
+``CriteriaBuilder`` a partir de la sesión:
+
+.. code-block:: java
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+
+A partir de ahora debemos definir qué es lo que se querrá obtener (recordemos
+que estamos haciendo un ``SELECT``) y sobre qué tabla/entidad se quiere hacer la
+consulta. Por ejemplo:
+
+Consulta básica
+===============
+
+.. code-block:: java
+   :name: orm-criteria-select-all
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Estudiante> query = cb.createQuery(Estudiante.class); // Obtendremos estudiantes.
+   Root<Estudiante> root = query.from(Estudiante.class); // Consultamos la entidad Estudiante
+   query.select(root); // SELECT * FROM Estudiante;
+
+   List<Estudiante> estudiantes = sesion.createQuery(query).getResultList();
+
+Si quisiéramos obtener un campo:
+
+.. code-block:: java
+   :emphasize-lines: 2, 4
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<String> query = cb.createQuery(String.class); // Obtendremos cadenas
+   Root<Estudiante> root = query.from(Estudiante.class); // Consultamos la entidad Estudiante
+   query.select(root.get("nombre")); // SELECT e.nombre FROM Estudiante e;
+
+   List<String> nombres = sesion.createQuery(query).getResultList();
+
+
+Y si varios:
+
+.. code-block:: java
+   :emphasize-lines: 2, 4
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+   Root<Estudiante> root = query.from(Estudiante.class); // Consultamos la entidad Estudiante
+   query.multiselect(root.get("nombre"), root.get("centro")); // SELECT e.nombre, e.centro FROM Estudiante e;
+
+   List<Object[]> campos = sesion.createQuery(query).getResultList();
+
+.. tip:: En este último caso, puede usarse también ``Tuple.class`` como con
+   |HQL|:
+
+   .. code-block:: java
+      :emphasize-lines: 2, 4
+
+      CriteriaBuilder cb = sesion.getCriteriaBuilder();
+      CriteriaQuery<Tuple> query = cb.createQuery(Tuple.class);
+      Root<Estudiante> root = query.from(Estudiante.class);
+      query.select(cb.tuple(root.get("nombre"), root.get("centro")));
+
+      List<Tuple> campos = sesion.createQuery(query).getResultList();
+
+
+
+Condiciones
+===========
+``CriteriaBuilder`` tiene definidos métodos que implementan los operadores
+básicos de |SQL|. Por ejemplo, para escoger los estudiantes no matriculados:
+
+.. code-block:: java
+   :emphasize-lines: 5
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Estudiante> query = cb.createQuery(Estudiante.class);
+   Root<Estudiante> root = query.from(Estudiante.class);
+   query.select(root);
+   query.where(cb.isNotNull(root.get("centro")));
+
+   List<Estudiante> estudiantes = sesion.createQuery(query).getResultList();
+
+Ordenación
+==========
+Para ordenar resultados basta con aplicar el orden a ``query``:
+
+.. code-block:: java
+   :emphasize-lines: 5
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Estudiante> query = cb.createQuery(Estudiante.class);
+   Root<Estudiante> root = query.from(Estudiante.class);
+   query.select(root);
+   query.orderBy(cb.desc(root.get("nacimiento")));
+
+   List<Estudiante> estudiantes = sesion.createQuery(query).getResultList();
+
+Agrupación
+==========
+También existe el equivalente a ``GROUP BY``:
+
+.. code-block:: java
+   :emphasize-lines: 4
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+   Root<Estudiante> root = query.from(Estudiante.class);
+   query.multiselect(root.get("centro"), cb.count(root)).groupBy(root.get("centro"));
+
+   List<Object[]> campos = sesion.createQuery(query).getResultList();
+
+Joins
+=====
+Como en |HQL| también se puede hacer facilmente *joins* de entidades. Esto
+permite hacer un ``INNER JOIN``:
+
+.. code-block:: java
+   :emphasize-lines: 4, 6
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaQuery<Estudiante> query = cb.createQuery(Estudiante.class);
+   Root<Estudiante> root = query.from(Estudiante.class);
+   Join<Estudiante, Centro> centro = root.join("centro", JoinType.INNER);
+   query.select(root);
+   query.where(cb.like(centro.get("nombre"), "C%")); // Centros cuyo nombre empieza por "C"
+
+   List<Estudiante> estudiantes = sesion.createQuery(query).getResultList();
+
+Actualización y borrado
+=======================
+Al igual que |HQL|, también se puede **actualizar** objetos. Por ejemplo, esto
+desmatricularía a todos los estudiantes cuyo nombre empieza por "J":
+
+.. code-block:: java
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaUpdate<Estudiante> update = cb.createCriteriaUpdate(Estudiante.class);
+   Root<Estudiante> root = update.from(Estudiante.class);
+   update.set("centro", null);
+   update.where(cb.like(root.get("nombre"), "J%"));
+
+   sesion.createQuery(update).executeUpdate();
+
+También es posible **borrar**:
+
+.. code-block:: java
+
+   CriteriaBuilder cb = sesion.getCriteriaBuilder();
+   CriteriaUpdate<Estudiante> delete = cb.createCriteriaUpdate(Estudiante.class);
+   Root<Estudiante> root = delete.from(Estudiante.class);
+   delete.where(cb.like(root.get("nombre"), "J%"));
+
+   sesion.createQuery(delete).executeUpdate();
+
+.. |HQL| replace:: :abbr:`HQL (Hibernate Query Language)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`

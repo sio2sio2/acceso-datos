@@ -42,10 +42,34 @@ o un conjunto de campos individuales:
       "SELECT e.nombre, e.nacimiento FROM Estudiante e"
    ).getResultList();
 
+   for(Object[] fila: campos) {
+      String nombre = (String) fila[0];
+      LocalDate nacimiento = (LocalDate) fila[1];
+      // ...
+   }
+
 .. note:: En los tres casos puede incluirse la clase de la lista
    (``Estudiante.class``, ``String.class`` y ``Object[].class``
    respectivamente). Obsérvese también que los campos mencionados son
    atributos de estudiantes, no nombres de columnas.
+
+.. tip:: Cuando se obtiene varias columnas, en vez de obtener un
+   ``Object[].class`` se puede pedir la obtención de  ``Tuple``, que hace más
+   amable la obtención posterior de los campos individules:
+
+   .. code-block:: java
+
+      List<Tuple> campos = session.createQuery(
+         "SELECT e.nombre, e.nacimiento FROM Estudiante e",
+         Tuple.class
+      ).getResultList();
+
+      for(Tuple tupla: campos) {
+         String nombre = tupla.get(0, String.class);
+         LocalDate nacimiento = tupla.get(1, LocalDate.class);
+         // ...
+      }
+
 
 Condiciones
 -----------

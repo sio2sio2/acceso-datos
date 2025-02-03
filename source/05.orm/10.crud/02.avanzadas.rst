@@ -2,6 +2,69 @@
 
 Avanzadas
 *********
+Las operaciones |CRUD| :ref:`vistas hasta ahora <orm-simple-crud>` son muy
+básicas y no cubren con seguridad todas las necesidades que se nos presenten en
+la aplicación (p.e. obtener la lista completa de objetos de un mismo tipo). Para
+operaciones más avanzadas (especialmente de lectura), Hibernate_ ofrece tres
+alternativas:
 
+#. |HQL|, esto es, *Lenguaje de consultas de Hibernate*.
+#. *Criteria API*
+#. Consultas nativas en |SQL|.
+
+Analizaremos cómo realizar las tres.
+
+.. _orm-hql:
+
+|HQL|
+=====
+Es un lenguaje de consulta prácticamente idéntico a |SQL| que sustituye tablas y
+campos por objetos y atributos. Además abstrae de las particularidades de los
+|SGBD|.
+
+**Consulta básica**
+   Para obtener todos los elementos de un relación basta hacer:
+
+   .. code-block:: java
+      :name: orm-hql-select-all
+
+      // "sesion" el objeto Session abierto.
+      List<Estudiante> estudiantes = session.createQuery(
+         "FROM Estudiante"
+      ).getResultlist();
+
+   donde la palabra *Estudiante* en la cadena no es el nombre de la tabla,
+   sino el nombre de la clase ``Estudiante`` que, en este caso, coinciden.
+   Recordemos que el lenguaje hace referencia a objetos y atributos.
+
+   Podemos también obtener campos individuales en vez de objetos ``Estudiante``:
+
+   .. code-block:: java
+
+      List<String> nombres = session.createQuery(
+         "SELECT e.nombre FROM Estudiante e",
+         String.class
+      ).getResultlist();
+
+   o un conjunto de campos individuales:
+
+   .. code-block:: java
+
+      List<Object[]> campos = session.createQuery(
+         "SELECT e.nombre, e.nacimiento FROM Estudiante e"
+      ).getResultlist();
+
+   .. note:: En los tres casos puede incluirse la clase de la lista
+      (``Estudiante.class``, ``String.class`` y ``Object[].class``
+      respectivamente). Obsérvese también que los campos mencionados son
+      atributos de estudiantes, no nombres de columnas.
+
+**Condiciones**
+
+**Joins**
 
 .. |CRUD| replace:: :abbr:`CRUD (Create, Replace, Update, Delete)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |HQL| replace:: :abbr:`HQL (Hybernate Query Language)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. _Hibernate: https://www.hibernate.org

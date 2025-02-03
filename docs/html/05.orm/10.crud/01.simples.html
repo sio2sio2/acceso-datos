@@ -400,10 +400,10 @@ document.write(`
 necesario introducir otro concepto, el de <em class="dfn">vinculación a la sesión</em>: un
 objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
 la sesión activa, lo cual ocurre cuando:</p>
-<ul class="simple">
+<ol class="loweralpha simple">
 <li><p>Lo hemos obtenido previamente de la base de datos en esa misma sesión.</p></li>
 <li><p>Hemos usando con él un método que supone su vinculación:</p>
-<ul>
+<ul class="simple">
 <li><p><cite>.persist</cite>, que agrega un nuevo objeto a la base de datos y, por su propia
 naturaleza se usa con un objeto creado <em>ex novo</em> y, por tanto, no vinculado.</p></li>
 <li><p><cite>.merge</cite>, que expresamente vincula un objeto a la base de datos, existiera
@@ -411,7 +411,7 @@ en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto <em>ex
 novo</em>).</p></li>
 </ul>
 </li>
-</ul>
+</ol>
 <section id="create">
 <span id="orm-crud-create"></span><h2><span class="section-number">5.6.1.1. </span>CREATE<a class="headerlink" href="#create" title="Link to this heading">#</a></h2>
 <p>Para agregar objetos (o sea, registros) a la base de datos, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> utiliza
@@ -461,8 +461,7 @@ identificador, para lo cual se usa el método <code class="docutils literal notr
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">Ver también</p>
-<p>La obtención de todos los objetos requiere el <a class="reference internal" href="02.avanzadas.html#orm-avanz-crud"><span class="std std-ref">uso de HLQ o
-Criteria</span></a>.</p>
+<p>La obtención de todos los objetos requiere el <a class="reference internal" href="02.avanzadas.html#orm-hql-select-all"><span class="std std-ref">uso de HLQ</span></a> o <span class="xref std std-ref">Criteria API</span>.</p>
 </div>
 </section>
 <section id="update">
@@ -539,8 +538,11 @@ al confirmarlos.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
 <p>Si el objeto no está vinculado, podremos vincularlo usando <strong>previamente</strong>
 <code class="docutils literal notranslate"><span class="pre">.merge</span></code>.</p>
+</div>
 </section>
 </section>
 

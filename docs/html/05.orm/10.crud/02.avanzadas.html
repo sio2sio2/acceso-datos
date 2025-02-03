@@ -356,7 +356,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -372,6 +374,14 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hql">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -383,6 +393,58 @@ document.write(`
                   
   <section id="avanzadas">
 <span id="orm-avanz-crud"></span><h1><span class="section-number">5.6.2. </span>Avanzadas<a class="headerlink" href="#avanzadas" title="Link to this heading">#</a></h1>
+<p>Las operaciones <abbr title="Create, Replace, Update, Delete">CRUD</abbr> <a class="reference internal" href="01.simples.html#orm-simple-crud"><span class="std std-ref">vistas hasta ahora</span></a> son muy
+básicas y no cubren con seguridad todas las necesidades que se nos presenten en
+la aplicación (p.e. obtener la lista completa de objetos de un mismo tipo). Para
+operaciones más avanzadas (especialmente de lectura), <a class="reference external" href="https://www.hibernate.org">Hibernate</a> ofrece tres
+alternativas:</p>
+<ol class="arabic simple">
+<li><p><abbr title="Hybernate Query Language">HQL</abbr>, esto es, <em>Lenguaje de consultas de Hibernate</em>.</p></li>
+<li><p><em>Criteria API</em></p></li>
+<li><p>Consultas nativas en <abbr title="Structured Query Language">SQL</abbr>.</p></li>
+</ol>
+<p>Analizaremos cómo realizar las tres.</p>
+<section id="hql">
+<span id="orm-hql"></span><h2><span class="section-number">5.6.2.1. </span><abbr title="Hybernate Query Language">HQL</abbr><a class="headerlink" href="#hql" title="Link to this heading">#</a></h2>
+<p>Es un lenguaje de consulta prácticamente idéntico a <abbr title="Structured Query Language">SQL</abbr> que sustituye tablas y
+campos por objetos y atributos. Además abstrae de las particularidades de los
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>.</p>
+<dl>
+<dt><strong>Consulta básica</strong></dt><dd><p>Para obtener todos los elementos de un relación basta hacer:</p>
+<div class="highlight-java notranslate" id="orm-hql-select-all"><div class="highlight"><pre><span></span><span class="c1">// &quot;sesion&quot; el objeto Session abierto.</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;FROM Estudiante&quot;</span>
+<span class="p">).</span><span class="na">getResultlist</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>donde la palabra <em>Estudiante</em> en la cadena no es el nombre de la tabla,
+sino el nombre de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que, en este caso, coinciden.
+Recordemos que el lenguaje hace referencia a objetos y atributos.</p>
+<p>Podemos también obtener campos individuales en vez de objetos <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nombres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e.nombre FROM Estudiante e&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">String</span><span class="p">.</span><span class="na">class</span>
+<span class="p">).</span><span class="na">getResultlist</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>o un conjunto de campos individuales:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e.nombre, e.nacimiento FROM Estudiante e&quot;</span>
+<span class="p">).</span><span class="na">getResultlist</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En los tres casos puede incluirse la clase de la lista
+(<code class="docutils literal notranslate"><span class="pre">Estudiante.class</span></code>, <code class="docutils literal notranslate"><span class="pre">String.class</span></code> y <code class="docutils literal notranslate"><span class="pre">Object[].class</span></code>
+respectivamente). Obsérvese también que los campos mencionados son
+atributos de estudiantes, no nombres de columnas.</p>
+</div>
+</dd>
+</dl>
+<p><strong>Condiciones</strong></p>
+<p><strong>Joins</strong></p>
+</section>
 </section>
 
 
@@ -420,6 +482,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hql">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

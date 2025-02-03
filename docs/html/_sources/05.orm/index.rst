@@ -3,9 +3,9 @@
 Herramientas |ORM|
 ==================
 |ORM| es el acrónimo de 'Mapeo objeto-relacional' por lo que el propio nombre
-define muy descritivamente cuál es la finalidad de estas herramientas. Si hemos
+define muy descriptivamente cuál es la finalidad de estas herramientas. Si hemos
 estudiado la unidad anterior y, sobre todo, hemos intentado :ref:`codificar
-estructuradamente una aplicación con conectores <conn-prog>` habremos notado que
+estructuradamente una aplicación con conectores <conn-prog>`, habremos notado que
 nuestro mayor esfuerzo se concentra en trasladar el modelo relacional de la base
 de datos al modelo de objetos del lenguaje de programación.
 

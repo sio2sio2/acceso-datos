@@ -208,7 +208,10 @@
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+</ul>
+</details></li>
 </ul>
 </details></li>
 </ul>
@@ -396,7 +399,7 @@ document.write(`
 <span id="orm-mapping"></span><h1><span class="section-number">5.4. </span>Mapeo<a class="headerlink" href="#mapeo" title="Link to this heading">#</a></h1>
 <p>El <em class="dfn">mapeo</em> consiste en definir cómo se hará la traducción entre las clases
 del modelo de objetos (de <em>Java</em>, en este caso) y las entidades del modelo
-relacional. En esta traducción las clases se corresponde con las tablas, las
+relacional. En esta traducción las clases se corresponden con las tablas, las
 instancias con los registros y los atributos con los campos.</p>
 <p>En <a class="reference external" href="https://www.hibernate.org">Hibernate</a>, la definición del <em>mapeo</em> puede realizarse con anotaciones
 siguiendo el estándar <abbr title="Java Persisten API">JPA</abbr>. Bajo este epígrafe aprenderemos fundamentalmente:</p>
@@ -478,7 +481,7 @@ anotación de la clase Centro</span></a>:</p>
 ampliar nuestro conocimientos sobre las anotaciones válidas:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code></dt><dd><p>Por lo general, todos los atributos de la clase, aunque no estén anotados en
-absoluto, se consideran campo de la tabla correspondiente. Las excepciones
+absoluto, se consideran campos de la tabla correspondiente. Las excepciones
 son:</p>
 <ul class="simple">
 <li><p>Los campos estáticos (<code class="docutils literal notranslate"><span class="pre">static</span></code>), ya que no forman parte del objeto.</p></li>
@@ -519,7 +522,7 @@ automáticamente sus valores. Lo más socorrido es:</p>
 (<code class="docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">ALWAYS</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code>). Si no usamos la segunda anotación el
 campo requerirá siempre que el usuario establezca el valor.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">&#64;Lob</span></code></dt><dd><p>Se utiliza para campos que contiene cantidades apreciables de datos (<code class="docutils literal notranslate"><span class="pre">BLOB</span></code>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Lob</span></code></dt><dd><p>Se utiliza para campos que contienen cantidades apreciables de datos (<code class="docutils literal notranslate"><span class="pre">BLOB</span></code>
 o <code class="docutils literal notranslate"><span class="pre">CLOB</span></code>) en el estándar:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Lob</span>
 <span class="kd">private</span><span class="w"> </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">foto</span><span class="p">;</span>

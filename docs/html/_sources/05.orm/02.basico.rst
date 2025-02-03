@@ -39,11 +39,11 @@ En este ejemplo:
     no hay manera de expresarlo con Hibernate_.
 
 + Los atributos que son campos se notan con ``@Column`` y pueden añadirse
-  parámetros afinar la definición (nombre del campo si no coincide con el del
-  atributo, restricciones adicionales, longitud si es una cadena). Un atributo
-  sin la anotación, no obstante, se añadirá a la tabla como campo, a menos que
-  sea ``static`` o ``transient``. Si se quiere forzar su exclusión, puede usarse
-  la anotación ``@Transient``.
+  parámetros para afinar la definición (nombre del campo si no coincide con el
+  del atributo, restricciones adicionales, longitud si es una cadena). Un
+  atributo sin la anotación, no obstante, se añadirá a la tabla como campo, a
+  menos que sea ``static`` o ``transient``. Si se quiere forzar su exclusión,
+  puede usarse la anotación ``@Transient``.
 
 + Si el identificador no lo fija el usuario, puede ser buena idea restringir la
   visibilidad de su *setter* (``protected``).
@@ -61,7 +61,7 @@ Para registrar la clase para el mapeo hay que añadir a
    <mapping class="edu.acceso.test_hibernate.modelo.Centro"/>
 
 .. note:: En caso de que la configuración no se hubiera hecho mediante
-   anotaciones, sino mediante un archivo |XML| el registro habría sido
+   anotaciones, sino mediante un archivo |XML|, el registro habría sido
    ligeramente diferente:
 
    .. code-block:: xml
@@ -122,7 +122,7 @@ Como puede verse:
 * Las operaciones deben englobarse dentro de sesiones y de transacciones, aunque
   en el caso de operaciones de lectura las transacciones no son indispensables.
 
-* Las transacciones no se cierra explícitamente, sino que se consideran acabadas
+* Las transacciones no se cierran explícitamente, sino que se consideran acabadas
   al realizar una confirmación (*commit*) o un rechazo (*rollback*).
 
 .. rubric:: Notas al pie

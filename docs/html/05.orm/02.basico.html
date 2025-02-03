@@ -208,7 +208,10 @@
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+</ul>
+</details></li>
 </ul>
 </details></li>
 </ul>
@@ -492,11 +495,11 @@ no hay manera de expresarlo con <a class="reference external" href="https://www.
 </ul>
 </li>
 <li><p>Los atributos que son campos se notan con <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> y pueden añadirse
-parámetros afinar la definición (nombre del campo si no coincide con el del
-atributo, restricciones adicionales, longitud si es una cadena). Un atributo
-sin la anotación, no obstante, se añadirá a la tabla como campo, a menos que
-sea <code class="docutils literal notranslate"><span class="pre">static</span></code> o <code class="docutils literal notranslate"><span class="pre">transient</span></code>. Si se quiere forzar su exclusión, puede usarse
-la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code>.</p></li>
+parámetros para afinar la definición (nombre del campo si no coincide con el
+del atributo, restricciones adicionales, longitud si es una cadena). Un
+atributo sin la anotación, no obstante, se añadirá a la tabla como campo, a
+menos que sea <code class="docutils literal notranslate"><span class="pre">static</span></code> o <code class="docutils literal notranslate"><span class="pre">transient</span></code>. Si se quiere forzar su exclusión,
+puede usarse la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code>.</p></li>
 <li><p>Si el identificador no lo fija el usuario, puede ser buena idea restringir la
 visibilidad de su <em>setter</em> (<code class="docutils literal notranslate"><span class="pre">protected</span></code>).</p></li>
 </ul>
@@ -512,7 +515,7 @@ visibilidad de su <em>setter</em> (<code class="docutils literal notranslate"><s
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>En caso de que la configuración no se hubiera hecho mediante
-anotaciones, sino mediante un archivo <abbr title="eXtensible Markup Language">XML</abbr> el registro habría sido
+anotaciones, sino mediante un archivo <abbr title="eXtensible Markup Language">XML</abbr>, el registro habría sido
 ligeramente diferente:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;mapping</span><span class="w"> </span><span class="na">resource=</span><span class="s">&quot;Centro.hbm.xml&quot;</span><span class="nt">/&gt;</span>
 </pre></div>
@@ -567,7 +570,7 @@ crear objetos en distintos archivos, con lo que la estructura
 este ejemplo tan simple.</p></li>
 <li><p>Las operaciones deben englobarse dentro de sesiones y de transacciones, aunque
 en el caso de operaciones de lectura las transacciones no son indispensables.</p></li>
-<li><p>Las transacciones no se cierra explícitamente, sino que se consideran acabadas
+<li><p>Las transacciones no se cierran explícitamente, sino que se consideran acabadas
 al realizar una confirmación (<em>commit</em>) o un rechazo (<em>rollback</em>).</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>

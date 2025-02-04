@@ -1,0 +1,52 @@
+.. _orm-exp:
+
+Manejo de excepciones
+*********************
+Hibernate_ define su propio conjunto de excepciones derivadas todas de
+:hibernate-api:`HibernateException <HibernateException>`, que a su vez deriva
+de :java-lang:`RuntimeException <RuntimeException>`. Hay que tener en cuenta
+dos particularidades:
+
++ Que todas deriven en última instancia de :java-lang:`RuntimeException
+  <RuntimeException>`, supone que las excepciones de este |ORM|, a diferencia de
+  las de :ref:`JBDC <conn>`, no son comprobadas; y, por tanto, no es necesario
+  capturarlas o declararlas a través de ``throws``.
+
++ Cuando Hibernate_ genera una excepción, la sesión suele quedar en estado
+  inconsistente, por lo que conviene cerrarla y comenzar una nueva.
+
+Excepciones comunes
+===================
+Una lista no exhaustiva de excepciones es esta:
+
+:hibernate-api:`NonUniqueResultException <NonUniqueResultException>`
+   Se produce cuando una consulta debería producir un sólo resultado, pero
+   devuelve más de uno.
+
+:hibernate-api:`LazyInitializationException <LazyInitializationException>`
+   Se produce cuando se intenta resolver una relación perezosa sin que el objeto
+   esté asociado a la sesión activa.
+
+:hibernate-api:`StaleObjectStateException <StaleObjectStateException>`
+   Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
+   que una entidad se modificó por otra transacción después de haber sido
+   recuperada por la actual.
+
+:hibernate-api:`ConstraintViolationException <exception/ConstraintViolationException>`
+   Esta asociada a violaciones de las restricciones de la base de datos como
+   ``NOT NULL``.
+
+:hibernate-api:`DataException <exception/DataException>`
+   Producida por no adecuarse los datos a los requisitos de la base de datos.
+
+:hibernate-api:`TransactionException <TransactionException>`
+   Son excepciones relaciondas con las transacciones como intentar confirmar
+   una sin haberla abierta.
+
+:hibernate-api:`JDBCConnectionException <exception/JDBCConnectionException>`
+   Producida por problemas en la conexión a la base de datos como que ésta no
+   exista o no haya conectividad o las credenciales sean inválidas.
+
+.. _Hibernate: https://www.hibernate.org
+
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

@@ -208,9 +208,16 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5. Transacciones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="15.errores.html">5.7. Manejo de excepciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
 </ul>
 </details></li>
 </ul>
@@ -222,6 +229,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html">Flujos</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/10.logging.html">Sistema de registros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../98.apendices/99.ide.html">Entorno de desarrollo</a></li>
 </ul>
 </details></li>
@@ -408,7 +416,7 @@ realizan transacciones:</p>
 una transacción y confirmala y desecharla explícitamente cuando se realiza
 alguna operación que implica cambios en la base de datos.</p>
 <p>Ciertamente la sintaxis es algo farragosa, por lo que podríamos definir un
-método en <code class="docutils literal notranslate"><span class="pre">HibernateFactory</span></code> que simplificara su creación:</p>
+método en <a class="reference internal" href="03.conexion.html#orm-conn"><span class="std std-ref">HibernateFactory</span></a> que simplificara su creación:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">Session</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 <span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -427,7 +435,7 @@ método en <code class="docutils literal notranslate"><span class="pre">Hibernat
 </div>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
-<p><code class="docutils literal notranslate"><span class="pre">HibernateException</span></code> es una clase derivada de <code class="docutils literal notranslate"><span class="pre">RuntimeException</span></code>.</p>
+<p><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/HibernateException.html">HibernateException</a> es una clase derivada de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>.</p>
 </div>
 <p>Con este método, la gestión de transacciones es más cómoda:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">HibernateFactory</span><span class="w"> </span><span class="n">hf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HibernateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;hibernate.cfg.xml&quot;</span><span class="p">);</span>

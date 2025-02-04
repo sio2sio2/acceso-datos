@@ -216,6 +216,8 @@
 </details></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../15.errores.html">5.7. Manejo de excepciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
 </ul>
 </details></li>
 </ul>
@@ -408,8 +410,8 @@ document.write(`
 es más verborreico, pero en compensación facilita la construcción dinámica de
 las consultas en tiempo de ejecución, ya que no se basa en una cadena, sino en
 la aplicación de métodos a objetos.</p>
-<p>Lo primero antes de construir la consulta es crear un objeto
-<code class="docutils literal notranslate"><span class="pre">CriteriaBuilder</span></code> a partir de la sesión:</p>
+<p>Lo primero antes de construir la consulta es crear un objeto <a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> a
+partir de la sesión:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -460,7 +462,7 @@ consulta. Por ejemplo:</p>
 </section>
 <section id="condiciones">
 <h2><span class="section-number">5.6.2.2.2. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">CriteriaBuilder</span></code> tiene definidos métodos que implementan los operadores
+<p><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> tiene definidos métodos que implementan los operadores
 básicos de <abbr title="Structured Query Language">SQL</abbr>. Por ejemplo, para escoger los estudiantes no matriculados:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
 <span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>

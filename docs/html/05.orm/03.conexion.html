@@ -210,10 +210,14 @@
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="15.errores.html">5.7. Manejo de excepciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
 </ul>
 </details></li>
 </ul>
@@ -225,6 +229,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html">Flujos</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/10.logging.html">Sistema de registros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../98.apendices/99.ide.html">Entorno de desarrollo</a></li>
 </ul>
 </details></li>
@@ -486,9 +491,9 @@ método que lo hace, sin necesidad de obtener la fábrica.</p></li>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p><code class="docutils literal notranslate"><span class="pre">HibernateFactory</span></code> no puede extender <code class="docutils literal notranslate"><span class="pre">SessionFactory</span></code> y ocultar su
-constructor para controlar la creación de objetos y forzar a que siempre se
-cree el mismo objeto, porque ésta última es una clase abstracta.</p>
+<p><code class="docutils literal notranslate"><span class="pre">HibernateFactory</span></code> no puede extender <a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/SessionFactory.html">SessionFactory</a> y
+ocultar su constructor para controlar la creación de objetos y forzar a que
+siempre se cree el mismo objeto, porque ésta última es una clase abstracta.</p>
 </aside>
 </aside>
 </section>

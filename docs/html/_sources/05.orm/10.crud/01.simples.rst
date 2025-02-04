@@ -16,6 +16,15 @@ a. Lo hemos obtenido previamente de la base de datos en esa misma sesión.
      en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto *ex
      novo*).
 
+.. note:: Hemos preferido acatar la terminología emanada del acrónimo |CRUD|,
+   por lo que incluimos cada uno de los términos en los epígrafes. Tenga
+   presente, pues, que *CREATE* hace referencia a \"crear\" datos en la base de
+   datos, esto es, añadir o insertar datos; y no con crear el esquema (```CREATE
+   TABLE``, etc). De hecho, no hemos de preocuparnos por el esquema, ya que éste
+   es capaz de generarse sólo a partir de las clases anotadas.
+
+
+
 .. _orm-crud-create:
 
 CREATE
@@ -64,7 +73,7 @@ identificador, para lo cual se usa el método ``.find``:
 
    try(Session sesion = hf.openSession()) {
       // No es necesaria transacción, puesto que no se escribe.
-      Centro castillo = find.persist(1L);
+      Centro castillo = sesion.find(Centro.class, 11004866L);
       System.out.println(castillo == null?"El centro no existe":castillo);
    }
    catch(HibernateException err) {
@@ -86,7 +95,7 @@ Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
       Transaction tr = null 
       try {
          tr = sesion.beginTransaction();
-         Centro castillo = find.persist(1L);  // Objeto vinculado.
+         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
          castillo.setNombre("I.E.S. Castillo de Luna");
          tr.commit(); // Guardamos cambios.
       }
@@ -103,7 +112,7 @@ actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
 
    Centro castillo = null;
    try(Session sesion = hf.openSession()) {
-      Centro castillo = find.persist(1L);
+      Centro castillo = sesion.find(Centro.class, 11004866L);
    }
 
    try(Session sesion = hf.openSession()) {
@@ -144,7 +153,7 @@ Para borrar un objeto **vinculado** a la sesión debe usarse el método
       Transaction tr = null 
       try {
          tr = sesion.beginTransaction();
-         Centro castillo = find.persist(1L);  // Objeto vinculado
+         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado
          castillo.remove(castillo);
          tr.commit(); // Guardamos cambios.
       }

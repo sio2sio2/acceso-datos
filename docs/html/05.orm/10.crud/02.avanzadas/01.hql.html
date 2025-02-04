@@ -216,6 +216,8 @@
 </details></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../15.errores.html">5.7. Manejo de excepciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
 </ul>
 </details></li>
 </ul>
@@ -520,8 +522,29 @@ tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:</p>
 <span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
+<p>Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
+una clave primaria o un campo con valores únicos), puede usarse el método
+<code class="docutils literal notranslate"><span class="pre">.getSingleResult()</span></code>. Por ejemplo, la consulta de arriba no debería dar más de
+un resultado. Por tanto, podría hacerse así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">      </span><span class="s">&quot;SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="n">List</span><span class="p">.</span><span class="na">class</span>
+<span class="w">   </span><span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;idCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">getSingleResult</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">NoResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;No hay ningún centro con tal id&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">NonUniqueResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Esto no puede ocurrir nunca.</span>
+<span class="w">   </span><span class="k">assert</span><span class="w"> </span><span class="kc">false</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Imposible que haya dos valores para una clave primaria&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Por hacer</p>
+<p>Probar la inversa:</p>
 <p>SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro</p>
 </div>
 </section>

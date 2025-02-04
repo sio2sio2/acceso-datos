@@ -130,7 +130,29 @@ tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
    ).setParameter("idCentro", 11004866L)
    .getResultList();
 
-.. TODO:: 
+Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
+una clave primaria o un campo con valores únicos), puede usarse el método
+``.getSingleResult()``. Por ejemplo, la consulta de arriba no debería dar más de
+un resultado. Por tanto, podría hacerse así:
+
+.. code-block:: java
+
+   try {
+      List<Estudiante> estudiantes = sesion.createQuery(
+         "SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro",
+         List.class
+      ).setParameter("idCentro", 11004866L)
+      .getSingleResult();
+   }
+   catch(NoResultException err) {
+      System.err.println("No hay ningún centro con tal id");
+   }
+   catch(NonUniqueResultException err) {
+      // Esto no puede ocurrir nunca.
+      assert false: "Imposible que haya dos valores para una clave primaria";
+   }
+
+.. TODO:: Probar la inversa:
 
    SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro
 

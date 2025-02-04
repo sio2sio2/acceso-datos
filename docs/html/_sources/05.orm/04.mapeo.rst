@@ -246,77 +246,98 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 **Relación 1:N**: ``@OneToMany``/``@ManyToOne``
    Se produce cuando una registro de la primera tabla se relaciona con muchos
    registros de la segunda, pero al contrario los registros de la segunda sólo
-   se relacionan con uno de la primera. Se resuelve colocando un campo en la
-   tabla cuyos registros se relacionan con uno y sólo un registro de la otra
-   tabla. Para significarla se usan las anotaciones ``@OneToMany`` y
-   ``@ManyToOne``, ya que --y esto es de suma importancia-- al anotar la
-   relación entre clases, ésta debe reflejarse en ambos extremos, esto es, en
-   las dos clases. Por eso, la relación **1:N** entre *Centro* y *Estudiante*
-   provoca que definamos así la clase ``Estudiante``:
+   se relacionan con uno de la primera.
 
-   .. literalinclude:: files/Estudiante.java
-      :language: java
-      :start-at: @Entity
-      :emphasize-lines: 13-15
+   En Hibernate_ hay dos modos de resolver esta relación (y las otras dos que se
+   explicarán a continuación): de modo **unidireccional** y de modo
+   **bidireccional**.
 
-   .. caution:: Recuerde registrar en la configuración esta nueva clase:
+   **Unidireccional**
+      El modo :dfn:`unidireccional` es el que más fielmente refleja el modelo
+      relacional, ya que la relación sólo se refleja en uno de los extremos: en
+      aquel en que se encuentra la clave foránea. Por ejemplo, la relación  la
+      relación **1:N** entre *Centro* y *Estudiante* provoca que definamos así la
+      clase ``Estudiante``:
 
-      .. code-block:: xml
+      .. literalinclude:: files/Estudiante.java
+         :language: java
+         :start-at: @Entity
+         :emphasize-lines: 13-15, 56-62
 
-         <mapping class="edu.acceso.test_hibernate.modelo.Estudiante"/>
+      .. caution:: Recuerde registrar en la configuración esta nueva clase:
 
-   Es de reseñar es esta definición:
+         .. code-block:: xml
 
-   + Cómo se ha definido la relación.
-   + Que este atributo, como los demás, tiene *setter* y *getter*.
-   + Que el constructor con argumentos y ``cargarDatos`` no fijan ningún
-     identificador, ya que éste lo establece la base de datos al guardar el objeto.
+            <mapping class="edu.acceso.test_hibernate.modelo.Estudiante"/>
 
-   Ahora bien, hemos dicho que tenemos que anotar los dos extremos de la relación,
-   así que deberemos añadir un campo a la clase ``Centro`` que sea una lista de
-   estudiantes, ya que en un centro hay muchos estudiantes:
+      Como se ve se ha significado:
 
-   .. code-block:: java
+      + Con la anotación ``@ManyToOne`` para un atributo que representa el objeto
+        (registro) completo, no sólo el identificador.
+      + Con un *getter* y un *setter* asociados.
+      + Haciendo que el constructor y ``.cargarDatos`` manejen el objeto
+        referenciado, no la clave foránea en sí.
 
-      @OneToMany(mappedBy = "centro")  //Ya está mapeado.
-      private List<Estudiante> estudiantes;
+      En definitiva, la traducción de la relación es casi literal con la única
+      salvedad de que el atributo no almacena la clave foránea (un identificador),
+      sino el registro completo (objeto en realidad).
 
-   Como se ve, expresamos que este campo ya está mapeado por el atributo ``centro``
-   de la clase ``Estudiante``. Además, deberemos definirle un *getter* para poder
-   acceder a su valor. El *setter*, en cambio, no es indispel *setter*, en cambio,
-   no es indispensable.
+   **Bidireccional**
+      En este modo, la relación se refleja en ambos extremos, por lo que debe
+      añadirse también un atributo en el otro extremo (``Centro``), que estará
+      anotado con ``@OneToMany``:
+
+      .. code-block:: java
+
+         @OneToMany(mappedBy = "centro")  //Ya está mapeado.
+         private List<Estudiante> estudiantes;
+
+      Como se ve, expresamos que este campo ya está mapeado por el atributo ``centro``
+      de la clase ``Estudiante``. Además, deberemos definirle un *getter* para poder
+      acceder a su valor. El *setter*, en cambio, no es indispensable.
+
+      Esta alternativa nos permite conocer todos los estudiantes matriculados en
+      un centro de modo sencillo, pero introduce complejidad en la
+      sincronización con la base de datos.
 
 **Relación 1:1**: ``@OneToOne``
    Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
-   ninguno) registro de la otra tabla. Se resuelve colocando el campo en cualquiera
-   de las dos tablas. Para significar este tipo relaciones se usa la notación
-   ``@OneToOne``. Para definir con Hibernate_ tal relación hemos de obrar de
-   manera análoga a como hicimos con la relación **1:N**. Para ilustrarlo,
-   supongamos que añadimos un campo ``dirección`` a la clase ``Centro`` de tipo
-   ``Direccion`` y queremos que en la base de datos los campos que componen la
-   dirección se mantengan en una tabla independiente (a diferencia de lo que
-   propusimos al explicar la :ref:`anotación @Embedded <orm-ann-embedded>`). En
-   este caso, la relación **1:1** se expresaría añadiendo a ``Centro``:
+   ninguno) registro de la otra tabla. En |SQL| se resuelve colocando el campo
+   en cualquiera de las dos tablas. En Hibernate_ para significar este tipo
+   relaciones se usa la notación ``@OneToOne`` y, como en el caso anterior,
+   podemos reflejarla de modo **unidireccional** o **bidireccional**.
 
-   .. code-block:: java
+   Para ilustrarlo, supongamos que añadimos un campo ``direccion`` a la clase
+   ``Centro`` de tipo ``Direccion`` y queremos que en la base de datos los
+   campos que componen la dirección se mantengan en una tabla independiente (a
+   diferencia de lo que propusimos al explicar la :ref:`anotación @Embedded
+   <orm-ann-embedded>`).
 
-      @OneToOne
-      @JoinColumn(name = "direccion_id", nullable = false)
-      private Direccion direccion;
+   **Unidireccional**
+      En este caso, la relación **1:1** se expresaría añadiendo a ``Centro``:
 
-   Y, además, deberíamos definir el *getter* y el *setter* correspondientes. 
-   Éste sería el extremo que tendría representación en la base de datos.
-   En el otro extremo de la relación, la clase ``Direccion`` debería añadir:
+      .. code-block:: java
+
+         @OneToOne
+         @JoinColumn(name = "direccion_id", nullable = false)
+         private Direccion direccion;
+
+      porque es en su tabla correspondiente donde decididimos añadir el campo.
+      Además, deberíamos definir el *getter* y el *setter* correspondientes. 
+
+   **Bidireccional**
+      Además de lo hecho antes, debemos reflejar la relación en el otro extremo
+      (la clase ``Direccion``), por lo que debemos añadir:
 
    .. code-block:: java
 
       @OneToOne(mappedBy = "direccion")
       private Centro centro;
 
-   más al menos el *getter* correspondiente.
+      más al menos el *getter* correspondiente.
 
 **Relación N:M**:
-   La relación sopone que un registro de una tabla se relaciona con muchos de la
+   La relación supone que un registro de una tabla se relaciona con muchos de la
    otra, y viceversa; y supone en el modelo relacional la aparición de una
    tercera tabla. En nuestro ejemplo, podríamos introducir este tipo de
    relación, si ampliáramos la base de datos para que incluyera profesores y los
@@ -329,31 +350,35 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    a. La relación no tiene atributos propios: ``@ManyToMany``.
 
       En este caso, puede expresarse la relación **N:M** directamente con
-      la anotación ``@ManyToMany`` y como en el caso anterior, habrá que
-      expresarla en los dos extremos (las dos clases). En cuál hagamos
-      propiamente la definición y en cuál indiquemos que se relaciona con la
-      otra (a través de ``mappedBy``) es cosa nuestro y dependerá más bien de
-      qué nos resulte más natural. Así podríamos añadir a ``Estudiante``:
+      la anotación ``@ManyToMany``.
 
-      .. code-block:: java
+      **Unidireccional**
+         Creamos el atributo anotado en uno de los dos extremos (el que nos
+         resulte más natural). Así podríamos añadir a ``Estudiante``:
 
-         @ManyToMany
-         @JoinTable(
-            name="Estudiante_Profesor", // Nombre de la tabla adicional
-            joinColums = @JoinColumn(name = "id_estudiante"),
-            inverseJoinColums = @JoinColumn(name = "id_profesor"),
-         )
-         private List<Profesor> profesores;
+         .. code-block:: java
 
-      y a ``Profesor``:
+            @ManyToMany
+            @JoinTable(
+               name="Estudiante_Profesor", // Nombre de la tabla adicional
+               joinColums = @JoinColumn(name = "id_estudiante"),
+               inverseJoinColums = @JoinColumn(name = "id_profesor"),
+            )
+            private List<Profesor> profesores;
 
-      .. code-block:: java
+         También debemos añadir un *getter*; el *setter* no es necesario.
 
-         @ManyToMany(mappedBy = "profesores")
-         private List<Estudiante> estudiantes;
+      **Bidireccional**
+         Además de lo anterior, debemos reflejar la relación en el otro extremo,
+         por lo que en ``Profesor`` debemos añadir:
+
+         .. code-block:: java
+
+            @ManyToMany(mappedBy = "profesores")
+            private List<Estudiante> estudiantes;
    
-      Deberemos crear los *getters* para ambos atributos, pero no son necesarios
-      los *setters*.
+         Como en el otro extremo, debemos añadir un *getter* y el *setter* no es
+         necesario.
 
    #. La relación tiene atributos propios: ``@OneToMany``/``@ManyToOne``.
 

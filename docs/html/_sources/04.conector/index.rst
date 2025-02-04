@@ -1,12 +1,12 @@
 .. _conn:
 
-Conectores a bases de datos relacionales
-****************************************
+Conectores
+**********
 
 .. todo:: Rehacer todo los contenidos de esta unidad para que el ejemplo se haga
    sobre Centro-Estudiante (como en Programación de conectores).
 
-Las bases de datos relacionales son unos de los mecanismos más utilizados para
+Las bases de datos relacionales son unos de los soportes más utilizados para
 el almacenamiento organizado de información. Su problema, al ser accedidas
 mediante aplicaciones es que basan su estructrura en el modelo relacional, que
 no es el modelo que usan los lenguajes de programación para manejar datos. En

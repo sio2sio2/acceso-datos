@@ -219,6 +219,7 @@
 <li class="toctree-l2"><a class="reference internal" href="15.errores.html">5.7. Manejo de excepciones</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.8. Mapeo avanzado</a></li>
 <li class="toctree-l2"><a class="reference internal" href="20.concurrencia.html">5.9. Gestión de la concurrencia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="25.performance.html">5.10. Optimización</a></li>
 </ul>
 </details></li>
 </ul>
@@ -365,7 +366,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -381,6 +384,14 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.8.1. Cascada de operaciones</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -392,6 +403,47 @@ document.write(`
                   
   <section id="mapeo-avanzado">
 <span id="orm-adv-mapping"></span><h1><span class="section-number">5.8. </span>Mapeo avanzado<a class="headerlink" href="#mapeo-avanzado" title="Link to this heading">#</a></h1>
+<p>Incluimos bajo este epígrafe otros aspectos más específicos que se reflejan al
+anotar las clases.</p>
+<section id="cascada-de-operaciones">
+<h2><span class="section-number">5.8.1. </span>Cascada de operaciones<a class="headerlink" href="#cascada-de-operaciones" title="Link to this heading">#</a></h2>
+<p>Cuando dos entidades se relaciones entre sí, los cambios en uno de los extremos
+pueden afectar al otro. En <abbr title="Structured Query Language">SQL</abbr>, al definir la relación con una clave
+foránea puede especificarse qué ocurre con la entidad hija<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> cuando la entidad padre se elimina (<code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span></code>) o cuando el identificador de la entidad padre se actualiza (<code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">UPDATE</span></code>)<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Esto efectos son:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CASCADE</span></code></dt><dd><p>aplicar también la operación a la entidad hija, lo que se traduce en borrar
+la entidad hija si la entidad padre se borró; o actualizar el valor de la
+clave foránea, si se actualizó el identificador del padre.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">NULL</span></code></dt><dd><p>desreferenciar, esto, poner a nulo la clave foránea para que ya no referencie
+ninguna entidad padre.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">DEFAULT</span></code> &lt;N&gt;</dt><dd><p>poner un valor predeterminado (el que se especifique a continuación) como
+valor de la clave foránea.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">RESTRICT</span></code></dt><dd><p>impedir la operación.</p>
+</dd>
+</dl>
+<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> permite también desencadenar efectos en un extremo ante una operación
+en el otro, pero, puesto que en el <abbr title="Object-Relational Mapping">ORM</abbr> las relaciones pueden ser
+bidireccionales, la causística es mayor.</p>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>La entidad hija es la entidad en que se sitúa la clave foránea y la
+entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
+no se ha definido ningún campo extra para significar la relación. En nuestro
+ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hija y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Sólo el identificador de la entidad padre, porque la clave foránea en la
+entidad hija sólo almacena el identificador. Si la entidad padre se actualiza
+cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
+</aside>
+</aside>
+</section>
 </section>
 
 
@@ -429,6 +481,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.8.1. Cascada de operaciones</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

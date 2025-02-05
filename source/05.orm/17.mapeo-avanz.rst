@@ -2,3 +2,47 @@
 
 Mapeo avanzado
 **************
+Incluimos bajo este epígrafe otros aspectos más específicos que se reflejan al
+anotar las clases.
+
+Cascada de operaciones
+======================
+Cuando dos entidades se relaciones entre sí, los cambios en uno de los extremos
+pueden afectar al otro. En |SQL|, al definir la relación con una clave
+foránea puede especificarse qué ocurre con la entidad hija\ [#]_ cuando la entidad padre se elimina (``ON DELETE``) o cuando el identificador de la entidad padre se actualiza (``ON UPDATE``)\ [#]_. Esto efectos son:
+
+``CASCADE``
+   aplicar también la operación a la entidad hija, lo que se traduce en borrar
+   la entidad hija si la entidad padre se borró; o actualizar el valor de la
+   clave foránea, si se actualizó el identificador del padre.
+
+``SET NULL``
+   desreferenciar, esto, poner a nulo la clave foránea para que ya no referencie
+   ninguna entidad padre.
+
+``SET DEFAULT`` <N>
+   poner un valor predeterminado (el que se especifique a continuación) como
+   valor de la clave foránea.
+
+``RESTRICT``
+   impedir la operación.
+   
+Hibernate_ permite también desencadenar efectos en un extremo ante una operación
+en el otro, pero, puesto que en el |ORM| las relaciones pueden ser
+bidireccionales, la causística es mayor.
+
+.. rubric:: Notas al pie
+
+.. [#] La entidad hija es la entidad en que se sitúa la clave foránea y la
+   entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
+   no se ha definido ningún campo extra para significar la relación. En nuestro
+   ejemplo, ``Estudiante`` es la entidad hija y ``Centro``, la entidad padre.
+
+.. [#] Sólo el identificador de la entidad padre, porque la clave foránea en la
+   entidad hija sólo almacena el identificador. Si la entidad padre se actualiza
+   cambiando cualquier otro campo, no hay ningún efecto que reflejar
+
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+
+.. _Hibernate: https://www.hibernate.org

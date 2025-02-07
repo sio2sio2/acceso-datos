@@ -191,7 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../03.xml/03.basex.html">3.3. BaseX</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../04.conector/index.html">4. Conectores a bases de datos relacionales</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../04.conector/index.html">4. Conectores</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../04.conector/01.basico.html">4.1. Operaciones básicas</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
@@ -217,7 +217,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../15.errores.html">5.7. Manejo de excepciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../17.mapeo-avanz.html">5.8. Mapeo avanzado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../20.concurrencia.html">5.9. Gestión de la concurrencia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../25.performance.html">5.10. Optimización</a></li>
 </ul>
 </details></li>
 </ul>
@@ -479,6 +481,28 @@ identificador, para lo cual se usa el método <code class="docutils literal notr
 <div class="admonition seealso">
 <p class="admonition-title">Ver también</p>
 <p>La obtención de todos los objetos requiere el <a class="reference internal" href="02.avanzadas/01.hql.html#orm-hql-select-all"><span class="std std-ref">uso de HLQ</span></a> o <a class="reference internal" href="02.avanzadas/02.criteria.html#orm-criteria-select-all"><span class="std std-ref">Criteria API</span></a>.</p>
+</div>
+<p>También podemos considerar una operación de lectura la que se hace a través del
+método <code class="docutils literal notranslate"><span class="pre">.refresh</span></code> que consiste en volver a tomar un objeto de la base de
+datos, desechando todos los cambios que haya podido sufrir en memoria:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span>
+<span class="w">      </span><span class="c1">// Hacemos cambios en el objeto</span>
+<span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;Pongo otro&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setTitularidad</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PRIVADA</span><span class="p">);</span>
+<span class="hll"><span class="w">      </span><span class="n">sesion</span><span class="p">.</span><span class="na">refresh</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Se vuelve a la versión de la BD</span>
+</span><span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// En realidad no cambia nada.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">HibernateException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
 </div>
 </section>
 <section id="update">

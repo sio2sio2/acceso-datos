@@ -217,7 +217,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="15.errores.html">5.7. Manejo de excepciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="20.concurrencia.html">5.8. Gestión de la concurrencia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17.mapeo-avanz.html">5.8. Mapeo avanzado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20.concurrencia.html">5.9. Gestión de la concurrencia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="25.performance.html">5.10. Optimización</a></li>
 </ul>
 </details></li>
 </ul>
@@ -780,12 +782,29 @@ anotado con <code class="docutils literal notranslate"><span class="pre">&#64;On
 <span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Como se ve, expresamos que este campo ya está mapeado por el atributo <code class="docutils literal notranslate"><span class="pre">centro</span></code>
-de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Además, deberemos definirle un <em>getter</em> para poder
-acceder a su valor. El <em>setter</em>, en cambio, no es indispensable.</p>
+<p>Como se ve, expresamos que este campo ya está mapeado por el atributo
+<code class="docutils literal notranslate"><span class="pre">centro</span></code> de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Además, deberemos definirle un
+<em>getter</em> para poder acceder a su valor. El <em>setter</em>, en cambio, no es
+indispensable.</p>
 <p>Esta alternativa nos permite conocer todos los estudiantes matriculados en
-un centro de modo sencillo, pero introduce complejidad en la
-sincronización con la base de datos.</p>
+un centro de modo sencillo, pero introduce problemas de sincronización
+con los que deberíamos lidiar. Por ejemplo, establecer como <em>nulo</em> el
+atributo <code class="docutils literal notranslate"><span class="pre">centro</span></code> de un estudiante, no actualizará automáticamente la
+lista de estudiantes matriculados del centro correspondiente. Para que la
+actualización fuera automática deberíamos manipular el <em>setter</em> de tal
+atributo.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Tenga presente esto último. Una relación bidireccional
+introduce un <strong>problema de sincronización</strong> entre los extremos de la
+relación, ya que un extremo puede que informe de una cosa distinta a la
+que informa el otro. En el caso anterior, el <em>estudiante</em> informa de que
+no está matriculado, mientras la lista de estudiantes en el centro
+informa de que sí lo está. En casos de discrepancia, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> hará
+prevalecer la información del extremo de la relación que realmente
+existe en la base de datos, esto es, la información que ofrece
+<em>estudiante</em>.</p>
+</div>
 </dd>
 </dl>
 </dd>

@@ -408,38 +408,97 @@ anotar las clases.</p>
 <section id="cascada-de-operaciones">
 <h2><span class="section-number">5.8.1. </span>Cascada de operaciones<a class="headerlink" href="#cascada-de-operaciones" title="Link to this heading">#</a></h2>
 <p>Cuando dos entidades se relaciones entre sí, los cambios en uno de los extremos
-pueden afectar al otro. En <abbr title="Structured Query Language">SQL</abbr>, al definir la relación con una clave
-foránea puede especificarse qué ocurre con la entidad hija<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> cuando la entidad padre se elimina (<code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span></code>) o cuando el identificador de la entidad padre se actualiza (<code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">UPDATE</span></code>)<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Esto efectos son:</p>
+pueden afectar al otro.</p>
+<p class="rubric"><abbr title="Structured Query Language">SQL</abbr></p>
+<p>En <abbr title="Structured Query Language">SQL</abbr>, al definir la relación con una clave foránea puede especificarse qué
+ocurre con la entidad hijo<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> cuando la entidad padre se elimina (<code class="docutils literal notranslate"><span class="pre">ON</span>
+<span class="pre">DELETE</span></code>) o cuando el identificador de la entidad padre se actualiza (<code class="docutils literal notranslate"><span class="pre">ON</span>
+<span class="pre">UPDATE</span></code>)<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Esto efectos son:</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">CASCADE</span></code></dt><dd><p>aplicar también la operación a la entidad hija, lo que se traduce en borrar
-la entidad hija si la entidad padre se borró; o actualizar el valor de la
+<dt><code class="docutils literal notranslate"><span class="pre">CASCADE</span></code></dt><dd><p>aplicar también la operación a la entidad hijo, lo que se traduce en borrar
+la entidad hijo si la entidad padre se borró; o actualizar el valor de la
 clave foránea, si se actualizó el identificador del padre.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">NULL</span></code></dt><dd><p>desreferenciar, esto, poner a nulo la clave foránea para que ya no referencie
-ninguna entidad padre.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">NULL</span></code></dt><dd><p>poner a nulo la clave foránea.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">DEFAULT</span></code> &lt;N&gt;</dt><dd><p>poner un valor predeterminado (el que se especifique a continuación) como
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">DEFAULT</span></code></dt><dd><p>poner un valor predeterminado (el que se especifique a continuación) como
 valor de la clave foránea.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">RESTRICT</span></code></dt><dd><p>impedir la operación.</p>
 </dd>
 </dl>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> permite también desencadenar efectos en un extremo ante una operación
-en el otro, pero, puesto que en el <abbr title="Object-Relational Mapping">ORM</abbr> las relaciones pueden ser
-bidireccionales, la causística es mayor.</p>
+<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a>, cuando se define la relación como bidireccional, permite usar una
+anotación <code class="docutils literal notranslate"><span class="pre">&#64;OnDelete</span></code> para notar el comportamiento <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span></code>, aunque sólo
+se soporta el efecto <code class="docutils literal notranslate"><span class="pre">CASCADE</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;centro&quot;</span><span class="p">)</span>
+<span class="nd">@OnDelete</span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OnDeleteAction</span><span class="p">.</span><span class="na">CASCADE</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>De este modo, se añadirá en el esquema <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span> <span class="pre">CASCADE</span></code> y la base de datos
+se encargará de propagar la operación en cascada.</p>
+<p class="rubric">Hibernate</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Por lo general, las operaciones en cascada se definen de padre a
+hijo cuando las relaciones son bidireccionales. Cuando las relaciones son
+unidireccionales, las operaciones en cascada pueden definirse también y se
+aplican de hijo a padre, pero no suelen ser buena idea por provocar
+inconsistencias y, por lo general, es mejor evitarlas.</p>
+</div>
+<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> permite desencadenar efectos adicionales en el nivel de aplicación
+sobre las entidades <em>hijo</em> cuando se realiza una operación en la entidad
+<em>padre</em>. Pueden definirse los siguientes <em>tipos de cascada</em>:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.PERSIST</span></code></dt><dd><p>Provoca que guardar la entidad <em>padre</em> provoque que se guarden también las
+entidades <em>hijo</em>. En nuestro ejemplo, guardar un objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> implicará
+también que se guarden los nuevos objetos <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que se hayan añadido
+a su lista de matriculados.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.MERGE</span></code></dt><dd><p>Provoca que la actualización de la entidad <em>padre</em> provoca una actualización
+de todas las entidades <em>hijo</em> con la que está relacionada. Entiéndase como si
+internamente se recorriera la lista de entidades hijo y se le aplicara a
+todas ellas el método <code class="docutils literal notranslate"><span class="pre">.merge</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.REMOVE</span></code></dt><dd><p>Provoca que la eliminación de la entidad <em>padre</em>, provoque la eliminación de
+todas las entidades <em>hijo</em>. Es, por tanto, el equivalente a <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span>
+<span class="pre">CASCADE</span></code>, pero hecho en el nivel de aplicación y no desencadenado por la
+propia base de datos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.REFRESH</span></code></dt><dd><p>Provoca que refrescar la entidad <em>padre</em>, refresque también todas las
+entidades <em>hijo</em>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.DETACH</span></code></dt><dd><p>Propaga el desvinculamiento de la entidad <em>padre</em> a todas las entidades
+<em>hijo</em>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.ALL</span></code></dt><dd><p>Equivale a haber configurado todas las anteriores.</p>
+</dd>
+</dl>
+<p>A todas estos desencadenamientos debe añadirse la opción:</p>
+<dl class="simple">
+<dt><code class="code docutils literal notranslate"><span class="pre">orphanRemoval</span> <span class="pre">=</span> <span class="pre">true</span></code></dt><dd><p>Provoca que eliminar un entidad <em>hijo</em> de la lista, es decir, desvincularla
+de la entidad <em>padre</em>, provoque su eliminación de la base de datos.</p>
+</dd>
+</dl>
+<p>Estas anotaciones deben incluirse en el extremo de la entidad padre de las
+relaciones bidireccionales:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s2">&quot;centro&quot;</span><span class="p">,</span> <span class="n">cascade</span> <span class="o">=</span> <span class="p">{</span><span class="n">CascadeType</span><span class="o">.</span><span class="n">PERSIST</span><span class="p">,</span> <span class="n">CascadeType</span><span class="o">.</span><span class="n">REMOVE</span><span class="p">},</span> <span class="n">orphanRemoval</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+<span class="n">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span> <span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>La entidad hija es la entidad en que se sitúa la clave foránea y la
+<p>La entidad hijo es la entidad en que se sitúa la clave foránea y la
 entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
 no se ha definido ningún campo extra para significar la relación. En nuestro
-ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hija y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
+ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hijp y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
 </aside>
 <aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Sólo el identificador de la entidad padre, porque la clave foránea en la
-entidad hija sólo almacena el identificador. Si la entidad padre se actualiza
+entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
 cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
 </aside>
 </aside>

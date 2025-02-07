@@ -83,6 +83,32 @@ identificador, para lo cual se usa el método ``.find``:
 .. seealso:: La obtención de todos los objetos requiere el :ref:`uso de HLQ
    <orm-hql-select-all>` o :ref:`Criteria API <orm-criteria-select-all>`.
 
+También podemos considerar una operación de lectura la que se hace a través del
+método ``.refresh`` que consiste en volver a tomar un objeto de la base de
+datos, desechando todos los cambios que haya podido sufrir en memoria:
+
+.. code-block:: java
+   :emphasize-lines: 8
+
+   try(Session sesion = hf.openSession()) {
+      Transaction tr = null;
+      try {
+         Centro castillo = sesion.find(Centro.class, 11004866L);
+         // Hacemos cambios en el objeto
+         castillo.setNombre("Pongo otro");
+         castillo.setTitularidad(Centro.Titularidad.PRIVADA);
+         sesion.refresh(castillo); // Se vuelve a la versión de la BD
+         tr.commit(); // En realidad no cambia nada.
+      }      
+      catch(Exception e) {
+         if(tr != null) tr.rollback();
+      }
+   }
+   catch(HibernateException err) {
+      e.printStackTrace();
+   }
+
+
 .. _orm-crud-update:
 
 UPDATE

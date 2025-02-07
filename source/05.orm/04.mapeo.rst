@@ -292,13 +292,28 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
          @OneToMany(mappedBy = "centro")  //Ya está mapeado.
          private List<Estudiante> estudiantes;
 
-      Como se ve, expresamos que este campo ya está mapeado por el atributo ``centro``
-      de la clase ``Estudiante``. Además, deberemos definirle un *getter* para poder
-      acceder a su valor. El *setter*, en cambio, no es indispensable.
+      Como se ve, expresamos que este campo ya está mapeado por el atributo
+      ``centro`` de la clase ``Estudiante``. Además, deberemos definirle un
+      *getter* para poder acceder a su valor. El *setter*, en cambio, no es
+      indispensable.
 
       Esta alternativa nos permite conocer todos los estudiantes matriculados en
-      un centro de modo sencillo, pero introduce complejidad en la
-      sincronización con la base de datos.
+      un centro de modo sencillo, pero introduce problemas de sincronización
+      con los que deberíamos lidiar. Por ejemplo, establecer como *nulo* el
+      atributo ``centro`` de un estudiante, no actualizará automáticamente la
+      lista de estudiantes matriculados del centro correspondiente. Para que la
+      actualización fuera automática deberíamos manipular el *setter* de tal
+      atributo.
+
+      .. caution:: Tenga presente esto último. Una relación bidireccional
+         introduce un **problema de sincronización** entre los extremos de la
+         relación, ya que un extremo puede que informe de una cosa distinta a la
+         que informa el otro. En el caso anterior, el *estudiante* informa de que
+         no está matriculado, mientras la lista de estudiantes en el centro
+         informa de que sí lo está. En casos de discrepancia, Hibernate_ hará
+         prevalecer la información del extremo de la relación que realmente
+         existe en la base de datos, esto es, la información que ofrece
+         *estudiante*.
 
 **Relación 1:1**: ``@OneToOne``
    Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o

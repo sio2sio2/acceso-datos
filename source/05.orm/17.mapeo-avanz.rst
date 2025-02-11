@@ -32,18 +32,22 @@ UPDATE``)\ [#]_. Esto efectos son:
 ``RESTRICT``
    impedir la operación.
    
-Hibernate_, cuando se define la relación como bidireccional, permite usar una
-anotación ``@OnDelete`` para notar el comportamiento ``ON DELETE``, aunque sólo
-se soporta el efecto ``CASCADE``:
+Hibernate_, tanto si la relación es unidireccional como bidireccional, permite
+añadir la anotación ``@OnDelete`` en el lado propietario (el que tiene la clave
+foránea) para notar el comportamiento ``ON DELETE``, aunque sólo se soporta el
+efecto ``CASCADE``:
 
 .. code-block:: java
 
-   @OneToMany(mappedBy = "centro")
+   @ManyToOne
+   @JoinColumn(name = "id_centro")
    @OnDelete(action = OnDeleteAction.CASCADE)
-   private List<Estudiante> estudiantes;
+   private Centro centro;
 
 De este modo, se añadirá en el esquema ``ON DELETE CASCADE`` y la base de datos
 se encargará de propagar la operación en cascada.
+
+.. caution:: En SQLite la integridad referencial está deshabilitada por defecto.
 
 .. rubric:: Hibernate
 
@@ -55,7 +59,26 @@ se encargará de propagar la operación en cascada.
 
 Hibernate_ permite desencadenar efectos adicionales en el nivel de aplicación
 sobre las entidades *hijo* cuando se realiza una operación en la entidad
-*padre*. Pueden definirse los siguientes *tipos de cascada*:
+*padre*. Para aclararnos recordemos que para la relación bidireccional entre
+``Centro`` (entidad padre) y ``Estudiante`` (entidad hijo) hemos definido lo
+siguiente:
+
+.. code-block:: java
+
+   // Estudiante
+
+   @ManyToOne
+   @JoinColumn(name = "id_centro")
+   private Centro centro
+
+.. code-block:: java
+
+   // Centro
+
+   @OneToMany(mappedBy = "centro")
+   private List<Estudiante> estudiantes;
+
+Pueden definirse los siguientes *tipos de cascada*:
 
 ``CascadeType.PERSIST``
    Provoca que guardar la entidad *padre* provoque que se guarden también las
@@ -89,8 +112,8 @@ sobre las entidades *hijo* cuando se realiza una operación en la entidad
 A todas estos desencadenamientos debe añadirse la opción:
 
 :code:`orphanRemoval = true`
-   Provoca que eliminar un entidad *hijo* de la lista, es decir, desvincularla
-   de la entidad *padre*, provoque su eliminación de la base de datos.
+   Provoca la eliminación de la entidad *hijo* en la base de datos al eliminarla
+   de la lista en la entidad *padre*, es decir, desvincularla de ésta.
 
 Estas anotaciones deben incluirse en el extremo de la entidad padre de las
 relaciones bidireccionales:
@@ -100,12 +123,29 @@ relaciones bidireccionales:
    @OneToMany(mappedBy = "centro", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
    private List<Estudiante> estudiantes;
 
+Mapeo de colecciones
+====================
+La anotación ``@ElementCollection`` permite mapear colecciones de tipos básicos
+(como ``String, ``Integer`` o ``LocalDate``) sin que haya necesidad de  crear
+una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
+teléfono a cada centro:
+
+.. code-block:: java
+
+   @ElementCollection
+   @CollectionTable(name = "Telefono", joinColumns = @JoinColum(name = "id_estudiante"))
+   @Column(name = "numero")
+   private List<Integer> telefonos = new ArrayList<>();
+
+Si no se permiten elementos repetidos, puedo optarse por un
+:java-util:`HashSet` en vez de un :java-util:`ArrayList`.
+
 .. rubric:: Notas al pie
 
 .. [#] La entidad hijo es la entidad en que se sitúa la clave foránea y la
    entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
    no se ha definido ningún campo extra para significar la relación. En nuestro
-   ejemplo, ``Estudiante`` es la entidad hijp y ``Centro``, la entidad padre.
+   ejemplo, ``Estudiante`` es la entidad hijo y ``Centro``, la entidad padre.
 
 .. [#] Sólo el identificador de la entidad padre, porque la clave foránea en la
    entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza

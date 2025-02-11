@@ -116,6 +116,7 @@ UPDATE
 Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
 
 .. code-block:: java
+   :emphasize-lines: 6
 
    try(Session sesion = hf.openSession()) {
       Transaction tr = null 
@@ -135,6 +136,7 @@ En cambio, si el objeto no está vinculado, aún podremos hacer las
 actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
 
 .. code-block:: java
+   :emphasize-lines: 11, 12
 
    Centro castillo = null;
    try(Session sesion = hf.openSession()) {
@@ -174,6 +176,7 @@ Para borrar un objeto **vinculado** a la sesión debe usarse el método
 ``.remove``:
 
 .. code-block:: java
+   :emphasize-lines: 6
 
    try(Session sesion = hf.openSession()) {
       Transaction tr = null 

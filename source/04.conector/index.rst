@@ -8,12 +8,12 @@ Conectores
 
 Las bases de datos relacionales son unos de los soportes más utilizados para
 el almacenamiento organizado de información. Su problema, al ser accedidas
-mediante aplicaciones es que basan su estructrura en el modelo relacional, que
+mediante aplicaciones, es que basan su estructrura en el modelo relacional, que
 no es el modelo que usan los lenguajes de programación para manejar datos. En
 concreto, los más habituales, los lenguajes de |POO| manejan los datos haciendo
-uso del modelo de objetos por lo que existe una discrepación entre el modo en
+uso del modelo de objetos, por lo que existe una discrepación entre el modo en
 que tratan los datos los |SGBD| relacionales y el modo en que los tratan los
-lenguajes. Para afrontarlo los lenguajes utilizan dos estrategias distintas:
+lenguajes. Para afrontarlo, los lenguajes utilizan dos estrategias distintas:
 
 #. El uso de conectores, en que el acceso a la base de datos se realiza mediante
    sentencias |SQL| y la traducción del modelo relacional al modelo de objetos
@@ -22,7 +22,7 @@ lenguajes. Para afrontarlo los lenguajes utilizan dos estrategias distintas:
 #. El uso de herramientas |ORM| en que la traducción entre ambos modelos corre a
    cargo de la propia herramienta siguiendo las orientaciones del programador.
 
-Podemos entender mejor estas dos estrategias, si las comparamos con estrategias
+Podemos entender mejor estas dos estrategias si las comparamos con estrategias
 ya vistas anteriormente para acceder a otros soportes de datos:
 
 - La primera estrategia es la misma que sigue la librería commons-csv_ para leer
@@ -44,7 +44,7 @@ Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
       se escriba la aplicación, pese a lo cual habrá que traducir el código al
       nuevo lenguaje.
    #. Son más sencillos de usar que un |ORM|.
-   #. Los conectores suelen formar parte de las librerías básicas del lenguaje
+   #. Los conectores suelen formar parte de las librerías básicas del lenguaje,
       por lo que no necesitaremos usar una librería de terceros (la librería
       |ORM|) ni tendremos que reescribir el código si decidimos cambiar a un
       |ORM| distinto.
@@ -53,13 +53,13 @@ Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
    a. Al proveer un mecanismo para traducir el modelo relacional al modelo de
       datos del lenguaje de programación (modelo de objetos), son herramientas
       más productivas.
-   #. El programador trata los datos directamente como objetos lo que hace el
+   #. El programador trata los datos directamente como objetos, lo que hace el
       código más sencillo y manipulable.
    #. Generalmente, cambiar de |SGBD| es trivial, puesto que la herramienta
-      nos abstrae de sus particularidades. Su uso, por tanto, nos independencia
+      nos abstrae de sus particularidades. Su uso, por tanto, nos independiza
       de cuál sea el |SGBD| que gestione los datos frente a los conectores que
       usan sentencias |SQL|, generalmente dependientes de cuál es el |SGBD|. En
-      contrapartida, puede resultar muy trabajoso cambiar de |ORM|
+      contrapartida, puede resultar muy trabajoso cambiar de |ORM|.
 
 En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
 :ref:`unidad siguiente <orm>`.
@@ -93,7 +93,7 @@ necesario que tengamos **instalado el motor**. En el caso de :program:`SQLite`:
 
 .. _rst-simple:
 
-* Las distribuciones de *Linux* suelen incluir un paquete por lo que su
+* Las distribuciones de *Linux* suelen incluir un paquete, por lo que su
   instalación es trivial.
 * Para sistemas *Windows* la página oficial ofrece `binarios precompilados
   <https://sqlite.org/download.html#win32>`_, pero no un instalador automático.
@@ -115,7 +115,7 @@ Tomemos como base el :ref:`ejercicio ilustrativo con que introducimos XML
 
 + Puede haber varios claustros.
 + Un mismo profesor puede trabajar en varios claustro diferentes.
-+ Si se da la anterior circunstancia, el profesor se adcribirá a un
++ Si se da la anterior circunstancia, el profesor se adscribirá a un
   departamento\ [#]_ por centro, pero no tiene que ser para todos los centros el
   mismo.
 + De igual modo, en un centro puede tener asignado uno o varios casilleros

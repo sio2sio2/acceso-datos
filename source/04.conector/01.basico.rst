@@ -53,9 +53,9 @@ En el código de ejemplo, hay dos claves fundamentales:
       SQL Server   `mssql-jdbc`_            com.microsoft.sqlserver.jdbc.SQLServerDriver   `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
      ============ ======================== ============================================== ==============================================================
 
-* El objeto de conexión, creado con las estructura *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
+* El objeto de conexión, creado con las estructuras *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
   es necesario facilitar la |URL|, y un usuario y una contraseña con permisos
-  para realizar las operaciones que se desee llevar acabo.
+  para realizar las operaciones que se deseen llevar a cabo.
 
   .. note:: Como :program:`SQLite` no define permisos para usuarios, sólo es
      necesaria la |URL|. Se ha dejado explícita esta falta de necesidad, pero
@@ -88,7 +88,7 @@ A partir de un objeto :java-sql:`Statement <Statement>`, para las primeras se
 usa el método ``executeUpdate``, mientras que para las segundas el método
 ``executeQuery``.
 
-.. note:: Hay otro método, ``execute`` que sirve para ambos casos y que devuelve
+.. note:: Hay otro método, ``execute``, que sirve para ambos casos y que devuelve
    ``true``, si hay resultados (segundo caso) o ``false``, si no los hay.
    Como lo normal es que se sepa de antemano si la sentencia devuelve datos o no
    (p.e. un ``SELECT`` devuelve datos; un ``INSERT``, no), podemos prescindir de
@@ -96,7 +96,7 @@ usa el método ``executeUpdate``, mientras que para las segundas el método
 
 Simples
 -------
-Comencemos creado cuatro tablas:
+Comencemos creando cuatro tablas:
 
 .. literalinclude:: files/01.create.java
    :language: java
@@ -107,8 +107,8 @@ El código tiene dos aspectos:
    forma parte de los objetivos de esta unidad\ [#]_, así que no entraremos en
    comentarlas.
 
-   .. hint:: No obstante si conviene precisar que procuremos al escribirlas
-      ceñirnos al estándar lo más posible a fin de que sean lo más universales
+   .. hint:: No obstante, sí conviene precisar que procuremos al escribirlas
+      ceñirnos al estándar lo más posible, a fin de que sean lo más universales
       posibles y nos sea menos costoso cambiar de |SGBD|. A este respecto:
 
       + Dejamos de escribir los nombres de elementos de la base de datos
@@ -142,7 +142,7 @@ podemos hacer:
           stmt.executeUpdate(String.format("INSERT INTO Departamento (denominacion) VALUES ('%s');", denominacion));
       }
 
-.. caution:: Aún estamos empezando y sabemos poco así que estas sentencias son
+.. caution:: Aún estamos empezando y sabemos poco, así que estas sentencias son
    torpes por dos razones:
 
    * Estamos ejecutando repetidamente (cuatro veces) la misma sentencia y no es
@@ -189,7 +189,7 @@ objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él
 
 .. note:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
    cerrarse automáticamente al cerrarse la sentencia que la originó. En
-   cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja e
+   cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
    sernos útil.
 
 En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
@@ -309,7 +309,7 @@ a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
    transformarlo al tipo requerido: esto implica una nimia sobrecarga también,
    despreciable en la mayoría de los casos.
 
-#. Si no pasamos literales, sino una variable. la variable puede ser nula y
+#. Si no pasamos literales, sino una variable, la variable puede ser nula y
    darnos problemas:
 
    .. code-block:: java
@@ -340,10 +340,10 @@ a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
 
 .. rubric:: Notas al pie
 
-.. [#] Según el estandar un nombre que no se encierra entre comillas dobles, se
+.. [#] Según el estándar, un nombre que no se encierra entre comillas dobles, se
    sobreentiende escrito todo en mayúsculas. En particular, :program:`SQLite` se
    salta el estándar en este aspecto y no hace esa distinción, incluso aunque
-   los nombres si se hayan entrecomillado. Otra razón que avala el que no
+   los nombres sí se hayan entrecomillado. Otra razón que avala el que no
    entrecomillemos es que :program:`MariaDB`/:program:`MySQL` exige que
    cambiemos la configuración predeterminada para soportar el entrecomillado con
    comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.

@@ -213,6 +213,7 @@ cabo definiendo un \"*resolutor de entidades*\".
 
                try {
                    if(!new URI(systemID).isAbsolute()) {
+                       // Se supone que "ruta" ya se definió como Path.
                        systemID = ruta.getParent().resolve(systemID).toString();
                    }
                }
@@ -230,6 +231,19 @@ llevar a cabo la validación. En cambio, si devolvemos un :code:`new
 InputSource(cadena)` utilizará el |DTD| que indique esa cadena (puede ser una
 |URL| o un archivo local) con independencia de lo que expresase la declaración
 original.
+
+.. admonition:: Advertencia
+
+   El código incluye una variable ``ruta``, que es un objeto ``Path`` que
+   contiene la ruta del archivo |XML| en consonancia con :ref:`el ejemplo
+   ilustrativo que escribimos sobre lectura <jaxp-read>`.
+
+   Si en cambio, ``ruta`` fuera una objeto ``URI`` podríamos obtener la cadena
+   con la ruta del |DTD| de este otro modo:
+
+   .. code-block:: java
+
+      systemID = ruta.resolve(systemID).toString();
 
 ¿Qué hace exactamente el código que hemos propuesto? En principio, si
 no hay definido ninguno, no hace nada. En cambio, si hay definido uno,

@@ -23,23 +23,23 @@ equivalente propio de Java.
 .. table::
    :class: tipos-sql
 
-   +-----------------+-------------------------+--------------------------------------+
-   | Tipo |SQL|      | Tipo Java\ [#]_         | Método |JDBC| de |PreparedStatement| |
-   +=================+=========================+======================================+
-   | | CHAR(n)       | :java-lang:`String`     | setString(int idx, String v)         |
-   | | VARCHAR(n)    |                         |                                      |
-   +-----------------+-------------------------+--------------------------------------+
-   | | SMALLINT      | | :java-lang:`Short`    | | setShort(int idx, short v)         |
-   | | INTEGER       | | :java-lang:`Integer`  | | setInt(int idx, int v)             |
-   | | BIGINT        | | :java-lang:`Long`     | | setLong(int idx, long v)           |
-   +-----------------+-------------------------+--------------------------------------+
-   | BOOLEAN         | :java-lang:`Boolean`    | | setBoolean(int idx, boolean v)     |
-   +-----------------+-------------------------+--------------------------------------+
-   | NUMERIC/DECIMAL | :java-lang:`BigDecimal` | | setBigDecimal(int idx, BigDecimal  |
-   +-----------------+-------------------------+--------------------------------------+
-   | | FLOAT         | | :java-lang:`Float`    | | setFloat(int idx, float v)         |
-   | | DOUBLE        | | :java-lang:`Double`   | | setDouble(int idx, double v)       |
-   +-----------------+-------------------------+--------------------------------------+
+   +---------------------------+-------------------------+--------------------------------------+
+   | Tipo |SQL|                | Tipo Java\ [#]_         | Método |JDBC| de |PreparedStatement| |
+   +===========================+=========================+======================================+
+   | | CHAR(n)                 | :java-lang:`String`     | setString(int idx, String v)         |
+   | | VARCHAR(n)              |                         |                                      |
+   +---------------------------+-------------------------+--------------------------------------+
+   | | SMALLINT                | | :java-lang:`Short`    | | setShort(int idx, short v)         |
+   | | INTEGER                 | | :java-lang:`Integer`  | | setInt(int idx, int v)             |
+   | | BIGINT                  | | :java-lang:`Long`     | | setLong(int idx, long v)           |
+   +---------------------------+-------------------------+--------------------------------------+
+   | BOOLEAN                   | :java-lang:`Boolean`    | | setBoolean(int idx, boolean v)     |
+   +---------------------------+-------------------------+--------------------------------------+
+   | NUMERIC/DECIMAL\ [#]_     | :java-lang:`BigDecimal` | | setBigDecimal(int idx, BigDecimal) |
+   +---------------------------+-------------------------+--------------------------------------+
+   | | FLOAT, REAL\ [#]_       | | :java-lang:`Float`    | | setFloat(int idx, float v)         |
+   | | FLOAT, DOUBLE PRECISION | | :java-lang:`Double`   | | setDouble(int idx, double v)       |
+   +---------------------------+-------------------------+--------------------------------------+
 
 .. note:: No hay más que sustituir `set` por `get` para obtener los métodos de
    |PreparedStatement| necesarios para guardar datos.
@@ -329,6 +329,31 @@ particular:
 .. rubric:: Notas al pie
 
 .. [#] Se han referido clases, pero también equivalen a tipos primitivos (``short`` en vez de :java-lang:`Short`).
+.. [#] Ambos tipos representan número reales de coma fija y necesitan que se
+   se les proporcionen dos parámetros: la :dfn:`precisión` (el número total de cifras)
+   y la :dfn:`escala` (el número de cifras decimales). Por ejemplo,
+   ``NUMERIC(10, 2)`` es un número de 10 cifras, dos de las cuales son
+   decimales.
+.. [#] En |SQL|, ``FLOAT`` representa un número en coma flotante de simple o de
+   doble precisión (*32* o *64* bits), a diferencia de lo que suele ocurrir en
+   los lenguajes de programación en que la palabra suele reservarse para la
+   simple precisión, mientras que ``DOUBLE`` significa la doble precisión. El
+   tipo exige que se incluya como argumento el número de bits que se usarán para
+   :ref:`la mantisa <linux:som-coma-flotante>`, por lo que ``FLOAT(23)`` indica
+   que se usan 23 *bits*. Dependiendo del valor de este argumento el |SGBD|
+   escoge la precisión:
+
+   .. table::
+
+      =========== =========================== ===============
+       Precisión   Bits para mantisa            Ejemplo
+      =========== =========================== ===============
+       Simple       :math:`1 \leq n \leq 24`   ``FLOAT(20)``
+       Double       :math:`25 \leq n \leq 53`  ``FLOAT(50)``
+      =========== =========================== ===============
+
+   Por su parte, ``REAL`` es un alias para ``FLOAT(24)`` y ``DOUBLE PRECISION``,
+   para ``FLOAT(53)``.
 
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`

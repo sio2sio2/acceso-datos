@@ -55,6 +55,7 @@
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/02.datos';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
@@ -427,7 +428,7 @@ equivalente propio de Java.</p>
 <div class="pst-scrollable-table-container"><table class="tipos-sql table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Tipo <abbr title="Structured Query Language">SQL</abbr></p></th>
-<th class="head"><p>Tipo Java<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
+<th class="head"><p>Tipo Java<a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></th>
 <th class="head"><p>Método <abbr title="Java DataBase Connectivity">JDBC</abbr> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a></p></th>
 </tr>
 </thead>
@@ -466,16 +467,16 @@ equivalente propio de Java.</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p>NUMERIC/DECIMAL</p></td>
+<tr class="row-odd"><td><p>NUMERIC/DECIMAL<a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></td>
 <td><p><a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/BigDecimal.html">BigDecimal</a></p></td>
 <td><div class="line-block">
-<div class="line">setBigDecimal(int idx, BigDecimal</div>
+<div class="line">setBigDecimal(int idx, BigDecimal)</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line">FLOAT</div>
-<div class="line">DOUBLE</div>
+<div class="line">FLOAT, REAL<a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></div>
+<div class="line">FLOAT, DOUBLE PRECISION</div>
 </div>
 </td>
 <td><div class="line-block">
@@ -801,9 +802,49 @@ igual que para el resto de <abbr title="Sistema Gestor de Bases de Datos">SGBD</
 </dl>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Se han referido clases, pero también equivalen a tipos primitivos (<code class="docutils literal notranslate"><span class="pre">short</span></code> en vez de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Short.html">Short</a>).</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Ambos tipos representan número reales de coma fija y necesitan que se
+se les proporcionen dos parámetros: la <em class="dfn">precisión</em> (el número total de cifras)
+y la <em class="dfn">escala</em> (el número de cifras decimales). Por ejemplo,
+<code class="docutils literal notranslate"><span class="pre">NUMERIC(10,</span> <span class="pre">2)</span></code> es un número de 10 cifras, dos de las cuales son
+decimales.</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>En <abbr title="Structured Query Language">SQL</abbr>, <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> representa un número en coma flotante de simple o de
+doble precisión (<em>32</em> o <em>64</em> bits), a diferencia de lo que suele ocurrir en
+los lenguajes de programación en que la palabra suele reservarse para la
+simple precisión, mientras que <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> significa la doble precisión. El
+tipo exige que se incluya como argumento el número de bits que se usarán para
+<a class="reference external" href="https://sio2sio2.github.io/doc-linux/guias/0222.som/01.si/04.datos/01.repr.html#som-coma-flotante" title="(en Linuxnomicón versión rolling)"><span class="xref std std-ref">la mantisa</span></a>, por lo que <code class="docutils literal notranslate"><span class="pre">FLOAT(23)</span></code> indica
+que se usan 23 <em>bits</em>. Dependiendo del valor de este argumento el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>
+escoge la precisión:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Precisión</p></th>
+<th class="head"><p>Bits para mantisa</p></th>
+<th class="head"><p>Ejemplo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Simple</p></td>
+<td><p><span class="math notranslate nohighlight">\(1 \leq n \leq 24\)</span></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FLOAT(20)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Double</p></td>
+<td><p><span class="math notranslate nohighlight">\(25 \leq n \leq 53\)</span></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FLOAT(50)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Por su parte, <code class="docutils literal notranslate"><span class="pre">REAL</span></code> es un alias para <code class="docutils literal notranslate"><span class="pre">FLOAT(24)</span></code> y <code class="docutils literal notranslate"><span class="pre">DOUBLE</span> <span class="pre">PRECISION</span></code>,
+para <code class="docutils literal notranslate"><span class="pre">FLOAT(53)</span></code>.</p>
 </aside>
 </aside>
 </section>

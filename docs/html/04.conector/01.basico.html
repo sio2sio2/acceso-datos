@@ -530,16 +530,16 @@ ella.</p>
 <section id="simples">
 <h3><span class="section-number">4.1.2.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h3>
 <p>Comencemos creando cuatro tablas:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
 
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:memory:&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Base de datos en la memoria</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
 <span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">   </span><span class="c1">// Particular de SQLite: respetar la integredad referencial (opcional).</span>
+<span class="w">   </span><span class="c1">// Particular de SQLite: respetar la integridad referencial (opcional).</span>
 <span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">);</span>
 
 <span class="w">   </span><span class="c1">// Tabla Departamento.</span>
@@ -574,7 +574,7 @@ ella.</p>
 <span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
 
 <span class="w">   </span><span class="c1">// Relación Profesor-Centro.</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executaUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
 <span class="s">      CREATE TABLE Trabaja (</span>
 <span class="s">         profesor          INTEGER,</span>
 <span class="s">         centro            INTEGER,</span>
@@ -618,8 +618,8 @@ ella.</p>
 </div>
 <p>El código tiene dos aspectos:</p>
 <ol class="arabic">
-<li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr> que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
-forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, así que no entraremos en
+<li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr>, que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
+forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, por lo que no entraremos en
 comentarlas.</p>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
@@ -802,11 +802,30 @@ mecanismo para parametrizar sentencias; y, en el caso de <abbr title="Java DataB
 <p>Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
 establecidos todos sus valores, ejecutar la sentencia.</p>
+<p>Obsérvese que en estas inserciones no estamos suministrando el identificador de
+la entidad, porque dejamos que la base de datos escoja uno por nosotros. Si nos
+interesara obtener ese identificador, podemos hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
+<span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span>
+<span class="w">      </span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (?)&quot;</span><span class="p">,</span>
+<span class="hll"><span class="w">      </span><span class="n">Statement</span><span class="p">.</span><span class="na">RETURN_GENERATED_KEYS</span>
+</span><span class="w">   </span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Informática&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span><span class="w">  </span><span class="c1">// 1: Valor para el primer &quot;?&quot;.</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="hll"><span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">getGeneratedKeys</span><span class="p">())</span><span class="w">  </span><span class="p">{</span>
+</span><span class="hll"><span class="w">           </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;&#39;%s&#39; se registró con ID=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span class="hll"><span class="w">        </span><span class="p">}</span>
+</span><span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>Pero no hemos dado aún con la forma eficiente, ya que estamos
 repitiendo la ejecución de la misma sentencia con distintos valores y lo que
-hemos hecho no es en absoluto eficiente. Necesitaremos <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">más adelante</span></a>, darle al menos una vuelta más.</p>
+hemos hecho no es en absoluto eficiente. Necesitaremos <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">más adelante</span></a> darle al menos una vuelta más.</p>
 </div>
 <p>Obsérvese que al definir los valores de los parámetros de una consulta,
 necesitamos cambiar de método según sea el tipo del campo:</p>

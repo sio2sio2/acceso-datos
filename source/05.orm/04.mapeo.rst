@@ -238,6 +238,29 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
    Y el conversor se aplicará automáticamente a todos los atributos de tipo
    ``Titularidad`` sin  necesidad de anotar los atributos individualmente.
 
+Otras anotaciones
+=================
+Existen otras anotaciones relacionadas con la validación de valores (el
+equivalente al ``CHECK`` de |SQL|), que requieren importar la librería
+`validation-api
+<https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api>`_. Son variadas. Por ejemplo:
+
+.. code-block::
+
+   @PositiveOrZero(message = "La cantidad no puede ser negativa")
+   private int cantidad
+
+   @Positive
+   private BigDecimal precio;
+
+   @Min(value = 18, message = "La entrada está vetada a menores de edad")
+   private int edad;
+
+   @Pattern(regexp = "[0-9]{7,8}[A-Z]")
+   private String nif;
+
+.. note:: \"*message*\" permite personalizar el mensaje de error.
+
 Relaciones
 ==========
 Las relaciones entre las entidades también se significan mediante anotaciones.

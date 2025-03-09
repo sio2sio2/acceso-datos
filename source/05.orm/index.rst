@@ -16,6 +16,14 @@ una estrategia frente a la otra <conn-vs-orm>`, no abundaremos más en ello.
 
 .. todo:: Investigar el enfoque de MyBatis_.
 
+.. Agenda:
+   Los apuntes desarrolla en enfoque tradicional de Hibernate, en vez de el
+   enfoque de JPA (archivo persistence.xml y EntityManager). Hay que explicar y
+   analizar este segundo enfoque y aplicarlo a los apuntes.
+
+   @Positive, @Min: añadir anotaciones para números. Estas anotaciones están en
+   paquete aparte y exigen importar una librería adicional.
+
 El |ORM| más utilizado en Java es Hibernate_ y a su uso dedicaremos esta unidad
 utilizando el :ref:`ejemplo ilustrativo sobre centros y profesores <conn-er-ec>`.
 

@@ -103,8 +103,8 @@ Comencemos creando cuatro tablas:
 
 El código tiene dos aspectos:
 
-#. Las sentencias |SQL| que son sentencias |SQL| cuya comprensión no
-   forma parte de los objetivos de esta unidad\ [#]_, así que no entraremos en
+#. Las sentencias |SQL|, que son sentencias |SQL| cuya comprensión no
+   forma parte de los objetivos de esta unidad\ [#]_, por lo que no entraremos en
    comentarlas.
 
    .. hint:: No obstante, sí conviene precisar que procuremos al escribirlas
@@ -260,10 +260,32 @@ Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
 establecidos todos sus valores, ejecutar la sentencia.
 
+Obsérvese que en estas inserciones no estamos suministrando el identificador de
+la entidad, porque dejamos que la base de datos escoja uno por nosotros. Si nos
+interesara obtener ese identificador, podemos hacer lo siguiente:
+
+.. code-block:: java
+   :emphasize-lines: 4,10-12
+
+   try(
+      PreparedStatement pstmt = conn.prepareStatement(
+         "INSERT INTO Departamento (denominacion) VALUES (?)",
+         Statement.RETURN_GENERATED_KEYS
+      )
+   ) {
+       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
+           pstmt.setString(1, denominacion);  // 1: Valor para el primer "?".
+           pstmt.executeUpdate();
+           try(ResultSet rs = pstmt.getGeneratedKeys())  {
+              if(rs.next()) System.out.printf("'%s' se registró con ID=%d\n", denominacion, rs.getInt(1));
+           }
+       }
+   }
+
 .. caution:: Pero no hemos dado aún con la forma eficiente, ya que estamos
    repitiendo la ejecución de la misma sentencia con distintos valores y lo que
    hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
-   <conn-batch>`, darle al menos una vuelta más.
+   <conn-batch>` darle al menos una vuelta más.
 
 Obsérvese que al definir los valores de los parámetros de una consulta,
 necesitamos cambiar de método según sea el tipo del campo:

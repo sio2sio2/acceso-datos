@@ -391,7 +391,8 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.4.1. Anotaciones básicas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.2. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.4.2. Otras anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.3. Relaciones</a></li>
 </ul>
             </nav>
         </div>
@@ -669,8 +670,31 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 </dd>
 </dl>
 </section>
+<section id="otras-anotaciones">
+<h2><span class="section-number">5.4.2. </span>Otras anotaciones<a class="headerlink" href="#otras-anotaciones" title="Link to this heading">#</a></h2>
+<p>Existen otras anotaciones relacionadas con la validación de valores (el
+equivalente al <code class="docutils literal notranslate"><span class="pre">CHECK</span></code> de <abbr title="Structured Query Language">SQL</abbr>), que requieren importar la librería
+<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">validation-api</a>. Son variadas. Por ejemplo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@PositiveOrZero</span><span class="p">(</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;La cantidad no puede ser negativa&quot;</span><span class="p">)</span>
+<span class="n">private</span> <span class="nb">int</span> <span class="n">cantidad</span>
+
+<span class="nd">@Positive</span>
+<span class="n">private</span> <span class="n">BigDecimal</span> <span class="n">precio</span><span class="p">;</span>
+
+<span class="nd">@Min</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="mi">18</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;La entrada está vetada a menores de edad&quot;</span><span class="p">)</span>
+<span class="n">private</span> <span class="nb">int</span> <span class="n">edad</span><span class="p">;</span>
+
+<span class="nd">@Pattern</span><span class="p">(</span><span class="n">regexp</span> <span class="o">=</span> <span class="s2">&quot;[0-9]{7,8}[A-Z]&quot;</span><span class="p">)</span>
+<span class="n">private</span> <span class="n">String</span> <span class="n">nif</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>&quot;<em>message</em>&quot; permite personalizar el mensaje de error.</p>
+</div>
+</section>
 <section id="relaciones">
-<h2><span class="section-number">5.4.2. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.4.3. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
 <p>Las relaciones entre las entidades también se significan mediante anotaciones.
 Hay tres tipos de relaciones binarias en el modelo relacional:</p>
 <dl>
@@ -946,7 +970,8 @@ clase.</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.4.1. Anotaciones básicas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.2. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.4.2. Otras anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.3. Relaciones</a></li>
 </ul>
   </nav></div>
 

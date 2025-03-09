@@ -1,13 +1,13 @@
-final String protocol = "jdbc:sqlite:";
+final String dbProtocol = "jdbc:sqlite:";
 
 String dbUrl = String.format("%s%s", dbProtocol, ":memory:");  // Base de datos en la memoria
 
 try (
-   Connection conn = DriverManager.getConnection(url);
+   Connection conn = DriverManager.getConnection(dbUrl);
    Statement stmt = conn.createStatement();
 ) {
 
-   // Particular de SQLite: respetar la integredad referencial (opcional).
+   // Particular de SQLite: respetar la integridad referencial (opcional).
    stmt.execute("PRAGMA foreign_keys = ON");
 
    // Tabla Departamento.
@@ -42,7 +42,7 @@ try (
    """);
 
    // Relación Profesor-Centro.
-   stmt.executaUpdate("""
+   stmt.executeUpdate("""
       CREATE TABLE Trabaja (
          profesor          INTEGER,
          centro            INTEGER,

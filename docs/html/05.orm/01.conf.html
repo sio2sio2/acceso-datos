@@ -394,89 +394,137 @@ document.write(`
                   
   <section id="configuracion">
 <span id="orm-conf"></span><h1><span class="section-number">5.1. </span>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h1>
-<p>El primer paso es saber cómo configurar nuestra aplicación para que haga uso
-de <a class="reference external" href="https://www.hibernate.org">Hibernate</a>. Para ello necesitamos utilizar las librerías:</p>
-<ol class="loweralpha simple">
-<li><p><a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a>, que es el <abbr title="Object-Relational Mapping">ORM</abbr> en sí.</p></li>
-<li><p>En caso de que el <abbr title="Object-Relational Mapping">ORM</abbr> no tenga soporte nativo para el dialecto del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>,
-una librería externa que lo proporcione.</p></li>
-<li><p>Los controladores <abbr title="Java DataBase Connectivity">JDBC</abbr> de la base de datos que queramos utilizar. Por
-ejemplo, <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>, si deseamos usar <a class="reference external" href="https://sqlite.org">SQLite</a>.</p></li>
-<li><p>Adicionalmente, un sistema de log con <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-api">slf4j-api</a> y <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-simple">slf4j-simple</a>.</p></li>
-</ol>
-<p>De este modo, las dependencias en Maven podrían quedar así:</p>
+<p>El primer paso es saber cómo configurar nuestro proyecto para poder usar la
+especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos cosas:</p>
+<ol class="loweralpha">
+<li><p>Importar librerías:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+<span class="w">      </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.49.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
+<span class="w">      </span><span class="cm">&lt;!-- JPA --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>jakarta.persistence<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>jakarta.persistence-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.2.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">      </span><span class="cm">&lt;!-- Hibernate (Implementación de JPA) --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">      </span><span class="cm">&lt;!-- Soporte en Hibernate para SQLite --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-community-dialects<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">      </span><span class="cm">&lt;!-- Opcional para anotaciones de comprobación --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>jakarta.validation<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>jakarta.validation-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.1.1<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">     </span><span class="cm">&lt;!-- Opcional para que Hibernate implemente las anotaciones de comprobación --&gt;</span>
 <span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta3<span class="nt">&lt;/version&gt;</span>
+<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.validator<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-validator<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">         </span><span class="nt">&lt;version&gt;</span>9.0.0.CR1<span class="nt">&lt;/version&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
-
-<span class="w">     </span><span class="cm">&lt;!-- Dialecto proporcionado por la comunidad --&gt;</span>
-<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-community-dialects<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta3<span class="nt">&lt;/version&gt;</span>
-<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
-
-<span class="w">     </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
-<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>3.48.0.0<span class="nt">&lt;/version&gt;</span>
-<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
-
-<span class="w">     </span><span class="cm">&lt;!-- Logs (Opcional) --&gt;</span>
-
-<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>slf4j-simple<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>2.1.0-alpha1<span class="nt">&lt;/version&gt;</span>
-<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
-
-<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>slf4j-api<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>2.1.0-alpha1<span class="nt">&lt;/version&gt;</span>
-<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
-
-<span class="w"> </span><span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
 </div>
-<p>Además, debe crearse un archivo <abbr title="eXtensible Markup Language">XML</abbr> llamado <code class="file docutils literal notranslate"><span class="pre">hibernate.cfg.xml</span></code> que
-indique cuál es la base de datos a la que se quiere conectar y algunos otros
-parámetros de funcionamiento:</p>
+<p>En resumidas cuentas es:</p>
+<ul class="simple">
+<li><p>El driver <abbr title="Java DataBase Connectivity">JDBC</abbr> para soportar el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que nos interese (para <a class="reference external" href="https://sqlite.org">SQLite</a>
+es <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>).</p></li>
+<li><p>El soporte para <abbr title="Java Persistence API">JPA</abbr> proporcionado por <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">jakarta.persistence-api</a>.</p></li>
+<li><p>El soporte para <a class="reference external" href="https://www.hibernate.org">Hibernate</a>. En el caso particular de SQLite,
+<a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a> no soporta de serie <a class="reference external" href="https://sqlite.org">SQLite</a>, por lo que se debe añadir
+uan librería más (<cite>hibernate-community-dialects</cite>).</p></li>
+<li><p>En principio, basta con lo anterior, pero si se quiere llevar a cabo
+comprobaciones sobre los valores de los datos, serán necesaria la
+especificación sita en <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a> y su implementación en
+<a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.</p></li>
+</ul>
+</li>
+<li><p>Escribir el archivo de configuración <code class="file docutils literal notranslate"><span class="pre">resources/META-INF/persistence.xml</span></code>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-<span class="cp">&lt;!DOCTYPE hibernate-configuration PUBLIC</span>
-<span class="cp">        &quot;-//Hibernate/Hibernate Configuration DTD 3.0//EN&quot;</span>
-<span class="cp">        &quot;http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd&quot;&gt;</span>
-<span class="nt">&lt;hibernate-configuration&gt;</span>
-<span class="w">    </span><span class="nt">&lt;session-factory&gt;</span>
-<span class="w">        </span><span class="cm">&lt;!-- Conexión a la base de datos --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.connection.url&quot;</span><span class="nt">&gt;</span>jdbc:sqlite::memory:<span class="nt">&lt;/property&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.connection.username&quot;</span><span class="nt">&gt;</span><span class="cm">&lt;!-- Sin utilidad para SQLite (puede eliminarse) --&gt;</span><span class="nt">&lt;/property&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.connection.password&quot;</span><span class="nt">&gt;</span><span class="cm">&lt;!-- Sin utilidad para SQLite (puede eliminarse) --&gt;</span><span class="nt">&lt;/property&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.connection.driver_class&quot;</span><span class="nt">&gt;</span>org.sqlite.JDBC<span class="nt">&lt;/property&gt;</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="cm">&lt;!-- Dialecto específico para SQLite --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.dialect&quot;</span><span class="nt">&gt;</span>org.hibernate.community.dialect.SQLiteDialect<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;persistence</span><span class="w"> </span><span class="na">version=</span><span class="s">&quot;3.0&quot;</span>
+<span class="w">    </span><span class="na">xmlns=</span><span class="s">&quot;https://jakarta.ee/xml/ns/persistence&quot;</span>
+<span class="w">    </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w">    </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;https://jakarta.ee/xml/ns/persistence </span>
+<span class="s">    https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd&quot;</span><span class="nt">&gt;</span>
 
-<span class="w">        </span><span class="cm">&lt;!-- Configuración de Hibernate --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.hbm2ddl.auto&quot;</span><span class="nt">&gt;</span>update<span class="nt">&lt;/property&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Política ante el esquema --&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- Nombre de la unidad de persistencia --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;persistence-unit</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;MiUnidadP&quot;</span><span class="w"> </span><span class="na">transaction-type=</span><span class="s">&quot;RESOURCE_LOCAL&quot;</span><span class="nt">&gt;</span>
 
-<span class="w">        </span><span class="cm">&lt;!-- Configuración de logs (útil para depuración) --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Los logs muestran las sentencias SQL --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.format_sql&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span><span class="w"> </span><span class="cm">&lt;!-- El SQL se muestra formateado --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.use_sql_comments&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Comenta las sentencias SQL --&gt;</span>
-<span class="w">    </span><span class="nt">&lt;/session-factory&gt;</span>
-<span class="nt">&lt;/hibernate-configuration&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Proveedor de JPA (Hibernate) --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;provider&gt;</span>org.hibernate.jpa.HibernatePersistenceProvider<span class="nt">&lt;/provider&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- Entidades (deberían autodetectarse si están anotadas con @Entity) --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;class&gt;</span>edu.acceso.ejemplo.modelo.MiClase<span class="nt">&lt;/class&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Más clases ... --&gt;</span>
+
+<span class="w">        </span><span class="nt">&lt;properties&gt;</span>
+<span class="w">            </span><span class="cm">&lt;!-- Propiedades generales (conexión a la base de datos) --&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.driver&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;org.sqlite.JDBC&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;jdbc:sqlite::file:memory:&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="cm">&lt;!-- Innecesarios para SQLite --&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.user&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.password&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">            </span><span class="cm">&lt;!-- Configuración propia de Hibernate --&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.dialect&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;org.hibernate.community.dialect.SQLiteDialect&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.hbm2ddl.auto&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;update&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.format_sql&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hibernate.use_sql_comments&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/properties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/persistence-unit&gt;</span>
+<span class="nt">&lt;/persistence&gt;</span>
 </pre></div>
 </div>
-<p>En un proyecto Maven deberemos guardar esta configuración en el directorio
-<code class="file docutils literal notranslate"><span class="pre">resources/</span></code>. Sobre este archivo de configuración es recomendable hacer
-algunos comentarios:</p>
+<p>En este archivo:</p>
 <ul>
+<li><p>Debemos recordar el nombre que le damos a la unidad de persistencia, porque
+la usaremos luego; y hay propiedades que</p></li>
+<li><p>El proveedor indica cuál es la implementación <abbr title="Java Persistence API">JPA</abbr> que usaremos. Algunos
+muy usandos son:</p>
+<div class="pst-scrollable-table-container"><table class="url-sql table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Proveedor</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Hibernate</p></td>
+<td><p>org.hibernate.jpa.HibernatePersistenceProvider</p></td>
+</tr>
+<tr class="row-odd"><td><p>EclipseLink</p></td>
+<td><p>org.eclipse.persistence.jpa.PersistenceProvider</p></td>
+</tr>
+<tr class="row-even"><td><p>OpenJPA</p></td>
+<td><p>org.apache.openjpa.persistence.PersistenceProviderImpl</p></td>
+</tr>
+<tr class="row-odd"><td><p>BatooJPA</p></td>
+<td><p>org.batoo.jpa.persistence.PersistenceProviderImpl</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><p>En caso de que no se detecten, se pueden registrar las clases del modelo
+cuyos objetos se quieren hacer persistentes.</p></li>
 <li><p>La <em>url</em>, el <em>driver</em> y dialecto específico dependen de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que
 utilicemos. La enumeración de los más utilizados la tenemos en <a class="reference internal" href="../04.conector/01.basico.html#conn-drivers"><span class="std std-ref">una tabla
 de la unidad anterior</span></a>, pero necesitamos añadir a ella cómo se
@@ -489,7 +537,7 @@ llaman los dialectos específicos de <a class="reference external" href="https:/
 </thead>
 <tbody>
 <tr class="row-even"><td><p>SQLite</p></td>
-<td><p>org.hibernate.community.dialect.SQLiteDialect<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
+<td><p>org.hibernate.community.dialect.SQLiteDialect<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>MariaDB</p></td>
 <td><p>org.hibernate.dialect.MariaDBDialect</p></td>
@@ -524,23 +572,28 @@ datos, y puede tener cuatro valores:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p>validate</p></td>
+<tr class="row-odd"><td><p>none</p></td>
+<td><p>No hace nada</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>validate</p></td>
 <td><p>Comprueba el esquema</p></td>
 <td><p>Error</p></td>
 <td><p>Error si no son iguales</p></td>
 </tr>
-<tr class="row-even"><td><p>update</p></td>
+<tr class="row-odd"><td><p>update</p></td>
 <td><p>Actualiza el esquema</p></td>
 <td><p>Crea el esquema</p></td>
 <td><p>Actualiza y conserva datos</p></td>
 </tr>
-<tr class="row-odd"><td><p>create</p></td>
+<tr class="row-even"><td><p>create</p></td>
 <td><p>Crea el esquema</p></td>
 <td><p>Crea el esquema</p></td>
 <td><p>Lo crea de nuevo
 (pérdida de datos)</p></td>
 </tr>
-<tr class="row-even"><td><p>create-drop</p></td>
+<tr class="row-odd"><td><p>create-drop</p></td>
 <td><p>Crea el esquema y lo
 desecha al cerrar.</p></td>
 <td colspan="2"><p>Como el anterior en ambos casos, pero se pierde
@@ -555,16 +608,11 @@ depuración: se registran las sentencias <abbr title="Structured Query Language"
 <em>DEBUG</em>), tales sentencias se formatean para que resulten más legibles y,
 además, se acompañan de comentarios.</p></li>
 </ul>
-<p>Con todo esto ya tendríamos preparado Hibernate para usarlo en nuestra
-aplicación.</p>
-<div class="admonition-todo admonition" id="id2">
-<p class="admonition-title">Por hacer</p>
-<p>Configuración para múltiples bases de datos (dejar aquí comentario y
-desarrollar bajo un epígrafe posterior de configuración avanzada).</p>
-</div>
+</li>
+</ol>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>No es dialecto nativo de Hibernate, sino proporcionado por la comunidad.</p>
 </aside>

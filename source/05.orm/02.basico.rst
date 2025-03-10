@@ -6,18 +6,16 @@ Una vez configurada, el uso básico de la herramienta se compone de cuatro eleme
 
 #. :dfn:`Mapear objetos`, esto es, informar de cómo se hará la traducción de
    las clases al modelo relacional.
-#. Registrar cada clase para que la tome en consideración Hibernate_.
-#. Crear la *fábrica* de sesiones, que nos permitirá operar con la base de datos.
+#. Registrar cada clase para que la tome en consideración el |ORM|.
+#. Crear la *fábrica* que nos permitirá crear los gestores para las distintas
+   entidades.
 #. Realizar operaciones |CRUD|.
 
 .. _orm-bas-map:
 
 Mapeo
 =====
-Hibernate tiene dos métodos para indicar cómo se traducen las clases y
-atributos a campos y tablas: uno basado en archivos |XML| que no trataremos y otro
-basado en anotaciones del estándar |JPA|, que es una especificación, una |API|,
-para anotar datos relacionales; y que utilizan muchas otras herramientas |ORM| de Java:
+Se basa en las anotaciones que define la especificación |JPA|:
 
 .. literalinclude:: files/Centro.java
    :language: java
@@ -53,21 +51,13 @@ En este ejemplo:
 Registro
 ========
 Para registrar la clase para el mapeo hay que añadir a
-:file:`hibernate.cfg.xml` la línea:
+:file:`persistence.xml` la línea:
 
 .. code-block:: xml
 
    <!-- Clases mapeadas -->
-   <mapping class="edu.acceso.test_hibernate.modelo.Centro"/>
+   <class>edu.acceso.test_hibernate.modelo.Centro</class>
 
-.. note:: En caso de que la configuración no se hubiera hecho mediante
-   anotaciones, sino mediante un archivo |XML|, el registro habría sido
-   ligeramente diferente:
-
-   .. code-block:: xml
-
-      <mapping resource="Centro.hbm.xml"/>
-   
 .. _orm-bas-conn:
 
 Conexión
@@ -77,53 +67,53 @@ ilustrar cómo operar con la base de datos:
 
 .. code-block:: java
 
-   Configuration config = new Configuration().configure("hibernate.cfg.xml");
+   try(EntityManagerFactory emf = Persistence.createEntityManagerFactory("MiUnidadP")) {
 
-   try(SessionFactory sf = config.buildSessionFactory()) {
-       Transaction tr = null;
+      try(EntityManager em = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+            em.persist(centro);
+            tr.commit();
+         }
+         catch(Exception err) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al almacenar el centro", err);
+         }
+      }
 
-       // Operación de inserción.
-       try(Session sesion = sf.openSession()) {
-          try {
-              tr = sesion.beginTransaction();
-              Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
-              sesion.persist(centro);
-              tr.commit();
-          }
-          catch(Exception e) {
-              if(tr != null) tr.rollback();
-          }
-       }
+      try(EntityManager em = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = em.find(Centro.class, 11004866);
+            centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
+            tr.commit();
+         }
+         catch(Exception err) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al modificar el centro", err);
+         }
+      }
 
-       // Operaciones de lectura y modificación.
-       try(Session sesion = sf.openSession()) {
-          try {
-             tr = sesion.beginTransaction();
-             Centro centro = sesion.find(Centro.class, 11004866);
-             System.out.println(centro);
-             centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
-             tr.commit();  // Hacemos persistente el cambio anterior.
-          }
-          catch(Exception e) {
-             if(tr != null) tr.rollback();
-          }
-       }
+   }
+   catch(Exception e) {
+      throw new RuntimeException("Imposible conectar a la base de datos");
    }
 
+   
 Como puede verse:
 
-* A partir de la configuración, debemos crear una fábrica de sesiones. Este es
-  un proceso costoso, así que deberíamos evitar crear más de una\ [#]_. El código no
-  es realista, ya que muy probablemente en una aplicación se requiera obtener y
-  crear objetos en distintos archivos, con lo que la estructura
-  *try-with-resources* no podremos usarla. Sin embargo, nos sirve para ilustrar
-  este ejemplo tan simple.
+* A partir de la configuración, debemos crear una fábrica de gestores
+  (:jakarta-persistence:`EntityManagerFactory`). Este es un proceso costoso, así
+  que deberíamos evitar crear más de una\ [#]_. El código no es realista, ya que
+  muy probablemente en una aplicación se requiera obtener y crear objetos en
+  distintos archivos, con lo que la estructura *try-with-resources* no podremos
+  usarla. Sin embargo, nos sirve para ilustrar este ejemplo tan simple.
 
-* Las operaciones deben englobarse dentro de sesiones y de transacciones, aunque
-  en el caso de operaciones de lectura las transacciones no son indispensables.
-
-* Las transacciones no se cierran explícitamente, sino que se consideran acabadas
-  al realizar una confirmación (*commit*) o un rechazo (*rollback*).
+* Es conveniente no reutilizar los objetos :jakarta-persistence:`EntityManager`,
+  de suerte que cada transacción debería usar uno nuevo.
 
 .. rubric:: Notas al pie
 

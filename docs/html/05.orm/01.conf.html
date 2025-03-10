@@ -367,7 +367,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -383,6 +385,15 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#depedencias">5.1.1. Depedencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-de-la-persistencia">5.1.2. Configuración de la persistencia</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -396,8 +407,12 @@ document.write(`
 <span id="orm-conf"></span><h1><span class="section-number">5.1. </span>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h1>
 <p>El primer paso es saber cómo configurar nuestro proyecto para poder usar la
 especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos cosas:</p>
-<ol class="loweralpha">
-<li><p>Importar librerías:</p>
+<ol class="loweralpha simple">
+<li><p>Importar librerías.</p></li>
+<li><p>Crear una configuración.</p></li>
+</ol>
+<section id="depedencias">
+<h2><span class="section-number">5.1.1. </span>Depedencias<a class="headerlink" href="#depedencias" title="Link to this heading">#</a></h2>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
 <span class="w">      </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
 <span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
@@ -456,8 +471,10 @@ comprobaciones sobre los valores de los datos, serán necesaria la
 especificación sita en <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a> y su implementación en
 <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.</p></li>
 </ul>
-</li>
-<li><p>Escribir el archivo de configuración <code class="file docutils literal notranslate"><span class="pre">resources/META-INF/persistence.xml</span></code>:</p>
+</section>
+<section id="configuracion-de-la-persistencia">
+<h2><span class="section-number">5.1.2. </span>Configuración de la persistencia<a class="headerlink" href="#configuracion-de-la-persistencia" title="Link to this heading">#</a></h2>
+<p>Debe escribirse en el archivo <code class="file docutils literal notranslate"><span class="pre">resources/META-INF/persistence.xml</span></code>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;persistence</span><span class="w"> </span><span class="na">version=</span><span class="s">&quot;3.0&quot;</span>
 <span class="w">    </span><span class="na">xmlns=</span><span class="s">&quot;https://jakarta.ee/xml/ns/persistence&quot;</span>
@@ -608,8 +625,20 @@ depuración: se registran las sentencias <abbr title="Structured Query Language"
 <em>DEBUG</em>), tales sentencias se formatean para que resulten más legibles y,
 además, se acompañan de comentarios.</p></li>
 </ul>
-</li>
-</ol>
+<p>Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
+no están definidos de antemano, sino que se definen en <strong>tiempo de ejecución</strong>?
+En ese caso, puede definirse un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashMap.html">java.util.HashMap</a> que defina las valores de
+propiedades y pasar el mapa cuando se usa la unidad de persistencia para crear
+el objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a> (véase a continuación
+<a class="reference internal" href="02.basico.html#orm-bas-conn"><span class="std std-ref">cómo conectar</span></a>). En ese caso, las definiciones del mapa
+sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:centro.db&quot;</span><span class="p">);</span>
+<span class="n">propos</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">);</span>
+
+<span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
+</pre></div>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
@@ -617,6 +646,7 @@ además, se acompañan de comentarios.</p></li>
 <p>No es dialecto nativo de Hibernate, sino proporcionado por la comunidad.</p>
 </aside>
 </aside>
+</section>
 </section>
 
 
@@ -654,6 +684,22 @@ además, se acompañan de comentarios.</p></li>
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#depedencias">5.1.1. Depedencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-de-la-persistencia">5.1.2. Configuración de la persistencia</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

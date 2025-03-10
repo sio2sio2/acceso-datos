@@ -410,16 +410,14 @@ document.write(`
 <ol class="arabic simple">
 <li><p><em class="dfn">Mapear objetos</em>, esto es, informar de cómo se hará la traducción de
 las clases al modelo relacional.</p></li>
-<li><p>Registrar cada clase para que la tome en consideración <a class="reference external" href="https://www.hibernate.org">Hibernate</a>.</p></li>
-<li><p>Crear la <em>fábrica</em> de sesiones, que nos permitirá operar con la base de datos.</p></li>
+<li><p>Registrar cada clase para que la tome en consideración el <abbr title="Object-Relational Mapping">ORM</abbr>.</p></li>
+<li><p>Crear la <em>fábrica</em> que nos permitirá crear los gestores para las distintas
+entidades.</p></li>
 <li><p>Realizar operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>.</p></li>
 </ol>
 <section id="mapeo">
 <span id="orm-bas-map"></span><h2><span class="section-number">5.2.1. </span>Mapeo<a class="headerlink" href="#mapeo" title="Link to this heading">#</a></h2>
-<p>Hibernate tiene dos métodos para indicar cómo se traducen las clases y
-atributos a campos y tablas: uno basado en archivos <abbr title="eXtensible Markup Language">XML</abbr> que no trataremos y otro
-basado en anotaciones del estándar <abbr title="Java Persistent API">JPA</abbr>, que es una especificación, una <abbr title="Application Programming Interface">API</abbr>,
-para anotar datos relacionales; y que utilizan muchas otras herramientas <abbr title="Object-Relational Mapping">ORM</abbr> de Java:</p>
+<p>Se basa en las anotaciones que define la especificación <abbr title="Java Persistent API">JPA</abbr>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
 <span class="nd">@Table</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Centro&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Sólo útil si la table se llama de modo diferente.</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="p">{</span>
@@ -515,71 +513,62 @@ visibilidad de su <em>setter</em> (<code class="docutils literal notranslate"><s
 <section id="registro">
 <span id="orm-bas-reg"></span><h2><span class="section-number">5.2.2. </span>Registro<a class="headerlink" href="#registro" title="Link to this heading">#</a></h2>
 <p>Para registrar la clase para el mapeo hay que añadir a
-<code class="file docutils literal notranslate"><span class="pre">hibernate.cfg.xml</span></code> la línea:</p>
+<code class="file docutils literal notranslate"><span class="pre">persistence.xml</span></code> la línea:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- Clases mapeadas --&gt;</span>
-<span class="nt">&lt;mapping</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;edu.acceso.test_hibernate.modelo.Centro&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;class&gt;</span>edu.acceso.test_hibernate.modelo.Centro<span class="nt">&lt;/class&gt;</span>
 </pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En caso de que la configuración no se hubiera hecho mediante
-anotaciones, sino mediante un archivo <abbr title="eXtensible Markup Language">XML</abbr>, el registro habría sido
-ligeramente diferente:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;mapping</span><span class="w"> </span><span class="na">resource=</span><span class="s">&quot;Centro.hbm.xml&quot;</span><span class="nt">/&gt;</span>
-</pre></div>
-</div>
 </div>
 </section>
 <section id="conexion">
 <span id="orm-bas-conn"></span><h2><span class="section-number">5.2.3. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
 <p>Registrada y anotada la clase, ya podemos realizar una conexión muy básica para
 ilustrar cómo operar con la base de datos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Configuration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Configuration</span><span class="p">().</span><span class="na">configure</span><span class="p">(</span><span class="s">&quot;hibernate.cfg.xml&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 
-<span class="k">try</span><span class="p">(</span><span class="n">SessionFactory</span><span class="w"> </span><span class="n">sf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">buildSessionFactory</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
+<span class="w">         </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
+<span class="w">         </span><span class="n">em</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">         </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Error al almacenar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
 
-<span class="w">    </span><span class="c1">// Operación de inserción.</span>
-<span class="w">    </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">           </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
-<span class="w">           </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
-<span class="w">           </span><span class="n">sesion</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="w">           </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">       </span><span class="p">}</span>
-<span class="w">       </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">           </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">       </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
+<span class="w">         </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span>
+<span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;I.E.S. Castillo de Luna&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Modificamos el objeto.</span>
+<span class="w">         </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">         </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Error al modificar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
 
-<span class="w">    </span><span class="c1">// Operaciones de lectura y modificación.</span>
-<span class="w">    </span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
-<span class="w">          </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span>
-<span class="w">          </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="w">          </span><span class="n">centro</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;I.E.S. Castillo de Luna&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Modificamos el objeto.</span>
-<span class="w">          </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w">  </span><span class="c1">// Hacemos persistente el cambio anterior.</span>
-<span class="w">       </span><span class="p">}</span>
-<span class="w">       </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">       </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Imposible conectar a la base de datos&quot;</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Como puede verse:</p>
 <ul class="simple">
-<li><p>A partir de la configuración, debemos crear una fábrica de sesiones. Este es
-un proceso costoso, así que deberíamos evitar crear más de una<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. El código no
-es realista, ya que muy probablemente en una aplicación se requiera obtener y
-crear objetos en distintos archivos, con lo que la estructura
-<em>try-with-resources</em> no podremos usarla. Sin embargo, nos sirve para ilustrar
-este ejemplo tan simple.</p></li>
-<li><p>Las operaciones deben englobarse dentro de sesiones y de transacciones, aunque
-en el caso de operaciones de lectura las transacciones no son indispensables.</p></li>
-<li><p>Las transacciones no se cierran explícitamente, sino que se consideran acabadas
-al realizar una confirmación (<em>commit</em>) o un rechazo (<em>rollback</em>).</p></li>
+<li><p>A partir de la configuración, debemos crear una fábrica de gestores
+(<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a>). Este es un proceso costoso, así
+que deberíamos evitar crear más de una<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. El código no es realista, ya que
+muy probablemente en una aplicación se requiera obtener y crear objetos en
+distintos archivos, con lo que la estructura <em>try-with-resources</em> no podremos
+usarla. Sin embargo, nos sirve para ilustrar este ejemplo tan simple.</p></li>
+<li><p>Es conveniente no reutilizar los objetos <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>,
+de suerte que cada transacción debería usar uno nuevo.</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">

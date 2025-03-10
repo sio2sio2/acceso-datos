@@ -56,6 +56,7 @@ extlinks = {
     'java-time': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/%s.html', '%s'),
     'hibernate-api': ('https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/%s.html', '%s'),
     'deb': ('https://packages.debian.org/stable/%s','%s'),
+    'jakarta-persistence': ('https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/%s', '%s'),
 }
 
 intersphinx_mapping = {

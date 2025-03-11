@@ -31,14 +31,17 @@ Si desglosamos en dos instrucciones la orden anterior, la entenderemos mejor:
    List<Centro> centro = query.getResultList();
 
 El segundo argumento de ``.createQuery`` permite tipar el resultado de la
-consulta (objetos ``Centro`` en este caso). Aunque no sea recomendable,
-podríamos no haber tipado la consulta:
+consulta (objetos ``Centro`` en este caso).
 
-.. code-block:: java
+.. note:: Aunque no sea recomendable, podríamos no haber tipado la consulta:
 
-   Query query = em.createQuery("FROM Centro", Centro.class);
-   // warning: el compilador no puede asegurar el tipo del resultado.
-   List<Centro> centro = query.getResultList();
+   .. code-block:: java
+
+      Query query = em.createQuery("FROM Centro", Centro.class);
+      // warning: el compilador no puede asegurar el tipo del resultado.
+      List<Centro> centro = query.getResultList();
+
+.. todo:: Anadir getStreamResult, setFirstResult y setMaxResults.
 
 Podemos también obtener campos individuales en vez de objetos ``Estudiante``:
 
@@ -69,6 +72,7 @@ o un conjunto de campos individuales:
    los campos individules:
 
    .. code-block:: java
+      :name: orm-tuple
    
       // Obsérvese los alias incluidos en la consulta: AS...
       TypedQuery<Tuple> query = em.createQuery(

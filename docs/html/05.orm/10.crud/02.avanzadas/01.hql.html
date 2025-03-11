@@ -467,7 +467,7 @@ que siempre se refieren clases y atributos, no tablas y columnas.</p>
 <code class="docutils literal notranslate"><span class="pre">Object[].class</span></code> se puede pedir la obtención de una tupla (<code class="docutils literal notranslate"><span class="pre">Tuple</span></code>) y
 asignar alias a los nombres, lo que hará más amable la obtención posterior de
 los campos individules:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Obsérvese los alias incluidos en la consulta: AS...</span>
+<div class="highlight-java notranslate" id="orm-tuple"><div class="highlight"><pre><span></span><span class="c1">// Obsérvese los alias incluidos en la consulta: AS...</span>
 <span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;SELECT c.id AS id, c.nombre AS nombre FROM Centro c&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>

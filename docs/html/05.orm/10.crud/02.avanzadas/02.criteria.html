@@ -59,7 +59,7 @@
     <link rel="index" title="Índice" href="../../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../../search.html" />
     <link rel="next" title="5.6.2.3. SQL nativo" href="03.nativo.html" />
-    <link rel="prev" title="5.6.2.1. HQL" href="01.hql.html" />
+    <link rel="prev" title="5.6.2.1. JPQL" href="01.hql.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -209,7 +209,7 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../02.avanzadas.html">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -391,11 +391,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.2.1. Consulta básica</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.2. Condiciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.3. Ordenación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.4. Agrupación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#joins">5.6.2.2.5. Joins</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.6. Actualización y borrado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.2.2. Metamodel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.3. Condiciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.4. Ordenación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.5. Agrupación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#joins">5.6.2.2.6. Joins</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.7. Actualización y borrado</a></li>
 </ul>
             </nav>
         </div>
@@ -409,134 +410,329 @@ document.write(`
                   
   <section id="criteria-api">
 <span id="orm-criteria"></span><h1><span class="section-number">5.6.2.2. </span>Criteria API<a class="headerlink" href="#criteria-api" title="Link to this heading">#</a></h1>
-<p><em>Criteria API</em> es un mecanismo alternativo a <abbr title="Hibernate Query Language">HQL</abbr> para escribir consultas, que
+<p><em>Criteria API</em> es un mecanismo alternativo a <abbr title="Java Persistence Query Language">JPQL</abbr> para escribir consultas, que
 es más verborreico, pero en compensación facilita la construcción dinámica de
 las consultas en tiempo de ejecución, ya que no se basa en una cadena, sino en
-la aplicación de métodos a objetos.</p>
+la aplicación de métodos a objetos. Se inspiró en <em>Hibernate Criteria</em>.</p>
 <p>Lo primero antes de construir la consulta es crear un objeto <a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> a
-partir de la sesión:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
+partir del objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
 </pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Es mejor crear un único objeto <code class="docutils literal notranslate"><span class="pre">CriterioBuilder</span></code> para construir todas
+las consultas.</p>
 </div>
 <p>A partir de ahora debemos definir qué es lo que se querrá obtener (recordemos
 que estamos haciendo un <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>) y sobre qué tabla/entidad se quiere hacer la
 consulta. Por ejemplo:</p>
 <section id="consulta-basica">
 <h2><span class="section-number">5.6.2.2.1. </span>Consulta básica<a class="headerlink" href="#consulta-basica" title="Link to this heading">#</a></h2>
-<div class="highlight-java notranslate" id="orm-criteria-select-all"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obtendremos estudiantes.</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
-<span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span><span class="w"> </span><span class="c1">// SELECT * FROM Estudiante;</span>
+<div class="highlight-java notranslate" id="orm-criteria-select-all"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obtendremos estudiantes.</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span><span class="w"> </span><span class="c1">// SELECT e.* FROM Estudiante e;</span>
 
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>Obsérvese que hacemos la consulta al equivalente <abbr title="Structured Query Language">SQL</abbr>:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Que obtengamos estudiantes (<code class="code docutils literal notranslate"><span class="pre">e.*</span></code>) es consecuencia de
+<code class="code docutils literal notranslate"><span class="pre">cb.createQuery(Estudiante.class)</span></code> y de que hemos aplicado el método
+<code class="docutils literal notranslate"><span class="pre">.select</span></code> a <code class="docutils literal notranslate"><span class="pre">root</span></code> sin más. Que la consulta se haya hecho sobre Estudiante
+es consecuencia de <code class="code docutils literal notranslate"><span class="pre">criteria.from(Estudiante.class)</span></code>.</p>
 <p>Si quisiéramos obtener un campo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obtendremos cadenas</span>
-</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// SELECT e.nombre FROM Estudiante e;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obtendremos cadenas</span>
+</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// SELECT e.nombre FROM Estudiante e;</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nombres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Y si varios:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">multiselect</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// SELECT e.nombre, e.centro FROM Estudiante e;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Consultamos la entidad Estudiante</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">multiselect</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// SELECT e.nombre, e.centro FROM Estudiante e;</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
-<p>En este último caso, puede usarse también <code class="docutils literal notranslate"><span class="pre">Tuple.class</span></code> como con
-<abbr title="Hibernate Query Language">HQL</abbr>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">tuple</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">)));</span>
+<p>En este último caso, puede usarse también <a class="reference internal" href="01.hql.html#orm-tuple"><span class="std std-ref">Tuple como en JPQL</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// o cb.createTupleQuery();</span>
+</span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">tuple</span><span class="p">(</span>
+</span><span class="hll"><span class="w">   </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span>
+</span><span class="hll"><span class="w">   </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="p">));</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>No es una buena práctica referir los atributos de las clases con
+una cadena (<code class="code docutils literal notranslate"><span class="pre">root.get(&quot;nombre&quot;)</span></code>), ya que los errores de digitalización no
+pueden detectarse en tiempo de compilación. Por ese motivo, es bastante
+recomendable generar el <em>Metamodel</em>, que nos permite escribir:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>como:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">nombre</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>donde <code class="docutils literal notranslate"><span class="pre">Estudiante_</span></code> es una clase generada por el compilador.</p>
+</div>
+</section>
+<section id="metamodel">
+<span id="orm-jra-metamodel"></span><h2><span class="section-number">5.6.2.2.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
+<p>Para la habilitar la creación del <em>metamodelo</em>, debemos añadir como dependencia
+<a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor">hibernate-processor</a>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>hibernate-processor<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+<p>Obsérvese su ámbito, ya que necesitamos la librería para el desarrollo, no para
+la ejecución de la aplicación.</p>
+<p>Además, debemos añadir una sección <cite>&lt;build&gt;</cite> a <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
+<span class="w">   </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">       </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">           </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">           </span><span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">           </span><span class="nt">&lt;version&gt;</span>3.14.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">           </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">               </span><span class="nt">&lt;release&gt;</span>21<span class="nt">&lt;/release&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Versión de JDK --&gt;</span>
+<span class="w">               </span><span class="nt">&lt;annotationProcessorPaths&gt;</span>
+<span class="w">                   </span><span class="nt">&lt;path&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;artifactId&gt;</span>hibernate-processor<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">                   </span><span class="nt">&lt;/path&gt;</span>
+<span class="w">               </span><span class="nt">&lt;/annotationProcessorPaths&gt;</span>
+<span class="w">           </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">       </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+<p>Con esto, deberíamos tener disponibles en el proyecto las metaclases
+correspondientes a nuestro modelo (<code class="docutils literal notranslate"><span class="pre">Centro_</span></code> y <code class="docutils literal notranslate"><span class="pre">Estudiante_</span></code> en el ejemplo).</p>
+<p>Ahora podríamos reescribir el ejemplo anterior así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// o</span>
+<span class="n">cb</span><span class="p">.</span><span class="na">createTupleQuery</span><span class="p">();</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">tuple</span><span class="p">(</span>
+<span class="hll"><span class="w">   </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">nombre</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span>
+</span><span class="hll"><span class="w">   </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">)</span>
+</span><span class="p">));</span>
+
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>A partir de ahora usaremos las metaclases para referir atributos.</p>
+</div>
 </section>
 <section id="condiciones">
-<h2><span class="section-number">5.6.2.2.2. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.2.3. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
 <p><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> tiene definidos métodos que implementan los operadores
 básicos de <abbr title="Structured Query Language">SQL</abbr>. Por ejemplo, para escoger los estudiantes no matriculados:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">isNotNull</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">)));</span>
+<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">isNull</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">)));</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Para obtener los estudiantes de un centro determinado (suponiendo que éste
+se almacene en la variable <code class="docutils literal notranslate"><span class="pre">centro</span></code>) la condición habría sido:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">equal</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">));</span>
 </pre></div>
 </div>
 </section>
 <section id="ordenacion">
-<h2><span class="section-number">5.6.2.2.3. </span>Ordenación<a class="headerlink" href="#ordenacion" title="Link to this heading">#</a></h2>
-<p>Para ordenar resultados basta con aplicar el orden a <code class="docutils literal notranslate"><span class="pre">query</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">orderBy</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">desc</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">)));</span>
+<h2><span class="section-number">5.6.2.2.4. </span>Ordenación<a class="headerlink" href="#ordenacion" title="Link to this heading">#</a></h2>
+<p>Para ordenar resultados basta con aplicar el orden a <code class="docutils literal notranslate"><span class="pre">criteria</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">orderBy</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">desc</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">nacimiento</span><span class="p">)));</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 <section id="agrupacion">
-<h2><span class="section-number">5.6.2.2.4. </span>Agrupación<a class="headerlink" href="#agrupacion" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.2.5. </span>Agrupación<a class="headerlink" href="#agrupacion" title="Link to this heading">#</a></h2>
 <p>También existe el equivalente a <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">multiselect</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">count</span><span class="p">(</span><span class="n">root</span><span class="p">)).</span><span class="na">groupBy</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">));</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">tuple</span><span class="p">(</span>
+<span class="w">   </span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">),</span>
+<span class="w">   </span><span class="n">cb</span><span class="p">.</span><span class="na">count</span><span class="p">(</span><span class="n">root</span><span class="p">).</span><span class="na">alias</span><span class="p">(</span><span class="s">&quot;cantidad&quot;</span><span class="p">)</span>
+<span class="p">));</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">groupBy</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">));</span>
 </span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Si ahora quisiéramos ordenar resultados por la cantidad de estudiantes que tiene
+cada centro deberíamos añadir:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">criteria</span><span class="p">.</span><span class="na">orderBy</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">asc</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">count</span><span class="p">(</span><span class="n">root</span><span class="p">)));</span>
+</pre></div>
+</div>
+<p>ya que no puede usarse el alias. O, si quisiéramos ordenar por el nombre del
+centro:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">criteria</span><span class="p">.</span><span class="na">orderBy</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">asc</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">).</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">_nombre</span><span class="p">)));</span>
 </pre></div>
 </div>
 </section>
 <section id="joins">
-<h2><span class="section-number">5.6.2.2.5. </span>Joins<a class="headerlink" href="#joins" title="Link to this heading">#</a></h2>
-<p>Como en <abbr title="Hibernate Query Language">HQL</abbr> también se puede hacer facilmente <em>joins</em> de entidades. Esto
-permite hacer un <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="hll"><span class="n">Join</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
-</span><span class="n">query</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
-<span class="hll"><span class="n">query</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">centro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;C%&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Centros cuyo nombre empieza por &quot;C&quot;</span>
-</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<h2><span class="section-number">5.6.2.2.6. </span>Joins<a class="headerlink" href="#joins" title="Link to this heading">#</a></h2>
+<p>Como en <abbr title="Java Persistence Query Language">JPQL</abbr> también se puede hacer facilmente <em>joins</em> de entidades. Esto
+permite hacer un <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> <strong>perezoso</strong>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">Join</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
+</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>La consulta equivale a:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Obsérvese que el <em>JOIN</em> viene representado por la variable <code class="docutils literal notranslate"><span class="pre">centro</span></code> que se
+define en la línea remarcada. En cambio, si nuestra intención hubiera sido:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>la consulta debería haberse construido así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">Join</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
+</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Obtendremos muchos centros repetidos así que lo suyo sería haber hecho
+un <code class="docutils literal notranslate"><span class="pre">DISTINCT</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">distinct</span><span class="p">(</span><span class="n">centro</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>que devolvería la lista de centros con algún estudiante matriculado.</p>
+</div>
+<p>Si intentáramos obtener lo contrario, la relación de centros sin alumnos
+matriculados, en <abbr title="Structured Query Language">SQL</abbr> podríamos obtenerla con una de estas dos consultas, que
+son equivalentes:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">RIGHT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">centro</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Al intentar trasladar esto a <em>Criteria API</em> nos encontraríamos con los siguientes
+problemas:</p>
+<p>La primera expresión podríamos traducirla así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">Join</span><span class="o">&lt;</span><span class="n">Centro</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Centro_</span><span class="p">.</span><span class="na">estudiantes</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">LEFT</span><span class="p">);</span>
+</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">_estudiantes</span><span class="p">)));</span>
+</span></pre></div>
+</div>
+<p>Obsérvese que al hacer el <em>JOIN</em> <code class="docutils literal notranslate"><span class="pre">root</span></code> hace referencia a un objeto
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code>, luego debemos indicar el campo que liga <code class="docutils literal notranslate"><span class="pre">Centro</span></code> con
+<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Es la lista de estudiantes… pero sólo si definimos como
+bidireccional la relación. Si la relación es unidireccional el único campo que
+establece la relación está en <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> y no podremos resolver de este modo
+el problema. Por su parte, la condición es trivial: la lista de estudiantes debe
+estar vacía.</p>
+<p>La segunda expresión si tiene teóricamente, pero sólo teóricamente, solución:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto NO VALE. Ni se le ocurra intentarlo.</span>
+<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Join</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">RIGHT</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">isNull</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">)));</span>
+</pre></div>
+</div>
+<p>El problema es que Criteria API <strong>no</strong> implementa <code class="docutils literal notranslate"><span class="pre">RIGHT</span> <span class="pre">JOIN</span></code> sino solamente
+los tipos ya vistos: <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> y <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code>.</p>
+<p>En consecuencia, el único modo de hacer la consulta con una relación
+unidireccional es recurrir a una subconsulta:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>lo que da pie a que intentemos implementar está consulta con subconsulta usando
+<em>Criteria API</em>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="c1">// Preparamos la subconsulta</span>
+<span class="n">Subquery</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">subquery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">subquery</span><span class="p">(</span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">subroot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subquery</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">subquery</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">subroot</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">));</span>
+<span class="c1">// Consulta con subconsulta</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">not</span><span class="p">(</span><span class="n">root</span><span class="p">).</span><span class="na">in</span><span class="p">(</span><span class="n">subquery</span><span class="p">));</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Nótese que aquí podemos comparar directamente centros en vez de
+identificadores de centros.</p>
+</div>
+<p>Todo lo referido arriba es para <em>carga perezosa</em>. Si deseamos hacer carga
+inmediata, basta con sustituir <code class="docutils literal notranslate"><span class="pre">.join</span></code> por <code class="docutils literal notranslate"><span class="pre">.fetch</span></code> en los ejemplos de este
+epígrafe en que existen <em>JOINs</em> explícitos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// ...</span>
+<span class="n">Join</span><span class="o">&lt;</span><span class="n">Centro</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">fetch</span><span class="p">(</span><span class="n">Centro_</span><span class="p">.</span><span class="na">estudiantes</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">LEFT</span><span class="p">);</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>Ahora bien, ¿qué ocurre cuando el <em>JOIN</em> no es explícito?</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">root</span><span class="p">.</span><span class="na">fetch</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">LEFT</span><span class="p">));</span>
+</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>La respuesta es que basta con hacerlo explícitopara poder usar el método
+<code class="docutils literal notranslate"><span class="pre">.fetch</span></code></p>
 </section>
 <section id="actualizacion-y-borrado">
-<h2><span class="section-number">5.6.2.2.6. </span>Actualización y borrado<a class="headerlink" href="#actualizacion-y-borrado" title="Link to this heading">#</a></h2>
-<p>Al igual que <abbr title="Hibernate Query Language">HQL</abbr>, también se puede <strong>actualizar</strong> objetos. Por ejemplo, esto
+<h2><span class="section-number">5.6.2.2.7. </span>Actualización y borrado<a class="headerlink" href="#actualizacion-y-borrado" title="Link to this heading">#</a></h2>
+<p>Al igual que <abbr title="Java Persistence Query Language">JPQL</abbr>, también se puede <strong>actualizar</strong> objetos. Por ejemplo, esto
 desmatricularía a todos los estudiantes cuyo nombre empieza por «J»:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaUpdate</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createCriteriaUpdate</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaUpdate</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createCriteriaUpdate</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">update</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-<span class="n">update</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">));</span>
+<span class="n">update</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">),</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="n">update</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">nombre</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">));</span>
 
-<span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">update</span><span class="p">).</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">update</span><span class="p">).</span><span class="na">executeUpdate</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>También es posible <strong>borrar</strong>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
-<span class="n">CriteriaUpdate</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">delete</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createCriteriaUpdate</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaDelete</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">delete</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createCriteriaDelete</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">delete</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">delete</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">));</span>
+<span class="n">delete</span><span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">root</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_nombre</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">));</span>
 
-<span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">delete</span><span class="p">).</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">delete</span><span class="p">).</span><span class="na">executeUpdate</span><span class="p">();</span>
 </pre></div>
 </div>
 </section>
@@ -559,7 +755,7 @@ desmatricularía a todos los estudiantes cuyo nombre empieza por «J»:</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.6.2.1. </span><abbr title="Hybernate Query Language">HQL</abbr></p>
+        <p class="prev-next-title"><span class="section-number">5.6.2.1. </span><abbr title="Java Persistence Query Language">JPQL</abbr></p>
       </div>
     </a>
     <a class="right-next"
@@ -588,11 +784,12 @@ desmatricularía a todos los estudiantes cuyo nombre empieza por «J»:</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.2.1. Consulta básica</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.2. Condiciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.3. Ordenación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.4. Agrupación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#joins">5.6.2.2.5. Joins</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.6. Actualización y borrado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.2.2. Metamodel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.3. Condiciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.4. Ordenación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.5. Agrupación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#joins">5.6.2.2.6. Joins</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.7. Actualización y borrado</a></li>
 </ul>
   </nav></div>
 

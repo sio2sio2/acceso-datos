@@ -1,97 +1,112 @@
-.. _orm-hql:
+.. _orm-jpql:
 
-|HQL|
-=====
+|JPQL|
+======
 Es un lenguaje de consulta prácticamente idéntico a |SQL| que sustituye tablas y
-campos por objetos y atributos. Además abstrae de las particularidades de los
-|SGBD|.
+campos por objetos y atributos; y abstrae de las particularidades de los
+|SGBD|. Deriva de |HQL|, un lenguaje de consulta que diseñó Hibernate_, por lo
+que sus semejanzas son notorias.
 
 Consulta básica
 ---------------
 Para obtener todos los elementos de un relación basta hacer:
 
 .. code-block:: java
-   :name: orm-hql-select-all
+   :name: orm-jpql-select-all
 
-   // "sesion" el objeto Session abierto.
-   List<Estudiante> estudiantes = session.createQuery(
-      "FROM Estudiante"
-   ).getResultList();
+   List<Centro> centro = em.createQuery("FROM Centro", Centro.class).getResultList();
 
-donde la palabra *Estudiante* en la cadena no es el nombre de la tabla,
-sino el nombre de la clase ``Estudiante`` que, en este caso, coinciden.
+donde la palabra *Centro* en la cadena no es el nombre de la tabla,
+sino el nombre de la clase ``Centro`` que, en este caso, coinciden.
 Recordemos que el lenguaje hace referencia a objetos y atributos.
 
-.. note:: La cadena también podría haber sido ":code:`SELECT e FROM
-   Estudiante e`"
+.. note:: La cadena también podría haber sido ":code:`SELECT c FROM
+   Centro c`"
+
+Si desglosamos en dos instrucciones la orden anterior, la entenderemos mejor:
+
+.. code-block:: java
+
+   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class);
+   List<Centro> centro = query.getResultList();
+
+El segundo argumento de ``.createQuery`` permite tipar el resultado de la
+consulta (objetos ``Centro`` en este caso). Aunque no sea recomendable,
+podríamos no haber tipado la consulta:
+
+.. code-block:: java
+
+   Query query = em.createQuery("FROM Centro", Centro.class);
+   // warning: el compilador no puede asegurar el tipo del resultado.
+   List<Centro> centro = query.getResultList();
 
 Podemos también obtener campos individuales en vez de objetos ``Estudiante``:
 
 .. code-block:: java
 
-   List<String> nombres = session.createQuery(
-      "SELECT e.nombre FROM Estudiante e",
-      String.class
-   ).getResultList();
+   TypedQuery<String> query = em.createQuery("SELECT c.nombre FROM Centro c", String.class);
+   List<String> nombres = query.getResultList();
 
 o un conjunto de campos individuales:
 
 .. code-block:: java
 
-   List<Object[]> campos = session.createQuery(
-      "SELECT e.nombre, e.nacimiento FROM Estudiante e"
-   ).getResultList();
+   TypedQuery<Object[]> query = em.createQuery("SELECT c.id, c.nombre FROM Centro c", Object[].class);
+   List<Object[]> registros = query.getResultList();
 
-   for(Object[] fila: campos) {
-      String nombre = (String) fila[0];
-      LocalDate nacimiento = (LocalDate) fila[1];
-      // ...
+   for(Object[] registro: registro) {
+      Long id = (Long) registro[0];
+      String nombre = (String) registro[1];
+      System.out.printf("id=%d -- nombre=%s\n", id, nombre);
    }
 
-.. note:: En los tres casos puede incluirse la clase de la lista
-   (``Estudiante.class``, ``String.class`` y ``Object[].class``
-   respectivamente). Obsérvese también que los campos mencionados son
-   atributos de estudiantes, no nombres de columnas.
+.. caution:: Los nombres son nombres de atributos, no nombres de columnas. Recuerde
+   que siempre se refieren clases y atributos, no tablas y columnas.
 
 .. tip:: Cuando se obtiene varias columnas, en vez de obtener un
-   ``Object[].class`` se puede pedir la obtención de  ``Tuple``, que hace más
-   amable la obtención posterior de los campos individules:
+   ``Object[].class`` se puede pedir la obtención de una tupla (``Tuple``) y
+   asignar alias a los nombres, lo que hará más amable la obtención posterior de
+   los campos individules:
+
+   .. code-block:: java
+   
+      // Obsérvese los alias incluidos en la consulta: AS...
+      TypedQuery<Tuple> query = em.createQuery(
+         "SELECT c.id AS id, c.nombre AS nombre FROM Centro c",
+         Tuple.class
+      );
+      List<Tuple> campos = query.getResultList();
+      System.out.println("=== Lista de campos ===");
+      for(Tuple registro: campos) {
+         Long id = registro.get("id", Long.class);
+         String nombre = registro.get("nombre", String.class);
+         System.out.printf("ID=%d -- nombre=%s\n", id, nombre);
+      }
+   
+   Sin alias en la consulta, aún podríamos haber obtenido valores con el
+   ordinal:
 
    .. code-block:: java
 
-      List<Tuple> campos = session.createQuery(
-         "SELECT e.nombre, e.nacimiento FROM Estudiante e",
-         Tuple.class
-      ).getResultList();
-
-      for(Tuple tupla: campos) {
-         String nombre = tupla.get(0, String.class);
-         LocalDate nacimiento = tupla.get(1, LocalDate.class);
-         // ...
-      }
-
-
+      Long id = registro.get(0, Long.class);
+      
 Condiciones
 -----------
-Como en el caso de |SQL|, |HQL| permite aplicar condiciones usando la
+Como en el caso de |SQL|, |JPQL| permite aplicar condiciones usando la
 sintaxis de ``WHERE``:
 
 .. code-block:: java
 
    // Incluir valores dentro de la cadena no es recomendable
-   List<Estudiante> estudiantes = sesion.createQuery(
-      "FROM Estudiante e WHERE nombre LIKE 'J%'"
-   ).getResultList();
+   TypedQuery<Centro> centros = sesion.createQuery("FROM Centro c WHERE c.nombre LIKE '%Castillo%'", Centro.class);
 
 Ahora bien, en este caso, es mejor parametrizar la consulta en vez de incluir
 directamente los valores dentro de la cadena:
 
 .. code-block:: java
 
-   List<Estudiante> estudiantes = sesion.createQuery(
-      "FROM Estudiante e WHERE nombre LIKE :patron"
-   ).setParamenter("patron", "J%")
-   .getResultList();
+   TypedQuery<Centro> centros = sesion.createQuery("FROM Centro c WHERE c.nombre LIKE :patron", Centro.class)
+      .setParamenter("patron", "%Castillo%");
 
 La principal limitación es que podemos usar los operadores básicos que
 existen en |SQL| (como el ``LIKE`` del ejemplo), pero no las funciones que
@@ -113,58 +128,54 @@ con menos de 20 años. Hay tres posibilidades:
   .. code-block:: java
 
      LocalDate fecRef = LocalDate.now().minusYears(20);
-     List<Estudiante> estudiantes = sesion.createQuery(
-       "FROM Estudiante e WHERE e.edad > :limite"
-     ).setParamenter("limite", fecRef)
-     .getResultList();
+     TypedQuery<Estudiante> estudiantes = em.createQuery("FROM Estudiante e WHERE e.edad > :limite", Estudiante.class)
+         .setParameter("limite", fecRef);
 
-Lo que sí podemos usar son los campos definidos por la relación entre dos
-tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
+Lo que sí podemos usar son los campos definidos por la relación bidireccional
+entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
 
 .. code-block:: java
 
-   // Estudiantes que pertenecen a un determinado centro
-   List<List<Estudiante>> estudiantes = sesion.createQuery(
-      "SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro",
-      List.class
-   ).setParameter("idCentro", 11004866L)
-   .getResultList();
+   TypedQuery<Estudiante> query = em.createQuery(
+      "SELECT c.estudiantes FROM Centro c WHERE c.nombre = :patron"
+   ).setParameter("patron", "%Castillo%");
 
-Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
-una clave primaria o un campo con valores únicos), puede usarse el método
-``.getSingleResult()``. Por ejemplo, la consulta de arriba no debería dar más de
-un resultado. Por tanto, podría hacerse así:
-
-.. code-block:: java
-
-   try {
-      List<Estudiante> estudiantes = sesion.createQuery(
-         "SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro",
-         List.class
-      ).setParameter("idCentro", 11004866L)
-      .getSingleResult();
-   }
-   catch(NoResultException err) {
-      System.err.println("No hay ningún centro con tal id");
-   }
-   catch(NonUniqueResultException err) {
-      // Esto no puede ocurrir nunca.
-      assert false: "Imposible que haya dos valores para una clave primaria";
-   }
+.. caution:: |JPA| aplana la lista, de modo que no se obtiene una lista de
+   listas, sino, simplemente, una lista de estudiantes.
 
 .. TODO:: Probar la inversa:
 
    SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro
 
-Ordenación
-----------
-|HQL| dispone de la cláusula ``ORDER BY`` para ordenar los resultados:
+Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
+una clave primaria o un campo con valores únicos), puede usarse el método
+``.getSingleResult()``. Por ejemplo:
 
 .. code-block:: java
 
-   List<Estudiante> estudiantes = sesion.createQuery(
-      "FROM Estudiante e ORDER BY e.nombre DESC"
-   ).getResultList();
+   try(EntityManager em = emf.createEntityManager()) {
+      try {
+         TypedQuery<Centro> query = em.createQuery("FROM Centro c WHERE id = :idCentro", Centro.class)
+            .setParameter("idCentro", 11004866L);
+         Centro centro = query.getSingleResult();
+         System.out.println(centro);
+      }
+      catch(NoResultException err) {
+         System.err.println("No hay ningún centro con tal id");
+      }
+      catch(NonUniqueResultException err) {
+         // Esto no puede ocurrir nunca.
+         assert false: "Imposible que haya dos valores para una clave primaria";
+      }
+   }
+
+Ordenación
+----------
+|JPQL| dispone de la cláusula ``ORDER BY`` para ordenar los resultados:
+
+.. code-block:: java
+
+   TypedQuery<Estudiante> query = em.createQuery("FROM Estudiante e ORDER BY e.nombre DESC");
 
 Agrupación
 ----------
@@ -172,26 +183,63 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
 
 .. code-block:: java
 
-   List<Object[]> res = sesion.createQuery(
-      "SELECT e.centro.nombre, COUNT(e) FROM Estudiante e GROUP BY e.centro.nombre"
-   ).getResultList();
+   TypedQuery<Tuple> query = em.createQuery(
+      "SELECT e.centro.nombre AS nombre, COUNT(e) AS estudiantes FROM Estudiante e GROUP BY e.centro.nombre",
+      Tuple.class
+   );
+   List<Tuple> resultados = query.getResultList();
+   for(Tuple t: resultados) {
+      String nombre = t.get("nombre", String.class);
+      Long cantidad = t.get("estudiantes", Long.class);
+      System.out.println("%s: %d estudiantes", nombre, cantidad);
+   }
 
 .. note:: No es posible agrupar por ``e.centro``.
 
+.. note:: Obsérvese que al estar consultando ``Estudiante``, los centros sin
+   estudiantes no aparecen listados. En cambio, podríamos haber abordado la
+   consulta así aprovechando la relación bidireccional:
+
+   .. code-block:: java
+
+      TypedQuery<Tuple> query = em.createQuery(
+         "SELECT c.nombre AS nombre, SIZE(c.estudiantes) AS estudiantes FROM Centro c GROUP BY c.nombre",
+          Tuple.class
+      );
+      List<Tuple> resultados = query.getResultList();
+      for(Tuple t: resultados) {
+         String nombre = t.get("nombre", String.class);
+         Integer cantidad = t.get("estudiantes", Integer.class);
+         System.out.println("%s: %d estudiantes", nombre, cantidad);
+      }
+
+   Y en este caso, sí aparecerán todos los centros.
+
 Joins
 -----
-|HQL| también permite hacer *joins*, la diferencia fundamental respecto a su
+|JPQL| también permite hacer *joins*, la diferencia fundamental respecto a su
 equivalente de |SQL| es que no se usan las entidades sino las referencias entre
 ellas:
 
 .. code-block:: java
 
-   List<Estudiante> res = sesion.createQuery(
-      "FROM Estudiante e JOIN e.centro c WHERE c.nombre = :nombreCentro"
-   ).setParameter("nombreCentro", "IES Castillo de Luna")
-   .getResultList();
+   TypedQuery<Estudiante> query = em.createQuery(
+      "FROM Estudiante e JOIN e.centro c WHERE c.nombre = :nombre",
+      Estudiante.class
+   ).setParameter("nombre", "IES Castillo de Luna");
 
-Hibernate_ soporta tres *joins* distintos:
+.. note:: La consulta es equivalente a esta otra:
+
+   .. code-block:: java
+
+      TypedQuery<Estudiante> query = em.createQuery(
+         "SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.nombre = :nombre",
+         Estudiante.class
+      ).setParameter("nombre", "IES Castillo de Luna");
+
+   en que hemos intercambiado el orden de las entidades.
+
+|JPA| soporta tres *joins* distintos:
 
 ``INNER JOIN``
    que es el que se ha escrito más arriba simplemente con ``JOIN``, aunque se
@@ -204,15 +252,14 @@ Hibernate_ soporta tres *joins* distintos:
 
    .. code-block:: java
 
-      List<Estudiante> res = sesion.createQuery(
-         "FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombreCentro"
-      ).setParameter("nombreCentro", "IES Castillo de Luna")
-      .getResultList();
+      TypedQuery<Estudiante> query = em.createQuery(
+         "FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombre"
+      ).setParameter("nombre", "IES Castillo de Luna");
 
 ``FETCH JOIN``
    Es una variante de ``INNER JOIN`` que obtiene los mismos resultados, pero
-   aprovecha la consulta para cargar también los centros. En general, Hibernate_
-   pratica uan carga perezosa de las referencias. Por ejemplo, si obtenemos un
+   aprovecha la consulta para cargar también los centros. En general, |JPA|
+   pratica una carga perezosa de las referencias. Por ejemplo, si obtenemos un
    estudiante, su centro matriculado no se obtendrá hasta que el usuario no
    use el *getter* correspondiente. Este *join* sí aprovecha la consulta en que
    están involucradas las entidades *Estudiante* y *Centro* para obtener también
@@ -220,33 +267,52 @@ Hibernate_ soporta tres *joins* distintos:
 
    .. code-block:: java
 
-      List<Estudiante> res = sesion.createQuery(
-         "FROM Estudiante e FETCH JOIN e.centro c WHERE c.nombre = :nombreCentro"
-      ).setParameter("nombreCentro", "IES Castillo de Luna")
-      .getResultList();
+      // Obtiene estudiantes con su centro cargado.
+      TypedQuery<Estudiante> query = sesion.createQuery(
+         "FROM Estudiante e JOIN FETCH e.centro c"
+      );
+
+   .. note:: Obsérvese que no tiene sentido:
+
+      .. code-block:: java
+
+         TypedQuery<Estudiante> query = sesion.createQuery(
+            "SELECT e FROM Centro c JOIN FETCH c.estudiantes e"
+         );
+
+      porque en lo devuelto (estudiantes) no hay ninguna lista de estudiantes
+      que precargar. Lo que sí podría tener sentido es:
+
+      .. code-block:: java
+
+         TypedQuery<Centro> query = sesion.createQuery(
+            "FROM Centro c JOIN FETCH c.estudiantes e"
+         );
 
 Actualización y borrado
 -----------------------
-Aunque menos habitual, |HQL| también permite hacer operaciones de
+Aunque menos habitual, |JPQL| también permite hacer operaciones de
 actualización y borrado:
 
 .. code-block:: java
 
    // Desvincula de cualquier centro a las personas
    // cuyo nombre empieza por "J".
-   int filasAfectadas = session.createQuery(
+   int filasAfectadas = em.createQuery(
       "UPDATE Estudiante SET centro = null WHERE nombre LIKE :patron"
    ).setParameter("patron", "J%")
    .executeUpdate();
 
    // Borra a todas las personas que se llaman Juan
-   int filasEliminadas = session.createQuery(
+   int filasEliminadas = em.createQuery(
       "DELETE FROM Estudiante WHERE nombre = :nombre"
    ).setParameter("nombre", "Juan")
    .executeUpdate();
 
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Replace, Update, Delete)`
-.. |HQL| replace:: :abbr:`HQL (Hybernate Query Language)`
+.. |HQL| replace:: :abbr:`HQL (Hibernate Query Language)`
+.. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
 .. _Hibernate: https://www.hibernate.org

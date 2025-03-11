@@ -410,11 +410,13 @@ document.write(`
 del modelo de objetos (de <em>Java</em>, en este caso) y las entidades del modelo
 relacional. En esta traducción las clases se corresponden con las tablas, las
 instancias con los registros y los atributos con los campos.</p>
-<p>En <a class="reference external" href="https://www.hibernate.org">Hibernate</a>, la definición del <em>mapeo</em> puede realizarse con anotaciones
-siguiendo el estándar <abbr title="Java Persisten API">JPA</abbr>. Bajo este epígrafe aprenderemos fundamentalmente:</p>
+<p>Las anotaciones se encuentran definidas en la especificación <abbr title="Java Persisten API">JPA</abbr> e <a class="reference external" href="https://www.hibernate.org">Hibernate</a>
+(o cualquier otro <abbr title="Object-Relational Mapping">ORM</abbr> compatible) se encarga de darles soporte.
+Fundamentalmente sirven para:</p>
 <ul class="simple">
-<li><p>Cómo marcar los atributos para que se incorporen a los campos de la tabla.</p></li>
-<li><p>Cómo marcar que los atributos representan relaciones entre tablas.</p></li>
+<li><p>Indicar qué atributos incorporan a los campos de la tabla y con qué nombre.</p></li>
+<li><p>Establecer restricciones sobre los valores.</p></li>
+<li><p>Definir relaciones entre tablas.</p></li>
 </ul>
 <section id="anotaciones-basicas">
 <h2><span class="section-number">5.4.1. </span>Anotaciones básicas<a class="headerlink" href="#anotaciones-basicas" title="Link to this heading">#</a></h2>
@@ -486,7 +488,7 @@ anotación de la clase Centro</span></a>:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Y convendría leer lo explicado allí para no repetirlo. Ahora bien: podemos
+<p>Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
 ampliar nuestro conocimientos sobre las anotaciones válidas:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code></dt><dd><p>Por lo general, todos los atributos de la clase, aunque no estén anotados en
@@ -701,7 +703,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:</p>
 <dt><strong>Relación 1:N</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code></dt><dd><p>Se produce cuando una registro de la primera tabla se relaciona con muchos
 registros de la segunda, pero al contrario los registros de la segunda sólo
 se relacionan con uno de la primera.</p>
-<p>En <a class="reference external" href="https://www.hibernate.org">Hibernate</a> hay dos modos de resolver esta relación (y las otras dos que se
+<p><abbr title="Java Persisten API">JPA</abbr> establece dos modos de resolver esta relación (y las otras dos que se
 explicarán a continuación): de modo <strong>unidireccional</strong> y de modo
 <strong>bidireccional</strong>.</p>
 <dl>
@@ -798,7 +800,7 @@ referenciado, no la clave foránea en sí.</p></li>
 </ul>
 <p>En definitiva, la traducción de la relación es casi literal con la única
 salvedad de que el atributo no almacena la clave foránea (un identificador),
-sino el registro completo (objeto en realidad).</p>
+sino el registro completo (objeto, en realidad).</p>
 </dd>
 <dt><strong>Bidireccional</strong></dt><dd><p>En este modo, la relación se refleja en ambos extremos, por lo que debe
 añadirse también un atributo en el otro extremo (<code class="docutils literal notranslate"><span class="pre">Centro</span></code>), que estará

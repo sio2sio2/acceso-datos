@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.6.2.1. HQL &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.6.2.1. JPQL &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -209,7 +209,7 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../02.avanzadas.html">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -380,7 +380,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>HQL</h1>
+    <h1>JPQL</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -407,89 +407,99 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hql">
-<span id="orm-hql"></span><h1><span class="section-number">5.6.2.1. </span><abbr title="Hybernate Query Language">HQL</abbr><a class="headerlink" href="#hql" title="Link to this heading">#</a></h1>
+  <section id="jpql">
+<span id="orm-jpql"></span><h1><span class="section-number">5.6.2.1. </span><abbr title="Java Persistence Query Language">JPQL</abbr><a class="headerlink" href="#jpql" title="Link to this heading">#</a></h1>
 <p>Es un lenguaje de consulta prácticamente idéntico a <abbr title="Structured Query Language">SQL</abbr> que sustituye tablas y
-campos por objetos y atributos. Además abstrae de las particularidades de los
-<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>.</p>
+campos por objetos y atributos; y abstrae de las particularidades de los
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Deriva de <abbr title="Hibernate Query Language">HQL</abbr>, un lenguaje de consulta que diseñó <a class="reference external" href="https://www.hibernate.org">Hibernate</a>, por lo
+que sus semejanzas son notorias.</p>
 <section id="consulta-basica">
 <h2><span class="section-number">5.6.2.1.1. </span>Consulta básica<a class="headerlink" href="#consulta-basica" title="Link to this heading">#</a></h2>
 <p>Para obtener todos los elementos de un relación basta hacer:</p>
-<div class="highlight-java notranslate" id="orm-hql-select-all"><div class="highlight"><pre><span></span><span class="c1">// &quot;sesion&quot; el objeto Session abierto.</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante&quot;</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate" id="orm-jpql-select-all"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>donde la palabra <em>Estudiante</em> en la cadena no es el nombre de la tabla,
-sino el nombre de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que, en este caso, coinciden.
+<p>donde la palabra <em>Centro</em> en la cadena no es el nombre de la tabla,
+sino el nombre de la clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code> que, en este caso, coinciden.
 Recordemos que el lenguaje hace referencia a objetos y atributos.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>La cadena también podría haber sido «<code class="code docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">e</span> <span class="pre">FROM</span>
-<span class="pre">Estudiante</span> <span class="pre">e</span></code>»</p>
+<p>La cadena también podría haber sido «<code class="code docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">c</span> <span class="pre">FROM</span>
+<span class="pre">Centro</span> <span class="pre">c</span></code>»</p>
+</div>
+<p>Si desglosamos en dos instrucciones la orden anterior, la entenderemos mejor:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>El segundo argumento de <code class="docutils literal notranslate"><span class="pre">.createQuery</span></code> permite tipar el resultado de la
+consulta (objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code> en este caso). Aunque no sea recomendable,
+podríamos no haber tipado la consulta:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="c1">// warning: el compilador no puede asegurar el tipo del resultado.</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+</pre></div>
 </div>
 <p>Podemos también obtener campos individuales en vez de objetos <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nombres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT e.nombre FROM Estudiante e&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="n">String</span><span class="p">.</span><span class="na">class</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;SELECT c.nombre FROM Centro c&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nombres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>o un conjunto de campos individuales:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT e.nombre, e.nacimiento FROM Estudiante e&quot;</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;SELECT c.id, c.nombre FROM Centro c&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 
-<span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">fila</span><span class="p">:</span><span class="w"> </span><span class="n">campos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">fila</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
-<span class="w">   </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LocalDate</span><span class="p">)</span><span class="w"> </span><span class="n">fila</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
-<span class="w">   </span><span class="c1">// ...</span>
+<span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Long</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;id=%d -- nombre=%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En los tres casos puede incluirse la clase de la lista
-(<code class="docutils literal notranslate"><span class="pre">Estudiante.class</span></code>, <code class="docutils literal notranslate"><span class="pre">String.class</span></code> y <code class="docutils literal notranslate"><span class="pre">Object[].class</span></code>
-respectivamente). Obsérvese también que los campos mencionados son
-atributos de estudiantes, no nombres de columnas.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Los nombres son nombres de atributos, no nombres de columnas. Recuerde
+que siempre se refieren clases y atributos, no tablas y columnas.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>Cuando se obtiene varias columnas, en vez de obtener un
-<code class="docutils literal notranslate"><span class="pre">Object[].class</span></code> se puede pedir la obtención de  <code class="docutils literal notranslate"><span class="pre">Tuple</span></code>, que hace más
-amable la obtención posterior de los campos individules:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT e.nombre, e.nacimiento FROM Estudiante e&quot;</span><span class="p">,</span>
+<code class="docutils literal notranslate"><span class="pre">Object[].class</span></code> se puede pedir la obtención de una tupla (<code class="docutils literal notranslate"><span class="pre">Tuple</span></code>) y
+asignar alias a los nombres, lo que hará más amable la obtención posterior de
+los campos individules:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Obsérvese los alias incluidos en la consulta: AS...</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT c.id AS id, c.nombre AS nombre FROM Centro c&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
-
-<span class="k">for</span><span class="p">(</span><span class="n">Tuple</span><span class="w"> </span><span class="n">tupla</span><span class="p">:</span><span class="w"> </span><span class="n">campos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupla</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="w">   </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupla</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="w">   </span><span class="c1">// ...</span>
+<span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">campos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== Lista de campos ===&quot;</span><span class="p">);</span>
+<span class="k">for</span><span class="p">(</span><span class="n">Tuple</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">campos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;ID=%d -- nombre=%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">);</span>
 <span class="p">}</span>
+</pre></div>
+</div>
+<p>Sin alias en la consulta, aún podríamos haber obtenido valores con el
+ordinal:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="condiciones">
 <h2><span class="section-number">5.6.2.1.2. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
-<p>Como en el caso de <abbr title="Structured Query Language">SQL</abbr>, <abbr title="Hybernate Query Language">HQL</abbr> permite aplicar condiciones usando la
+<p>Como en el caso de <abbr title="Structured Query Language">SQL</abbr>, <abbr title="Java Persistence Query Language">JPQL</abbr> permite aplicar condiciones usando la
 sintaxis de <code class="docutils literal notranslate"><span class="pre">WHERE</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Incluir valores dentro de la cadena no es recomendable</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e WHERE nombre LIKE &#39;J%&#39;&quot;</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro c WHERE c.nombre LIKE &#39;%Castillo%&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Ahora bien, en este caso, es mejor parametrizar la consulta en vez de incluir
 directamente los valores dentro de la cadena:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e WHERE nombre LIKE :patron&quot;</span>
-<span class="p">).</span><span class="na">setParamenter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro c WHERE c.nombre LIKE :patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">setParamenter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%Castillo%&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>La principal limitación es que podemos usar los operadores básicos que
@@ -507,84 +517,119 @@ que depende del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>.</p><
 sencillos. Por ejemplo, en este caso, podemos calcular en Java, qué fecha
 era hace 20 años para poder comparar directamente con el campo nacimiento.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fecRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">minusYears</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">  </span><span class="s">&quot;FROM Estudiante e WHERE e.edad &gt; :limite&quot;</span>
-<span class="p">).</span><span class="na">setParamenter</span><span class="p">(</span><span class="s">&quot;limite&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fecRef</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Estudiante e WHERE e.edad &gt; :limite&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;limite&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fecRef</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
 </ul>
-<p>Lo que sí podemos usar son los campos definidos por la relación entre dos
-tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Estudiantes que pertenecen a un determinado centro</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="n">List</span><span class="p">.</span><span class="na">class</span>
-<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;idCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<p>Lo que sí podemos usar son los campos definidos por la relación bidireccional
+entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT c.estudiantes FROM Centro c WHERE c.nombre = :patron&quot;</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%Castillo%&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
-una clave primaria o un campo con valores únicos), puede usarse el método
-<code class="docutils literal notranslate"><span class="pre">.getSingleResult()</span></code>. Por ejemplo, la consulta de arriba no debería dar más de
-un resultado. Por tanto, podría hacerse así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">      </span><span class="s">&quot;SELECT c.estudiantes FROM Centro c WHERE c.id = :idCentro&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="n">List</span><span class="p">.</span><span class="na">class</span>
-<span class="w">   </span><span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;idCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">)</span>
-<span class="w">   </span><span class="p">.</span><span class="na">getSingleResult</span><span class="p">();</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">NoResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;No hay ningún centro con tal id&quot;</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">NonUniqueResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Esto no puede ocurrir nunca.</span>
-<span class="w">   </span><span class="k">assert</span><span class="w"> </span><span class="kc">false</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Imposible que haya dos valores para una clave primaria&quot;</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p><abbr title="Java Persistence API">JPA</abbr> aplana la lista, de modo que no se obtiene una lista de
+listas, sino, simplemente, una lista de estudiantes.</p>
 </div>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Por hacer</p>
 <p>Probar la inversa:</p>
 <p>SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro</p>
 </div>
+<p>Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
+una clave primaria o un campo con valores únicos), puede usarse el método
+<code class="docutils literal notranslate"><span class="pre">.getSingleResult()</span></code>. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro c WHERE id = :idCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">         </span><span class="p">.</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;idCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getSingleResult</span><span class="p">();</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">NoResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;No hay ningún centro con tal id&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">NonUniqueResultException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Esto no puede ocurrir nunca.</span>
+<span class="w">      </span><span class="k">assert</span><span class="w"> </span><span class="kc">false</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Imposible que haya dos valores para una clave primaria&quot;</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 <section id="ordenacion">
 <h2><span class="section-number">5.6.2.1.3. </span>Ordenación<a class="headerlink" href="#ordenacion" title="Link to this heading">#</a></h2>
-<p><abbr title="Hybernate Query Language">HQL</abbr> dispone de la cláusula <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> para ordenar los resultados:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e ORDER BY e.nombre DESC&quot;</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<p><abbr title="Java Persistence Query Language">JPQL</abbr> dispone de la cláusula <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> para ordenar los resultados:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Estudiante e ORDER BY e.nombre DESC&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 <section id="agrupacion">
 <h2><span class="section-number">5.6.2.1.4. </span>Agrupación<a class="headerlink" href="#agrupacion" title="Link to this heading">#</a></h2>
 <p>También puede usarse <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> y funciones agregadas:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT e.centro.nombre, COUNT(e) FROM Estudiante e GROUP BY e.centro.nombre&quot;</span>
-<span class="p">).</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e.centro.nombre AS nombre, COUNT(e) AS estudiantes FROM Estudiante e GROUP BY e.centro.nombre&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>
+<span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resultados</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="n">Tuple</span><span class="w"> </span><span class="n">t</span><span class="p">:</span><span class="w"> </span><span class="n">resultados</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Long</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;%s: %d estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">cantidad</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>No es posible agrupar por <code class="docutils literal notranslate"><span class="pre">e.centro</span></code>.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Obsérvese que al estar consultando <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>, los centros sin
+estudiantes no aparecen listados. En cambio, podríamos haber abordado la
+consulta así aprovechando la relación bidireccional:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT c.nombre AS nombre, SIZE(c.estudiantes) AS estudiantes FROM Centro c GROUP BY c.nombre&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>
+<span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resultados</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="n">Tuple</span><span class="w"> </span><span class="n">t</span><span class="p">:</span><span class="w"> </span><span class="n">resultados</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Integer</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;%s: %d estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">cantidad</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Y en este caso, sí aparecerán todos los centros.</p>
+</div>
 </section>
 <section id="joins">
 <h2><span class="section-number">5.6.2.1.5. </span>Joins<a class="headerlink" href="#joins" title="Link to this heading">#</a></h2>
-<p><abbr title="Hybernate Query Language">HQL</abbr> también permite hacer <em>joins</em>, la diferencia fundamental respecto a su
+<p><abbr title="Java Persistence Query Language">JPQL</abbr> también permite hacer <em>joins</em>, la diferencia fundamental respecto a su
 equivalente de <abbr title="Structured Query Language">SQL</abbr> es que no se usan las entidades sino las referencias entre
 ellas:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e JOIN e.centro c WHERE c.nombre = :nombreCentro&quot;</span>
-<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombreCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;FROM Estudiante e JOIN e.centro c WHERE c.nombre = :nombre&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> soporta tres <em>joins</em> distintos:</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La consulta es equivalente a esta otra:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.nombre = :nombre&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>en que hemos intercambiado el orden de las entidades.</p>
+</div>
+<p><abbr title="Java Persistence API">JPA</abbr> soporta tres <em>joins</em> distintos:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code></dt><dd><p>que es el que se ha escrito más arriba simplemente con <code class="docutils literal notranslate"><span class="pre">JOIN</span></code>, aunque se
 puede escribir <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> si se desea. En este caso, los estudiantes sin
@@ -592,42 +637,57 @@ centro asignado no se obtendrán.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code></dt><dd><p>Como en el caso de <abbr title="Structured Query Language">SQL</abbr>, se obtendrán también los estudiantes no
 matriculados en ningún centro (o sea, no relacionados con ningún centro:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombreCentro&quot;</span>
-<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombreCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombre&quot;</span>
+<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">FETCH</span> <span class="pre">JOIN</span></code></dt><dd><p>Es una variante de <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> que obtiene los mismos resultados, pero
-aprovecha la consulta para cargar también los centros. En general, <a class="reference external" href="https://www.hibernate.org">Hibernate</a>
-pratica uan carga perezosa de las referencias. Por ejemplo, si obtenemos un
+aprovecha la consulta para cargar también los centros. En general, <abbr title="Java Persistence API">JPA</abbr>
+pratica una carga perezosa de las referencias. Por ejemplo, si obtenemos un
 estudiante, su centro matriculado no se obtendrá hasta que el usuario no
 use el <em>getter</em> correspondiente. Este <em>join</em> sí aprovecha la consulta en que
 están involucradas las entidades <em>Estudiante</em> y <em>Centro</em> para obtener también
 el centro:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;FROM Estudiante e FETCH JOIN e.centro c WHERE c.nombre = :nombreCentro&quot;</span>
-<span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombreCentro&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">)</span>
-<span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Obtiene estudiantes con su centro cargado.</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;FROM Estudiante e JOIN FETCH e.centro c&quot;</span>
+<span class="p">);</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Obsérvese que no tiene sentido:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT e FROM Centro c JOIN FETCH c.estudiantes e&quot;</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>porque en lo devuelto (estudiantes) no hay ninguna lista de estudiantes
+que precargar. Lo que sí podría tener sentido es:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;FROM Centro c JOIN FETCH c.estudiantes e&quot;</span>
+<span class="p">);</span>
+</pre></div>
+</div>
 </div>
 </dd>
 </dl>
 </section>
 <section id="actualizacion-y-borrado">
 <h2><span class="section-number">5.6.2.1.6. </span>Actualización y borrado<a class="headerlink" href="#actualizacion-y-borrado" title="Link to this heading">#</a></h2>
-<p>Aunque menos habitual, <abbr title="Hybernate Query Language">HQL</abbr> también permite hacer operaciones de
+<p>Aunque menos habitual, <abbr title="Java Persistence Query Language">JPQL</abbr> también permite hacer operaciones de
 actualización y borrado:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Desvincula de cualquier centro a las personas</span>
 <span class="c1">// cuyo nombre empieza por &quot;J&quot;.</span>
-<span class="kt">int</span><span class="w"> </span><span class="n">filasAfectadas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">filasAfectadas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;UPDATE Estudiante SET centro = null WHERE nombre LIKE :patron&quot;</span>
 <span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">)</span>
 <span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 
 <span class="c1">// Borra a todas las personas que se llaman Juan</span>
-<span class="kt">int</span><span class="w"> </span><span class="n">filasEliminadas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">filasEliminadas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;DELETE FROM Estudiante WHERE nombre = :nombre&quot;</span>
 <span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Juan&quot;</span><span class="p">)</span>
 <span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>

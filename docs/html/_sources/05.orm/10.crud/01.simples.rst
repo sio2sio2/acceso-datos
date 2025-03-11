@@ -10,9 +10,9 @@ la sesión activa, lo cual ocurre cuando:
 a. Lo hemos obtenido previamente de la base de datos en esa misma sesión.
 #. Hemos usando con él un método que supone su vinculación:
 
-   * `.persist`, que agrega un nuevo objeto a la base de datos y, por su propia
+   * ``.persist``, que agrega un nuevo objeto a la base de datos y, por su propia
      naturaleza se usa con un objeto creado *ex novo* y, por tanto, no vinculado.
-   * `.merge`, que expresamente vincula un objeto a la base de datos, existiera
+   * ``.merge``, que expresamente vincula un objeto a la base de datos, existiera
      en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto *ex
      novo*).
 
@@ -23,37 +23,30 @@ a. Lo hemos obtenido previamente de la base de datos en esa misma sesión.
    TABLE``, etc). De hecho, no hemos de preocuparnos por el esquema, ya que éste
    es capaz de generarse sólo a partir de las clases anotadas.
 
-
-
 .. _orm-crud-create:
 
 CREATE
 ======
-Para agregar objetos (o sea, registros) a la base de datos, Hibernate_ utiliza
+Para agregar objetos (o sea, registros) a la base de datos, debe utilizarse
 el método ``.persist``:
 
 .. code-block:: java
-   :emphasize-lines: 14
+   :emphasize-lines: 9
 
    // Supongamos que el objeto ya se instanció antes y se creó.
-   HibernateFactory hf = HibernateFactory.getInstance();
-   Transaction tr = null;
+   EntityManagerFactory emf = JpaEMUtils.getEntityManagerFactory();
 
-   try(Session sesion = hf.openSession()) {
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
-         tr = sesion.beginTransaction();
-         // Supongamos que nuestra base de datos no tiene direcciones de centro
-         Centro castillo = new Centro(
-            11004866,
-            "IES Castillo de Luna",
-            Centro.Titularidad.PUBLICA
-         );
-         sesion.persist(castillo); // Vincula y agrega.
-         // Guardamos los cambios y cerramos la sesión.
-         tr.commit();
+         tx.begin();
+         Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+         em.persist(centro);
+         tx.commit();
       }
-      catch(Exception err) {
-         if(tr != null) tr.rollback;
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         throw new RuntimeException("Error al guardar el centro", e);
       }
    }
 
@@ -71,43 +64,41 @@ identificador, para lo cual se usa el método ``.find``:
 .. code-block:: java
    :emphasize-lines: 3
 
-   try(Session sesion = hf.openSession()) {
+   try(EntityManager em = emf.createEntityManager()) {
       // No es necesaria transacción, puesto que no se escribe.
-      Centro castillo = sesion.find(Centro.class, 11004866L);
-      System.out.println(castillo == null?"El centro no existe":castillo);
+       Centro centro = em.find(Centro.class, 11004866L);
+       System.out.println(centro);
    }
-   catch(HibernateException err) {
-      e.printStackTrace();
+   catch(Exception e) {
+       e.printStackTrace();
    }
 
-.. seealso:: La obtención de todos los objetos requiere el :ref:`uso de HLQ
-   <orm-hql-select-all>` o :ref:`Criteria API <orm-criteria-select-all>`.
+.. seealso:: La obtención de todos los objetos requiere el :ref:`uso de JLQ
+   <orm-jpql-select-all>` o :ref:`Criteria API <orm-criteria-select-all>`.
 
 También podemos considerar una operación de lectura la que se hace a través del
 método ``.refresh`` que consiste en volver a tomar un objeto de la base de
 datos, desechando todos los cambios que haya podido sufrir en memoria:
 
 .. code-block:: java
-   :emphasize-lines: 8
+   :emphasize-lines: 9
 
-   try(Session sesion = hf.openSession()) {
-      Transaction tr = null;
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
+         tx.begin();
          Centro castillo = sesion.find(Centro.class, 11004866L);
          // Hacemos cambios en el objeto
          castillo.setNombre("Pongo otro");
          castillo.setTitularidad(Centro.Titularidad.PRIVADA);
-         sesion.refresh(castillo); // Se vuelve a la versión de la BD
-         tr.commit(); // En realidad no cambia nada.
+         em.refresh(castillo); // Se vuelve a la versión de la BD
+         tx.commit(); // En realidad no cambia nada.
       }      
       catch(Exception e) {
-         if(tr != null) tr.rollback();
+         if(tx != null && tx.isActive()) tx.rollback();
+         e.printStackTrace();
       }
    }
-   catch(HibernateException err) {
-      e.printStackTrace();
-   }
-
 
 .. _orm-crud-update:
 
@@ -118,16 +109,16 @@ Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
 .. code-block:: java
    :emphasize-lines: 6
 
-   try(Session sesion = hf.openSession()) {
-      Transaction tr = null 
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
-         tr = sesion.beginTransaction();
+         tx.begin();
          Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
          castillo.setNombre("I.E.S. Castillo de Luna");
-         tr.commit(); // Guardamos cambios.
-      }
-      catch(RuntimeException err) {
-         if(tr != null) tr.rollback();
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
          e.printStackTrace();
       }
    }
@@ -136,24 +127,23 @@ En cambio, si el objeto no está vinculado, aún podremos hacer las
 actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
 
 .. code-block:: java
-   :emphasize-lines: 11, 12
+   :emphasize-lines: 10, 11
 
    Centro castillo = null;
-   try(Session sesion = hf.openSession()) {
-      Centro castillo = sesion.find(Centro.class, 11004866L);
+   try(EntityManager em = emf.createEntityManager()) {
+       centro = em.find(Centro.class, 11004866L);
    }
 
-   try(Session sesion = hf.openSession()) {
-      Transaction tr = null 
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
-         tr = sesion.beginTransaction();
-         // castillo no está ligado a esta sesión.
+         tx.begin();
          castillo.setNombre("I.E.S. Castillo de Luna");
-         sesion.merge(castillo);  // Vincula el objeto a la sesión.
-         tr.commit(); // Guardamos cambios.
-      }
-      catch(RuntimeException err) {
-         if(tr != null) tr.rollback();
+         em.merge(castillo);  // Vincula el objeto a la sesión.
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
          e.printStackTrace();
       }
    }
@@ -178,16 +168,16 @@ Para borrar un objeto **vinculado** a la sesión debe usarse el método
 .. code-block:: java
    :emphasize-lines: 6
 
-   try(Session sesion = hf.openSession()) {
-      Transaction tr = null 
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
-         tr = sesion.beginTransaction();
-         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado
-         castillo.remove(castillo);
-         tr.commit(); // Guardamos cambios.
-      }
-      catch(RuntimeException err) {
-         if(tr != null) tr.rollback();
+         tx.begin();
+         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
+         em.remove(castillo);
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
          e.printStackTrace();
       }
    }

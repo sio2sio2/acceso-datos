@@ -7,11 +7,13 @@ del modelo de objetos (de *Java*, en este caso) y las entidades del modelo
 relacional. En esta traducción las clases se corresponden con las tablas, las
 instancias con los registros y los atributos con los campos.
 
-En Hibernate_, la definición del *mapeo* puede realizarse con anotaciones
-siguiendo el estándar |JPA|. Bajo este epígrafe aprenderemos fundamentalmente:
+Las anotaciones se encuentran definidas en la especificación |JPA| e Hibernate_
+(o cualquier otro |ORM| compatible) se encarga de darles soporte.
+Fundamentalmente sirven para:
 
-- Cómo marcar los atributos para que se incorporen a los campos de la tabla.
-- Cómo marcar que los atributos representan relaciones entre tablas.
+- Indicar qué atributos incorporan a los campos de la tabla y con qué nombre.
+- Establecer restricciones sobre los valores.
+- Definir relaciones entre tablas.
 
 Anotaciones básicas
 ===================
@@ -22,7 +24,7 @@ anotación de la clase Centro <orm-bas-map>`:
    :language: java
    :start-at: @Entity
 
-Y convendría leer lo explicado allí para no repetirlo. Ahora bien: podemos
+Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
 ampliar nuestro conocimientos sobre las anotaciones válidas:
 
 ``@Column``/``@Transient``
@@ -271,7 +273,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    registros de la segunda, pero al contrario los registros de la segunda sólo
    se relacionan con uno de la primera.
 
-   En Hibernate_ hay dos modos de resolver esta relación (y las otras dos que se
+   |JPA| establece dos modos de resolver esta relación (y las otras dos que se
    explicarán a continuación): de modo **unidireccional** y de modo
    **bidireccional**.
 
@@ -303,7 +305,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 
       En definitiva, la traducción de la relación es casi literal con la única
       salvedad de que el atributo no almacena la clave foránea (un identificador),
-      sino el registro completo (objeto en realidad).
+      sino el registro completo (objeto, en realidad).
 
    **Bidireccional**
       En este modo, la relación se refleja en ambos extremos, por lo que debe
@@ -435,4 +437,5 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 
 .. |JPA| replace:: :abbr:`JPA (Java Persisten API)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. _Hibernate: https://www.hibernate.org

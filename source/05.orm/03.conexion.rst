@@ -2,30 +2,26 @@
 
 Conexión
 ========
-Tras haber configurado Hibernate_, lo primero es construir una fábrica de
-sesiones a partir de la cual creemos las sesiones que nos permiten conectarnos a
-la base de datos. Así pues, esta fábrica es el punto de acceso para interacturar
-con el |ORM| y lo habitual (aplicación que accede a una única base de datos) es
-que la fábrica sea única y que, sin embargo, debemos utilizarla a lo largo de
-todos los archivos que componen la aplicación.
+En el apartado dedicado a :ref:`operaciones básicas <orm-bas>` ya adelantamos
+que la creación del objeto :jakarta-persistence:`EntityManagerFactory` es muy
+costosa, puesto que implica el establecimiento y validación de la conexión. Por
+consiguiente, conviene asegurarnos de que su creación sólo se realiza una vez
+para lo cual nos valdremos del `patrón Singleton`_ modificado para crear una
+:download:`clase con utilidades <files/JpaEMUtils.java>`:
 
-En consecuencia, es conveniente crear una clase que facilite su uso y asegure
-que no creamos más de una\ [#]_:
-
-.. literalinclude:: files/HibernateFactory.java
+.. literalinclude:: files/JpaEMUtils.java
    :language: java
    :start-at: public class
 
 La clase:
 
-* Implementa el `patrón Singleton`_, de modo que, mientras no se cierre, siempre
-  se devuelve el mismo objeto, lo que equivale a que siempre se maneja la misma
-  fábrica de sesiones.
-* Sólo es necesario pasar la configuración, cuando se crea de forma efectiva
-  el objeto.
-* Dado que lo más habitual con la fábrica es crear sesiones, se implementa un
-  método que lo hace, sin necesidad de obtener la fábrica.
-* Si se cierra el objeto, entonces sí se podrá crear otro.
+* Implementa un `patrón Singleton`_, de modo que para la misma configuración
+  de conexión, siempre se devuelve la misma fábrica.
+* En caso de que sólo se haya creado una fábrica, es posible recuperarla sin
+  necesidad de facilitar la configuración.
+
+.. note:: Los métodos dedicados a las transacciones :ref:`los trararemos más
+   adelante <orm-transaction>`.
 
 De este modo:
 
@@ -33,39 +29,36 @@ De este modo:
    :name: orm-uso-sf
 
    public static main(String[] args) throws Exception {
-     // Crea la fábrica de sesiones
-      try(HibernateFactory hf = HibernateFactory.getInstance("hibernate.cfg.xml")) {
+      // Propiedades configuradas en tiempo de ejecución.
+      Map<String, String> props = new HashMap<>();
+      props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
+      props.put("hibernate.show_sql", "true");
+
+      try(EntityManagerFactory emf = JpaEmFactory.getInstance("MiUnidadP", props)) {
          operaciones();
       }
    }
 
    private static operaciones() {
       // ¡Ojo! No hay que cerrarlo.
-      Hibernate hf = HibernateFactory.getInstance(); // Devuelve el mismo objeto.
-      Transaction tr = null;
+      emf = JpaEmFactory.getInstance(); // Devuelve el mismo objeto.
 
-      try(Session sesion = hf.openSession()) {
+      try(em EntityFactory = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
          try {
-            tr = sesion.beginTransaction();
-
-            // Hago operaciones CRUD.
-
+            tr.begin();
+            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+            em.persist(centro);
             tr.commit();
          }
          catch(Exception e) {
-            if(tr != null) tr.rollback();
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al almacenar el centro", err);
          }
       }
    }
 
-.. rubric:: Notas al pie
-
-.. [#] ``HibernateFactory`` no puede extender :hibernate-api:`SessionFactory` y
-   ocultar su constructor para controlar la creación de objetos y forzar a que
-   siempre se cree el mismo objeto, porque ésta última es una clase abstracta.
-
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 
-.. _Hibernate: https://www.hibernate.org
 .. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
 

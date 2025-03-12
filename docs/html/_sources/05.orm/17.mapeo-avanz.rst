@@ -32,7 +32,7 @@ UPDATE``)\ [#]_. Esto efectos son:
 ``RESTRICT``
    impedir la operación.
    
-Hibernate_, tanto si la relación es unidireccional como bidireccional, permite
+|JPA|, tanto si la relación es unidireccional como bidireccional, permite
 añadir la anotación ``@OnDelete`` en el lado propietario (el que tiene la clave
 foránea) para notar el comportamiento ``ON DELETE``, aunque sólo se soporta el
 efecto ``CASCADE``:
@@ -57,7 +57,7 @@ se encargará de propagar la operación en cascada.
    aplican de hijo a padre, pero no suelen ser buena idea por provocar
    inconsistencias y, por lo general, es mejor evitarlas.
 
-Hibernate_ permite desencadenar efectos adicionales en el nivel de aplicación
+|JPA| permite desencadenar efectos adicionales en el nivel de aplicación
 sobre las entidades *hijo* cuando se realiza una operación en la entidad
 *padre*. Para aclararnos recordemos que para la relación bidireccional entre
 ``Centro`` (entidad padre) y ``Estudiante`` (entidad hijo) hemos definido lo
@@ -126,7 +126,7 @@ relaciones bidireccionales:
 Mapeo de colecciones
 ====================
 La anotación ``@ElementCollection`` permite mapear colecciones de tipos básicos
-(como ``String, ``Integer`` o ``LocalDate``) sin que haya necesidad de  crear
+(como ``String``, ``Integer`` o ``LocalDate``) sin que haya necesidad de  crear
 una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
 teléfono a cada centro:
 
@@ -153,4 +153,4 @@ Si no se permiten elementos repetidos, puedo optarse por un
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
-.. _Hibernate: https://www.hibernate.org
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`

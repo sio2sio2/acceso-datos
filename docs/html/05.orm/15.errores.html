@@ -209,7 +209,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -394,40 +394,42 @@ document.write(`
                   
   <section id="excepciones">
 <span id="orm-exp"></span><h1><span class="section-number">5.7. </span>Excepciones<a class="headerlink" href="#excepciones" title="Link to this heading">#</a></h1>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> define su propio conjunto de excepciones derivadas todas de
-<a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/HibernateException.html">HibernateException</a>, que a su vez deriva
+<p><abbr title="Java Persistence API">JPA</abbr> define su propio conjunto de excepciones derivadas todas de
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/PersistenceException">PersistenceException</a>, que a su vez deriva
 de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>. Hay que tener en cuenta
 dos particularidades:</p>
 <ul class="simple">
 <li><p>Que todas deriven en última instancia de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>, supone que las excepciones de este <abbr title="Object-Relational Mapping">ORM</abbr>, a diferencia de
 las de <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">JBDC</span></a>, no son comprobadas; y, por tanto, no es necesario
 capturarlas o declararlas a través de <code class="docutils literal notranslate"><span class="pre">throws</span></code>.</p></li>
-<li><p>Cuando <a class="reference external" href="https://www.hibernate.org">Hibernate</a> genera una excepción, la sesión suele quedar en estado
+<li><p>Cuando se genera una excepción, la sesión suele quedar en estado
 inconsistente, por lo que conviene cerrarla y comenzar una nueva.</p></li>
 </ul>
 <p class="rubric">Excepciones comunes</p>
 <p>Una lista no exhaustiva de excepciones es esta:</p>
 <dl class="simple">
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/NonUniqueResultException.html">NonUniqueResultException</a></dt><dd><p>Se produce cuando una consulta debería producir un sólo resultado, pero
-devuelve más de uno.</p>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NoResultException">NoResultException</a>, <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NonUniqueResultException">NonUniqueResultException</a></dt><dd><p>Se producen cuando se espera un único resultado (véase
+<a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-singleresult"><span class="std std-ref">.getSingleResult()</span></a>) y no se obtiene eso.</p>
 </dd>
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/LazyInitializationException.html">LazyInitializationException</a></dt><dd><p>Se produce cuando se intenta resolver una relación perezosa sin que el objeto
-esté asociado a la sesión activa.</p>
-</dd>
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/StaleObjectStateException.html">StaleObjectStateException</a></dt><dd><p>Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/OptimisticLockException">OptimisticLockException</a></dt><dd><p>Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
 que una entidad se modificó por otra transacción después de haber sido
 recuperada por la actual.</p>
 </dd>
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/exception/ConstraintViolationException.html">ConstraintViolationException</a></dt><dd><p>Esta asociada a violaciones de las restricciones de la base de datos como
-<code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>.</p>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/RollbackException">RollbackException</a></dt><dd><p>Se produce cuando una transacción no puede confirmarse, por lo general por
+violarse restricciones en los valores de los campos.</p>
 </dd>
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/exception/DataException.html">DataException</a></dt><dd><p>Producida por no adecuarse los datos a los requisitos de la base de datos.</p>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/TransactionRequiredException">TransactionRequiredException</a></dt><dd><p>Se lanza cuando se intenta hacer una operación de escritura sin haber
+iniciado una transacción.</p>
 </dd>
-<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/TransactionException.html">TransactionException</a></dt><dd><p>Son excepciones relaciondas con las transacciones como intentar confirmar
-una sin haberla abierta.</p>
-</dd>
+</dl>
+<p>Dependiendo de qué proveedor se use, además de las genéricas, pueden lanzarse
+otras, como estas específicas de <a class="reference external" href="https://hibernate.org/">Hibernate</a>:</p>
+<dl class="simple">
 <dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/exception/JDBCConnectionException.html">JDBCConnectionException</a></dt><dd><p>Producida por problemas en la conexión a la base de datos como que ésta no
 exista o no haya conectividad o las credenciales sean inválidas.</p>
+</dd>
+<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/LazyInitializationException.html">LazyInitializationException</a></dt><dd><p>Se produce cuando se intenta resolver una relación perezosa sin que el objeto
+esté asociado a la sesión activa.</p>
 </dd>
 </dl>
 </section>

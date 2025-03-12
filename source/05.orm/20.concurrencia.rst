@@ -2,7 +2,7 @@
 
 Gestión de la concurrencia
 **************************
-Hibernate_ permite también controlar el acceso concurrente a la base de datos.
+|JPA| permite también controlar el acceso concurrente a la base de datos.
 Nótese que, cuando hay dos o más accesos a la base de datos, uno de ellos puede
 obtener datos y el otro, alterarlos después de aquel acceso. La consecuencia esa
 que los datos obtenidos en esa primera sesión no serán exactamente iguales a los
@@ -15,7 +15,7 @@ Bloqueo optimista
 =================
 Este bloqueo se basa en el uso de un atributo anotado con ``@Version`` que
 signifique la versión del objeto, de modo que cada vez que se cambian sus
-valores, Hibernate_ se encarga de aumentar su versión. No tenemos que
+valores, el |ORM| se encarga de aumentar su versión. No tenemos que
 preocuparnos por dotarlo de valor, por lo que podemos establecer su *getter*
 como ``protected``. Por ejemplo, si quisiéramos que ``Centro`` tuviera un
 atributo de este tipo podríamos añadir a :ref:`su definición <orm-bas-map>` lo
@@ -35,10 +35,10 @@ siguiente:
    }
 
 Ante un atributo de este tipo, cada vez que hagamos una operación de
-actualización o borrado, Hibernate_ comprobará que el valor almacenado en la
+actualización o borrado, el |ORM| comprobará que el valor almacenado en la
 base de datos para este campo coincide con el del objeto que pretendemos borrar
 o actualizar, y, en caso contrario, lanza una excepción
-:hibernate-api:`OptimisticEntityLockException <dialect/lock/OptimisticEntityLockException>`.
+:jakarta-persistence:`OptimisticLockException`.
 
 Esta solución es ideal para situaciones en que las colisiones por concurrencia
 no son frecuentes.
@@ -66,41 +66,37 @@ bloquearlo:
 .. code-block:: java
    :emphasize-lines: 5
 
-   try(Session sesion = hf.openSession()) {
-      Transaction tr = null;
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
       try {
-         tr = sesion.beginTransaction();
+         tx.begin();
          Centro castillo = sesion.find(Centro.class, 11004866L, LockModeType.PESSIMISTIC_WRITE);
          // Acabamos de bloquear ese registro, así
          // que ninguna otra sesión concurrente podrá
          // leer o escribir este registro durante la transacción.
 
          // ...
-
-         tr.commit();
+         tx.commit();
       }
-      catch(HibernateException err) {
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
          e.printStackTrace();
-         if(tr != null) tr.rollback();
       }
 
       // Registro desbloqueado.
-   }
-   catch(HibernateException err) {
-      e.printStackTrace();
    }
 
 El bloqueo sobre el registro dura hasta que se cierra la transacción en la que
 se llevó a cabo.
 
-Los bloqueos se pueden definir también sobre consultas y, en ese caso, se
-aplicarán a todos los registros devueltos por la consulta:
+Los bloqueos se pueden definir también sobre consultas y, en
+ese caso, se aplicarán a todos los registros devueltos por la consulta:
 
 .. code-block:: java 
    :emphasize-lines: 2
 
-   // También podríamos usar Criteria API
-   Query query = session.createQuery("FROM Estudiante");
+   // También podríamos haber usado Criteria API
+   TypedQuery<Estudiante> query = session.createQuery("FROM Estudiante", Estudiante.class);
    query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
    List<Estudiante> estudiantes = query.setResultList(); // Todos están bloquedos
@@ -111,6 +107,6 @@ aplicarán a todos los registros devueltos por la consulta:
 .. caution:: En *SQLite* los bloques se hacen para toda la base de datos, no se
    pueden bloquer registros individuales.
 
-.. _Hibernate: https://www.hibernate.org
-
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`

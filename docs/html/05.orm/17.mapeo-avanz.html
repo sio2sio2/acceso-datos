@@ -209,7 +209,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -429,7 +429,7 @@ valor de la clave foránea.</p>
 <dt><code class="docutils literal notranslate"><span class="pre">RESTRICT</span></code></dt><dd><p>impedir la operación.</p>
 </dd>
 </dl>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a>, tanto si la relación es unidireccional como bidireccional, permite
+<p><abbr title="Java Persistence API">JPA</abbr>, tanto si la relación es unidireccional como bidireccional, permite
 añadir la anotación <code class="docutils literal notranslate"><span class="pre">&#64;OnDelete</span></code> en el lado propietario (el que tiene la clave
 foránea) para notar el comportamiento <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span></code>, aunque sólo se soporta el
 efecto <code class="docutils literal notranslate"><span class="pre">CASCADE</span></code>:</p>
@@ -454,7 +454,7 @@ unidireccionales, las operaciones en cascada pueden definirse también y se
 aplican de hijo a padre, pero no suelen ser buena idea por provocar
 inconsistencias y, por lo general, es mejor evitarlas.</p>
 </div>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> permite desencadenar efectos adicionales en el nivel de aplicación
+<p><abbr title="Java Persistence API">JPA</abbr> permite desencadenar efectos adicionales en el nivel de aplicación
 sobre las entidades <em>hijo</em> cuando se realiza una operación en la entidad
 <em>padre</em>. Para aclararnos recordemos que para la relación bidireccional entre
 <code class="docutils literal notranslate"><span class="pre">Centro</span></code> (entidad padre) y <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> (entidad hijo) hemos definido lo
@@ -514,7 +514,7 @@ relaciones bidireccionales:</p>
 <section id="mapeo-de-colecciones">
 <h2><span class="section-number">5.8.2. </span>Mapeo de colecciones<a class="headerlink" href="#mapeo-de-colecciones" title="Link to this heading">#</a></h2>
 <p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;ElementCollection</span></code> permite mapear colecciones de tipos básicos
-(como <code class="docutils literal notranslate"><span class="pre">String,</span> <span class="pre">``Integer</span></code> o <code class="docutils literal notranslate"><span class="pre">LocalDate</span></code>) sin que haya necesidad de  crear
+(como <code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Integer</span></code> o <code class="docutils literal notranslate"><span class="pre">LocalDate</span></code>) sin que haya necesidad de  crear
 una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
 teléfono a cada centro:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ElementCollection</span>

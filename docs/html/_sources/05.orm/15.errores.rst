@@ -2,8 +2,8 @@
 
 Excepciones
 ***********
-Hibernate_ define su propio conjunto de excepciones derivadas todas de
-:hibernate-api:`HibernateException <HibernateException>`, que a su vez deriva
+|JPA| define su propio conjunto de excepciones derivadas todas de
+:jakarta-persistence:`PersistenceException`, que a su vez deriva
 de :java-lang:`RuntimeException <RuntimeException>`. Hay que tener en cuenta
 dos particularidades:
 
@@ -12,41 +12,41 @@ dos particularidades:
   las de :ref:`JBDC <conn>`, no son comprobadas; y, por tanto, no es necesario
   capturarlas o declararlas a través de ``throws``.
 
-+ Cuando Hibernate_ genera una excepción, la sesión suele quedar en estado
++ Cuando se genera una excepción, la sesión suele quedar en estado
   inconsistente, por lo que conviene cerrarla y comenzar una nueva.
 
 .. rubric:: Excepciones comunes
 
 Una lista no exhaustiva de excepciones es esta:
 
-:hibernate-api:`NonUniqueResultException <NonUniqueResultException>`
-   Se produce cuando una consulta debería producir un sólo resultado, pero
-   devuelve más de uno.
+:jakarta-persistence:`NoResultException`, :jakarta-persistence:`NonUniqueResultException`
+   Se producen cuando se espera un único resultado (véase
+   :ref:`.getSingleResult() <orm-singleresult>`) y no se obtiene eso.
 
-:hibernate-api:`LazyInitializationException <LazyInitializationException>`
-   Se produce cuando se intenta resolver una relación perezosa sin que el objeto
-   esté asociado a la sesión activa.
-
-:hibernate-api:`StaleObjectStateException <StaleObjectStateException>`
+:jakarta-persistence:`OptimisticLockException`
    Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
    que una entidad se modificó por otra transacción después de haber sido
    recuperada por la actual.
 
-:hibernate-api:`ConstraintViolationException <exception/ConstraintViolationException>`
-   Esta asociada a violaciones de las restricciones de la base de datos como
-   ``NOT NULL``.
+:jakarta-persistence:`RollbackException`
+   Se produce cuando una transacción no puede confirmarse, por lo general por
+   violarse restricciones en los valores de los campos.
 
-:hibernate-api:`DataException <exception/DataException>`
-   Producida por no adecuarse los datos a los requisitos de la base de datos.
+:jakarta-persistence:`TransactionRequiredException`
+   Se lanza cuando se intenta hacer una operación de escritura sin haber
+   iniciado una transacción.
 
-:hibernate-api:`TransactionException <TransactionException>`
-   Son excepciones relaciondas con las transacciones como intentar confirmar
-   una sin haberla abierta.
+Dependiendo de qué proveedor se use, además de las genéricas, pueden lanzarse
+otras, como estas específicas de Hibernate_:
 
 :hibernate-api:`JDBCConnectionException <exception/JDBCConnectionException>`
    Producida por problemas en la conexión a la base de datos como que ésta no
    exista o no haya conectividad o las credenciales sean inválidas.
 
-.. _Hibernate: https://www.hibernate.org
+:hibernate-api:`LazyInitializationException <LazyInitializationException>`
+   Se produce cuando se intenta resolver una relación perezosa sin que el objeto
+   esté asociado a la sesión activa.
 
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+.. _Hibernate: https://hibernate.org/

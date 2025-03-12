@@ -209,7 +209,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -405,7 +405,7 @@ document.write(`
                   
   <section id="gestion-de-la-concurrencia">
 <span id="orm-concurrencia"></span><h1><span class="section-number">5.9. </span>Gestión de la concurrencia<a class="headerlink" href="#gestion-de-la-concurrencia" title="Link to this heading">#</a></h1>
-<p><a class="reference external" href="https://www.hibernate.org">Hibernate</a> permite también controlar el acceso concurrente a la base de datos.
+<p><abbr title="Java Persistence API">JPA</abbr> permite también controlar el acceso concurrente a la base de datos.
 Nótese que, cuando hay dos o más accesos a la base de datos, uno de ellos puede
 obtener datos y el otro, alterarlos después de aquel acceso. La consecuencia esa
 que los datos obtenidos en esa primera sesión no serán exactamente iguales a los
@@ -415,7 +415,7 @@ inconsistencia. Para paliar estos problemas, hay dos estrategias de <strong>bloq
 <span id="orm-bloq-opt"></span><h2><span class="section-number">5.9.1. </span>Bloqueo optimista<a class="headerlink" href="#bloqueo-optimista" title="Link to this heading">#</a></h2>
 <p>Este bloqueo se basa en el uso de un atributo anotado con <code class="docutils literal notranslate"><span class="pre">&#64;Version</span></code> que
 signifique la versión del objeto, de modo que cada vez que se cambian sus
-valores, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> se encarga de aumentar su versión. No tenemos que
+valores, el <abbr title="Object-Relational Mapping">ORM</abbr> se encarga de aumentar su versión. No tenemos que
 preocuparnos por dotarlo de valor, por lo que podemos establecer su <em>getter</em>
 como <code class="docutils literal notranslate"><span class="pre">protected</span></code>. Por ejemplo, si quisiéramos que <code class="docutils literal notranslate"><span class="pre">Centro</span></code> tuviera un
 atributo de este tipo podríamos añadir a <a class="reference internal" href="02.basico.html#orm-bas-map"><span class="std std-ref">su definición</span></a> lo
@@ -433,10 +433,10 @@ siguiente:</p>
 </pre></div>
 </div>
 <p>Ante un atributo de este tipo, cada vez que hagamos una operación de
-actualización o borrado, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> comprobará que el valor almacenado en la
+actualización o borrado, el <abbr title="Object-Relational Mapping">ORM</abbr> comprobará que el valor almacenado en la
 base de datos para este campo coincide con el del objeto que pretendemos borrar
 o actualizar, y, en caso contrario, lanza una excepción
-<a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/dialect/lock/OptimisticEntityLockException.html">OptimisticEntityLockException</a>.</p>
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/OptimisticLockException">OptimisticLockException</a>.</p>
 <p>Esta solución es ideal para situaciones en que las colisiones por concurrencia
 no son frecuentes.</p>
 </section>
@@ -455,37 +455,33 @@ entidad sea versionada.</p>
 </dl>
 <p>Para practicarlo sólo hay que obtener el objeto, indicando que queremos
 bloquearlo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Session</span><span class="w"> </span><span class="n">sesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hf</span><span class="p">.</span><span class="na">openSession</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Transaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">beginTransaction</span><span class="p">();</span>
+<span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
 <span class="hll"><span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">,</span><span class="w"> </span><span class="n">LockModeType</span><span class="p">.</span><span class="na">PESSIMISTIC_WRITE</span><span class="p">);</span>
 </span><span class="w">      </span><span class="c1">// Acabamos de bloquear ese registro, así</span>
 <span class="w">      </span><span class="c1">// que ninguna otra sesión concurrente podrá</span>
 <span class="w">      </span><span class="c1">// leer o escribir este registro durante la transacción.</span>
 
 <span class="w">      </span><span class="c1">// ...</span>
-
-<span class="w">      </span><span class="n">tr</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
 <span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">HibernateException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">tx</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
 <span class="w">      </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
-<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">tr</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
 <span class="w">   </span><span class="p">}</span>
 
 <span class="w">   </span><span class="c1">// Registro desbloqueado.</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">HibernateException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>El bloqueo sobre el registro dura hasta que se cierra la transacción en la que
 se llevó a cabo.</p>
-<p>Los bloqueos se pueden definir también sobre consultas y, en ese caso, se
-aplicarán a todos los registros devueltos por la consulta:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// También podríamos usar Criteria API</span>
-<span class="hll"><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Estudiante&quot;</span><span class="p">);</span>
+<p>Los bloqueos se pueden definir también sobre consultas y, en
+ese caso, se aplicarán a todos los registros devueltos por la consulta:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// También podríamos haber usado Criteria API</span>
+<span class="hll"><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </span><span class="n">query</span><span class="p">.</span><span class="na">setLockMode</span><span class="p">(</span><span class="n">LockModeType</span><span class="p">.</span><span class="na">PESSIMISTIC_WRITE</span><span class="p">);</span>
 
 <span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">setResultList</span><span class="p">();</span><span class="w"> </span><span class="c1">// Todos están bloquedos</span>

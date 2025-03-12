@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.9. Gestión de la concurrencia &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.7. Otros aspectos &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/20.concurrencia';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/15.extra';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.10. Optimización" href="25.performance.html" />
-    <link rel="prev" title="5.8. Mapeo avanzado" href="17.mapeo-avanz.html" />
+    <link rel="next" title="Apéndices" href="../98.apendices/index.html" />
+    <link rel="prev" title="5.6.2.3. SQL nativo" href="10.crud/02.avanzadas/03.nativo.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -216,10 +216,7 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="15.errores.html">5.7. Excepciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="17.mapeo-avanz.html">5.8. Mapeo avanzado</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.9. Gestión de la concurrencia</a></li>
-<li class="toctree-l2"><a class="reference internal" href="25.performance.html">5.10. Optimización</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.7. Otros aspectos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -296,7 +293,7 @@
       
       
       
-      <li><a href="../_sources/05.orm/20.concurrencia.rst" target="_blank"
+      <li><a href="../_sources/05.orm/15.extra.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -380,7 +377,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Gestión de la concurrencia</h1>
+    <h1>Otros aspectos</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -390,8 +387,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.9.1. Bloqueo optimista</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.9.2. Bloqueo pesimista</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.1. Excepciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.2. Mapeo avanzado</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.2.1. Cascada de operaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.2.2. Mapeo de colecciones</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.3. Concurrencia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.3.1. Bloqueo optimista</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.3.2. Bloqueo pesimista</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.4. Optimización</a></li>
 </ul>
             </nav>
         </div>
@@ -403,8 +410,191 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="gestion-de-la-concurrencia">
-<span id="orm-concurrencia"></span><h1><span class="section-number">5.9. </span>Gestión de la concurrencia<a class="headerlink" href="#gestion-de-la-concurrencia" title="Link to this heading">#</a></h1>
+  <section id="otros-aspectos">
+<span id="orm-extra"></span><h1><span class="section-number">5.7. </span>Otros aspectos<a class="headerlink" href="#otros-aspectos" title="Link to this heading">#</a></h1>
+<section id="excepciones">
+<span id="orm-exp"></span><h2><span class="section-number">5.7.1. </span>Excepciones<a class="headerlink" href="#excepciones" title="Link to this heading">#</a></h2>
+<p><abbr title="Java Persistence API">JPA</abbr> define su propio conjunto de excepciones derivadas todas de
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/PersistenceException">PersistenceException</a>, que a su vez deriva
+de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>. Hay que tener en cuenta
+dos particularidades:</p>
+<ul class="simple">
+<li><p>Que todas deriven en última instancia de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>, supone que las excepciones de este <abbr title="Object-Relational Mapping">ORM</abbr>, a diferencia de
+las de <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">JBDC</span></a>, no son comprobadas; y, por tanto, no es necesario
+capturarlas o declararlas a través de <code class="docutils literal notranslate"><span class="pre">throws</span></code>.</p></li>
+<li><p>Cuando se genera una excepción, la sesión suele quedar en estado
+inconsistente, por lo que conviene cerrarla y comenzar una nueva.</p></li>
+</ul>
+<p class="rubric">Excepciones comunes</p>
+<p>Una lista no exhaustiva de excepciones es esta:</p>
+<dl class="simple">
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NoResultException">NoResultException</a>, <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NonUniqueResultException">NonUniqueResultException</a></dt><dd><p>Se producen cuando se espera un único resultado (véase
+<a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-singleresult"><span class="std std-ref">.getSingleResult()</span></a>) y no se obtiene eso.</p>
+</dd>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/OptimisticLockException">OptimisticLockException</a></dt><dd><p>Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
+que una entidad se modificó por otra transacción después de haber sido
+recuperada por la actual.</p>
+</dd>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/RollbackException">RollbackException</a></dt><dd><p>Se produce cuando una transacción no puede confirmarse, por lo general por
+violarse restricciones en los valores de los campos.</p>
+</dd>
+<dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/TransactionRequiredException">TransactionRequiredException</a></dt><dd><p>Se lanza cuando se intenta hacer una operación de escritura sin haber
+iniciado una transacción.</p>
+</dd>
+</dl>
+<p>Dependiendo de qué proveedor se use, además de las genéricas, pueden lanzarse
+otras, como estas específicas de <a class="reference external" href="https://hibernate.org/">Hibernate</a>:</p>
+<dl class="simple">
+<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/exception/JDBCConnectionException.html">JDBCConnectionException</a></dt><dd><p>Producida por problemas en la conexión a la base de datos como que ésta no
+exista o no haya conectividad o las credenciales sean inválidas.</p>
+</dd>
+<dt><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/LazyInitializationException.html">LazyInitializationException</a></dt><dd><p>Se produce cuando se intenta resolver una relación perezosa sin que el objeto
+esté asociado a la sesión activa.</p>
+</dd>
+</dl>
+</section>
+<section id="mapeo-avanzado">
+<span id="orm-adv-mapping"></span><h2><span class="section-number">5.7.2. </span>Mapeo avanzado<a class="headerlink" href="#mapeo-avanzado" title="Link to this heading">#</a></h2>
+<p>Incluimos bajo este epígrafe otros aspectos más específicos que se reflejan al
+anotar las clases.</p>
+<section id="cascada-de-operaciones">
+<h3><span class="section-number">5.7.2.1. </span>Cascada de operaciones<a class="headerlink" href="#cascada-de-operaciones" title="Link to this heading">#</a></h3>
+<p>Cuando dos entidades se relaciones entre sí, los cambios en uno de los extremos
+pueden afectar al otro.</p>
+<p class="rubric"><abbr title="Structured Query Language">SQL</abbr></p>
+<p>En <abbr title="Structured Query Language">SQL</abbr>, al definir la relación con una clave foránea puede especificarse qué
+ocurre con la entidad hijo<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> cuando la entidad padre se elimina (<code class="docutils literal notranslate"><span class="pre">ON</span>
+<span class="pre">DELETE</span></code>) o cuando el identificador de la entidad padre se actualiza (<code class="docutils literal notranslate"><span class="pre">ON</span>
+<span class="pre">UPDATE</span></code>)<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Esto efectos son:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CASCADE</span></code></dt><dd><p>aplicar también la operación a la entidad hijo, lo que se traduce en borrar
+la entidad hijo si la entidad padre se borró; o actualizar el valor de la
+clave foránea, si se actualizó el identificador del padre.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">NULL</span></code></dt><dd><p>poner a nulo la clave foránea.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">DEFAULT</span></code></dt><dd><p>poner un valor predeterminado (el que se especifique a continuación) como
+valor de la clave foránea.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">RESTRICT</span></code></dt><dd><p>impedir la operación.</p>
+</dd>
+</dl>
+<p><abbr title="Java Persistence API">JPA</abbr>, tanto si la relación es unidireccional como bidireccional, permite
+añadir la anotación <code class="docutils literal notranslate"><span class="pre">&#64;OnDelete</span></code> en el lado propietario (el que tiene la clave
+foránea) para notar el comportamiento <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span></code>, aunque sólo se soporta el
+efecto <code class="docutils literal notranslate"><span class="pre">CASCADE</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToOne</span>
+<span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">)</span>
+<span class="nd">@OnDelete</span><span class="p">(</span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OnDeleteAction</span><span class="p">.</span><span class="na">CASCADE</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>De este modo, se añadirá en el esquema <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span> <span class="pre">CASCADE</span></code> y la base de datos
+se encargará de propagar la operación en cascada.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>En SQLite la integridad referencial está deshabilitada por defecto.</p>
+</div>
+<p class="rubric">Hibernate</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Por lo general, las operaciones en cascada se definen de padre a
+hijo cuando las relaciones son bidireccionales. Cuando las relaciones son
+unidireccionales, las operaciones en cascada pueden definirse también y se
+aplican de hijo a padre, pero no suelen ser buena idea por provocar
+inconsistencias y, por lo general, es mejor evitarlas.</p>
+</div>
+<p><abbr title="Java Persistence API">JPA</abbr> permite desencadenar efectos adicionales en el nivel de aplicación
+sobre las entidades <em>hijo</em> cuando se realiza una operación en la entidad
+<em>padre</em>. Para aclararnos recordemos que para la relación bidireccional entre
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code> (entidad padre) y <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> (entidad hijo) hemos definido lo
+siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Estudiante</span>
+
+<span class="nd">@ManyToOne</span>
+<span class="nd">@JoinColumn</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span>
+</pre></div>
+</div>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Centro</span>
+
+<span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;centro&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Pueden definirse los siguientes <em>tipos de cascada</em>:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.PERSIST</span></code></dt><dd><p>Provoca que guardar la entidad <em>padre</em> provoque que se guarden también las
+entidades <em>hijo</em>. En nuestro ejemplo, guardar un objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> implicará
+también que se guarden los nuevos objetos <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que se hayan añadido
+a su lista de matriculados.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.MERGE</span></code></dt><dd><p>Provoca que la actualización de la entidad <em>padre</em> provoca una actualización
+de todas las entidades <em>hijo</em> con la que está relacionada. Entiéndase como si
+internamente se recorriera la lista de entidades hijo y se le aplicara a
+todas ellas el método <code class="docutils literal notranslate"><span class="pre">.merge</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.REMOVE</span></code></dt><dd><p>Provoca que la eliminación de la entidad <em>padre</em>, provoque la eliminación de
+todas las entidades <em>hijo</em>. Es, por tanto, el equivalente a <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">DELETE</span>
+<span class="pre">CASCADE</span></code>, pero hecho en el nivel de aplicación y no desencadenado por la
+propia base de datos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.REFRESH</span></code></dt><dd><p>Provoca que refrescar la entidad <em>padre</em>, refresque también todas las
+entidades <em>hijo</em>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.DETACH</span></code></dt><dd><p>Propaga el desvinculamiento de la entidad <em>padre</em> a todas las entidades
+<em>hijo</em>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CascadeType.ALL</span></code></dt><dd><p>Equivale a haber configurado todas las anteriores.</p>
+</dd>
+</dl>
+<p>A todas estos desencadenamientos debe añadirse la opción:</p>
+<dl class="simple">
+<dt><code class="code docutils literal notranslate"><span class="pre">orphanRemoval</span> <span class="pre">=</span> <span class="pre">true</span></code></dt><dd><p>Provoca la eliminación de la entidad <em>hijo</em> en la base de datos al eliminarla
+de la lista en la entidad <em>padre</em>, es decir, desvincularla de ésta.</p>
+</dd>
+</dl>
+<p>Estas anotaciones deben incluirse en el extremo de la entidad padre de las
+relaciones bidireccionales:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s2">&quot;centro&quot;</span><span class="p">,</span> <span class="n">cascade</span> <span class="o">=</span> <span class="p">{</span><span class="n">CascadeType</span><span class="o">.</span><span class="n">PERSIST</span><span class="p">,</span> <span class="n">CascadeType</span><span class="o">.</span><span class="n">REMOVE</span><span class="p">},</span> <span class="n">orphanRemoval</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+<span class="n">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span> <span class="n">estudiantes</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="mapeo-de-colecciones">
+<h3><span class="section-number">5.7.2.2. </span>Mapeo de colecciones<a class="headerlink" href="#mapeo-de-colecciones" title="Link to this heading">#</a></h3>
+<p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;ElementCollection</span></code> permite mapear colecciones de tipos básicos
+(como <code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Integer</span></code> o <code class="docutils literal notranslate"><span class="pre">LocalDate</span></code>) sin que haya necesidad de  crear
+una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
+teléfono a cada centro:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ElementCollection</span>
+<span class="nd">@CollectionTable</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Telefono&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">joinColumns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_estudiante&quot;</span><span class="p">))</span>
+<span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;numero&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">telefonos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Si no se permiten elementos repetidos, puedo optarse por un
+<a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashSet.html">java.util.HashSet</a> en vez de un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">java.util.ArrayList</a>.</p>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>La entidad hijo es la entidad en que se sitúa la clave foránea y la
+entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
+no se ha definido ningún campo extra para significar la relación. En nuestro
+ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hijo y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Sólo el identificador de la entidad padre, porque la clave foránea en la
+entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
+cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
+</aside>
+</aside>
+</section>
+</section>
+<section id="concurrencia">
+<span id="orm-concurrencia"></span><h2><span class="section-number">5.7.3. </span>Concurrencia<a class="headerlink" href="#concurrencia" title="Link to this heading">#</a></h2>
 <p><abbr title="Java Persistence API">JPA</abbr> permite también controlar el acceso concurrente a la base de datos.
 Nótese que, cuando hay dos o más accesos a la base de datos, uno de ellos puede
 obtener datos y el otro, alterarlos después de aquel acceso. La consecuencia esa
@@ -412,7 +602,7 @@ que los datos obtenidos en esa primera sesión no serán exactamente iguales a l
 que hay en la base de datos y eso puede dar lugar a situaciones de
 inconsistencia. Para paliar estos problemas, hay dos estrategias de <strong>bloqueo</strong>.</p>
 <section id="bloqueo-optimista">
-<span id="orm-bloq-opt"></span><h2><span class="section-number">5.9.1. </span>Bloqueo optimista<a class="headerlink" href="#bloqueo-optimista" title="Link to this heading">#</a></h2>
+<span id="orm-bloq-opt"></span><h3><span class="section-number">5.7.3.1. </span>Bloqueo optimista<a class="headerlink" href="#bloqueo-optimista" title="Link to this heading">#</a></h3>
 <p>Este bloqueo se basa en el uso de un atributo anotado con <code class="docutils literal notranslate"><span class="pre">&#64;Version</span></code> que
 signifique la versión del objeto, de modo que cada vez que se cambian sus
 valores, el <abbr title="Object-Relational Mapping">ORM</abbr> se encarga de aumentar su versión. No tenemos que
@@ -441,7 +631,7 @@ o actualizar, y, en caso contrario, lanza una excepción
 no son frecuentes.</p>
 </section>
 <section id="bloqueo-pesimista">
-<span id="orm-bloq-pes"></span><h2><span class="section-number">5.9.2. </span>Bloqueo pesimista<a class="headerlink" href="#bloqueo-pesimista" title="Link to this heading">#</a></h2>
+<span id="orm-bloq-pes"></span><h3><span class="section-number">5.7.3.2. </span>Bloqueo pesimista<a class="headerlink" href="#bloqueo-pesimista" title="Link to this heading">#</a></h3>
 <p>Este bloqueo es más adecuado cuando las colisiones son probables. Hay tres tipos
 de bloqueo:</p>
 <dl class="simple">
@@ -499,6 +689,38 @@ pueden bloquer registros individuales.</p>
 </div>
 </section>
 </section>
+<section id="optimizacion">
+<span id="orm-optimo"></span><h2><span class="section-number">5.7.4. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h2>
+<p>Así tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
+indicamos que <em>fetch</em> permitía forzar una carga inmediata de las entidades
+relacionadas. Ahora bien, ¿cuál es el comportamiento de <abbr title="Java Persistence API">JPA</abbr> ante las
+relaciones?</p>
+<p>Si al anotar una entidad no se especifica nada, las relaciones <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code> y
+<code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code> cargan inmediatamente la entidad relacionada, mientras que las
+relaciones <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code> lo hacen de forma perezosa:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToOne</span>
+<span class="n">JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga inmediata (eager).</span>
+
+<span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;estudiantes&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Curso</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cursos</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga perezosa (lazy).</span>
+</pre></div>
+</div>
+<p>Si quiere modificarse este comportamiento predeterminado, pueden añadirse
+<code class="docutils literal notranslate"><span class="pre">FetchType.EAGER</span></code> o <code class="docutils literal notranslate"><span class="pre">FetchType.LAZY</span></code>, según convenga:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToOne</span><span class="p">(</span><span class="n">fetch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FetchType</span><span class="p">.</span><span class="na">LAZY</span><span class="p">)</span>
+<span class="n">JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga perezosa.</span>
+
+<span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fetch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FetchType</span><span class="p">.</span><span class="na">EAGER</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Curso</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cursos</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga inmediata.</span>
+</pre></div>
+</div>
+<p>Tanto en <abbr title="Java Persistence Query Language">JPQL</abbr> como en <em>Criteria API</em>, los <em>JOIN</em> a secas respetan este
+comportamiento derivado de las anotaciones, mientras que los <em>FETCH JOIN</em>
+fuerzan siempre la carga inmediata.</p>
+</section>
+</section>
 
 
                 </article>
@@ -512,20 +734,20 @@ pueden bloquer registros individuales.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="17.mapeo-avanz.html"
+       href="10.crud/02.avanzadas/03.nativo.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.8. </span>Mapeo avanzado</p>
+        <p class="prev-next-title"><span class="section-number">5.6.2.3. </span><abbr title="Structured Query Language">SQL</abbr> nativo</p>
       </div>
     </a>
     <a class="right-next"
-       href="25.performance.html"
+       href="../98.apendices/index.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.10. </span>Optimización</p>
+        <p class="prev-next-title">Apéndices</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -545,8 +767,18 @@ pueden bloquer registros individuales.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.9.1. Bloqueo optimista</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.9.2. Bloqueo pesimista</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.1. Excepciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.2. Mapeo avanzado</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.2.1. Cascada de operaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.2.2. Mapeo de colecciones</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.3. Concurrencia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.3.1. Bloqueo optimista</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.3.2. Bloqueo pesimista</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.4. Optimización</a></li>
 </ul>
   </nav></div>
 

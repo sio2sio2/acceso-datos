@@ -498,7 +498,7 @@ resultados, esto es, en aquello que por ahora hemos despachado con un simple
 <p>Lo cierto es que, cuando los resultados son muchos, esta estrategia puede
 resultarnos poco eficiente. Para empezar tenemos dos métodos que permiten
 reducir el número de resultados: <code class="docutils literal notranslate"><span class="pre">.setFirstResult</span></code> y <code class="docutils literal notranslate"><span class="pre">.setMaxResult</span></code>, que se
-corresponden el estándar SQL <code class="code docutils literal notranslate"><span class="pre">OFFSET</span> <span class="pre">i</span> <span class="pre">ROWS</span> <span class="pre">FETCH</span> <span class="pre">FIRST</span> <span class="pre">n</span> <span class="pre">ROWS</span> <span class="pre">ONLY</span></code><a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+corresponden el estándar SQL <code class="code docutils literal notranslate"><span class="pre">OFFSET</span> <span class="pre">i</span> <span class="pre">ROWS</span> <span class="pre">FETCH</span> <span class="pre">FIRST</span> <span class="pre">n</span> <span class="pre">ROWS</span> <span class="pre">ONLY</span></code><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="s">&quot;FROM Centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">setFirstResult</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w">  </span><span class="c1">// Saltamos los 100 primeros registros.</span>
 <span class="w">   </span><span class="p">.</span><span class="na">setMaxResult</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">    </span><span class="c1">// Obtenemos únicamente 10 registros.</span>
@@ -569,11 +569,6 @@ entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:</p>
 <p class="admonition-title">Prudencia</p>
 <p><abbr title="Java Persistence API">JPA</abbr> aplana la lista, de modo que no se obtiene una lista de
 listas, sino, simplemente, una lista de estudiantes.</p>
-</div>
-<div class="admonition-todo admonition" id="id2">
-<p class="admonition-title">Por hacer</p>
-<p>Probar la inversa:</p>
-<p>SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro</p>
 </div>
 <p id="orm-singleresult">Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
 una clave primaria o un campo con valores únicos), puede usarse el método
@@ -679,12 +674,7 @@ matriculados en ningún centro (o sea, no relacionados con ningún centro:</p>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">FETCH</span> <span class="pre">JOIN</span></code></dt><dd><p>Es una variante de <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> que obtiene los mismos resultados, pero
-aprovecha la consulta para cargar también los centros. En general, <abbr title="Java Persistence API">JPA</abbr>
-pratica una carga perezosa de las referencias. Por ejemplo, si obtenemos un
-estudiante, su centro matriculado no se obtendrá hasta que el usuario no
-use el <em>getter</em> correspondiente. Este <em>join</em> sí aprovecha la consulta en que
-están involucradas las entidades <em>Estudiante</em> y <em>Centro</em> para obtener también
-el centro:</p>
+aprovecha la consulta para cargar la entidad relacionada inmediatamente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Obtiene estudiantes con su centro cargado.</span>
 <span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;FROM Estudiante e JOIN FETCH e.centro c&quot;</span>
@@ -706,6 +696,11 @@ que precargar. Lo que sí podría tener sentido es:</p>
 <span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Consulte el <a class="reference internal" href="../../25.performance.html#orm-optimo"><span class="std std-ref">epígrafe sobre optimización</span></a>
+donde se discute con más detalle la carga perezosa.</p>
 </div>
 </dd>
 </dl>
@@ -730,7 +725,7 @@ actualización y borrado:</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Aunque, todo hay que decirlo, implementan pocos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Lo habitual es
 que refieran esto como <code class="code docutils literal notranslate"><span class="pre">LIMIT</span> <span class="pre">n</span> <span class="pre">OFFSET</span> <span class="pre">i</span></code>.</p>

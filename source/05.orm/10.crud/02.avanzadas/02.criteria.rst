@@ -231,8 +231,8 @@ centro:
 
 Joins
 =====
-Como en |JPQL| también se puede hacer facilmente *joins* de entidades. Esto
-permite hacer un ``INNER JOIN`` **perezoso**:
+Como en |JPQL| también se puede relacionar fácilmente entidades. Esto permite
+hacer un ``INNER JOIN``:
 
 .. code-block:: java
    :emphasize-lines: 3
@@ -392,9 +392,9 @@ En cambio, si la tercera entidad fuera la entidad ``ComunidadA`` relacionada con
 
 .. rubric:: Carga inmediata
 
-Todo lo referido arriba es para *carga perezosa*. Si deseamos hacer carga
-inmediata, basta con sustituir ``.join`` por ``.fetch`` en los ejemplos de este
-epígrafe en que existen *JOINs* explícitos:
+COmo en el caso de |JPQL| puede forzarse una carga inmediata de la entidad
+relacionada sustituyendo el método ``.join`` por el método ``.fetch`` en los
+ejemplos de este epígrafe en que existen *JOINs* explícitos:
 
 .. code-block:: java
 
@@ -413,7 +413,10 @@ Ahora bien, ¿qué ocurre cuando la relación no es explícita?
    criteria.select(root);
 
 La respuesta es que basta con hacerla explícito para poder usar el método
-``.fetch``
+``.fetch``.
+
+.. seealso:: Consulte para más información el :ref:`epígrafe dedicado a
+   optimización <orm-optimo>`.
 
 Actualización y borrado
 =======================

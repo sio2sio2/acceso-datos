@@ -209,7 +209,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -393,7 +393,35 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="optimizacion">
-<span id="orm-rendimiento"></span><h1><span class="section-number">5.10. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h1>
+<span id="orm-optimo"></span><h1><span class="section-number">5.10. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h1>
+<p>Así tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
+indicamos que <em>fetch</em> permitía forzar una carga inmediata de las entidades
+relacionadas. Ahora bien, ¿cuál es el comportamiento de <abbr title="Java Persistence API">JPA</abbr> ante las
+relaciones?</p>
+<p>Si al anotar una entidad no se especifica nada, las relaciones <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code> y
+<code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code> cargan inmediatamente la entidad relacionada, mientras que las
+relaciones <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code> y <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code> lo hacen de forma perezosa:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToOne</span>
+<span class="n">JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga inmediata (eager).</span>
+
+<span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;estudiantes&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Curso</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cursos</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga perezosa (lazy).</span>
+</pre></div>
+</div>
+<p>Si quiere modificarse este comportamiento predeterminado, pueden añadirse
+<code class="docutils literal notranslate"><span class="pre">FetchType.EAGER</span></code> o <code class="docutils literal notranslate"><span class="pre">FetchType.LAZY</span></code>, según convenga:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ManyToOne</span><span class="p">(</span><span class="n">fetch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FetchType</span><span class="p">.</span><span class="na">LAZY</span><span class="p">)</span>
+<span class="n">JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga perezosa.</span>
+
+<span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fetch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FetchType</span><span class="p">.</span><span class="na">EAGER</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Curso</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cursos</span><span class="p">;</span><span class="w"> </span><span class="c1">// Carga inmediata.</span>
+</pre></div>
+</div>
+<p>Tanto en <abbr title="Java Persistence Query Language">JPQL</abbr> como en <em>Criteria API</em>, los <em>JOIN</em> a secas respetan este
+comportamiento derivado de las anotaciones, mientras que los <em>FETCH JOIN</em>
+fuerzan siempre la carga inmediata.</p>
 </section>
 
 

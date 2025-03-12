@@ -183,10 +183,6 @@ entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
 .. caution:: |JPA| aplana la lista, de modo que no se obtiene una lista de
    listas, sino, simplemente, una lista de estudiantes.
 
-.. TODO:: Probar la inversa:
-
-   SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro
-
 .. _orm-singleresult:
 
 Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
@@ -300,12 +296,7 @@ ellas:
 
 ``FETCH JOIN``
    Es una variante de ``INNER JOIN`` que obtiene los mismos resultados, pero
-   aprovecha la consulta para cargar también los centros. En general, |JPA|
-   pratica una carga perezosa de las referencias. Por ejemplo, si obtenemos un
-   estudiante, su centro matriculado no se obtendrá hasta que el usuario no
-   use el *getter* correspondiente. Este *join* sí aprovecha la consulta en que
-   están involucradas las entidades *Estudiante* y *Centro* para obtener también
-   el centro:
+   aprovecha la consulta para cargar la entidad relacionada inmediatamente:
 
    .. code-block:: java
 
@@ -330,6 +321,9 @@ ellas:
          TypedQuery<Centro> query = sesion.createQuery(
             "FROM Centro c JOIN FETCH c.estudiantes e"
          );
+
+   .. seealso:: Consulte el :ref:`epígrafe sobre optimización <orm-optimo>`
+      donde se discute con más detalle la carga perezosa.
 
 Actualización y borrado
 -----------------------

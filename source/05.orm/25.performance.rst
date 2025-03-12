@@ -1,4 +1,41 @@
-.. _orm-rendimiento:
+.. _orm-optimo:
 
 Optimización
 ************
+Así tratar :ref:`JPQL <orm-jpql>` y :ref:`Criteria API <orm-criteria>`
+indicamos que *fetch* permitía forzar una carga inmediata de las entidades
+relacionadas. Ahora bien, ¿cuál es el comportamiento de |JPA| ante las
+relaciones?
+
+Si al anotar una entidad no se especifica nada, las relaciones ``@ManyToOne`` y
+``@OneToOne`` cargan inmediatamente la entidad relacionada, mientras que las
+relaciones ``@OneToMany`` y ``@ManyToMany`` lo hacen de forma perezosa:
+
+.. code-block:: java
+
+   @ManyToOne
+   JoinColum(name = "id_centro", nullable = "false")
+   private Centro centro; // Carga inmediata (eager).
+
+   @ManyToMany(mappedBy = "estudiantes")
+   private List<Curso> cursos; // Carga perezosa (lazy).
+
+Si quiere modificarse este comportamiento predeterminado, pueden añadirse
+``FetchType.EAGER`` o ``FetchType.LAZY``, según convenga:
+
+.. code-block:: java
+
+   @ManyToOne(fetch = FetchType.LAZY)
+   JoinColum(name = "id_centro", nullable = "false")
+   private Centro centro; // Carga perezosa.
+
+   @ManyToMany(mappedBy = "estudiantes", fetch = FetchType.EAGER)
+   private List<Curso> cursos; // Carga inmediata.
+
+
+Tanto en |JPQL| como en *Criteria API*, los *JOIN* a secas respetan este
+comportamiento derivado de las anotaciones, mientras que los *FETCH JOIN*
+fuerzan siempre la carga inmediata.
+
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+.. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`

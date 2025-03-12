@@ -401,10 +401,10 @@ que sólo debería usarse como método complementario a <a class="reference inte
 últimos medios porque la consulta es demasiado compleja y no las pueden expresar
 o están involucradas vistas o funciones almacenadas.</p>
 <p>Sabiendo <abbr title="Structured Query Language">SQL</abbr> (y las particularidades del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>) son sencillas de realizar:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createNativeQuery</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createNativeQuery</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron&quot;</span>
 <span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;patron&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;J%&quot;</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">resultado</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
 <div class="admonition note">

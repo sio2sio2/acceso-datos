@@ -157,7 +157,7 @@ hubiéramos decidido devolver ``List``):
            Statement stmt = conn.createStatement();
            ResultSet rs = stmt.executeQuery(sqlString);
 
-           return SqlUtils.resultSetToStream(cp.isCloseable()?conn:stmt, rs, CentroSqlite::resultToCentro);
+           return SqlUtils.resultSetToStream(conn, stmt, rs, CentroSqlite::resultToCentro);
        }
        catch(SQLException err) {
            throw new DataAccessException(err);
@@ -166,17 +166,13 @@ hubiéramos decidido devolver ``List``):
        // No cerramos la conexión.
    }
 
-Obsérvese que en este método, a diferencia de los anteriores, no cerramos la
-conexión, ni la sentencia, ni el resultado, ya que de lo contrario no podremos
-obtener centros del ``Stream`` devuelto, ya que la evaluación es perezosa y se
-van obteniendo registros de ``ResultSet`` a medida que se van consumiento los
-objetos del ``Stream``. Quien se encargará de cerrar finalmente todo será el
-propio flujo cuando se cierre, por lo que convendrá usar con él un
-*try-with-resources*. Además, el primer argumento que recibe
-``SqlUtils.resultToStream`` es aquello que debe cerrarse cuando se acaba de usar
-el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea la
-sentencia. Qué sea depende de cómo hayamos creado este objeto de comunicación
-con la base de datos: más adelante daremos las explicaciones.
+Obsérvese que, en este método, a diferencia de los anteriores, no cerramos la
+conexión, ni la sentencia, ni el resultado, ya que de lo contrario, al ser la
+evaluación perezosa y obtenerse registros de ``ResultSet`` a medida que se
+consumen, no podremos obtener centros del ``Stream`` devuelto, Quien se
+encargará de cerrar finalmente todo será el propio flujo cuando se cierre, por
+lo que convendrá usar con él un *try-with-resources*. Por ese motivo, es preciso
+pasar tanto la conexión como la sentencia a ``SqlUtils.resultToStream``.
 
 En principio, cada operación parece abrir una conexión propia y cerrarla al
 acabar (excepto este último método por la particularidad ya referida). Si se

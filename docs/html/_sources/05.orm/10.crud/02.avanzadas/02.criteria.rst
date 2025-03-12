@@ -208,10 +208,10 @@ También existe el equivalente a ``GROUP BY``:
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple);
    Root<Estudiante> root = criteria.from(Estudiante.class);
    criteria.select(cb.tuple(
-      root.get(Estudiante._centro).alias("centro"), 
+      root.get(Estudiante_.centro).alias("centro"), 
       cb.count(root).alias("cantidad")
    ));
-   criteria.groupBy(root.get(Estudiante._centro));
+   criteria.groupBy(root.get(Estudiante_.centro));
 
    TypedQuery<Tuple> query = sesion.createQuery(query);
 
@@ -227,7 +227,7 @@ centro:
 
 .. code-block:: java
 
-   criteria.orderBy(cb.asc(root.get(Estudiante_.centro).get(Centro._nombre)));
+   criteria.orderBy(cb.asc(root.get(Estudiante_.centro).get(Centro_.nombre)));
 
 Joins
 =====
@@ -239,7 +239,7 @@ permite hacer un ``INNER JOIN`` **perezoso**:
 
    CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
    Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante._centro, JoinType.INNER);
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
    criteria.select(root);
 
    TypedQuery<Estudiante> query = em.createQuery(criteria);
@@ -264,7 +264,7 @@ la consulta debería haberse construido así:
 
    CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
    Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante._centro, JoinType.INNER);
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
    criteria.select(centro);
 
    TypedQuery<Estudiante> query = em.createQuery(criteria);
@@ -299,9 +299,9 @@ La primera expresión podríamos traducirla así:
    Root<Centro> root = criteria.from(Centro.class);
    Join<Centro, Estudiante> estudiante = root.join(Centro_.estudiantes, JoinType.LEFT);
    criteria.select(centro);
-   criteria.where(cb.isEmpty(root.get(Centro._estudiantes)));
+   criteria.where(cb.isEmpty(root.get(Centro_.estudiantes)));
 
-Obsérvese que al hacer el *JOIN* ``root`` hace referencia a un objeto
+Obsérvese que en la relación ``root`` hace referencia a un objeto
 ``Centro``, luego debemos indicar el campo que liga ``Centro`` con
 ``Estudiante``. Es la lista de estudiantes... pero sólo si definimos como
 bidireccional la relación. Si la relación es unidireccional el único campo que
@@ -318,13 +318,16 @@ La segunda expresión si tiene teóricamente, pero sólo teóricamente, solució
    Root<Estudiante> root = criteria.from(Estudiante.class);
    Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.RIGHT);
    criteria.select(centro);
-   criteria.where(cb.isNull(root.get(Estudiante._centro)));
+   criteria.where(cb.isNull(root.get(Estudiante_.centro)));
 
 El problema es que Criteria API **no** implementa ``RIGHT JOIN`` sino solamente
 los tipos ya vistos: ``INNER JOIN`` y ``LEFT JOIN``.
 
+.. rubric:: Subconsultas
+   :name: orm-subquery
+
 En consecuencia, el único modo de hacer la consulta con una relación
-unidireccional es recurrir a una subconsulta:
+unidireccional es recurrir a una **subconsulta**:
 
 .. code-block:: sql
 
@@ -340,13 +343,54 @@ lo que da pie a que intentemos implementar está consulta con subconsulta usando
    // Preparamos la subconsulta
    Subquery<Long> subquery = criteria.subquery(Long.class);
    Root<Estudiante> subroot = subquery.from(Estudiante.class);
-   subquery.select(subroot.get(Estudiante._centro));
+   subquery.select(subroot.get(Estudiante_.centro));
    // Consulta con subconsulta
    criteria.select(root);
    criteria.where(cb.not(root).in(subquery));
 
 .. note:: Nótese que aquí podemos comparar directamente centros en vez de
    identificadores de centros.
+
+.. rubric:: Cadena de consultas
+
+Observemos parte del código ya presentado anteriormente:
+
+.. code-block:: java
+
+   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
+   Root<Estudiante> root = criteria.from(Estudiante.class);
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+   criteria.select(root);
+
+Partidos de ``Estudiante`` (root) y relacionamos con ``Centro`` a través del
+atributo ``centro`` de ``Estudiante``, de ahí que la relación se escriba así:
+
+.. code-block:: java
+
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+
+O sea, para relacionar con ``Centro``, *juntamos* ``root`` (que es
+``Estudiante``) a través de su atributo llamado ``centro``. Si deseamos que en
+la consulta participe una segunda relación, deberemos tener en cuenta con qué
+entidad se relaciona. Si la tercera entidad fuera la entidad ``Grupo``
+relacionada con ``Estudiante`` entonces tendríamos que hacer:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+   Join<Estudiante, Curso> curso = root.join(Estudiante_.curso, JoinType.INNER);
+
+En cambio, si la tercera entidad fuera la entidad ``ComunidadA`` relacionada con
+``Centro``, entonces la relación se establecería así:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+   Join<Centro, ComunidadA> comunidad = centro.join(Centro_.comunidad, JoinType.INNER);
+
+.. rubric:: Carga inmediata
 
 Todo lo referido arriba es para *carga perezosa*. Si deseamos hacer carga
 inmediata, basta con sustituir ``.join`` por ``.fetch`` en los ejemplos de este
@@ -358,7 +402,7 @@ epígrafe en que existen *JOINs* explícitos:
    Join<Centro, Estudiante> estudiante = root.fetch(Centro_.estudiantes, JoinType.LEFT);
    // ...
    
-Ahora bien, ¿qué ocurre cuando el *JOIN* no es explícito?
+Ahora bien, ¿qué ocurre cuando la relación no es explícita?
 
 .. code-block:: java
    :emphasize-lines: 3
@@ -368,7 +412,7 @@ Ahora bien, ¿qué ocurre cuando el *JOIN* no es explícito?
    root.fetch(root.get(Estudiante_.centro, JoinType.LEFT));
    criteria.select(root);
 
-La respuesta es que basta con hacerlo explícitopara poder usar el método
+La respuesta es que basta con hacerla explícito para poder usar el método
 ``.fetch``
 
 Actualización y borrado
@@ -391,7 +435,7 @@ También es posible **borrar**:
 
    CriteriaDelete<Estudiante> delete = cb.createCriteriaDelete(Estudiante.class);
    Root<Estudiante> root = delete.from(Estudiante.class);
-   delete.where(cb.like(root.get(Estudiante._nombre), "J%"));
+   delete.where(cb.like(root.get(Estudiante_.nombre), "J%"));
 
    em.createQuery(delete).executeUpdate();
 

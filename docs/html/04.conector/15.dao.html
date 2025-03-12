@@ -209,7 +209,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../05.orm/10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../05.orm/10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Hybernate Query Language">HQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
@@ -766,9 +766,10 @@ de <code class="docutils literal notranslate"><span class="pre">CentroSqlite</sp
 <span class="w">            </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="w">            </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
 
-<span class="w">            </span><span class="c1">// Si cp no se puede ni se quiere cerrar (porque es un objeto Connection y no un DataSource),</span>
-<span class="w">            </span><span class="c1">// entonces pasar a resultToStream &quot;conn&quot; no tiene ningún efecto y hay que pasar stmt.</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">cp</span><span class="p">.</span><span class="na">isCloseable</span><span class="p">()</span><span class="o">?</span><span class="n">conn</span><span class="p">:</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// Se pasan conn y stmt para que el stream pueda cerrarlos</span>
+<span class="w">            </span><span class="c1">// cuando el mismo se cierre. En cualquier caso, dependiendo de cp,</span>
+<span class="w">            </span><span class="c1">// la conexión se cerrará realmente o no.</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
@@ -895,7 +896,7 @@ hubiéramos decidido devolver <code class="docutils literal notranslate"><span c
 <span class="w">        </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="w">        </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
 
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">cp</span><span class="p">.</span><span class="na">isCloseable</span><span class="p">()</span><span class="o">?</span><span class="n">conn</span><span class="p">:</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
@@ -905,17 +906,13 @@ hubiéramos decidido devolver <code class="docutils literal notranslate"><span c
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Obsérvese que en este método, a diferencia de los anteriores, no cerramos la
-conexión, ni la sentencia, ni el resultado, ya que de lo contrario no podremos
-obtener centros del <code class="docutils literal notranslate"><span class="pre">Stream</span></code> devuelto, ya que la evaluación es perezosa y se
-van obteniendo registros de <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code> a medida que se van consumiento los
-objetos del <code class="docutils literal notranslate"><span class="pre">Stream</span></code>. Quien se encargará de cerrar finalmente todo será el
-propio flujo cuando se cierre, por lo que convendrá usar con él un
-<em>try-with-resources</em>. Además, el primer argumento que recibe
-<code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> es aquello que debe cerrarse cuando se acaba de usar
-el objeto y se desea cerrar; y que puede que sea la conexión o puede que sea la
-sentencia. Qué sea depende de cómo hayamos creado este objeto de comunicación
-con la base de datos: más adelante daremos las explicaciones.</p>
+<p>Obsérvese que, en este método, a diferencia de los anteriores, no cerramos la
+conexión, ni la sentencia, ni el resultado, ya que de lo contrario, al ser la
+evaluación perezosa y obtenerse registros de <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code> a medida que se
+consumen, no podremos obtener centros del <code class="docutils literal notranslate"><span class="pre">Stream</span></code> devuelto, Quien se
+encargará de cerrar finalmente todo será el propio flujo cuando se cierre, por
+lo que convendrá usar con él un <em>try-with-resources</em>. Por ese motivo, es preciso
+pasar tanto la conexión como la sentencia a <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code>.</p>
 <p>En principio, cada operación parece abrir una conexión propia y cerrarla al
 acabar (excepto este último método por la particularidad ya referida). Si se
 utiliza un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a> y se facilita para la creación

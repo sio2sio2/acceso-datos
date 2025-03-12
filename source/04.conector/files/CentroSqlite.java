@@ -63,9 +63,10 @@ public class CentroSqlite extends AbstractDao implements Crud<Centro> {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlString);
 
-            // Si cp no se puede ni se quiere cerrar (porque es un objeto Connection y no un DataSource),
-            // entonces pasar a resultToStream "conn" no tiene ningún efecto y hay que pasar stmt.
-            return SqlUtils.resultSetToStream(cp.isCloseable()?conn:stmt, rs, CentroSqlite::resultToCentro);
+            // Se pasan conn y stmt para que el stream pueda cerrarlos
+            // cuando el mismo se cierre. En cualquier caso, dependiendo de cp,
+            // la conexión se cerrará realmente o no.
+            return SqlUtils.resultSetToStream(conn, stmt, rs, CentroSqlite::resultToCentro);
         }
         catch(SQLException err) {
             throw new DataAccessException(err);

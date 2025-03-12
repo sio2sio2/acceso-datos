@@ -13,10 +13,10 @@ Sabiendo |SQL| (y las particularidades del |SGBD|) son sencillas de realizar:
 
 .. code-block:: java
 
-   TypedQuery<Tuple> query = em.createNativeQuery(
-      "SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron",
-      Tuple.class
+   Query query = em.createNativeQuery(
+      "SELECT id, nombre FROM Estudiante WHERE nombre LIKE :patron"
    ).setParameter("patron", "J%");
+   List<Object[]> resultado = query.getResultList();
 
 .. note:: En este caso, como usamos |SQL| directamente, los nombres que aparecen
    en la sentencia son nombres de tablas y columnas.

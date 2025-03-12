@@ -14,7 +14,10 @@ Para obtener todos los elementos de un relación basta hacer:
 .. code-block:: java
    :name: orm-jpql-select-all
 
-   List<Centro> centro = em.createQuery("FROM Centro", Centro.class).getResultList();
+   // Construimos la consulta.
+   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class);
+   // Obtenemos resultados.
+   List<Centro> centros = query.getResultList();
 
 donde la palabra *Centro* en la cadena no es el nombre de la tabla,
 sino el nombre de la clase ``Centro`` que, en este caso, coinciden.
@@ -22,13 +25,6 @@ Recordemos que el lenguaje hace referencia a objetos y atributos.
 
 .. note:: La cadena también podría haber sido ":code:`SELECT c FROM
    Centro c`"
-
-Si desglosamos en dos instrucciones la orden anterior, la entenderemos mejor:
-
-.. code-block:: java
-
-   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class);
-   List<Centro> centro = query.getResultList();
 
 El segundo argumento de ``.createQuery`` permite tipar el resultado de la
 consulta (objetos ``Centro`` en este caso).
@@ -41,7 +37,6 @@ consulta (objetos ``Centro`` en este caso).
       // warning: el compilador no puede asegurar el tipo del resultado.
       List<Centro> centro = query.getResultList();
 
-.. todo:: Anadir getStreamResult, setFirstResult y setMaxResults.
 
 Podemos también obtener campos individuales en vez de objetos ``Estudiante``:
 
@@ -94,6 +89,47 @@ o un conjunto de campos individuales:
 
       Long id = registro.get(0, Long.class);
       
+Una vez hemos tratado cómo construir la consulta, centrémos en la obtención de
+resultados, esto es, en aquello que por ahora hemos despachado con un simple
+``.getResultList()``:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class);
+   List<Centro> centros = query.getResultList();
+
+Lo cierto es que, cuando los resultados son muchos, esta estrategia puede
+resultarnos poco eficiente. Para empezar tenemos dos métodos que permiten
+reducir el número de resultados: ``.setFirstResult`` y ``.setMaxResult``, que se
+corresponden el estándar SQL :code:`OFFSET i ROWS FETCH FIRST n ROWS ONLY`\ [#]_.
+
+.. code-block:: java
+
+   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class)
+      .setFirstResult(100)  // Saltamos los 100 primeros registros.
+      .setMaxResult(10);    // Obtenemos únicamente 10 registros.
+
+Como se ve estos argumentos permite paginar la respuesta.
+
+Además, hay tres métodos que permiten obtener resultados a partir de la consulta
+ya construida:
+
+``.getResultList()``,
+   que como hemos visto devuelve una lista.
+
+``.getStreamList()``,
+   que devuelve un flujo que va obteniendo de forma perezosa los resultados.
+
+   .. warning:: Como la obtención es perezosa, para que podamos consumir el
+      flujo, el objeto ``EntityManager`` a partir del cual se construyó la
+      consulta debe continuar abierto.
+
+``.getSingleResult()``,
+   que se usa cuando se espera obtener un único resultado. Véase más adelante
+   :ref:`como se usa .getSingleResult <orm-singleresult>`.
+
+
 Condiciones
 -----------
 Como en el caso de |SQL|, |JPQL| permite aplicar condiciones usando la
@@ -150,6 +186,8 @@ entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
 .. TODO:: Probar la inversa:
 
    SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.id = :idCentro
+
+.. _orm-singleresult:
 
 Cuando debido a la condición se espera obtener un único resultado (p.e. se usa
 una clave primaria o un campo con valores únicos), puede usarse el método
@@ -243,7 +281,7 @@ ellas:
 
    en que hemos intercambiado el orden de las entidades.
 
-|JPA| soporta tres *joins* distintos:
+|JPQL| soporta tres *joins* distintos:
 
 ``INNER JOIN``
    que es el que se ha escrito más arriba simplemente con ``JOIN``, aunque se
@@ -312,6 +350,11 @@ actualización y borrado:
       "DELETE FROM Estudiante WHERE nombre = :nombre"
    ).setParameter("nombre", "Juan")
    .executeUpdate();
+
+.. rubric:: Notas al pie
+
+.. [#] Aunque, todo hay que decirlo, implementan pocos |SGBD|. Lo habitual es
+   que refieran esto como :code:`LIMIT n OFFSET i`.
 
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Replace, Update, Delete)`

@@ -2,10 +2,6 @@
 
 Conectores
 **********
-
-.. todo:: Rehacer todo los contenidos de esta unidad para que el ejemplo se haga
-   sobre Centro-Estudiante (como en Programación de conectores).
-
 Las bases de datos relacionales son unos de los soportes más utilizados para
 el almacenamiento organizado de información. Su problema, al ser accedidas
 mediante aplicaciones, es que basan su estructrura en el modelo relacional, que
@@ -110,29 +106,25 @@ Además, necesitaremos importar en nuestro proyecto la librería propia de :prog
 
 .. rubric:: Ejercicio ilustrativo
 
-Tomemos como base el :ref:`ejercicio ilustrativo con que introducimos XML
-<xml>`, aunque con algunos cambios (generalizaciones):
+Tomaremos como base un problema muy sencillo en el que simplemente existen
+centros y estudiantes matriculados en ellos. Podemos representarlo
+gráficamente con el siguente diagrama |E/R|:
 
-+ Puede haber varios claustros.
-+ Un mismo profesor puede trabajar en varios claustro diferentes.
-+ Si se da la anterior circunstancia, el profesor se adscribirá a un
-  departamento\ [#]_ por centro, pero no tiene que ser para todos los centros el
-  mismo.
-+ De igual modo, en un centro puede tener asignado uno o varios casilleros
-  distintos a los que tiene en otro.
-
-Esto podemos representarlo gráficamente con el siguente diagrama |E/R|:
-
-.. image:: files/ER-problema.png
+.. image:: files/er-ec.png
 
 Podemos traducir el anterior esquema al modelo relacional así:
 
 .. code-block:: none
 
-   Centro(*idCentro*, nombre)
-   Profesor(*idProfesor*, casillero, sustituye, apelativo, apellidos, nombre)
-   Departamento(*idDepartamento*, denominacion)
-   Trabaja(*idProfesor, idCcentro*, departamento)
+   Centro(*id*, nombre, titularidad)
+   Estudiante(*id*, nombre, nacimiento, _centro_)
+
+El cual en |SQL| se define así:
+
+.. literalinclude:: files/ec.sql
+   :name: ec-esquema
+   :language: sql
+   :end-before: -- Datos
 
 .. rubric:: Contenidos
 
@@ -159,10 +151,3 @@ Podemos traducir el anterior esquema al modelo relacional así:
 .. _SQLite: https://sqlite.org/
 .. _sqlite-jdbc: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
 .. _mariadb-java-client: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-
-.. rubric:: Notas al pie
-
-.. [#] En puridad, los profesores desempeñan puestos que se adscriben a
-   departamentos y a cada departamento pueden estar adscritos uno o varios
-   puestos, pero obviaremos esto para simplificar y nos limitaremos a afirmar
-   que trabajan para departamentos.

@@ -96,7 +96,7 @@ usa el método ``executeUpdate``, mientras que para las segundas el método
 
 Simples
 -------
-Comencemos creando cuatro tablas:
+Comencemos creando dos tablas:
 
 .. literalinclude:: files/01.create.java
    :language: java
@@ -108,8 +108,8 @@ El código tiene dos aspectos:
    comentarlas.
 
    .. hint:: No obstante, sí conviene precisar que procuremos al escribirlas
-      ceñirnos al estándar lo más posible, a fin de que sean lo más universales
-      posibles y nos sea menos costoso cambiar de |SGBD|. A este respecto:
+      ceñirnos al estándar, a fin de que sean lo más universales posibles y nos
+      sea menos costoso cambiar de |SGBD|. A este respecto:
 
       + Dejamos de escribir los nombres de elementos de la base de datos
         (tablas, columnas) entre comillas dobles, porque el estándar |SQL| lo
@@ -132,20 +132,29 @@ El código tiene dos aspectos:
 Tampoco las sentencias de inserción devuelven resultados, por lo que también
 podemos hacer:
 
-.. _ej-insert-sin-par:
-
 .. code-block:: java
+   :name: ej-insert-sin-par
 
-      // Agregamos algunos departamentos.
-      stmt.executeUpdate("INSERT INTO Departamento (denominacion) VALUES ('Informática')");
-      for(String denominacion: new String[] {"Inglés", "Francés", "Tecnología"}) {
-          stmt.executeUpdate(String.format("INSERT INTO Departamento (denominacion) VALUES ('%s');", denominacion));
+      // Agregamos algunos centros
+      stmt.executeUpdate("INSERT INTO Centro VALUES (11004866, 'IES Castillo de Luna', 'pública')");
+
+      Object[] registros = new Object[][] {
+         new Object[] {11007533, "IES Arroyo Hondo", "pública"},
+         new Object[] {11701164, "IES Astaroth", "pública"}
+      };
+      String sqlString = "INSERT INTO Centro VALUES (%d, '%s', '%s');"
+      for(Object[] registro: registros) {
+          stmt.executeUpdate(String.format(sqlString,
+            (Integer) registro[0],
+            (String) registro[1],
+            (String) registro[2]
+          ));
       }
 
 .. caution:: Aún estamos empezando y sabemos poco, así que estas sentencias son
    torpes por dos razones:
 
-   * Estamos ejecutando repetidamente (cuatro veces) la misma sentencia y no es
+   * Estamos ejecutando repetidamente (tres veces) la misma sentencia y no es
      eficiente. Ya aprenderemos cómo hacer :ref:`operaciones masivas <conn-batch>`.
    * Las sentencias usan valores almacenados en variables y hay que construirlas
      incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
@@ -156,63 +165,53 @@ podemos hacer:
    Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
    mejor.
 
-.. seealso:: Se proporcionan adicionalmente dos guiones para su uso directo con
-   :program:`SQLite`: :download:`sustituye.sql <files/sustituye.sql>`, que
-   implementa la solución desarrollada aquí y :download:`sustituto.sql
-   <files/sustituto.sql>` en que el campo *sustituye* se cambia por *sustituto*
-   para que su significado sea quién es el sustituto del profesor en vez de a
-   quién sustituye el profesor. En ambas soluciones, al código Java mostrado se
-   añaden algunos ``INSERT`` para agregar registros a la base de datos y se
-   define una |CTE| recursiva (totalmente compatible con el estándar |SQL|) para
-   que la propia base de datos nos cree una vista (*PlantillaFuncionamiento*)
-   que muestra cada profesor, a qué titular en último caso sustituye (o él mismo
-   si es titular) y si está activo o no. Esta vista es de enorme utilidad para
-   saber en dónde trabaja cada profesor, ya que la tabla *Trabaja* sólo contiene
-   profesores titulares.
-
 .. rubric:: Consultas
 
-Las consultas, en cambio, sí devuelven resultados, que deberán procesarse luego:
+Las consultas, en cambio, sí devuelven resultados que deberán procesarse luego:
 
 .. code-block:: java
+   :emphasize-lines: 1
 
-   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento;")) {
-      while(rs.next()) {
-           int id = rs.getInt("id_departamento");
-           String denominacion = rs.getString("denominacion");
-           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
-      }
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Centro")) {
+       while(rs.next()) {
+           int id = rs.getInt("id");
+           String nombre = rs.getString("nombre");
+           String titularidad = rs.getString("titularidad");
+           System.out.println(String.format("Código: %d -- Nombre: %s (%s)", id, nombre, titularidad));
+       }
    }
 
 Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
 objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él.
 
 .. note:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
-   cerrarse automáticamente al cerrarse la sentencia que la originó. En
+   cerrarse automáticamente al cerrarse la sentencia que lo originó. En
    cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
    sernos útil.
 
 En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
 pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
 de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
-``Departamento`` así:
+``Centro`` así:
 
-.. literalinclude:: files/Departamento.java
+.. literalinclude:: files/CentroS.java
    :language: java
 
 podríamos hacer esto:
 
 .. code-block:: java
 
-   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento")) {
-      List<Departamento> departamentos = new ArrayList<>(); 
 
-      while(rs.next()) {
-           int id = rs.getInt("idDepartamento");
-           String denominacion = rs.getString("denominacion");
-           departamentos.add(new Departamento().cargarDatos(id, denominacion));
-           System.out.println(String.format("ID: %d  -- nombre: %s", id, denominacion));
-      }
+   try(ResultSet rs = stmt.executeQuery("SELECT * FROM Centro")) {
+      List<Centro> centros = new ArrayList<>(); 
+
+       while(rs.next()) {
+           int id = rs.getInt("id");
+           String nombre = rs.getString("nombre");
+           String titularidad = rs.getString("titularidad");
+           // Posiblemente titularidad debería ser un enum.
+           centros.add(new Centros(id, nombre, titularidad));
+       }
    }
 
 .. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
@@ -245,13 +244,22 @@ mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
 |PreparedStatement|:
 
 .. code-block:: java
-   :emphasize-lines: 2, 5
+   :name: ej-insert-par
+   :emphasize-lines: 8, 11-13
+
+   Object[] registros = new Object[][] {
+      new Object[] {11004866, "IES Castillo de Luna", "pública"},
+      new Object[] {11007533, "IES Arroyo Hondo", "pública"},
+      new Object[] {11701164, "IES Astaroth", "pública"}
+   };
 
    try(
-      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
+      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Centro (id, nombre, titulacion) VALUES (?, ?, ?)")
    ) {
-       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
-           pstmt.setString(1, denominacion);  // 1: Valor para el primer "?".
+       for(Object[] registro: registros) {
+           pstmt.setInt(1, (int) registro[0]);        // id
+           pstmt.setString(2, (String) registro[1]);  // nombre
+           pstmt.setString(3, (String) registro[2]);  // titulación
            pstmt.executeUpdate();
        }
    }
@@ -260,105 +268,81 @@ Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
 establecidos todos sus valores, ejecutar la sentencia.
 
-Obsérvese que en estas inserciones no estamos suministrando el identificador de
-la entidad, porque dejamos que la base de datos escoja uno por nosotros. Si nos
-interesara obtener ese identificador, podemos hacer lo siguiente:
+En estos registros, hemos decidido prefijar el valor del identificador. Sin
+embargo, es común dejar indefinido su valor y dejar que la base de datos escoja
+uno al agregarlo como registro. En nuestro ejemplo, sería el caso los
+estudiantes. En esos casos, es probable que al insertarlos queramos conocer qué
+identificador se definió. Para ello podemos hacer lo siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 4,10-12
+   :emphasize-lines: 11, 20-22
+
+   TimeDateFormatter df = TimeDateFormatter.ofPattern("dd/MM/yyyy");
+   // centro es un centro que ya tenemos definido.
+   Object[][] registros = new Object[][] {
+      new Object[] {"Perico de los Palotes", LocalDate.parse("12/06/1995", df), centro},
+      new Object[] {"Mariquilla de la O", LocalDate.parse("07/09/1999", df), centro}
+   };
 
    try(
       PreparedStatement pstmt = conn.prepareStatement(
-         "INSERT INTO Departamento (denominacion) VALUES (?)",
+         "INSERT INTO Estudiante (nombre, nacimiento, centro, id) VALUES (?, ?, ?, ?)",
          Statement.RETURN_GENERATED_KEYS
       )
    ) {
-       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
-           pstmt.setString(1, denominacion);  // 1: Valor para el primer "?".
+       for(Object[] registro: registros) {
+           pstmt.setString(1, registro[0]); 
+           pstmt.setDate(2, registro[1] == null?null:Date.valueOf(registro[1]));
+           pstmt.setObject(3, centro == null?null:centro.getId(), Types.INTEGER);
+           pstmt.setNull(4, Types.INTEGER);
            pstmt.executeUpdate();
            try(ResultSet rs = pstmt.getGeneratedKeys())  {
-              if(rs.next()) System.out.printf("'%s' se registró con ID=%d\n", denominacion, rs.getInt(1));
+              if(rs.next()) System.out.printf("'%s' se registró con ID=%d\n", registro[0], rs.getInt(1));
            }
        }
    }
 
 .. caution:: Pero no hemos dado aún con la forma eficiente, ya que estamos
-   repitiendo la ejecución de la misma sentencia con distintos valores y lo que
-   hemos hecho no es en absoluto eficiente. Necesitaremos :ref:`más adelante
-   <conn-batch>` darle al menos una vuelta más.
+   repitiendo la ejecución de la misma sentencia con distintos valores.
+   Necesitaremos :ref:`más adelante <conn-batch>` darle al menos una vuelta más.
 
 Obsérvese que al definir los valores de los parámetros de una consulta,
-necesitamos cambiar de método según sea el tipo del campo:
-
-.. code-block:: java
-
-   try(
-      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)");
-   ) {
-         pstmt.setString(1, "Manolo");
-         pstmt.setString(2, "Manuel");
-         pstmt.setString(3, "Peñalba Pinzón");
-         pstmt.setNull(4, Types.INTEGER);
-         pstmt.executeUpdate();
-   }
-
+necesitamos cambiar de método según sea el tipo del campos. Sin embargo,
 |JDBC| permite usar un método genérico (``setObject``) que se encargará de
-inferir el tipo |SQL| correcto a partir del tipo de *Java*:
+inferir el tipo |SQL| correcto a partir del tipo de *Java*. La razón por la que
+en el ejemplo se añade un tercer parámetro se debe a que el valor puede ser nulo
+y, en ese caso, no podrá inferirse el tipo.
 
-.. code-block:: java
+El uso de este último método implica algunas cosas:
 
-   try(
-      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)")
-   ) {
-         pstmt.setObject(1, "Manolo");
-         pstmt.setObject(2, "Manuel");
-         pstmt.setObject(3, "Peñalba Pinzón");
-         pstmt.setObject(4, null, Types.INTEGER);  // No se puede inferir entero a partir de null
-         pstmt.executeUpdate();
-   }
-
-El uso de este método implica algunas cosas:
-
-a. El driver debe inferirse el tipo |SQL| a partir del tipo de *Java*: eso
+a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
    provoca una ligera sobrecarga y puede originar que la traducción no sea la
    deseada. Lo segundo puede solucionarse añadiendo el tercer argumento:
 
    .. code-block:: java
 
-      pstmt.setObject(1, "Manolo", Types.VARCHAR);
+      Integer idCentro = centro == null?null:centro.getId();
+      pstmt.setObject(3, centro, Types.INTEGER);
 
 #. El segundo argumento se pasa como ``Object`` y siempre habrá que
    transformarlo al tipo requerido: esto implica una nimia sobrecarga también,
    despreciable en la mayoría de los casos.
 
 #. Si no pasamos literales, sino una variable, la variable puede ser nula y
-   darnos problemas:
-
-   .. code-block:: java
-
-      Integer sustituye = null;
-      pstmt.setObject(4, sustituye); // ¿Cómo inferimos el tipo?
-
-   En este caso, se solucionaría añadiendo siempre el tercer argumento:
-
-   .. code-block:: java
-
-      Integer sustituye = null;
-      pstmt.setObject(4, sustituye, Types.INTEGER); // ¿Cómo inferimos el tipo?
+   darnos problemas. Eso, de nuevo, se soluciona añadiendo el tercer argumento.
 
 .. tip:: El código:
 
    .. code-block:: java
 
-      // Supongamos que en 1 queremos indicar el identificador, no el apodo.
-      pstmt.setObject(1, id == 0?null:id, Types.INTEGER);
+      pstmt.setObject(3, centro == null?null:centro.getId(), Types.INTEGER);
 
    es más sucinto que este otro equivalente:
 
    .. code-block:: java
 
-      if(id == 0) pstmt.setNull(1, Types.INTEGER);
-      else pstmt.setInt(1, id);
+      if(centro == null) pstmt.setNull(1, Types.INTEGER);
+      else pstmt.setInt(1, centro.getId());
 
 .. rubric:: Notas al pie
 

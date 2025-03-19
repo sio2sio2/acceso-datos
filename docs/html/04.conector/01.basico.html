@@ -526,90 +526,47 @@ ella.</p>
 </div>
 <section id="simples">
 <h3><span class="section-number">4.1.2.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h3>
-<p>Comencemos creando cuatro tablas:</p>
+<p>Comencemos creando dos tablas:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
 
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:memory:&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Base de datos en la memoria</span>
+<span class="c1">// Algunos centros para agregar a la base de datos.</span>
+<span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
+<span class="p">};</span>
 
-<span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
-<span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">   </span><span class="c1">// Particular de SQLite: respetar la integridad referencial (opcional).</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Particular de SQLite: respetar la integridad referencial (opcional).</span>
+<span class="w">      </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">);</span>
 
-<span class="w">   </span><span class="c1">// Tabla Departamento.</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">      CREATE TABLE Departamento (</span>
-<span class="s">         id_departamento   INTEGER PRIMARY KEY /* GENERATED BY DEFAULT AS IDENTITY */,</span>
-<span class="s">         denominacion      VARCHAR(50)    NOT NULL</span>
-<span class="s">      );</span>
-<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
+<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">           CREATE TABLE Centro (</span>
+<span class="s">               id          INTEGER             PRIMARY KEY,</span>
+<span class="s">               nombre      VARCHAR(200)        NOT NULL,</span>
+<span class="s">               titularidad CHAR(7)             CHECK (titularidad IN (&#39;pública&#39;,&#39;privada&#39;))</span>
+<span class="s">           );</span>
+<span class="s">       &quot;&quot;&quot;</span><span class="p">);</span>
+<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">           CREATE TABLE Estudiante (</span>
+<span class="s">               id_estudiante  INTEGER       PRIMARY KEY /* GENERATED BY DEFAULT AS IDENTITY */,</span>
+<span class="s">               nombre         VARCHAR(250)  NOT NULL,</span>
+<span class="s">               nacimiento     DATE          NOT NULL,</span>
+<span class="s">               centro         INTEGER,</span>
 
-<span class="w">   </span><span class="c1">// Tabla Centro</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">      CREATE TABLE Centro (</span>
-<span class="s">         id_centro         INTEGER        PRIMARY KEY /* GENERATED BY DEFAULT AS IDENTITY */,</span>
-<span class="s">         nombre            VARCHAR(100)   NOT NULL</span>
-<span class="s">      );</span>
-<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
-
-<span class="w">   </span><span class="c1">// Tabla Profesor.</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">      CREATE TABLE Profesor (</span>
-<span class="s">         id_profesor       INTEGER        PRIMARY KEY /* GENERATED BY DEFAULT AS IDENTITY */,</span>
-<span class="s">         apelativo         VARCHAR(50)    NOT NULL,</span>
-<span class="s">         nombre            VARCHAR(75)    NOT NULL,</span>
-<span class="s">         apellidos         VARCHAR(150)   NOT NULL,</span>
-<span class="s">         sustituye         INTEGER        UNIQUE DEFAULT NULL,</span>
-
-<span class="s">         CONSTRAINT fk_pro_pro FOREIGN KEY(sustituye) REFERENCES Profesor(id_profesor)</span>
-<span class="s">            ON DELETE SET NULL</span>
-<span class="s">            ON UPDATE CASCADE</span>
-<span class="s">      );</span>
-<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
-
-<span class="w">   </span><span class="c1">// Relación Profesor-Centro.</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">      CREATE TABLE Trabaja (</span>
-<span class="s">         profesor          INTEGER,</span>
-<span class="s">         centro            INTEGER,</span>
-<span class="s">         departamento      INTEGER,</span>
-<span class="s">         -- Para permitir que un mismo profesor tenga varios casilleros.</span>
-<span class="s">         casillero         INTEGER ARRAY    NOT NULL,</span>
-<span class="s">         </span>
-<span class="s">         CONSTRAINT pk_tra     PRIMARY KEY(profesor, centro),</span>
-<span class="s">         CONSTRAINT fk_tra_pro FOREIGN KEY(profesor) REFERENCES Profesor(id_profesor)</span>
-<span class="s">            ON DELETE CASCADE</span>
-<span class="s">            ON UPDATE CASCADE,</span>
-<span class="s">         CONSTRAINT fk_tra_cla FOREIGN KEY(centro) REFERENCES Centro(id_centro)</span>
-<span class="s">            ON DELETE CASCADE</span>
-<span class="s">            ON UPDATE CASCADE,</span>
-<span class="s">         CONSTRAINT fk_est_dep FOREIGN KEY(&quot;departamento&quot;) REFERENCES Departamento(id_departamento)</span>
-<span class="s">            ON DELETE SET NULL</span>
-<span class="s">            ON UPDATE CASCADE</span>
-<span class="s">      );</span>
-<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
-
-<span class="w">   </span><span class="c1">// Trigger para evitar que un sustituto pueda aparecer en Trabaja,</span>
-<span class="w">   </span><span class="c1">// ya que su trabajo debe ser el del titular. ESTO NO ES ESTÁNDAR.</span>
-
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">      CREATE TRIGGER NoSustitutoEnTrabaja</span>
-<span class="s">      BEFORE INSERT ON Trabaja</span>
-<span class="s">      FOR EACH ROW</span>
-<span class="s">      WHEN (SELECT sustituye FROM Profesor WHERE id_profesor = NEW.profesor) IS NOT NULL</span>
-<span class="s">      BEGIN</span>
-<span class="s">         SELECT RAISE(FAIL, &#39;Imposible registrar un sustituto en Trabaja: hace la misma labor que el sustituido.&#39;);</span>
-<span class="s">      END;</span>
-<span class="s">   &quot;&quot;&quot;</span><span class="p">);</span>
-
-<span class="w">   </span><span class="c1">// Más sentencias que ya veremos.</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
-<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="s">               constraint fk_est_cen FOREIGN KEY(centro) REFERENCES Centro(id_centro)</span>
+<span class="s">                   ON DELETE SET NULL</span>
+<span class="s">                   on UPDATE CASCADE</span>
+<span class="s">           );                       </span>
+<span class="s">       &quot;&quot;&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -621,8 +578,8 @@ comentarlas.</p>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
 <p>No obstante, sí conviene precisar que procuremos al escribirlas
-ceñirnos al estándar lo más posible, a fin de que sean lo más universales
-posibles y nos sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. A este respecto:</p>
+ceñirnos al estándar, a fin de que sean lo más universales posibles y nos
+sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. A este respecto:</p>
 <ul class="simple">
 <li><p>Dejamos de escribir los nombres de elementos de la base de datos
 (tablas, columnas) entre comillas dobles, porque el estándar <abbr title="Structured Query Language">SQL</abbr> lo
@@ -647,11 +604,21 @@ modificar el contenido de la base de datos, no obtener información.</p></li>
 </div></blockquote>
 <p>Tampoco las sentencias de inserción devuelven resultados, por lo que también
 podemos hacer:</p>
-<div class="highlight-java notranslate" id="ej-insert-sin-par"><div class="highlight"><pre><span></span><span class="c1">// Agregamos algunos departamentos.</span>
-<span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (&#39;Informática&#39;)&quot;</span><span class="p">);</span>
-<span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Francés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (&#39;%s&#39;);&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
-<span class="p">}</span>
+<div class="highlight-java notranslate" id="ej-insert-sin-par"><div class="highlight"><pre><span></span><span class="w">   </span><span class="c1">// Agregamos algunos centros</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;INSERT INTO Centro VALUES (11004866, &#39;IES Castillo de Luna&#39;, &#39;pública&#39;)&quot;</span><span class="p">);</span>
+
+<span class="w">   </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
+<span class="w">   </span><span class="p">};</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro VALUES (%d, &#39;%s&#39;, &#39;%s&#39;);&quot;</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span>
+<span class="w">         </span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+<span class="w">         </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span>
+<span class="w">         </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span>
+<span class="w">       </span><span class="p">));</span>
+<span class="w">   </span><span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition caution">
@@ -659,7 +626,7 @@ podemos hacer:</p>
 <p>Aún estamos empezando y sabemos poco, así que estas sentencias son
 torpes por dos razones:</p>
 <ul class="simple">
-<li><p>Estamos ejecutando repetidamente (cuatro veces) la misma sentencia y no es
+<li><p>Estamos ejecutando repetidamente (tres veces) la misma sentencia y no es
 eficiente. Ya aprenderemos cómo hacer <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">operaciones masivas</span></a>.</p></li>
 <li><p>Las sentencias usan valores almacenados en variables y hay que construirlas
 incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
@@ -669,29 +636,15 @@ específico para realizar esta labor: las <a class="reference internal" href="#c
 <p>Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
 mejor.</p>
 </div>
-<div class="admonition seealso">
-<p class="admonition-title">Ver también</p>
-<p>Se proporcionan adicionalmente dos guiones para su uso directo con
-<strong class="program">SQLite</strong>: <a class="reference download internal" download="" href="../_downloads/32df3fa3409385265d36cc032c9ffcd4/sustituye.sql"><code class="xref download docutils literal notranslate"><span class="pre">sustituye.sql</span></code></a>, que
-implementa la solución desarrollada aquí y <a class="reference download internal" download="" href="../_downloads/4bd5718b49155d3fba839e92b3045bc5/sustituto.sql"><code class="xref download docutils literal notranslate"><span class="pre">sustituto.sql</span></code></a> en que el campo <em>sustituye</em> se cambia por <em>sustituto</em>
-para que su significado sea quién es el sustituto del profesor en vez de a
-quién sustituye el profesor. En ambas soluciones, al código Java mostrado se
-añaden algunos <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> para agregar registros a la base de datos y se
-define una <abbr title="Common Table Expression">CTE</abbr> recursiva (totalmente compatible con el estándar <abbr title="Structured Query Language">SQL</abbr>) para
-que la propia base de datos nos cree una vista (<em>PlantillaFuncionamiento</em>)
-que muestra cada profesor, a qué titular en último caso sustituye (o él mismo
-si es titular) y si está activo o no. Esta vista es de enorme utilidad para
-saber en dónde trabaja cada profesor, ya que la tabla <em>Trabaja</em> sólo contiene
-profesores titulares.</p>
-</div>
 <p class="rubric">Consultas</p>
-<p>Las consultas, en cambio, sí devuelven resultados, que deberán procesarse luego:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_departamento&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
-<span class="w">   </span><span class="p">}</span>
+<p>Las consultas, en cambio, sí devuelven resultados que deberán procesarse luego:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;Código: %d -- Nombre: %s (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -700,30 +653,62 @@ objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>El objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> hay también que cerrarlo, aunque debería
-cerrarse automáticamente al cerrarse la sentencia que la originó. En
+cerrarse automáticamente al cerrarse la sentencia que lo originó. En
 cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
 sernos útil.</p>
 </div>
 <p>En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
 pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
 de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
-<code class="docutils literal notranslate"><span class="pre">Departamento</span></code> así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
-<span class="cm"> * Esto en realidad se debería comportar como un Enum. Podríamos redefinir la</span>
-<span class="cm"> * clase, para que tuviera ese comportamiento y al cargar los datos de la tabla,</span>
-<span class="cm"> * impidiera crear más objetos.</span>
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code> así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">edu.acceso.borrarlo.modelo</span><span class="p">;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">edu.acceso.sqlutils.Entity</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Modela un centro de enseñanza.</span>
 <span class="cm"> */</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Departamento</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Entity</span><span class="w"> </span><span class="p">{</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Código identificativo del centro.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Nombre del centro.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Titularidad: pública o privada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Departamento</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">super</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Centro</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Departamento</span><span class="w"> </span><span class="nf">cargarDatos</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Carga todos los datos en el objeto.</span>
+<span class="cm">     * @param id Código del centro.</span>
+<span class="cm">     * @param nombre Nombre del centro.</span>
+<span class="cm">     * @param titularidad Titularidad del centro.</span>
+<span class="cm">     * @return El propio objeto.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">cargarDatos</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">setId</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setDenominacion</span><span class="p">(</span><span class="n">denominacion</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setTitularidad</span><span class="p">(</span><span class="n">titularidad</span><span class="p">);</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor que admite todos los datos de definición del centro.</span>
+<span class="cm">     * @param id Código del centro.</span>
+<span class="cm">     * @param nombre Nombre del centro.</span>
+<span class="cm">     * @param titularidad Titularidad del centro (pública o privada)</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Centro</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -734,26 +719,40 @@ de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getDenominacion</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">denominacion</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setDenominacion</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">denominacion</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getTitularidad</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">titularidad</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setTitularidad</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">titularidad</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">getId</span><span class="p">());</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>podríamos hacer esto:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Departamento&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Departamento</span><span class="o">&gt;</span><span class="w"> </span><span class="n">departamentos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-<span class="w">   </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;idDepartamento&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;denominacion&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">departamentos</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Departamento</span><span class="p">().</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
-<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;ID: %d  -- nombre: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">));</span>
-<span class="w">   </span><span class="p">}</span>
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// Posiblemente titularidad debería ser un enum.</span>
+<span class="w">        </span><span class="n">centros</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Centros</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -786,11 +785,19 @@ muchos casos que se incluyan valores de variables en las propias sentencias
 anterior</span></a>.). Por este motivo los conectores incluyen un
 mecanismo para parametrizar sentencias; y, en el caso de <abbr title="Java DataBase Connectivity">JDBC</abbr>, se hace uso de
 <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
-<span class="hll"><span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (?)&quot;</span><span class="p">)</span>
+<div class="highlight-java notranslate" id="ej-insert-par"><div class="highlight"><pre><span></span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">try</span><span class="p">(</span>
+<span class="hll"><span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Centro (id, nombre, titulacion) VALUES (?, ?, ?)&quot;</span><span class="p">)</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Informática&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span><span class="w">  </span><span class="c1">// 1: Valor para el primer &quot;?&quot;.</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span><span class="w">        </span><span class="c1">// id</span>
+</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// nombre</span>
+</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// titulación</span>
 </span><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -799,20 +806,32 @@ mecanismo para parametrizar sentencias; y, en el caso de <abbr title="Java DataB
 <p>Por tanto, cuando se ejecutan sentencias parametrizadas, hay que definir el
 valor para todos los parámetros (el primero, el segundo, etc.) y cuando se han
 establecidos todos sus valores, ejecutar la sentencia.</p>
-<p>Obsérvese que en estas inserciones no estamos suministrando el identificador de
-la entidad, porque dejamos que la base de datos escoja uno por nosotros. Si nos
-interesara obtener ese identificador, podemos hacer lo siguiente:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
+<p>En estos registros, hemos decidido prefijar el valor del identificador. Sin
+embargo, es común dejar indefinido su valor y dejar que la base de datos escoja
+uno al agregarlo como registro. En nuestro ejemplo, sería el caso los
+estudiantes. En esos casos, es probable que al insertarlos queramos conocer qué
+identificador se definió. Para ello podemos hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TimeDateFormatter</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TimeDateFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">);</span>
+<span class="c1">// centro es un centro que ya tenemos definido.</span>
+<span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Perico de los Palotes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;12/06/1995&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">},</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Mariquilla de la O&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;07/09/1999&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">try</span><span class="p">(</span>
 <span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span>
-<span class="w">      </span><span class="s">&quot;INSERT INTO Departamento (denominacion) VALUES (?)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s">&quot;INSERT INTO Estudiante (nombre, nacimiento, centro, id) VALUES (?, ?, ?, ?)&quot;</span><span class="p">,</span>
 <span class="hll"><span class="w">      </span><span class="n">Statement</span><span class="p">.</span><span class="na">RETURN_GENERATED_KEYS</span>
 </span><span class="w">   </span><span class="p">)</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">denominacion</span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Informática&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Tecnología&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">);</span><span class="w">  </span><span class="c1">// 1: Valor para el primer &quot;?&quot;.</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setDate</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">));</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
 <span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 <span class="hll"><span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">getGeneratedKeys</span><span class="p">())</span><span class="w">  </span><span class="p">{</span>
-</span><span class="hll"><span class="w">           </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;&#39;%s&#39; se registró con ID=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">denominacion</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span class="hll"><span class="w">           </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;&#39;%s&#39; se registró con ID=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
 </span><span class="hll"><span class="w">        </span><span class="p">}</span>
 </span><span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -821,41 +840,22 @@ interesara obtener ese identificador, podemos hacer lo siguiente:</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>Pero no hemos dado aún con la forma eficiente, ya que estamos
-repitiendo la ejecución de la misma sentencia con distintos valores y lo que
-hemos hecho no es en absoluto eficiente. Necesitaremos <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">más adelante</span></a> darle al menos una vuelta más.</p>
+repitiendo la ejecución de la misma sentencia con distintos valores.
+Necesitaremos <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">más adelante</span></a> darle al menos una vuelta más.</p>
 </div>
 <p>Obsérvese que al definir los valores de los parámetros de una consulta,
-necesitamos cambiar de método según sea el tipo del campo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
-<span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)&quot;</span><span class="p">);</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manolo&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manuel&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Peñalba Pinzón&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><abbr title="Java DataBase Connectivity">JDBC</abbr> permite usar un método genérico (<code class="docutils literal notranslate"><span class="pre">setObject</span></code>) que se encargará de
-inferir el tipo <abbr title="Structured Query Language">SQL</abbr> correcto a partir del tipo de <em>Java</em>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span>
-<span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Profesor (apelativo, nombre, apellidos, sustituye) VALUES (?, ?, ?, ?)&quot;</span><span class="p">)</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manolo&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manuel&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Peñalba Pinzón&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span><span class="w">  </span><span class="c1">// No se puede inferir entero a partir de null</span>
-<span class="w">      </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>El uso de este método implica algunas cosas:</p>
+necesitamos cambiar de método según sea el tipo del campos. Sin embargo,
+<abbr title="Java DataBase Connectivity">JDBC</abbr> permite usar un método genérico (<code class="docutils literal notranslate"><span class="pre">setObject</span></code>) que se encargará de
+inferir el tipo <abbr title="Structured Query Language">SQL</abbr> correcto a partir del tipo de <em>Java</em>. La razón por la que
+en el ejemplo se añade un tercer parámetro se debe a que el valor puede ser nulo
+y, en ese caso, no podrá inferirse el tipo.</p>
+<p>El uso de este último método implica algunas cosas:</p>
 <ol class="loweralpha">
-<li><p>El driver debe inferirse el tipo <abbr title="Structured Query Language">SQL</abbr> a partir del tipo de <em>Java</em>: eso
+<li><p>El driver debe inferir el tipo <abbr title="Structured Query Language">SQL</abbr> a partir del tipo de <em>Java</em>: eso
 provoca una ligera sobrecarga y puede originar que la traducción no sea la
 deseada. Lo segundo puede solucionarse añadiendo el tercer argumento:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Manolo&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">VARCHAR</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">idCentro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">();</span>
+<span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
@@ -863,28 +863,17 @@ deseada. Lo segundo puede solucionarse añadiendo el tercer argumento:</p>
 transformarlo al tipo requerido: esto implica una nimia sobrecarga también,
 despreciable en la mayoría de los casos.</p></li>
 <li><p>Si no pasamos literales, sino una variable, la variable puede ser nula y
-darnos problemas:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">sustituye</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">sustituye</span><span class="p">);</span><span class="w"> </span><span class="c1">// ¿Cómo inferimos el tipo?</span>
-</pre></div>
-</div>
-<p>En este caso, se solucionaría añadiendo siempre el tercer argumento:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">sustituye</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">sustituye</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span><span class="w"> </span><span class="c1">// ¿Cómo inferimos el tipo?</span>
-</pre></div>
-</div>
-</li>
+darnos problemas. Eso, de nuevo, se soluciona añadiendo el tercer argumento.</p></li>
 </ol>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El código:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Supongamos que en 1 queremos indicar el identificador, no el apodo.</span>
-<span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>es más sucinto que este otro equivalente:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
-<span class="k">else</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
+<span class="k">else</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
 </pre></div>
 </div>
 </div>

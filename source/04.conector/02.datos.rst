@@ -10,14 +10,14 @@ datos en la base de datos y los métodos `getXXXX` de |ResultSet| para
 recuperarlos.
 
 En principio (aunque hay excepciones), podemos usar estos métodos y abstraernos
-de cómo implementa el tipo el |SGBD| el estándar |SQL|.
+de cómo el |SGBD| lo traduce a un tipo |SQL|.
 
 .. _conn-data-simple:
 
 Datos simples
 -------------
 Por datos simples entendemos los que representan caracteres, enteros, números
-reales(flotantes o de precisión fija) o booleanos y tienen, por lo general, un
+reales (flotantes o de precisión fija) o booleanos y tienen, por lo general, un
 equivalente propio de Java.
 
 .. table::
@@ -52,41 +52,41 @@ no es un tipo primitivo en Java, pero su uso es trivial:
 
    BigDecimal comaFija = new BigDecimal("13.456");
 
-.. rubric:: SQLite
+.. admonition:: Aclaración
 
-Dado que hemos escogido este |SGBD| para desarrollar la unidad, nos conviene
-centrarnos en sus particularidades. La característica fundamental de :program:`SQLite`
-es que tiene **tipado dinámico** y cuál sea el tipo que declaremos al crear la tabla
-es irrelevante, porque el sistema gestor aceptará el dato con independencia de
-su tipo. Por ejemplo:
+   Dado que hemos escogido :program:`SQLite` para desarrollar la unidad, nos
+   conviene aclarar sus particularidades. Su característica fundamental en lo
+   referente a tipos es que tiene **tipado dinámico** y cuál sea el tipo que
+   declaremos al crear la tabla es irrelevante, porque el sistema gestor
+   aceptará el dato con independencia de su tipo. Por ejemplo:
 
-.. code-block:: sql
-   :emphasize-lines: 7
+   .. code-block:: sql
+      :emphasize-lines: 7
 
-   CREATE TABLE Persona (
-      nombre    VARCHAR(255);
-   );
+      CREATE TABLE Persona (
+         nombre    VARCHAR(255);
+      );
 
-   INSERT INTO Persona VALUES
-      ("Manolo"),   // Consecuente con la definición: no da problemas.
-      (4356);       // Inconsecuente, pero da igual: el dato se almacena como entero.
+      INSERT INTO Persona VALUES
+         ("Manolo"),   // Consecuente con la definición: no da problemas.
+         (4356);       // Inconsecuente, pero da igual: el dato se almacena como entero.
 
-De hecho, :program:`SQLite` ni siquiera atiende a qué palabra usamos para
-definir el tipo y creará la tabla, incluso aunque nos inventemos el nombre del
-tipo:
+   De hecho, :program:`SQLite` ni siquiera atiende a qué palabra usamos para
+   definir el tipo y creará la tabla, incluso aunque nos inventemos el nombre del
+   tipo:
 
-.. code-block:: sql
+   .. code-block:: sql
 
-   CREATE TABLE Persona (
-      nombre    TIPOINVENTADO   // No da error.
-   );
+      CREATE TABLE Persona (
+         nombre    TIPOINVENTADO   // No da error.
+      );
 
-Internamente, :program:`SQLite` sólo dispone de datos de tipo texto, entero (de
-diverso tamaño), doble y BLOB; y dependiendo del valor que se suministre usará
-un tipo u otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto,
-``INTEGER``, ``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``,
-``DOBLE`` y ``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión
-de este último tipo).
+   Internamente, :program:`SQLite` sólo dispone de datos de tipo texto, entero (de
+   diverso tamaño), doble y BLOB; y dependiendo del valor que se suministre usará
+   un tipo u otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto,
+   ``INTEGER``, ``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``,
+   ``DOBLE`` y ``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión
+   de este último tipo).
 
 .. _conn-data-complex:
 
@@ -138,7 +138,7 @@ El estándar |SQL| define cinco tipos de datos para la expresión de tiempos:
 A través de |JDBC| sólo se soportan directamente los tres primeros tipos y,
 además, se requiere saber cómo convertir entre :java-sql:`Date`,
 :java-sql:`Time`, :java-sql:`Timestamp` y los tipos con los que frecuentemente
-se trabaja en *Java*.
+se trabaja en *Java*:
 
 .. code-block:: java
 
@@ -197,7 +197,7 @@ BLOB y CLOB
 '''''''''''
 Ambos tipos representan datos de tamaño considerable, ``BLOB`` datos binarios
 (p.e. una imagen) y ``CLOB`` un conjunto de caracteres, o sea, un texto mayor
-que el que se podrían almacenar con ``VARCHAR`` (cuyo límite depende del
+que el que se podría almacenar con ``VARCHAR`` (cuyo límite depende del
 |SGBD|). Al margen de esa diferencia, explicado uno, explicado el otro.
 
 Por ejemplo, si tuviéramos un archivo con una foto que quisiéramos guardar en
@@ -289,42 +289,42 @@ los mapas de *Python* o *Java*:
       letra          CHAR(2)
    );
 
-.. rubric:: SQLite
+.. admonition:: Aclaración
 
-:program:`SQLite` no soporta de forma nativa los datos complejos (ya explicamos
-al tratar los datos simples cómo funcionan en realidad los tipos en él). En
-particular:
+   :program:`SQLite` no soporta de forma nativa los datos complejos (ya explicamos
+   al tratar los datos simples cómo funcionan en realidad los tipos en él). En
+   particular:
 
-``DATE``\ /\ ``TIME``\ /\ ``TIMESTAMP``
-   Puede almacenarlos como una cadena ('2024-12-12'), un entero(el tiempo *UNIX*
-   1733961600) o un flotante (`fecha juliana
-   <https://es.wikipedia.org/wiki/Fecha_juliana>`_ usada en Astronomía). Para
-   darles soporte añade funciones específicas.
+   ``DATE``\ /\ ``TIME``\ /\ ``TIMESTAMP``
+      Puede almacenarlos como una cadena ('2024-12-12'), un entero(el tiempo *UNIX*
+      1733961600) o un flotante (`fecha juliana
+      <https://es.wikipedia.org/wiki/Fecha_juliana>`_ usada en Astronomía). Para
+      darles soporte añade funciones específicas.
 
-   En el caso particular de |JDBC|, ``setDate`` almacenará la fecha como un
-   entero, lo cual nos es indiferente si leemos los campos con ``getDate``, pero
-   quizás no nos guste tanto, si la lectura la hacemos por otros medios (p.e.
-   usando directamente el cliente de :program:`SQLite` sin echar mano de funciones
-   específicas).
-   
-``BLOB``
-   Es el único dato complejo que realmente soporta :program:`SQLite`, así que no
-   tendremos problemas con él.
+      En el caso particular de |JDBC|, ``setDate`` almacenará la fecha como un
+      entero, lo cual nos es indiferente si leemos los campos con ``getDate``, pero
+      quizás no nos guste tanto, si la lectura la hacemos por otros medios (p.e.
+      usando directamente el cliente de :program:`SQLite` sin echar mano de funciones
+      específicas).
+      
+   ``BLOB``
+      Es el único dato complejo que realmente soporta :program:`SQLite`, así que no
+      tendremos problemas con él.
 
-``CLOB``
-   :program:`SQLite` no le da un tratamiento especial y se trata como cualquier
-   otra cadena, ya que internamente :program:`SQLite` sólo tiene un tipo para
-   datos que son cadenas. Sin embargo, ``setClob`` **no está implementado** para
-   él, por lo que tendremos que usar ``setString``.
+   ``CLOB``
+      :program:`SQLite` no le da un tratamiento especial y se trata como cualquier
+      otra cadena, ya que internamente :program:`SQLite` sólo tiene un tipo para
+      datos que son cadenas. Sin embargo, ``setClob`` **no está implementado** para
+      él, por lo que tendremos que usar ``setString``.
 
-``JSON``
-   No tiene soporte nativo sino a través de funciones específicas. En cualquier
-   caso, |JDBC| tampoco lo tiene con lo que tendrá que usarse ``setString``
-   igual que para el resto de |SGBD|.
+   ``JSON``
+      No tiene soporte nativo sino a través de funciones específicas. En cualquier
+      caso, |JDBC| tampoco lo tiene con lo que tendrá que usarse ``setString``
+      igual que para el resto de |SGBD|.
 
-``ARRAY``\ /\ ``STRUCT``
-   No tienen soporte en :program:`SQLite` y, además, los métodos ``setArray`` y
-   ``setStruct`` no están implementados para el *driver*.
+   ``ARRAY``\ /\ ``STRUCT``
+      No tienen soporte en :program:`SQLite` y, además, los métodos ``setArray`` y
+      ``setStruct`` no están implementados para el *driver*.
 
 .. rubric:: Notas al pie
 
@@ -354,7 +354,6 @@ particular:
 
    Por su parte, ``REAL`` es un alias para ``FLOAT(24)`` y ``DOUBLE PRECISION``,
    para ``FLOAT(53)``.
-
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`

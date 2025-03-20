@@ -409,7 +409,7 @@ mecanismo que se encarga de administrar un grupo de conexiones a una base de
 datos a fin de que puedan ser reutilizadas por diferentes partes de una
 aplicación. Esto ahorra al programa el coste de la creación y establecimiento de
 conexiones.</p>
-<img alt="../_images/pool.png" src="../_images/pool.png" />
+<img alt="../_images/pool.png" id="conn-image-pool" src="../_images/pool.png" />
 <p>En la figura el pool de conexiones tiene abiertas tres conexiones a las bases de
 datos, dos de las cuales están siendo usados en la aplicación. Esto significa
 que aún hay una libre y que, si ésta necesitara otra, podría usarla sin
@@ -444,11 +444,12 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:</p>
 </div>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
-<p>En el código anterior los dos objetos |
-embargo, es más que probable que ambos estén utilizando la misma conexión a
-la base de datos, ya que se crean a partir de un pool de conexiones y al
-crear el segundo objeto, el primero ya se cerró y, por tanto, ha dejado
-disponible la conexión en el pool.</p>
+<p>En el código anterior los dos objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> generan dos objetos
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> distintos. Sin embargo, es más que probable que ambos estén
+utilizando, en realidad, la misma conexión a la base de datos, ya que se
+crean a partir de un pool de conexiones y al crear el segundo objeto, el
+primero ya se cerró y, por tanto, ha dejado disponible la conexión en el
+pool.</p>
 <p>En cambio, si se hubieran generado directamente con <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a>, ambos
 objetos conectores estarían asociados a dos conexiones distintas.</p>
 </div>
@@ -488,7 +489,7 @@ objeto antes de crear el segundo, pero si el código fuera este:</p>
 </div>
 <p>al crearse el objeto <code class="docutils literal notranslate"><span class="pre">conn2</span></code>, <code class="docutils literal notranslate"><span class="pre">conn1</span></code> se cerrará y quedará inútil. El
 <em>bug</em>, no obstante, es un defecto del controlador para <strong class="program">SQLite</strong>. El
-código equivalente para otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> sí debe funcionar correctamente.</p>
+código equivalente para otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> sí debería funcionar correctamente.</p>
 </div>
 </section>
 <section id="id1">

@@ -11,6 +11,7 @@ aplicación. Esto ahorra al programa el coste de la creación y establecimiento 
 conexiones.
 
 .. image:: files/pool.png
+   :name: conn-image-pool
 
 En la figura el pool de conexiones tiene abiertas tres conexiones a las bases de
 datos, dos de las cuales están siendo usados en la aplicación. Esto significa
@@ -51,11 +52,12 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:
 
 .. admonition:: Aclaración
 
-   En el código anterior los dos objetos |
-   embargo, es más que probable que ambos estén utilizando la misma conexión a
-   la base de datos, ya que se crean a partir de un pool de conexiones y al
-   crear el segundo objeto, el primero ya se cerró y, por tanto, ha dejado
-   disponible la conexión en el pool.
+   En el código anterior los dos objetos |DataSource| generan dos objetos
+   |Connection| distintos. Sin embargo, es más que probable que ambos estén
+   utilizando, en realidad, la misma conexión a la base de datos, ya que se
+   crean a partir de un pool de conexiones y al crear el segundo objeto, el
+   primero ya se cerró y, por tanto, ha dejado disponible la conexión en el
+   pool.
 
    En cambio, si se hubieran generado directamente con |DriverManager|, ambos
    objetos conectores estarían asociados a dos conexiones distintas.
@@ -99,7 +101,7 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:
 
    al crearse el objeto ``conn2``, ``conn1`` se cerrará y quedará inútil. El
    *bug*, no obstante, es un defecto del controlador para :program:`SQLite`. El
-   código equivalente para otros |SGBD| sí debe funcionar correctamente.
+   código equivalente para otros |SGBD| sí debería funcionar correctamente.
 
 HikariCP
 --------
@@ -156,8 +158,8 @@ Su uso, por otro lado es muy sencillo:
 
    ds.close();  // Se liberan recursos.
 
-
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |DriverManager| replace:: :java-sql:`DriverManager <DriverManager>`
+.. |DataSource| replace:: :java-sql:`DataSource <DataSource>`

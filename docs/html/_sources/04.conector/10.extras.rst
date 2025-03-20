@@ -4,10 +4,8 @@ Extras
 ******
 Arrinconamos bajo este epígrafe algunos aspectos adiciones de los conectores:
 
-
 Metadatos
 =========
-
 .. todo:: DatabaseMetaData y ResultSetMetaData.
 
 .. _conn-pool-extra:
@@ -16,11 +14,35 @@ Metadatos
 ====================
 Ya tratamos cómo crear un :ref:`pool de conexiones <conn-pool>`. Si queremos
 simplificar la creación del pool y abstraernos de qué se usa para crearlo,
-podemos envolverlo en una clase básica parecida a esta:
+podemos envolverlo en una clase como esta:
 
-.. literalinclude:: files/PoolConnectionBuilder.java
+.. literalinclude:: files/ConnectionPool.java
    :language: java
-   
+   :start-at: public class
+
+De este modo, para crear un *pool* con HikariCP_ basta con hacer lo siguiente\ [#]_:
+
+.. code-block:: java
+
+   // Pool de conexiones de una base SQLite en memoria.
+   ConnectionPool pool = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
+   DataSource ds = pool.getDataSource();
+   Connection conn = pool.getConnection();  // o ds.getConnection()
+
+Lo interesante de la clase, además de que simplifica la creación del *pool*, es que
+usa un `patrón Singleton`_, de manera que si intentamos crear un pool con los
+mismos parámetros, devolverá el pool ya creado y no otro distinto:
+
+.. code-block:: java
+
+   ConnectionPool pool1 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
+   ConnectionPool pool2 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
+   pool1 == pool2; // true
+   ConnectionPool pool3 = PoolConnection.getInstance();
+   pool1 == pool3; // true
+   ConnectionPool pool4 = PoolConnection.getInstance("jdbc:sqlite:caca.db");
+   pool1 == pool4; // false
+   ConnectionPool pool5 = PoolConnection.getInstance();  // IllegalArgumentException (hay dos, ¿cuál?)
 
 .. _conn-sqlutils:
 
@@ -40,23 +62,26 @@ Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
 modo:
 
 .. code-block:: java
-   :emphasize-lines: 6-11
+   :emphasize-lines: 6-14
 
    // No los cerramos, porque se encargara el cierre del flujo de hacerlo.
    Statement stmt = conn.createStatement();
-   ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento");
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
 
    try ( // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
-      Stream<Departamento> departamentos = SqlUtils.resultSetToStream(stmt, rs, fila -> {
+      Stream<Centro> centros = SqlUtils.resultSetToStream(stmt, rs, fila -> {
          // Esta función puede generar un SQLException
-         int id = fila.getInt("id_departamento");
-         String denominacion = fila.getString("denominacion");
-         return new Departamento().cargarDatos(id, denominacion);
+         int id = fila.getInt("id");
+         String nombre = fila.getString("nombre");
+         // Suponemos que hemos definido mejor Titularidad y hemos creado
+         // un método estático que obtiene Titularidad.PUBLICA a partir de "pública", etc.
+         Titularidad titularidad = Titularidad.fromNombre(fila.getString("titularidad"));
+         return new Centro(id, nombre, titularidad);
       });
    ) {
       //Tratamos el flujo como estimemos más oportuno.
-      for(Departamento d: (Iterable<Departamento>) departamentos::iterator) {
-         System.out.println(String.format("ID: %d -- Denominación: %s", d.getId(), d.getDenominacion()));
+      for(Centro c: (Iterable<Centro>) centros::iterator) {
+         System.out.println(c);
       }
    }
 
@@ -68,23 +93,22 @@ modo:
 
    .. code-block:: java
 
-      Stream<Departamento> departamentos = null;
+      Stream<Centro> centros = null;
 
       try(
          Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery("SELECT * FROM Departamento";
+         ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
       ) {
-
-          departamentos = SqlUtils.resultSetToStream(stmt, rs, fila
-         -> {
-               int id = fila.getInt("id_departamento");
-               String denominacion = fila.getString("denominacion");
-               return new Departamento().cargarDatos(id, denominacion);
-            });
+         centros = SqlUtils.resultSetToStream(stmt, rs, fila -> {
+            int id = fila.getInt("id");
+            String nombre = fila.getString("nombre");
+            Titularidad titularidad = Titularidad.fromNombre(fila.getString("titularidad"));
+            return new Centro(id, nombre, titularidad);
+         });
       }
 
-      for(Departamento d: departamento) {
-         // Jamás obtendremos ningún departamento
+      for(Centro c: centros) {
+         // Jamás obtendremos ningún centro
          // porque el objeto "rs" está cerrado.
       }
 
@@ -144,7 +168,9 @@ las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
 de él, en vez de encontrarse incrustadas en el código.
 
 Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
-guión |SQL| completo, así que la única forma de poner ejecutar sus sentencias,
+guión |SQL| completo y que pasemos una cadena larga con todas instrucciones
+separadas por comas, no aegura que el |SGBD| las descomponga y ejecute
+individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
 + `JSQLParser
@@ -167,7 +193,7 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
 .. hint:: Podemos añadir ambos métodos a la :ref:`clase SqlUtils
    <conn-sqlutils>` ya propuesta. De hecho, hemos preparado un `repositorio de
-   Github <https://github.com/sio2sio2/sqlutils>` listo para su uso:
+   Github <https://github.com/sio2sio2/sqlutils>`_ listo para su uso:
 
    .. code-block:: xml
 
@@ -183,13 +209,30 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
         <dependency>
             <groupId>com.github.sio2sio2</groupId>
             <artifactId>sqlutils</artifactId>
-            <version>1.3.3</version>
+            <version>1.7.0</version>
         </dependency>
       </dependencies>
+
+.. rubric:: Notas al pie
+
+.. [#] Al método sólo se le proporciona la |URL|, porque usamos *SQLite* como
+   |SGBD|. Si fuera otro como *MySQL*, tendríamos también que proporcionar un
+   usuario y una contraseña. Por otro lado, en el caso particular de *SQLite*
+   nos vemos obligados añadir el parámetro :code:`cache=shared` a la |URL|, ya
+   que de lo contrario cada conexión que devuelva el *pool* será una base de
+   datos distinta en memoria. Con una base de datos persistente, no habría sido
+   necesario.
+
+.. [#] Con *SQLite* por ejemplo el método ``.execute`` sí será capaz de ejecutar
+   todas las sentencias |SQL|; ``executeUpdate``, en cambio, no lo hará. Con
+   otros |SGBD| el comportamiento puede variar.
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
+.. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
+.. _HikariCP: https://github.com/brettwooldridge/HikariCP

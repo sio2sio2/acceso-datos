@@ -25,28 +25,33 @@ En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
 pertenezcan a una misma transacción debemos hacer lo siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 1, 10, 14, 17
+   :emphasize-lines: 8, 17, 21, 24
+
+   Object[] registros = new Object[][] {
+       new Object[] {11004866, "IES Castillo de Luna", "pública"},
+       new Object[] {11007533, "IES Arroyo Hondo", "pública"},
+       new Object[] {11701164, "IES Astaroth", "pública"}
+   };
+   String sqlString = "INSERT INTO Centro VALUES (?, ?, ?);"
 
    conn.setAutoCommit(false);  // Evitamos que cada sentencia implique una transacción
 
-   try(
-      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
-   ) {
-       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
-           pstmt.setString(1, denominacion);
+   try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
+       for(Object[] registro: registros) {
+           pstmt.setInt(1, (int) registro[0]);
+           pstmt.setString(2, (String) registro[1]);
+           pstmt.setString(3, (String) registro[2]);
            pstmt.executeUpdate();
        }
        conn.commit(); // Después de ejecutar todas las sentencias, las confirmamos.
    }
    catch(SQLException err) {
       err.printStackTrace();
-      conn.rollback();  // Hubo un problema, no ejecutamos ninguna inserción.
+      conn.rollback();  // Hubo un problema, se deshace todo lo hecho.
    }
    finally {
-      conn.setAutoCommit(true);
+      conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.
    }
-
-.. borrar esto)
 
 .. important:: En el ejemplo, las sentencias son una misma sentencia con
    distinto parámetros.  Evidentemente, las transacciones pueden estar
@@ -64,28 +69,33 @@ la misma sentencia y distintos parámetros (como en el ejemplo anterior
 precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 8, 11
+   :emphasize-lines: 15, 17
 
-   conn.setAutoCommit(false);  // Todas las inserciones forman parte de una transacción
+   Object[] registros = new Object[][] {
+       new Object[] {11004866, "IES Castillo de Luna", "pública"},
+       new Object[] {11007533, "IES Arroyo Hondo", "pública"},
+       new Object[] {11701164, "IES Astaroth", "pública"}
+   };
+   String sqlString = "INSERT INTO Centro VALUES (?, ?, ?);"
 
-   try(
-      PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Departamento (denominacion) VALUES (?)")
-   ) {
-       for(String denominacion: new String[] {"Informática", "Inglés", "Tecnología"}) {
-           pstmt.setString(1, denominacion);
+   conn.setAutoCommit(false);  // Evitamos que cada sentencia implique una transacción
+
+   try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
+       for(Object[] registro: registros) {
+           pstmt.setInt(1, (int) registro[0]);
+           pstmt.setString(2, (String) registro[1]);
+           pstmt.setString(3, (String) registro[2]);
            pstmt.addBatch();  // Añadimos la inserción al procedimiento.
        }
-
        pstmt.executeBatch(); // Ejecutamos todas las inserciones pendientes.
-       conn.commit(); // Grabamos la transacción.
+       conn.commit(); // Confirmamos las inserciones.
    }
    catch(SQLException err) {
       err.printStackTrace();
-      conn.rollback();  // Hubo un problema, no ejecutamos ninguna inserción.
+      conn.rollback();  // Hubo un problema, se deshace todo lo hecho.
    }
    finally {
-      conn.setAutoCommit(true);
+      conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.
    }
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
-

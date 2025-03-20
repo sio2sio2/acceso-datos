@@ -416,11 +416,11 @@ correspondencia entre tipos de datos de Java y de <abbr title="Structured Query 
 datos en la base de datos y los métodos <cite>getXXXX</cite> de <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> para
 recuperarlos.</p>
 <p>En principio (aunque hay excepciones), podemos usar estos métodos y abstraernos
-de cómo implementa el tipo el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el estándar <abbr title="Structured Query Language">SQL</abbr>.</p>
+de cómo el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> lo traduce a un tipo <abbr title="Structured Query Language">SQL</abbr>.</p>
 <section id="datos-simples">
 <span id="conn-data-simple"></span><h2><span class="section-number">4.2.1. </span>Datos simples<a class="headerlink" href="#datos-simples" title="Link to this heading">#</a></h2>
 <p>Por datos simples entendemos los que representan caracteres, enteros, números
-reales(flotantes o de precisión fija) o booleanos y tienen, por lo general, un
+reales (flotantes o de precisión fija) o booleanos y tienen, por lo general, un
 equivalente propio de Java.</p>
 <div class="pst-scrollable-table-container"><table class="tipos-sql table">
 <thead>
@@ -501,12 +501,13 @@ no es un tipo primitivo en Java, pero su uso es trivial:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">comaFija</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">&quot;13.456&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p class="rubric">SQLite</p>
-<p>Dado que hemos escogido este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> para desarrollar la unidad, nos conviene
-centrarnos en sus particularidades. La característica fundamental de <strong class="program">SQLite</strong>
-es que tiene <strong>tipado dinámico</strong> y cuál sea el tipo que declaremos al crear la tabla
-es irrelevante, porque el sistema gestor aceptará el dato con independencia de
-su tipo. Por ejemplo:</p>
+<div class="admonition-aclaracion admonition">
+<p class="admonition-title">Aclaración</p>
+<p>Dado que hemos escogido <strong class="program">SQLite</strong> para desarrollar la unidad, nos
+conviene aclarar sus particularidades. Su característica fundamental en lo
+referente a tipos es que tiene <strong>tipado dinámico</strong> y cuál sea el tipo que
+declaremos al crear la tabla es irrelevante, porque el sistema gestor
+aceptará el dato con independencia de su tipo. Por ejemplo:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">Persona</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">nombre</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">);</span>
 <span class="p">);</span>
@@ -530,6 +531,7 @@ un tipo u otro para el dato. Así, <code class="docutils literal notranslate"><s
 <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code>, <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">SMALLINT</span></code> y <code class="docutils literal notranslate"><span class="pre">BOOLEAN</span></code> a enteros, <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code>,
 <code class="docutils literal notranslate"><span class="pre">DOBLE</span></code> y <code class="docutils literal notranslate"><span class="pre">NUMERIC</span></code>/<code class="docutils literal notranslate"><span class="pre">DECIMAL</span></code> a dobles (por tanto, se perderá la precisión
 de este último tipo).</p>
+</div>
 </section>
 <section id="datos-complejos">
 <span id="conn-data-complex"></span><h2><span class="section-number">4.2.2. </span>Datos complejos<a class="headerlink" href="#datos-complejos" title="Link to this heading">#</a></h2>
@@ -628,7 +630,7 @@ microsegundo, añadiendo decimales al segundo.</p></li>
 <p>A través de <abbr title="Java DataBase Connectivity">JDBC</abbr> sólo se soportan directamente los tres primeros tipos y,
 además, se requiere saber cómo convertir entre <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Date.html">java.sql.Date</a>,
 <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Time.html">java.sql.Time</a>, <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Timestamp.html">java.sql.Timestamp</a> y los tipos con los que frecuentemente
-se trabaja en <em>Java</em>.</p>
+se trabaja en <em>Java</em>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDate</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalTime</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDateTime</span><span class="p">;</span>
@@ -686,7 +688,7 @@ se trabaja en <em>Java</em>.</p>
 <h3><span class="section-number">4.2.2.2. </span>BLOB y CLOB<a class="headerlink" href="#blob-y-clob" title="Link to this heading">#</a></h3>
 <p>Ambos tipos representan datos de tamaño considerable, <code class="docutils literal notranslate"><span class="pre">BLOB</span></code> datos binarios
 (p.e. una imagen) y <code class="docutils literal notranslate"><span class="pre">CLOB</span></code> un conjunto de caracteres, o sea, un texto mayor
-que el que se podrían almacenar con <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> (cuyo límite depende del
+que el que se podría almacenar con <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> (cuyo límite depende del
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>). Al margen de esa diferencia, explicado uno, explicado el otro.</p>
 <p>Por ejemplo, si tuviéramos un archivo con una foto que quisiéramos guardar en
 una base de datos podríamos hacer:</p>
@@ -767,7 +769,8 @@ los mapas de <em>Python</em> o <em>Java</em>:</p>
 <span class="p">);</span>
 </pre></div>
 </div>
-<p class="rubric">SQLite</p>
+<div class="admonition-aclaracion admonition">
+<p class="admonition-title">Aclaración</p>
 <p><strong class="program">SQLite</strong> no soporta de forma nativa los datos complejos (ya explicamos
 al tratar los datos simples cómo funcionan en realidad los tipos en él). En
 particular:</p>
@@ -797,6 +800,7 @@ igual que para el resto de <abbr title="Sistema Gestor de Bases de Datos">SGBD</
 <code class="docutils literal notranslate"><span class="pre">setStruct</span></code> no están implementados para el <em>driver</em>.</p>
 </dd>
 </dl>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id4" role="doc-footnote">

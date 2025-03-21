@@ -105,6 +105,7 @@ necesario que tengamos **instalado el motor**. En el caso de :program:`SQLite`:
 Además, necesitaremos importar en nuestro proyecto la librería propia de :program:`SQLite`: sqlite-jdbc_.
 
 .. rubric:: Ejercicio ilustrativo
+   :name: ej-centros-alumnos
 
 Tomaremos como base un problema muy sencillo en el que simplemente existen
 centros y estudiantes matriculados en ellos. Podemos representarlo

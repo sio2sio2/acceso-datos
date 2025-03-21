@@ -15,6 +15,67 @@ las particularidades del acceso a datos estén reducidas a un paquete dentro de
 la aplicación (p.ej. llamado *backend*), fuera del cual no haya otra cosa que
 objetos.
 
+Uno de los patrones más usados para lograr la abstracción es el `patrón DAO
+<https://www.baeldung.com/java-dao-pattern>`_, que se carga de tomar los objetos
+de la capa de negocio y transladarlos al soporte de persistencia o viceversa.
+Retomando el ya manido :ref:`ejemplo de centros y alumnos <ej-centros-alumnos>`:
+
+.. image:: files/DAO.png
+   :name: dia-dao
+
+Este patrón básicamente:
+
++ Define una interfaz para establecer las operaciones |CRUD| y, quizás, algunas
+  consultas más específicas.
++ Define clases (``CentroDAO``, ``EstudianteDAO``) que implementan la interfaz
+  anterior para el soporte de datos que utilice la aplicación, el cual
+  forzosamente no tiene por qué ser una base de datos relacional. Un cambio en
+  el soporte implica rehacer estas implementaciones, sin alterar el resto de la
+  aplicación.
++ El resto de la aplicación se encarga de utilizar la interfaz, por lo que es
+  ajena a la implementación para un soporte particular.
+
+Por lo general, aunque no forzosamente, cada clase del modelo tendrá asociada
+una clase |DAO|. Recordemos las clases del modelo (``Centro`` y
+``Estudiante``), aunque en esta ocasión para intentar uniformizar la
+implementación forzaremos a que ambas deriven de una interfaz que nos asegura que
+ambas manejan de igual modo su identificador:
+
+.. literalinclude:: files/Entity.java
+   :name: clase-Entity
+
+La clase ``Centro`` es esta:
+
+.. literalinclude:: files/Centro.java
+   :language: java
+   :start-at: public class
+
+que incluye la definición del enum ``Titularidad``. La del ``Estudiante`` es esta
+otra:
+
+.. literalinclude:: files/Estudiante.java
+   :language: java
+   :start-at: public class
+
+Este es el modelo. Ahora necesitamos implementar el acceso a los datos. Eso
+requiere definir la interfaz para las operaciones |CRUD|, que en un alarde de
+originalidad llamaremos ``Crud``, y dos clases |DAO|, ``CentroSqlDAO`` y
+``EstudianteSqlDAO``. La interfaz podemos establecerla como estimemos mejor,
+mientras recoja todas las operaciones necesarias. Por ejemplo:
+
+.. literalinclude:: files/Crud.java
+   :language: java
+   :start-at: public interface
+
+.. admonition:: Aclaración
+
+   Esta interfaz no tiene por qué ser definida exactamente así: podrían defirnir
+   otra que satisfaga también la necesidad de implementar las cuatro operaciones
+   básicas. Por ejemplo, podríamos devolver |Stream| en vez de |List|.
+
+
+SEGUIR POR AQUI...
+
 .. caution:: La solución que se propone aquí y cuyo código se encuentra completo
    en los test de `este repositorio de GitHub
    <https://github.com/sio2sio2/sqlutils>`_ es más bien una prueba de concepto y
@@ -28,17 +89,6 @@ los objetos del modelo de datos de nuestra aplicación y por otro los objetos qu
 se encargan del acceso a la base de datos. Ilustrémoslo con un ejemplo muy
 sencillo: un conjunto de estudiantes que cursan estudios en centros de
 enseñanza:
-
-.. image:: files/er-ec.png
-   :name: conn-er-ec
-
-que podemos codificar de este modo:
-
-.. literalinclude:: files/Centro.java
-   :language: java
-
-.. literalinclude:: files/Estudiante.java
-   :language: java
 
 Como puede observarse, las dos definiciones son independientes del soporte de
 almacenamiento y responden únicamente a la lógica de la aplicación\ [#]_. Para
@@ -85,15 +135,6 @@ Como para todos los objetos, en principio, hay que implementar las mismas
 operaciones de persistencia, esto es, las operaciones |CRUD|, podemos definir
 una interfaz que cumplan todas estas clases relacionadas con el almacenamiento
 en el backend:
-
-.. literalinclude:: files/Crud.java
-   :language: java
-
-.. admonition:: Aclaración
-
-   Esta interfaz no tiene por qué ser definida exactamente así: podrían defirnir
-   otra que satisfaga también la necesidad de implementar las cuatro operaciones
-   básicas. 
 
 .. note:: Estas operaciones son universales y no exclusivas del ejemplo
    ilustrativo que nos proponemos resolver. Por ese motivo la hemos incluido
@@ -436,7 +477,8 @@ preocduparnos por ellos.
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
-.. |List| replace:: :java-util:`List <List>`.
+.. |Stream| replace:: :java-util:`Stream <stream/Stream>` 
+.. |List| replace:: :java-util:`List <List>`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |DataSource| replace:: :javax-sql:`DataSource <DataSource>`

@@ -1,12 +1,41 @@
+package edu.acceso.test_dao.modelo;
+
+import java.util.Arrays;
+
 /**
  * Modela un centro de enseñanza.
  */
 public class Centro implements Entity {
 
+    public static enum Titularidad {
+        PUBLICA("pública"),
+        PRIVADA("privada");
+
+        private String desc;
+
+        Titularidad(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDescripcion() {
+            return desc;
+        }
+
+        /**
+         * Obtiene la titularidad a partir de la descripción.
+         * @param desc La descripción
+         * @return El elemento Titularidad o null, si no hay ninguno con esa descripción.
+         */
+        public static Titularidad fromDesc(String desc) {
+            return Arrays.stream(Titularidad.values())
+                .filter(t -> t.getDescripcion().compareToIgnoreCase(desc) == 0).findFirst().orElse(null);
+        }
+    }
+
     /**
      * Código identificativo del centro.
      */
-    private int id;
+    private Long id;
     /**
      * Nombre del centro.
      */
@@ -14,7 +43,7 @@ public class Centro implements Entity {
     /**
      * Titularidad: pública o privada.
      */
-    private String titularidad;
+    private Titularidad titularidad;
 
     public Centro() {
         super();
@@ -27,7 +56,7 @@ public class Centro implements Entity {
      * @param titularidad Titularidad del centro.
      * @return El propio objeto.
      */
-    public Centro cargarDatos(int id, String nombre, String titularidad) {
+    public Centro cargarDatos(Long id, String nombre, Titularidad titularidad) {
         setId(id);
         setNombre(nombre);
         setTitularidad(titularidad);
@@ -40,15 +69,17 @@ public class Centro implements Entity {
      * @param nombre Nombre del centro.
      * @param titularidad Titularidad del centro (pública o privada)
      */
-    public Centro(int id, String nombre, String titularidad) {
+    public Centro(Long id, String nombre, Titularidad titularidad) {
         cargarDatos(id, nombre, titularidad);
     }
 
-    public int getId() {
+    @Override
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    @Override
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -60,11 +91,11 @@ public class Centro implements Entity {
         this.nombre = nombre;
     }
 
-    public String getTitularidad() {
+    public Titularidad getTitularidad() {
         return titularidad;
     }
 
-    public void setTitularidad(String titularidad) {
+    public void setTitularidad(Titularidad titularidad) {
         this.titularidad = titularidad;
     }
 

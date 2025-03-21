@@ -1,3 +1,9 @@
+package edu.acceso.test_dao.modelo;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+
 /**
  * Modela un estudiante.
  */
@@ -6,7 +12,7 @@ public class Estudiante implements Entity {
     /**
      * Identificador del estudiante.
      */
-    private int id;
+    private Long id;
     /**
      * Nombre completo del estudiante.
      */
@@ -19,7 +25,7 @@ public class Estudiante implements Entity {
     /**
      * Centro al que está adscrito.
      */
-    @Fk private Centro centro;
+    private Centro centro;
 
     public Estudiante() {
         super();
@@ -33,7 +39,7 @@ public class Estudiante implements Entity {
      * @param centro El centro al que está adscrito.
      * @return El propio objeto.
      */
-    public Estudiante cargarDatos(int id, String nombre, LocalDate nacimiento, Centro centro) {
+    public Estudiante cargarDatos(Long id, String nombre, LocalDate nacimiento, Centro centro) {
         setId(id);
         setNombre(nombre);
         setNacimiento(nacimiento);
@@ -50,15 +56,17 @@ public class Estudiante implements Entity {
      * @param centro El centro al que está adscrito.
      * @return El propio objeto.
      */
-    public Estudiante(int id, String nombre, LocalDate nacimiento, Centro centro) {
+    public Estudiante(Long id, String nombre, LocalDate nacimiento, Centro centro) {
         this.cargarDatos(id, nombre, nacimiento, centro);
     }
 
-    public int getId() {
+    @Override
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    @Override
+    public void setId(Long id) {
         this.id = id;
     }
     public String getNombre() {
@@ -83,7 +91,6 @@ public class Estudiante implements Entity {
     @Override
     public String toString() {
         LocalDate hoy = LocalDate.now();
-
         return String.format("%s (%d años)", getNombre(), ChronoUnit.YEARS.between(getNacimiento(), hoy));
     }
 }

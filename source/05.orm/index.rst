@@ -14,15 +14,15 @@ traducción entre los dos modelos y descargar al programador de esta
 responsabilidad. Como ya se enumeraron las :ref:`ventajas e inconvenientes de
 una estrategia frente a la otra <conn-vs-orm>`, no abundaremos más en ello.
 
-.. todo:: Investigar el enfoque de MyBatis_.
-
 *Java* presenta la enorme ventaja de que define una especificación muy completa
 llamada |JPA| para el uso de |ORM|, de manera que, si usamos |ORM|\ s
 compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El
 |ORM| más utilizado en Java es Hibernate_ y es compatible, por lo que esta
 unidad explicará cómo usar esta especificación usando como implementación
 Hibernate_. Los ejemplos los basaremos en :ref:`nuestro caso sobre centros y
-profesores <conn-er-ec>`.
+profesores <ej-centros-alumnos>`.
+
+.. todo:: Investigar el enfoque de MyBatis_ (quizás para la unidad anterior).
 
 .. rubric:: Contenidos
 
@@ -32,7 +32,8 @@ profesores <conn-er-ec>`.
 
    [0-9]*
 
-.. seealso:: Puede consultar también la `pequeña guía oficial
+.. seealso:: Dado que usaremos Hibernate_ como implementación de |JPA|, puede consultar
+   también su `pequeña guía oficial
    <https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html>`_.
 
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

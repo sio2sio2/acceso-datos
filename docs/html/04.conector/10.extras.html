@@ -418,7 +418,7 @@ document.write(`
 <p>Ya tratamos cómo crear un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>. Si queremos
 simplificar la creación del pool y abstraernos de qué se usa para crearlo,
 podemos envolverlo en una clase como esta:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate" id="clase-connectionpool"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
@@ -905,9 +905,9 @@ necesario.</p>
 </aside>
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
-<p>Con <em>SQLite</em> por ejemplo el método <code class="docutils literal notranslate"><span class="pre">.execute</span></code> sí será capaz de ejecutar
-todas las sentencias <abbr title="Structured Query Language">SQL</abbr>; <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code>, en cambio, no lo hará. Con
-otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el comportamiento puede variar.</p>
+<p>Con <em>SQLite</em> por ejemplo el método <code class="docutils literal notranslate"><span class="pre">.executeUpdate</span></code> sí será capaz de
+ejecutar todas las sentencias <abbr title="Structured Query Language">SQL</abbr>; <code class="docutils literal notranslate"><span class="pre">execute</span></code>, en cambio, no lo hará y
+ejecutará solo la primera. Con otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el comportamiento puede variar.</p>
 </aside>
 </aside>
 </section>

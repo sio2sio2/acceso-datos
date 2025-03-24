@@ -418,6 +418,12 @@ aplicación.</p></li>
 <li><p>El resto de la aplicación se encarga de utilizar la interfaz, por lo que es
 ajena a la implementación para un soporte particular.</p></li>
 </ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Todo el código que se describe y comenta en este apartado está en el
+<a class="reference external" href="https://github.com/josem-dam/test_dao">repositorio de GitHub test_dao</a>. Se
+recomienda descargarlo para repasar mejor las explicaciones.</p>
+</div>
 <p>Por lo general, aunque no forzosamente, cada clase del modelo tendrá asociada
 una clase <abbr title="Data Access Object">DAO</abbr>. Recordemos las clases del modelo (<code class="docutils literal notranslate"><span class="pre">Centro</span></code> y
 <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>), aunque en esta ocasión para intentar uniformizar la
@@ -431,11 +437,13 @@ ambas manejan de igual modo su identificador:</p>
 </pre></div>
 </div>
 <p>La clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code> es esta:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Entity</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="clase-centro">
+<div class="code-block-caption"><span class="caption-text">Centro.java</span><a class="headerlink" href="#clase-centro" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Entity</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">PUBLICA</span><span class="p">(</span><span class="s">&quot;pública&quot;</span><span class="p">),</span>
-<span class="w">        </span><span class="n">PRIVADA</span><span class="p">(</span><span class="s">&quot;privada&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">PUBLICA</span><span class="p">(</span><span class="s">&quot;público&quot;</span><span class="p">),</span>
+<span class="w">        </span><span class="n">PRIVADA</span><span class="p">(</span><span class="s">&quot;privado&quot;</span><span class="p">);</span>
 
 <span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">desc</span><span class="p">;</span>
 
@@ -532,9 +540,12 @@ ambas manejan de igual modo su identificador:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
 <p>que incluye la definición del enum <code class="docutils literal notranslate"><span class="pre">Titularidad</span></code>. La del <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es esta
 otra:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Estudiante</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Entity</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="clase-estudiante">
+<div class="code-block-caption"><span class="caption-text">Estudiante.java</span><a class="headerlink" href="#clase-estudiante" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Estudiante</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Entity</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Identificador del estudiante.</span>
@@ -623,650 +634,587 @@ otra:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
 <p>Este es el modelo. Ahora necesitamos implementar el acceso a los datos. Eso
 requiere definir la interfaz para las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, que en un alarde de
 originalidad llamaremos <code class="docutils literal notranslate"><span class="pre">Crud</span></code>, y dos clases <abbr title="Data Access Object">DAO</abbr>, <code class="docutils literal notranslate"><span class="pre">CentroSqlDAO</span></code> y
 <code class="docutils literal notranslate"><span class="pre">EstudianteSqlDAO</span></code>. La interfaz podemos establecerla como estimemos mejor,
 mientras recoja todas las operaciones necesarias. Por ejemplo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Crud</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Entity</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="clase-crud">
+<div class="code-block-caption"><span class="caption-text">Crud.java</span><a class="headerlink" href="#clase-crud" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Crud</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Entity</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene una entidad a partir de su identificador.</span>
+<span class="cm">     * @param id Identificador de la entidad.</span>
+<span class="cm">     * @return La entidad requerida.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene la relación completa de entidades de un tipo.</span>
+<span class="cm">     * @return Una lista con todas las entidades.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Borra una entidad con un determinado identificador.</span>
+<span class="cm">     * @param id Identificador de la entidad.</span>
+<span class="cm">     * @return true, si se encontró la entidad y se borró.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Borra una entidad.</span>
+<span class="cm">     * @param obj La entidad que se quiere borrar.</span>
+<span class="cm">     * @return true, si la entidad existía y se borro.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">delete</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Agrega una entidad a la base de datos.</span>
+<span class="cm">     * @param obj La entidad que se quiere agregar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía una entidad con ese identificador.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Agrega una multitud de entidades de un determinado tipo a la base de datos.</span>
+<span class="cm">     * @param objs Las entidades a agregar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía alguna de las entidades.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">:</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="n">insert</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Agrega un array de entidades a la base de datos.</span>
+<span class="cm">     * @param objs Las entidades a agregar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía alguna de las entidades.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="o">[]</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">       </span><span class="n">insert</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">objs</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Actualiza los campos de una entidad cuyo identificador no ha cambiado.</span>
+<span class="cm">     * @param obj La entidad con los valores actualizados.</span>
+<span class="cm">     * @return true, si la entidad existía y se pudo actualizar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Actualiza el identificador de una entidad.</span>
+<span class="cm">     * @param oldId El valor antiguo del identificador.</span>
+<span class="cm">     * @param newId El nuevo valor de identificador.</span>
+<span class="cm">     * @return true, si la entidad existía y se pudo actualizar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Actualiza el identificador de una entidad.</span>
+<span class="cm">     * @param obj La entidad con el identificador sin actualizar. </span>
+<span class="cm">     * @param newId El nuevo valor de identificador.</span>
+<span class="cm">     * @return true, si la entidad existía y se pudo actualizar.</span>
+<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
+<p>Nótese que la interfaz es genérica, porque tiene que servir para cualquier tipo
+de objeto que quiera almacenarse en la base de datos. En nuestro ejemplo, se
+particularizará para <a class="reference internal" href="#clase-centro"><span class="std std-ref">Centro</span></a> y para <a class="reference internal" href="#clase-estudiante"><span class="std std-ref">Estudiante</span></a>.</p>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
-<p>Esta interfaz no tiene por qué ser definida exactamente así: podrían defirnir
+<p>Esta interfaz no tiene por qué ser definida exactamente así: podría definirse
 otra que satisfaga también la necesidad de implementar las cuatro operaciones
-básicas. Por ejemplo, podríamos devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
+básicas. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
+podrían devolverlas en forma de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
 </div>
-<p>SEGUIR POR AQUI…</p>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>La solución que se propone aquí y cuyo código se encuentra completo
-en los test de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">este repositorio de GitHub</a> es más bien una prueba de concepto y
-tiene el propósito lograr abstraer al programa de los detalles de la
-conexión, de manera que la persistencia se pueda manejar exclusivamente con
-objetos. Precisamente, esa la labor de las <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">herramientas ORM</span></a> y
-esas son las que deberíamos usar si quisiéramos crear una aplicación real.</p>
-</div>
-<p>Para lograr esta abstracción proponemos un patrón <abbr title="Data Access Object">DAO</abbr>, que separa por un lado
-los objetos del modelo de datos de nuestra aplicación y por otro los objetos que
-se encargan del acceso a la base de datos. Ilustrémoslo con un ejemplo muy
-sencillo: un conjunto de estudiantes que cursan estudios en centros de
-enseñanza:</p>
-<p>Como puede observarse, las dos definiciones son independientes del soporte de
-almacenamiento y responden únicamente a la lógica de la aplicación<a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Para
-simplicar las cosas obligamos a que todas estas clases incluyan un campo
-identificador, de ahí que implementen una interfaz <code class="docutils literal notranslate"><span class="pre">Entity</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Entity</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getId</span><span class="p">();</span>
-<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setId</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Si estas clases son ajenas a su persistencia, ¿cómo entonces se escribe o
-recupera información sobre ellas en la base de datos? El patrón consiste en
-crear por cada una otra clase que se encargue de esa labor. Por tanto:</p>
+<p>Como puede comprobarse, tanto las definiciones de las clases como la interfaz
+son independientes de cuál sea el soporte de almacenamiento y responden las
+primeras a la lógica de la aplicación y la segunda a la necesidad de obtención
+de datos almacenados.</p>
+<p>Llegamos por fin a la parte en la que implementamos la lógica de la
+persistencia. Necesitamos, en principio, tres clases: una que abstraiga del
+establecimiento de la conexión, que bien podría ser <a class="reference internal" href="10.extras.html#clase-connectionpool"><span class="std std-ref">ConnectionPool</span></a> y otra por cada una de las clases del modelo:</p>
 <div class="pst-scrollable-table-container"><table class="table" id="clase-dao">
 <thead>
-<tr class="row-odd"><th class="head"><p>Clase</p></th>
-<th class="head"><p>Clase <abbr title="Data Access Object">DAO</abbr></p></th>
+<tr class="row-odd"><th class="head"><p>Clase del modelo</p></th>
+<th class="head"><p>Clase del patrón</p></th>
+<th class="head"><p>Descripción</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Centro</p></td>
-<td><p>CentroSqlite</p></td>
+<tr class="row-even"><td><p>-</p></td>
+<td><p>ConnectionPool</p></td>
+<td><p>Se encarga de establecer la conexión.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Estudiante</p></td>
-<td><p>EstudianteSqlite</p></td>
+<tr class="row-odd"><td><p>Centro</p></td>
+<td><p>CentroSqlDao</p></td>
+<td><p>Acceso a la tabla Centro.</p></td>
+</tr>
+<tr class="row-even"><td><p>Estudiante</p></td>
+<td><p>EstudianteSqlDao</p></td>
+<td><p>Acceso a la tabla Estudiante.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Estas clases encargadas de la conversión entre el modelo de objetos (la
-definición de la clase en la aplicación) y el modelo relacional (su
-persistencia en la base de datos) dependen de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> concreto, ya
-que ninguno implementa exactamente igual el lenguaje <abbr title="Structured Query Language">SQL</abbr><a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.  La idea es
-que cada vez que haya que consultar la base de datos, se usen estas clases y el
-resto del código de nuestra aplicación quede libre de sentencias <abbr title="Structured Query Language">SQL</abbr>, objetos
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> y demás particularidades de la persistencia. Por ejemplo, obtener
-un centro se podrá hacer así<a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// ds es un DataSource.</span>
-<span class="kd">var</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-<span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">11004866</span><span class="p">);</span>
+<p>La implementación de ambas clases es muy semejante y ambas necesitarán que les
+pasemos en su construcción un objeto <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> o un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> para
+que puedan llevar a cabo sus operaciones. ¿Qué les pasamos? Analicémoslo:</p>
+<ul class="simple">
+<li><p>Si decidimos que se construyan pasando un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>, corremos el
+riesgo de que este objeto se cierre en algún momento, con lo que los objetos
+dejarán de poder realizar operaciones.</p></li>
+<li><p>Si pasando un objeto <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, podemos crear una nueva conexión dedicada
+cada vez que hagamos una operación, pero nos quedamos sin la posibilidad de
+hacer transacciones que incluyan dos o más operaciones.</p></li>
+</ul>
+<p>La mejor solución es permitir que se pase una u otra cosa, de manera que cuando
+tengamos que hacer una operación podamos obrar así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
+
+<span class="hll"><span class="w">    </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">        </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span><span class="w"> </span><span class="c1">// ¡Ojo! No debe cerrarse directamente</span>
+</span><span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible borrar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Como para todos los objetos, en principio, hay que implementar las mismas
-operaciones de persistencia, esto es, las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, podemos definir
-una interfaz que cumplan todas estas clases relacionadas con el almacenamiento
-en el backend:</p>
+<p>Básicamente, tenemos un objeto <code class="docutils literal notranslate"><span class="pre">cp</span></code> (ya veremos que de tipo <code class="docutils literal notranslate"><span class="pre">ConnProvider</span></code>)
+que nos permite crear un objeto envoltorio (<code class="docutils literal notranslate"><span class="pre">cw</span></code>). A partir de este objeto
+envoltorio podemos obtener la conexión en sí para hacer la operación. La
+particularidad de este envoltorio es que al cerrar el objeto se cierra el objeto
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> asociado, si se tomó para construir el objeto <code class="docutils literal notranslate"><span class="pre">cp</span></code> un
+<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>; pero no se cerrará, si lo que se tomó para construir fue el propio
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Estas operaciones son universales y no exclusivas del ejemplo
-ilustrativo que nos proponemos resolver. Por ese motivo la hemos incluido
-como parte de la librería <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>. De hecho, se ha hecho un esfuerzo por
-generalizar todo lo que no depende de la particularidad del ejemplo, de ahí
-que haya mucho código dentro de la librería que utilice clases genéricas y
-reflexión. Crear una solución particular que cumpla los mismos principios de
-abstracción para el resto de la aplicación, no es en exceso complicado y
-puede resultar un ejercico pedagógicamente muyl útil.</p>
+<p>Toda esta argucia es necesaria si queremos habilitar transacción que
+incluyan varias operaciones. Si no es así, podríamos construir los objetos
+<abbr title="Data Access Object">DAO</abbr> con el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>.</p>
 </div>
-<p>Son precisas algunas aclaraciones:</p>
-<ul class="simple">
-<li><p>La interfaz es genérica, porque una clase orientada a almacenar estudiantes
-deberá recuperar estudiantes o admitir un estudiante cuando desea añadir datos
-a la base de datos, mientras que si está orientada a centros, deberá hacer lo
-propio con centros.</p></li>
-<li><p>El método de inserción de varios objetos puede resultar redundante y,
-de hecho, se facilita una implementación predeterminada que consiste en
-insertar sucesivamente todos. Pero es útil porque da pie a que podamos
-implementar algo más eficiente, si así lo estimamos oportuno.</p></li>
-<li><p>Hemos preferido que la obtención de todos los objetos de una misma clase se
-haga mediante un flujo para lo cual podemos usar el método
-<code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> de <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>. Por supuesto es posible también
-alterar la firma del método para devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a><a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
-<li><p>La obtención de un objeto a partir de su identificador puede resultar
-infructuosa, si tal objeto no existe en el almacenamiento. Por ese motivo se
-ha preferido devolver <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Optional.html">Opcional</a> en vez de directamente
-el objeto.</p></li>
-<li><p>Todas estas operaciones son susceptibles de generar excepciones (típicamente
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a> si la base de datos es relacional), así que hemos definido una
-excepción propia para abstraernos de cuál es la excepción particular del
-soporte de almacenamiento.</p></li>
-</ul>
-<p>Esta, pues, es la interfaz que cumplirán todas las clases encargadas de
-comunicarse con la base de datos para extraer o guardar datos. La implementación
-de <code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> para almacenar objetos <code class="docutils literal notranslate"><span class="pre">Centros</span></code> es esta:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<p>Por tanto, tenemos que implementar estos dos tipos de objetos:</p>
+<div class="literal-block-wrapper docutils container" id="clase-connprovider">
+<div class="code-block-caption"><span class="caption-text">ConnProvider.java</span><a class="headerlink" href="#clase-connprovider" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnProvider</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Constructor de la clase.</span>
-<span class="cm">     * @param ds Fuente de datos.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlite</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnWrapper</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">closeable</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConnWrapper</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">closeable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConnWrapper</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">            </span><span class="n">closeable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">closeable</span><span class="p">)</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Constructor de la clase.</span>
-<span class="cm">     * @param conn Conexión de datos.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlite</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConnProvider</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
+<span class="w">        </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Constructor de la clase.</span>
-<span class="cm">     * @param cp Proveedor de la conexión.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlite</span><span class="p">(</span><span class="n">ConnectionProvider</span><span class="w"> </span><span class="n">cp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="kd">super</span><span class="p">(</span><span class="n">cp</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConnProvider</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Recupera los datos de un registro de la tabla para convertirlos en objeto Centro.</span>
-<span class="cm">     * @param rs El ResultSet que contiene el registro.</span>
-<span class="cm">     * @return Un objeto Centro que modela los datos del registro.</span>
-<span class="cm">     * @throws SQLException Cuando se produce un error al recuperar los datos del registro.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">resultToCentro</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_centro&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">ConnWrapper</span><span class="w"> </span><span class="nf">getConnWrapper</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="k">new</span><span class="w"> </span><span class="nf">ConnWrapper</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span><span class="k">new</span><span class="w"> </span><span class="n">ConnWrapper</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Ya están listos los preliminares. Hechos, podemos implementar por completo las
+dos clases <abbr title="Data Access Object">DAO</abbr>:</p>
+<div class="literal-block-wrapper docutils container" id="clase-centrosqldao">
+<div class="code-block-caption"><span class="caption-text">CentroSqlDao.java</span><a class="headerlink" href="#clase-centrosqldao" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ConnProvider</span><span class="w"> </span><span class="n">cp</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlDao</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnProvider</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlDao</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnProvider</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">resultSetToCentro</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="s">&quot;id_centro&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromNombre</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">));</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Fija los valores de los campos de un registro para una sentencia parametrizada.</span>
-<span class="cm">     * @param centro El objeto Centro.</span>
-<span class="cm">     * @param pstmt La sentencia parametrizada.</span>
-<span class="cm">     * @throws SQLException Cuando se produce un error al establecer valor para los parámentros de la consulta.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCentroParams</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">centroToParams</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">());</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">());</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">());</span><span class="w"> </span><span class="c1">// TODO: Esto en realidad es un JSON.</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">().</span><span class="na">getNombre</span><span class="p">());</span>
+<span class="w">        </span><span class="c1">// En este caso el ID siempre tiene valor, con lo que puede usarse directamente setInt.</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">BIGINT</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="c1">// No pueden cerrarse ahora, sino cuando se agote el Stream</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
-<span class="w">            </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
 
-<span class="w">            </span><span class="c1">// Se pasan conn y stmt para que el stream pueda cerrarlos</span>
-<span class="w">            </span><span class="c1">// cuando el mismo se cierre. En cualquier caso, dependiendo de cp,</span>
-<span class="w">            </span><span class="c1">// la conexión se cerrará realmente o no.</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">()</span><span class="o">?</span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">resultSetToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">)):</span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible obtener el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-<span class="w">        </span><span class="k">try</span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
-<span class="w">            </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">();</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">()</span><span class="o">?</span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">resultToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">)):</span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">centros</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">resultSetToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">));</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">centros</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible obtener el listado de centros&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible borrar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro (nombre, titularidad, direccion, id_centro) VALUES (?, ?, ?, ?, ?)&quot;</span><span class="p">;</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="k">try</span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">setCentroParams</span><span class="p">(</span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">pstmt</span><span class="p">);</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro (nombre, titularidad, id_centro) VALUES (?, ?, ?)&quot;</span><span class="p">;</span>
 
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro (nombre, titularidad, direccion, id_centro) VALUES (?, ?, ?, ?, ?)&quot;</span><span class="p">;</span>
-
-<span class="w">        </span><span class="k">try</span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">getConn</span><span class="p">().</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="n">setCentroParams</span><span class="p">(</span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">pstmt</span><span class="p">);</span>
-<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">addBatch</span><span class="p">();</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">centroToParams</span><span class="p">(</span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 <span class="w">            </span><span class="p">}</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeBatch</span><span class="p">();</span>
-<span class="w">            </span><span class="n">tm</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
-
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible agregar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET nombre = ?, titularidad = ?, direccion = ? WHERE id_centro = ?&quot;</span><span class="p">;</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="k">try</span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">setCentroParams</span><span class="p">(</span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">pstmt</span><span class="p">);</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET nombre = ?, titularidad = ? WHERE id_centro = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">centroToParams</span><span class="p">(</span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible actualizar el centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET id_centro = ? WHERE id_centro = ?&quot;</span><span class="p">;</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="k">try</span><span class="p">(</span>
-<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
-<span class="w">            </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">);</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET id_centro = ? WHERE id_centro = ?&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">);</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible actualizar el identificador del centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Si observamos la implementación de cualquiera de las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, veremos
-que consiste en poner en práctica lo aprendido anteriormente: se abre una
-conexión, se construye ls sentencia <abbr title="Structured Query Language">SQL</abbr> apropiada y se ejecuta para realizar
-la operación. Tan sólo el método que devuelve un <code class="docutils literal notranslate"><span class="pre">Stream</span></code> se sale un poco de
-esta regla por las particularidades del propio <code class="docutils literal notranslate"><span class="pre">Stream</span></code> (que no existirían si
-hubiéramos decidido devolver <code class="docutils literal notranslate"><span class="pre">List</span></code>):</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
-<span class="kd">public</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
+</div>
+<div class="literal-block-wrapper docutils container" id="clase-estudiantesqldao">
+<div class="code-block-caption"><span class="caption-text">EstudianteSqlDao.java</span><a class="headerlink" href="#clase-estudiantesqldao" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">EstudianteSqlDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ConnProvider</span><span class="w"> </span><span class="n">cp</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">EstudianteSqlDao</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnProvider</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">EstudianteSqlDao</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnProvider</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="nf">resultSetToEstudiante</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="s">&quot;id_estudiante&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">nac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getDate</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nac</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">nac</span><span class="p">.</span><span class="na">toLocalDate</span><span class="p">();</span>
+<span class="w">    </span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">idCentro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Carga inmediata.</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">idCentro</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">CentroSqlDao</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlDao</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">idCentro</span><span class="p">).</span><span class="na">orElse</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="w">                </span><span class="k">assert</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Identificador como clave foránea no existe&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SQLException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Estudiante</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">estudianteToParams</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNombre</span><span class="p">());</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNacimiento</span><span class="p">();</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setDate</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">));</span>
+<span class="w">        </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getCentro</span><span class="p">();</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">BIGINT</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">BIGINT</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Estudiante WHERE id_estudiante = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">()</span><span class="o">?</span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">resultSetToEstudiante</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">conn</span><span class="p">)):</span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible obtener el estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Estudiante&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">estudiantes</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">resultSetToEstudiante</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">conn</span><span class="p">));</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible obtener el listado de estudiantes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Estudiante WHERE id_estudiante = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible borrar el estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Estudiante (nombre, nacimiento, centro, id_estudiante) VALUES (?, ?, ?, ?)&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="p">.</span><span class="na">RETURN_GENERATED_KEYS</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">estudianteToParams</span><span class="p">(</span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">getGeneratedKeys</span><span class="p">())</span><span class="w">  </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">setId</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible agregar el estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Estudiante Centro SET nombre = ?, nacimiento = ?, centro = ? WHERE id_estudiante = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">estudianteToParams</span><span class="p">(</span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible actualizar el estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Estudiante SET id_estudiante = ? WHERE id_estudiante = ?&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ConnWrapper</span><span class="w"> </span><span class="n">cw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnWrapper</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cw</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">);</span>
+<span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;Imposible actualizar el identificador del estudiante&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Nótese que al crear estos objetos, podemos pasar un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> o un
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>. Lo primero será lo habitual, pero lo segundo lo podemos hacer
+cuando queremos que todas las operaciones pueden compartir conexión para formar
+parte de una misma transacción.</p>
+<p>Otra particularidad de estas clases es que cómo son tan sencillas, usan <abbr title="Structured Query Language">SQL</abbr>
+estándar y, por consiguiente, el código no depende del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> particular. De ahí
+que hayamos elegido nombres que hacen referencia a <abbr title="Structured Query Language">SQL</abbr> y no a
+<strong class="program">SQLite</strong>.</p>
+<p>Sea como sea, estas clases nos permiten que el resto del código se abstraiga de
+cómo se hacen persistentes los datos. De este modo, hacer persistente un nuevo
+centro puede hacerse así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// cpool es un objeto ConnectionPool y obtengo de él el DataSource.</span>
+<span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
+<span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlDao</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
+<span class="n">Centro</span><span class="w"> </span><span class="n">astaroth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
+<span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">astaroth</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Hay, por último, un detalle que no debe pasarse por alto: la relación entre
+<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>. En el código se resuelve de la manera más sencilla
+posible: al cargar un objeto <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> también se carga el objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code>
+al que está asociado, ya que una carga perezosa, esto es, que el centro se
+cargue sólo cuando se requiere de forma efectiva con su <em>getter</em>
+correspondiente, complica mucho el código.</p>
+<p>Para terminar, si tuviéramos que crear una transacción, podríamos construir los
+objetos <abbr title="Data Access Object">DAO</abbr> con una conexión ya abierta:</p>
+<div class="highlight-java notranslate" id="transaccion-dao"><div class="highlight"><pre><span></span><span class="c1">// cpool es un objeto ConnectionPool y obtengo de él una conexión</span>
+<span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpool</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Ambos DAO se crean usando la misma conexión.</span>
+<span class="w">    </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cdao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlDao</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">edao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlDao</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Transacción.</span>
+<span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
 
 <span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cp</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">        </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
-<span class="w">        </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sqlString</span><span class="p">);</span>
-
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
+<span class="w">        </span><span class="n">cdao</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">astaroth</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// Esta inserción falla.</span>
+<span class="w">        </span><span class="n">cdao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Centro repetido&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">));</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">    </span><span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;Se malogra la transacción: %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="c1">// No cerramos la conexión.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Obsérvese que, en este método, a diferencia de los anteriores, no cerramos la
-conexión, ni la sentencia, ni el resultado, ya que de lo contrario, al ser la
-evaluación perezosa y obtenerse registros de <code class="docutils literal notranslate"><span class="pre">ResultSet</span></code> a medida que se
-consumen, no podremos obtener centros del <code class="docutils literal notranslate"><span class="pre">Stream</span></code> devuelto, Quien se
-encargará de cerrar finalmente todo será el propio flujo cuando se cierre, por
-lo que convendrá usar con él un <em>try-with-resources</em>. Por ese motivo, es preciso
-pasar tanto la conexión como la sentencia a <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code>.</p>
-<p>En principio, cada operación parece abrir una conexión propia y cerrarla al
-acabar (excepto este último método por la particularidad ya referida). Si se
-utiliza un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a> y se facilita para la creación
-del objeto <code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> el <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> correspondiente, esto no penaliza
-prácticamente el rendimiento y es muy cómodo. El problema de que cada operación
-abra y cierre su propio objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> es que nos quedamos sin poder reunir
-en una misma transacción dos o más operaciones, ya que las operaciones que
-constituyen una transacción deben compartir la misma conexión.</p>
-<p>En consecuencia, si lo requiere la circunstancia, necesitamos poder crear estos
-objetos a partir de una conexión ya existente y que sus métodos la utilicen sin
-cerrarla. Para no duplicar código, hemos acudido a una argucia: un objeto
-<code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code> que enmascara el hecho de que hayamos creado el objeto a
-partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> o un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> compartido, en cuyo último caso no
-hay que cerrar jamás al acabar la operación, aun cuando en el método que la
-implementa usemos una estructura <em>try-with-resources</em>.  Por esta razón, las
-conexiones se obtienen a partir de un atributo <code class="docutils literal notranslate"><span class="pre">cp</span></code> (definido en
-<code class="docutils literal notranslate"><span class="pre">AbstractDao</span></code> como un <code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code>).  Esta es también la razón por
-la que se pasa a <code class="docutils literal notranslate"><span class="pre">SqlUtils.resultToStream</span></code> a veces una conexión (cuando la
-conexion la creó el propio método a partir de un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>) y a veces una
-sentencia (cuando se usa una conexión preexistente que no debe cerrarse)<a class="footnote-reference brackets" href="#id11" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
-<p>Necesitamos también crear una clase para la persistencia de los objetos
-<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. La clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> es análoga a la anterior, pero hay
-una gran diferencia: uno de los atributos de <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es un centro, lo que
-supone que en la base de datos el campo es una clave foránea (un entero) que
-hace referencia al registro de otra tabla. El problema de esta circunstancia se
-produce cuando deseemos generar un objeto <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> a partir de una
-operación de lectura (<code class="docutils literal notranslate"><span class="pre">.get</span></code> en nuestra interfaz), ya que la consulta nos
-devolverá el identificador del centro, no el centro en sí. Para abordar esta
-dificultad tenemos dos vías:</p>
-<ol class="arabic simple">
-<li><p>Obtener automáticamente también el centro asociado al obtener el estudiante.</p></li>
-<li><p>No hacerlo y posponer su obtención hasta que sea realmente necesario: cuando
-en la aplicación se ejecute el método <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code>.</p></li>
-</ol>
-<p>La primera vía es sencilla, aunque menos eficiente: si nunca llegamos a usar el
-centro, habremos hecho una segunda consulta<a class="footnote-reference brackets" href="#id12" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> inútil. La segunda vía es
-perezosa, pero tiene el inconveniente de que es más difícil de implementar, ya
-que pasa por crear un objeto proxy que almacene inicialmente el identificador
-del centro e intercepte las llamadas al método <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code>. La primera vez
-que se use, hará la consulta con dicho identificador para obtener de forma
-efectiva el objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code> y asignará el valor del atributo, para que las
-veces sucesivas se devuelva el atributo sin hacer consulta . En cualquier caso,
-tal implementación está hecha en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>, así que sólo tenemos que ver cómo
-usarla:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="nf">resultToEstudiante</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id_estudiante&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="n">Integer</span><span class="w"> </span><span class="n">idCentro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">wasNull</span><span class="p">())</span><span class="w"> </span><span class="n">idCentro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">    </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getDate</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">).</span><span class="na">toLocalDate</span><span class="p">();</span>
-
-<span class="w">    </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Estudiante</span><span class="p">();</span>
-<span class="w">    </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// Carga inmediata: obtenemos inmediatamente el centro.</span>
-<span class="w">    </span><span class="c1">//if(IdCentro != null) centro = new CentroSqlite(ds).get(IdCentro).orElse(null);</span>
-
-<span class="w">    </span><span class="c1">// Carga perezosa: proxy al que se le carga la clave foránea</span>
-<span class="w">    </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FkLazyLoader</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">estudiante</span><span class="p">)</span>
-<span class="w">                  </span><span class="p">.</span><span class="na">setFk</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idCentro</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">cp</span><span class="p">))</span>
-<span class="w">                  </span><span class="p">.</span><span class="na">createProxy</span><span class="p">();</span>
-
-<span class="w">    </span><span class="c1">// Cargamos datos en el objeto y entregamos.</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">cargarDatos</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Sin embargo, para simplificar su uso las utilidades definen una clase llamada
-<code class="docutils literal notranslate"><span class="pre">Dao</span></code> que permite registrar las clases <abbr title="Data Access Object">DAO</abbr> que se utilizarán a través de
-ella, y usar esta única clase para hacer persistentes todos los objetos, sean de
-la clase que sean (en nuestro ejemplo, centros y estudiantes). Dicho de otra
-forma, si <code class="docutils literal notranslate"><span class="pre">ds</span></code> es un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, en vez de:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definió así en algún sitio.</span>
-<span class="kd">var</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-<span class="kd">var</span><span class="w"> </span><span class="n">estudianteDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">(</span><span class="n">ds</span><span class="p">);</span>
-
-<span class="c1">// Y me permite operar:</span>
-<span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">11004866</span><span class="p">);</span>
-<span class="n">Estudiante</span><span class="w"> </span><span class="n">perico</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>haré esto otro:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto se definirá en algún sitio</span>
-<span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dao</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">EstudianteSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-
-<span class="c1">// Usamos dao con centros y estudiantes</span>
-<span class="n">dao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span><span class="w">  </span><span class="c1">// Hay que decir si quiero centros o estudiantes.</span>
-<span class="n">Estudiante</span><span class="w"> </span><span class="n">perico</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">   </span><span class="c1">// Ídem.</span>
-</pre></div>
-</div>
-<p>Por ahora hemos fijado cómo hacer operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>, pero no hemos dicho nada
-sobre cómo preparar y establecer la conexión a la base de datos. Para ello
-existe una clase <em>abstracta</em> en la librería llamada <code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> que deberá
-extender la clase <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>. Las labores de esta clase son:</p>
-<ol class="arabic simple">
-<li><p>Crear el pool de conexiones, lo que nos facilitará un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> con el que
-crear objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p></li>
-<li><p>Poblar la base de datos cuando no existe o no tiene esquema.</p></li>
-<li><p>Registrar las clases <abbr title="Data Access Object">DAO</abbr> (<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y <code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code>) para que
-sepa cómo se realizar las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>.</p></li>
-<li><p>Proporcionar un objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> para que la aplicación pueda hacer
-persistentes los objetos.</p></li>
-<li><p>Proporcionar un método para que varias operaciones puedan constituir una
-misma transacción.</p></li>
-</ol>
-<dl>
-<dt><strong>Pool de conexiones</strong></dt><dd><p>Como es obvio que por cada acceso a una base de datos sólo debería crearse un
-<em>pool</em>, la clase abstracta se asegura de que así sea cuando se intenta crear
-el objeto con las mismas opciones que una vez anterior. En la clase derivada
-<code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code> sólo nos tenemos que preocupar de definir:</p>
-<ul class="simple">
-<li><p>Cómo se crea el <em>pool</em> generando el objeto <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>. Esto se
-hace sobreescribiendo el método <code class="docutils literal notranslate"><span class="pre">.createDataSource</span></code>.</p></li>
-<li><p>Cómo se distingue un acceso de otro implementando <code class="docutils literal notranslate"><span class="pre">.generateKey</span></code>. Por
-ejemplo, en una base de datos SQlite cada acceso se distingue por la <abbr title="Uniform Resource Locator">URL</abbr>
-de conexión; en cambio en una base de datos MariaDB también hay
-credenciales, por lo que la clave para distinguir accesos deberá generarse
-combinando <abbr title="Uniform Resource Locator">URL</abbr> y usuario.</p></li>
-</ul>
-<p>Como en Java los constructores de la subclase no se heredan implícitamente,
-también debemos implementar trivialmente el constructor en
-<code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>.</p>
-</dd>
-<dt><strong>Crear el esquema</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> da libertad para:</p>
-<ol class="arabic simple">
-<li><p>No pasar en absoluto ningún mecanismo para crear el esquema en la base de
-datos.</p></li>
-<li><p>Proporcionar un <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">java.nio.file.Path</a> con el archivo que contiene las
-sentencias <abbr title="Structured Query Language">SQL</abbr>.</p></li>
-<li><p>Definir nosotros mismos las sentencias de inicialización.</p></li>
-</ol>
-<p>Por esa razón, la clase abstracta define tres constructores. En nuestro
-ejemplo, nos hemos centrado en la segunda posibilidad, así que sólo hemos
-implementado el segundo constructor en <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code>.</p>
-</dd>
-<dt><strong>Registro de clases DAO</strong></dt><dd><p>Es necesario pasarlas como argumentos del constructor.</p>
-</dd>
-<dt><strong>Facilitar el objeto Dao</strong></dt><dd><p>Dado que se registran las clases <abbr title="Data Access Object">DAO</abbr> en el momento de la construcción, la
-clase es capaz de proporcionar a través de <code class="docutils literal notranslate"><span class="pre">.getDao()</span></code> un objeto único para
-la persistencia. Este objeto construye los objetos <abbr title="Data Access Object">DAO</abbr> (<code class="docutils literal notranslate"><span class="pre">CentroSqlite</span></code> y
-<code class="docutils literal notranslate"><span class="pre">EstudianteSqlite</span></code> en el ejemplo) usando un <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, por lo que cada
-operación usa una conexión distinta y no es posible a través de él incluir
-varias en una misma transacción.</p>
-</dd>
-<dt><strong>Transacciones</strong></dt><dd><p>Dada las limitaciones del objeto anterior, <code class="docutils literal notranslate"><span class="pre">DaoConnection</span></code> proporciona un
-método llamado <cite>.transaction</cite> que admite como argumento un <a class="extlink-java-function reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/Consumer.html">Consumer</a> (una
-variante en realidad) que facilita un objeto <code class="docutils literal notranslate"><span class="pre">Dao</span></code> construido no con un
-<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>, sino con un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>. Esto posibilita que las operaciones
-incluidas en el <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> formen parte todas de una misma transacción.</p>
-</dd>
-</dl>
-<p>A pesar de todo ello, la implementación particular de <code class="docutils literal notranslate"><span class="pre">ConexionSqlite</span></code> es
-bastante sencilla, ya que lo demás se encuentra en la clase abstracta general:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConexionSqlite</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DaoConnection</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">maxConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">minConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Constructor de la conexión.</span>
-<span class="cm">     * Si la url+username+password coincide con una que ya se haya utilizado, no se crea un objeto</span>
-<span class="cm">     * distinto, sino que se devuelve el objeto que se creó anteriormente.</span>
-<span class="cm">     * @param opciones Las opciones de conexión.</span>
-<span class="cm">     * @param scriptSql El archivo con el guión SQL que crea el esquema en la base de datos.</span>
-<span class="cm">     * @param daoClasses Las clases DAO que se usarán con la conexión para hacer persistentes los objetos.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ConexionSqlite</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">scriptSql</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">daoClasses</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">scriptSql</span><span class="p">,</span><span class="w"> </span><span class="n">daoClasses</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="c1">// No he implementados los otros dos constructores posibles, porque no los usaré.</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Crea el pool de conexiones.</span>
-<span class="cm">     * @param opciones Las opciones para crear el pool.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="nf">createDataSource</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">path</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;No se ha fijado la url de la base de datos&quot;</span><span class="p">);</span>
-
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">protocol</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">);</span>
-<span class="w">        </span><span class="n">Short</span><span class="w"> </span><span class="n">maxConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Short</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">getOrDefault</span><span class="p">(</span><span class="s">&quot;maxconn&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ConexionSqlite</span><span class="p">.</span><span class="na">maxConn</span><span class="p">);</span>
-<span class="w">        </span><span class="n">Short</span><span class="w"> </span><span class="n">minConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Short</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">getOrDefault</span><span class="p">(</span><span class="s">&quot;minconn&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ConexionSqlite</span><span class="p">.</span><span class="na">minConn</span><span class="p">);</span>
-
-
-<span class="w">        </span><span class="n">HikariConfig</span><span class="w"> </span><span class="n">hconfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariConfig</span><span class="p">();</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setJdbcUrl</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMaximumPoolSize</span><span class="p">(</span><span class="n">maxConn</span><span class="p">);</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMinimumIdle</span><span class="p">(</span><span class="n">minConn</span><span class="p">);</span>
-
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Define cómo se diferencias unas conexiones de otras.</span>
-<span class="cm">     * En el caso de SQLite, sólo por la URL, ya que no hay credenciales.</span>
-<span class="cm">     * @param opciones Las opciones de conexión.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">generateKey</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">opciones</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">opciones</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Por último, podría darse el caso de que quisiéramos que nuestra aplicación
-soportara distintos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, lo que obliga a escoger la clase de conexión en
-tiempo de ejecución. La solución es usar un patrón <strong>Factory</strong> y crear los
-objetos de conexión no directamente, sino a través de una clase que lo
-implemente: <code class="docutils literal notranslate"><span class="pre">BackendFactory</span></code>. Por ese motivo, la obtención del objeto que
-implemente la conexión debe ser como sigue:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// &quot;base&quot; es la cadena que identifica el SGBD (p.e. sqlite o SQLite)</span>
-<span class="c1">// &quot;esquema&quot; es un Path al script SQL que define el esquema</span>
-<span class="c1">// &quot;opciones&quot; es un Map&lt;String, Object&gt; con los parámetros de conexión.</span>
-
-<span class="n">DaoConnection</span><span class="w"> </span><span class="n">conexion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BackendFactory</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">// Registramos todos los tipos de bases de datos soportados</span>
-<span class="w">    </span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;SQLITE&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ConexionSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;MARIADB&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="c1">// No hay soporte por ahora, pero se prevé.</span>
-<span class="w">    </span><span class="c1">// Escogemos el conector adecuado e indicamos las clases DAO.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">createConnection</span><span class="p">(</span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">opciones</span><span class="p">,</span><span class="w"> </span><span class="n">esquema</span><span class="p">,</span><span class="w"> </span><span class="n">CentroSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">EstteSqlite</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-</pre></div>
+<p>En el código anterior la eliminación del centro no llega a ser efectiva porque
+una operación posterior incluida en la misma transacción falla.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El repositorio <a class="reference external" href="https://github.com/sio2sio2/sqlutils">SqlUtils</a> incluye otra implementación del patrón
+algo más elaborada, cuyo uso se ilustra en el código de prueba.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Para las cadenas que identifican los <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> no se hacen distinciones
-entre mayúsculas y minúsculas de ahí que aunque <code class="docutils literal notranslate"><span class="pre">base</span></code> sea <em>sqlite</em>
-concuerde con <em>SQLITE</em>.</p>
-</div>
-<p>Una vez tenemos un objeto de conexión, podemos obtener el <code class="docutils literal notranslate"><span class="pre">Dao</span></code> que facilita
-la realización de las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Dao</span><span class="w"> </span><span class="n">dao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conexion</span><span class="p">.</span><span class="na">getDao</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>Y a partir de ahora podremos obtener y almacenar centros y estudiantes a través
-de este objeto. Si en algún momento, necesitáramos crear una transacción:</p>
-<div class="highlight-java notranslate" id="conn-transaccion-impl"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">transaccion</span><span class="p">(</span><span class="w"> </span><span class="n">tao</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Todas las operaciones hechas con tao,</span>
-<span class="w">      </span><span class="c1">// forman parte de una misma transacción.</span>
-<span class="w">      </span><span class="n">tao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante1</span><span class="p">);</span>
-<span class="w">      </span><span class="n">tao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante2</span><span class="p">);</span>
-<span class="w">   </span><span class="p">});</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;He fracasado miserablemente&quot;</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Tanto el <em>commit</em> como el <em>rollback</em> son implícitos y no tenemos que
-preocduparnos por ellos.</p>
-<div class="admonition warning">
-<p class="admonition-title">Advertencia</p>
-<p>El método <code class="docutils literal notranslate"><span class="pre">transaction</span></code> crea su propia conexión y no puede
-heredar una ya existente, así que no es anidable.
-Es una limitación que se podría intentar subsanar, implementando
-de otro modo las transacciones (el más <code class="docutils literal notranslate"><span class="pre">transactionSQL</span></code> del que deriva, sí
-lo es, pero no está enfocado a usar el patrón <abbr title="Data Access Object">DAO</abbr>).</p>
-</div>
-<p class="rubric">Notas al pie</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id7" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Hemos incluido, eso sí, una anotación en el campo <code class="docutils literal notranslate"><span class="pre">centro</span></code> de
-<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> que lo identifica como clave foránea. Pero no deja de ser una
-mera anotación que además no es indispensable. Esta anotación está definida en <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>.</p>
-</aside>
-<aside class="footnote brackets" id="id8" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p>Es probable, no obstante, que si las operaciones son sencillas, podamos
-escribir unas clases comunes a los dialectos <abbr title="Structured Query Language">SQL</abbr> más conocidos.</p>
-</aside>
-<aside class="footnote brackets" id="id9" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
-<p>Luego veremos que haremos una abstracción más y ni siquiera haremos esto.</p>
-</aside>
-<aside class="footnote brackets" id="id10" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
-<p>La ventaja de <code class="docutils literal notranslate"><span class="pre">Stream</span></code> es su evaluación perezosa; las desventajas son
-dos: nos veremos obligados a usar <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> y, además, se debe ser más
-cuidadoso al utilizarla ya que debemos asegurarnos de que quien cierra la
-conexión es el propio Stream.</p>
-</aside>
-<aside class="footnote brackets" id="id11" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
-<p>De todos modos, en caso de que pasáramos la conexión cuando hemos creado
-el objeto con una conexión, la conexión no se cerraría, porque la hemos
-manipulado para que no sea así (recordemos que la manejamos a través de
-<code class="docutils literal notranslate"><span class="pre">ConnectionProvider</span></code> y no directamente); y la sentencia quedaría sin cerrar
-hasta que no se cerrara la conexión fuera del objeto.</p>
-</aside>
-<aside class="footnote brackets" id="id12" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
-<p>En realidad, en vez de hacer una segunda consulta, podríamos hacer una
-consulta compuesta para obtener estudiante y centro.</p>
-</aside>
-</aside>
 </section>
 
 

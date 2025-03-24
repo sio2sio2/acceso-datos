@@ -17,6 +17,7 @@ simplificar la creación del pool y abstraernos de qué se usa para crearlo,
 podemos envolverlo en una clase como esta:
 
 .. literalinclude:: files/ConnectionPool.java
+   :name: clase-connectionpool
    :language: java
    :start-at: public class
 
@@ -223,9 +224,9 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
    datos distinta en memoria. Con una base de datos persistente, no habría sido
    necesario.
 
-.. [#] Con *SQLite* por ejemplo el método ``.execute`` sí será capaz de ejecutar
-   todas las sentencias |SQL|; ``executeUpdate``, en cambio, no lo hará. Con
-   otros |SGBD| el comportamiento puede variar.
+.. [#] Con *SQLite* por ejemplo el método ``.executeUpdate`` sí será capaz de
+   ejecutar todas las sentencias |SQL|; ``execute``, en cambio, no lo hará y
+   ejecutará solo la primera. Con otros |SGBD| el comportamiento puede variar.
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`

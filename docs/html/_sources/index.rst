@@ -14,8 +14,7 @@ autonómica de 16 de junio de 2011
 través del `Real Decreto 405/2023
 <https://www.boe.es/eli/es/rd/2023/05/29/405>`_.
 
-Unidades del curso
-------------------
+.. rubric:: Contenidos del curso
 
 .. toctree::
    :maxdepth: 2
@@ -24,16 +23,18 @@ Unidades del curso
 
    [0-8]*/index
 
+----
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   99.ejercicios/index
+
+----
+
 .. toctree::
    :maxdepth: 2
 
    98.apendices/index
 
-Ejercicios
-----------
-
-.. toctree::
-   :maxdepth: 1
-   :glob:
-
-   99.ejercicios/[0-9]*

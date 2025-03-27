@@ -57,6 +57,7 @@ extlinks = {
     'hibernate-api': ('https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/%s.html', '%s'),
     'deb': ('https://packages.debian.org/stable/%s','%s'),
     'jakarta-persistence': ('https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/%s', '%s'),
+    'java-slf4j': ('https://www.slf4j.org/api/org/slf4j/%s.html', '%s')
 }
 
 intersphinx_mapping = {

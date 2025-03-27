@@ -2,5 +2,447 @@
 
 Sistema de registros
 ********************
+Un aspecto fundamental en cualquier aplicación es que incluya un sistema sólido
+de registros (*logs* como se dice habitualmente en inglés), a fin de que el
+usuario pueda comprobar su funcionamiento. Téngase presente que, además de
+fundamental, es transversal y cualquier código (lo que incluye librerías de
+terceros que podamos usar en nuestro programa) es probable que necesite usarlo.
+A pesar de ello y de lo que ocurre con otros aspectos (véase :ref:`el uso de ORM
+<orm>`), *Java* no presenta una especificación general a la que puedan acogerse
+las distintas librerías de implementación.
 
-.. TODO:: Por escribir cómo usar un sistema de registros en Java.
+En vez de la especificación, desde su versión 1.4, |JDK| incluye una librería de
+implementación comúnmente llamada |JUL| que podría ser una solución... si fuera
+lo suficientemente buena. En cambio, el hecho de `cosechar muchísimas críticas
+<https://stackoverflow.com/questions/11359187/why-not-use-java-util-logging>`_
+ha provocado la aparición de librerías de terceros, lo que ha fragmentado la
+generación de registros y ha provocado que una aplicación pueda acabar usando
+múltiples librerías de implementación distintas, ya que su desarrollador ha
+podido escoger una para su código, pero necesitar librerías de terceros que
+hagan uso de implementaciones distintas.
+
+En cualquier caso, antes de proseguir, convendría aclarar qué queremos decir
+con especificación e implementación.
+
+:dfn:`Especificación`
+   Es simplemente una |API| que define las clases y los métodos que deben usarse
+   para expresar todas las operaciones que resuelven un problema.
+
+:dfn:`Librería de implementación` (o :dfn:`framework`)
+   Es una librería que realmente desarrolla la solución al problema. Puede
+   presentar su propia |API| o acogerse a una especificación definida o ambas
+   cosas, por supuesto.
+
+*Java*, a través de terceros, tiene definidas algunas especificaciones y algunas
+librerías de implementación\ [#]_, pero dado el carácter eminentemente práctico
+de este apéndice nos centraremos en aconsejar sin más una posible elección:
+
+* `SLF4J <https://www.slf4j.org/>`_ como *especificación*.
+* `Logback <https://logback.qos.ch/>`_ como *implementación* o, en la
+  terminología de |SLF4J|, como proveedor. La librería la ha desarrollado el
+  mismo programador que |SLF4J| con lo que no presenta una interfaz alternativa.
+
+.. caution:: La especificación se limita a definir cómo se envían mensajes al
+   sistema de registros, pero no entra en aspectos de configuración. Por tanto:
+
+   .. table::
+      :name: aspectos-logging
+
+      +--------------------+---------------------------------------+
+      |  Aspecto           | Definición                            |
+      +====================+=======================================+
+      | Envío de mensajes  | Común (definida por la implemntación) |
+      +--------------------+---------------------------------------+
+      | Nivel registrable  |                                       |
+      +--------------------+                                       |
+      | Soporte de salida  |  Propio de cada implementación        |
+      +--------------------+                                       |
+      | Formato de mensaje |                                       |
+      +--------------------+---------------------------------------+
+
+Preliminares
+============
+Antes de empezar de lleno conviene saber cómo empezar a usar el sistema de
+registros.
+
+Dependencias
+------------
+En nuestro proyecto deberemos enlazar al menos con:
+
+* La interfaz de la especificación de |SLF4J|, esto es, slf4j-api_.
+* El proveedor que proporciona una implementación: logback-classic_,
+  log4j-core_, etc. También podemos usar slf4j-simple_ que es una implementación
+  muy básica que sólo permite mostrar los mensajes por la salida de errores y no
+  nos permite cambiar el :ref:`nivel <loglevel>`, por lo que siempre se
+  mostrarán errores has el nivel *INFO*. Si usamos como implementación |JUL| no
+  necesitaremos cargar ninguna librería de terceros, puesto que ya está incluida
+  en |JDK|.
+* La librería que permite vincular la implementación a |SLF4J|: slf4j-reload4j_
+  para log4j-core_, jul-to-slf4j_ para |JUL|. Ni Logback_ ni slf4j-simple_
+  necesitan ninguna vinculación adicional.
+
+En resumen:
+
+.. table::
+   :name: slf4j-depends
+
+   ====================== ================ =================== =================
+    Solución               Especificación   Implementación      Vínculo
+   ====================== ================ =================== =================
+    |SLF4J| + Simple       slf4j-api_       slf4j-simple_       \-
+    |SLF4J| + Logback_     slf4j-api_       logback-classic_    \-
+    |SLF4J| + Log4J_       slf4j-api_       log4j-core_         slf4j-reload4j_
+    |SLF4J| + |JUL|        slf4j-api_       Incluida en |JDK|   jul-to-slf4j_
+   ====================== ================ =================== =================
+
+.. _loglevel:
+
+Clasificación de mensajes
+-------------------------
+En estos sistemas los mensajes se envían para su registro clasificándolos con
+dos criterios distintos:
+
++ El *asunto del mensaje*, que en los sistemas de registros de *Java* se asimila
+  a la clase que origina el mensaje. Ya profundizaremos en ello cuando veamos
+  `cómo enviar mensajes <logging-uso>`.
++ La gravedad del mensaje, que en |SLF4J| puede ser de menor a mayor:
+
+  .. table::
+     :name: loglevel-slf4j
+
+     ========= =====================================================
+      Nombre    Descripción
+     ========= =====================================================
+      TRACE     Nivel de detalle muy, muy fino.
+      DEBUG     Nivel propio de la depuración.
+      INFO      Mensajes sobre el funcionamiento habitual.
+      WARN      Mensajes que indican circunstancias problemáticas.
+      ERROR     Mensajes de error que requieren atención inmediata.
+     ========= =====================================================
+
+  En ausencia de :ref:`configuración adicional <logging-conf>`, el sistema
+  muestra mensajes a partir del nivel *INFO*.
+
+.. _logging-uso:
+
+Envío de mensajes
+=================
+Para enviar mensajes lo primero es obtener una instancia :java-slf4j:`Logger` a
+partir de :java-slf4j:`LoggerFactory`. La convención es que se cree una
+instancia por clase y pasar como parámetro la propia clase para identificar lo
+que hemos llamado antes el *asunto del mensaje*:
+
+.. code-block:: java
+
+   public class CentroSqlDao implements Crud<Centro> {
+      // logger servirá para registrar todos los mensajes
+      // que se envían desde la clase.
+      private static final Logger logger = LoggerFactory.getLogger(CentroSqlDao.class);
+
+      // Implementación de la clase.
+   }
+
+Una vez que disponemos de un objeto :java-slf4j:`Logger` podemos registrar los
+mensajes con métodos que reproducen el nivel de gravedad:
+
+.. code-block:: java
+
+   logger.error("Este es un mensaje fatal");
+   logger.warn("Esta es una advertencia que puede ser importante conocer");
+   logger.info("Este mensaje informa de que la aplicación ha hecho algo")
+   logger.debug("Este mensaje sirve para depurar el comportamiento de la aplicación")
+   logger.trace("Este mensaje permite seguir muy concienzudamente la ejecución de la aplicación");
+
+Ha de tenerse en cuenta que, dependiendo del nivel que se haya definido como
+registrable, los mensajes se registrarán de modo efectivo o no lo harán. Es
+importante tenerlo presente porque muy habitualmente los mensajes no son meras
+frases como las de arriba, sino que incluyen valores:
+
+.. code-block:: java
+
+   logger.debug("Se ha registrado el centro con código {} y nombre {}", centro.getId(), centro.getNombre());
+
+Como se ve, se incluye una sintaxis para poder incluir valores dentro del
+mensaje sin recurrir a ``String.format``. Ahora bien, en el ejemplo dado obtener
+ambos valores es muy económico ya que simplemente invocamos dos *setters*, por
+lo que el hecho de que se evalúen esos dos parámetros, aunque luego no acabe por
+escribirse el mensaje, no penaliza demasiado el rendimiento. Ahora bien, si la
+obtención del valor es costosa, ¿cómo evitaríamos la merma improductiva de
+rendimiento? Para ello |SLF4J| permite usar una expresión lambda como argumento:
+
+.. code-block:: java
+
+   // Se supone que lo que se guarda es la fecha de nacimiento y la edad es calculada.
+   logger.warn(() -> String.format(
+      "Se evita el registro porque el estudiante ID=%d tiene %d años",
+      estudiante.getId(),
+      estudiante.getEdad()
+   ));
+
+En todos los casos anteriores, si se quiere proporcionar un error para que se
+registre, puede proporcionarse como argumento adicional al final:
+
+.. code-block:: java
+
+   // e es una Excepción.
+   logger.debug("Se ha registrado el centro con código {} y nombre {}", centro.getId(), centro.getNombre(), e);
+
+En versiones más modernas existe otro modo de evitar la ejecución previa
+de operaciones costosas
+
+.. code-block:: java
+
+   logger.atWarn()
+         .addArgument(estudiante.getId())
+         .addArgument(() -> estudiante.getEdad()) // Este es costoso.
+         .setCause(e)   // Opcional, si quisiéramos pasar un error.
+         .log("Se evita el registro porque el estudiante ID={} tiene {} años");
+
+Con todo esto, ya sabemos sobradamente enviar mensajes al registro indicando qué
+nivel de gravedad tienen.
+
+.. _logging-conf:
+
+Configuración adicional
+=======================
+Pese a que ya sabemos cómo enviar mensajes, no es aún suficiente. Es muy común
+que, además, necesitemos al menos:
+
+- Definir sobre qué soporte se registrarán los mensajes.
+- Definir a partir de qué nivel los mensajes se registrarán.
+- Definir el formato de los mensajes.
+
+.. caution:: Como ya se ha explicado, todas estas configuraciones son
+   específicas de la implementación. Nos centraremos en cómo se realizan con
+   Logback_.
+
+La configuracíón **predeterminada** es la siguiente:
+
+a. Los mensajes se escriben en la salida estándar (o sea, en ``System.out``).
+#. No se filtran mensaje, por lo que el nivel registrable es a partir de
+   **DEBUG**.
+#. El formato de salida tiene este formato:
+
+   .. code-block:: none
+
+      %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+
+   Lo que generaría un mensaje como:
+
+   .. code-block:: none
+
+      14:23:45.678 [main] DEBUG edu.acceso.test.MiClase - Mensaje de depuración.
+
+Por otro lado, estas configuraciones pueden ser estáticas o dinámicas. Las
+primeras consisten en leer un archivo, mientras que las segundas permiten
+definir la configuración dentro del código en tiempo de ejecución.
+
+Estática
+--------
+La configuración estática se realiza a través de archivos |XML| en principio,
+pero también pueden usarse |YAML| o |JSON|, si lo prefiere el desarrollador,
+aunque para esto último se necesitan también incluirse como dependencias o
+`snakeyaml <https://mvnrepository.com/artifact/org.yaml/snakeyaml>`_ o
+`jackson-databind
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind>`_.
+
+El archivo debe colocarse en el directorio :file:`resources` (en un proyecto
+Maven o Gradle) y denominarse:
+
+========= ====================== ================================
+ Formato   Nombre                 Librería
+========= ====================== ================================
+|XML|      :file:`logback.xml`    Ninguna
+|JSON|     :file:`logback.json`   jackson-databind_\ [#]_
+|YAML|     :file:`logback.yaml`   jackson-databind_, snakeyaml_
+========= ====================== ================================
+
+... pero prescindiremos de |JSON|, porque no aporta ninguna ventaja.
+
+Un ejemplo sencillo de configuración podría ser este:
+
+.. code-block:: xml
+   :caption: logback.xml
+   :class: toggle
+   :name: logback-basico-xml
+
+   <configuration status="WARN">
+      <!-- Definición de un soporte -->
+      <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+         <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+         </encoder>
+      </appender>
+
+      <!-- El logger raíz (y todos sus descendiente) tienen esta configuración -->
+      <root level="INFO">
+         <appender-ref ref="CONSOLE"/>
+      </root>
+   </configuration>
+
+.. code-block:: yaml
+   :caption: logback.yaml
+   :class: toggle
+   :name: logback-basico-yaml
+
+   configuration:
+      # Log interno del propio Logback
+      status: WARN
+      # Definición de soportes de salida
+      appender:
+         - name: CONSOLE
+           class: ch.qos.logback.core.ConsoleAppender
+           encoder:
+              pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+      # Definición de la configuración del logger raíz
+      root:
+         level: INFO
+         append-ref:
+            - ref: CONSOLE
+
+En caso de querer definir archivos como soporte de salida, podemos hacer:
+
+.. code-block:: yaml
+   :caption: Ejemplo de registros en archivo
+   :class: toggle
+
+   appender:
+      - name: FILE
+        class: ch.qos.logback.core.FileAppender
+        file: logs/app.log
+        encoder:
+           pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+        append: true  # Añade registros sin borrar los anteriores.
+      - name: ROLLING_FILE
+        class: ch.qos.logback.core.RollingFileAppender
+        file: logs/app.log
+        encoder:
+           pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+        rollingPolicy:
+           class: ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy
+           fileNamePattern: "logs/app.%d{yyyy-MM-dd}.%i.log"
+           maxFileSize: 10MB  # Rota al alcanzar 10 MB
+           maxHistory: 30     # Conserva hasta 30 días de logs
+           totalSizeCap: 1GB  # Tamaño máximo total de todos los archivos
+
+Debe tenerse presente que las rutas son relativas al directorio de trabajo. Las
+rutas podrían ser absolutas, pero en ese caso introduciríamos una dependencia
+del sistema operativo. Para evitarlo tenemos alternativas:
+
+* Pasar variables a Java al ejecutar la aplicación usando la opción `-D`\ [#]_:
+
+  .. code-block:: yaml
+
+     file: ${LOG_DIR:-logs}/app.log
+
+  En este caso, si hubiéramos ejecutado así la aplicación:
+
+  .. code-block:: console
+
+     $ java -DLOG_DIR=/var/log -jar app.jar
+
+  La ruta del archivo sería :file:`/var/log/app.log`. La sintaxis que se ha
+  usado se inspira en la de la shell POSIX e indica que si no se define el valor
+  de la variable se use como valor \"logs\", por lo que la ruta será la relativa
+  :file:`logs/app.log`. Por supuesto puede evitarse indicar un valor
+  predeterminado: :code:`${LOG_DIR}`
+
+* Variables de ambiente (que dependen del sistema, por cierto):
+
+  .. code-block:: yaml
+
+     file: ${env.HOME:-logs}/app.log
+
+* Valores de propiedades del sistema de Java:
+
+  .. code-block:: yaml
+
+     # En un sistema UNIX esto equivale a /tmp/app.log
+     file: ${java.io.tmpdir}/app.log
+
+En un sistema UNIX también existiría la posibilidad de integrar los mensajes 
+en los registros del sistema:
+
+.. code-block:: yaml
+   :caption: Ejemplo de registros con syslog
+   :class: toggle
+
+   appender:
+        # Syslog clásico.
+      - name: SYSLOG
+        class: ch.qos.logback.classic.net.SyslogAppender
+        syslogHost: localhost
+        port: 514 
+        facility: LOCAL0
+        suffixPattern: "[%thread] %logger{36} - %msg"
+        stackTracePattern: "   %ex{full}"
+        tag: MiApp
+        # Journald con compatibilidad con syslog.
+      - name: JOURNAL_SYSLOG
+        class: ch.qos.logback.classic.net.SyslogAppender
+        syslogHost: /run/systemd/journal/syslog
+        port: -1
+        facility: LOCAL0
+        suffixPattern: "[%thread] %logger{36} - %msg"
+        stackTracePattern: "   %ex{full}"
+        tag: MiApp
+
+Dinámica
+--------
+
+Otros aspectos
+==============
+
+.. Puenteo: log4j-over-slf4j, jul-to-slf4j, etc.
+
+
+.. seealso:: Es interesantísimo y esclarecedor el artículo `How To Do Logging in
+   Java <https://www.marcobehler.com/guides/java-logging>`_ incluido en las
+   `Guías poco convencionales de Marco Behler
+   <https://www.marcobehler.com/guides/java-logging>`_. El presente texto lo ha
+   tomado en gran medida como base.
+
+.. rubric:: Notas al pie
+
+.. [#] Para una pequeña disertación sobre todas ellas consulter al `artículo de
+   Marco Behler <https://www.marcobehler.com/guides/java-logging>`_
+
+.. [#] En realidad, |JSON| es un subconjunto de |YAML| por lo que un procesador
+   de |YAML| debe entender |JSON|. Por tanto, snakeyaml_ debe teóricamente ser
+   capaz de procesar |JSON|. Es así y lo hace, pero ante una extensión `.json`
+   Logback_ comprobará si se tiene disponible jackson-databind_ y, si no es así,
+   no leerá el archivo y cargará la configuración predeterminada. Es posible, eso
+   sí, nombrar el archivo :file:`logback.yaml` y escribirse en formato |JSON|,
+   pero es algo bastante antinatural.
+
+.. [#] El valor de la variable también se puede establecer en el propio archivo
+   de configuración:
+
+   .. code-block:: yaml
+
+      configuration:
+         status: WARN
+         property:
+            - name: LOG_DIR
+              value: /var/log
+         # Resto de configuración
+
+    Pero en este caso no habríamos adelantado mucho, porque la configuración
+    dependería del sistema en el que se ejecuta la aplicación, tal como ocurría
+    cuando lo escribimos directamente.
+
+.. |JUL| replace:: :abbr:`JUL (java.util.logging)`
+.. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
+.. |SLF4J| replace:: :abbr:`SLF4J (Simple Logging Facade For Java)`
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
+.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+
+.. _slf4j-api: https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+.. _slf4j-simple: https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+.. _logback-classic: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+.. _log4j-core: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+.. _slf4j-reload4j: https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j
+.. _jul-to-slf4j: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j
+.. _Log4J: https://logging.apache.org/log4j/2.x/index.html

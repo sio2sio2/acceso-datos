@@ -466,7 +466,7 @@ sistema de registros, pero no entra en aspectos de configuración. Por tanto:</p
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Envío de mensajes</p></td>
-<td><p>Común (definida por la implemntación)</p></td>
+<td><p>Común (definida por la implemtación)</p></td>
 </tr>
 <tr class="row-odd"><td><p>Nivel registrable</p></td>
 <td rowspan="3"><p>Propio de cada implementación</p></td>
@@ -499,7 +499,7 @@ registros.</p>
 <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core">log4j-core</a>, etc. También podemos usar <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-simple">slf4j-simple</a> que es una implementación
 muy básica que sólo permite mostrar los mensajes por la salida de errores y no
 nos permite cambiar el <a class="reference internal" href="#loglevel"><span class="std std-ref">nivel</span></a>, por lo que siempre se
-mostrarán errores has el nivel <em>INFO</em>. Si usamos como implementación <abbr title="java.util.logging">JUL</abbr> no
+mostrarán errores hasta el nivel <em>INFO</em>. Si usamos como implementación <abbr title="java.util.logging">JUL</abbr> no
 necesitaremos cargar ninguna librería de terceros, puesto que ya está incluida
 en <abbr title="Java Development Kit">JDK</abbr>.</p></li>
 <li><p>La librería que permite vincular la implementación a <abbr title="Simple Logging Facade For Java">SLF4J</abbr>: <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j">slf4j-reload4j</a>
@@ -575,7 +575,7 @@ a la clase que origina el mensaje. Ya profundizaremos en ello cuando veamos
 </table>
 </div>
 <p>En ausencia de <a class="reference internal" href="#logging-conf"><span class="std std-ref">configuración adicional</span></a>, el sistema
-muestra mensajes a partir del nivel <em>INFO</em>.</p>
+muestra mensajes a partir del nivel <em>DEBUG</em>.</p>
 </li>
 </ul>
 </section>
@@ -644,28 +644,30 @@ frases como las de arriba, sino que incluyen valores:</p>
 </pre></div>
 </div>
 <p>Como se ve, se incluye una sintaxis para poder incluir valores dentro del
-mensaje sin recurrir a <code class="docutils literal notranslate"><span class="pre">String.format</span></code>. Ahora bien, en el ejemplo dado obtener
-ambos valores es muy económico ya que simplemente invocamos dos <em>getters</em>, por
-lo que el hecho de que se evalúen esos dos parámetros, aunque luego no acabe por
-escribirse el mensaje, no penaliza demasiado el rendimiento. Ahora bien, si la
-obtención del valor es costosa, ¿cómo evitaríamos la merma improductiva de
-rendimiento? Para ello <abbr title="Simple Logging Facade For Java">SLF4J</abbr> permite usar una expresión lambda como argumento:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Se supone que lo que se guarda es la fecha de nacimiento y la edad es calculada.</span>
-<span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span>
-<span class="w">   </span><span class="s">&quot;Se evita el registro porque el estudiante ID=%d tiene %d años&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span>
-<span class="w">   </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getEdad</span><span class="p">()</span>
-<span class="p">));</span>
-</pre></div>
-</div>
+mensaje sin recurrir a <code class="docutils literal notranslate"><span class="pre">String.format</span></code>.</p>
 <p>En todos los casos anteriores, si se quiere proporcionar un error para que se
 registre, puede proporcionarse como argumento adicional al final:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// e es una Excepción.</span>
 <span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Se ha registrado el centro con código {} y nombre {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>En versiones más modernas existe otro modo de evitar la ejecución previa
-de operaciones costosas</p>
+<p>Ahora bien, en el ejemplo dado obtener ambos valores es muy económico ya que
+simplemente invocamos dos <em>getters</em>, por lo que el hecho de que se evalúen esos
+dos parámetros, aunque luego no acabe por escribirse el mensaje, no penaliza
+demasiado el rendimiento. Ahora bien, si la obtención del valor es costosa,
+¿cómo evitaríamos la merma improductiva de rendimiento? Para ello, a partir de
+la versión 2 de <abbr title="Simple Logging Facade For Java">SLF4J</abbr>, existe una <abbr title="Application Programming Interface">API</abbr> fluida que permite usar una expresión
+lambda como argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Se supone que lo que se guarda es la fecha de nacimiento y la edad es calculada.</span>
+<span class="n">logger</span><span class="p">.</span><span class="na">atWarn</span><span class="p">().</span><span class="na">log</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span>
+<span class="w">   </span><span class="s">&quot;Se evita el registro porque el estudiante ID=%d tiene %d años&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span>
+<span class="w">   </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getEdad</span><span class="p">()</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<p>Una variante a esto último que permite pasar los parámetros como argumento, en
+vez de recurrir a <code class="docutils literal notranslate"><span class="pre">String.format</span></code> es:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="p">.</span><span class="na">atWarn</span><span class="p">()</span>
 <span class="w">      </span><span class="p">.</span><span class="na">addArgument</span><span class="p">(</span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span>
 <span class="w">      </span><span class="p">.</span><span class="na">addArgument</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getEdad</span><span class="p">())</span><span class="w"> </span><span class="c1">// Este es costoso.</span>
@@ -675,9 +677,30 @@ de operaciones costosas</p>
 </div>
 <p>Con todo esto, ya sabemos sobradamente enviar mensajes al registro indicando qué
 nivel de gravedad tienen.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En versiones anteriores a la 2, la única forma de sortear la
+evaluación gratuita de expresiones costosas era usar condiciones:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">logger</span><span class="p">.</span><span class="na">isWarnEnabled</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span>
+<span class="w">      </span><span class="s">&quot;Se evita el registro porque el estudiante ID={} tiene {} años&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span>
+<span class="w">      </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getEdad</span><span class="p">()</span>
+<span class="w">   </span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="configuracion-adicional">
 <span id="logging-conf"></span><h2><span class="section-number">2.3. </span>Configuración adicional<a class="headerlink" href="#configuracion-adicional" title="Link to this heading">#</a></h2>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p><abbr title="Simple Logging Facade For Java">SLF4J</abbr> se limita a especificar el envío de mensajes, por lo que
+toda la configuración adicional que queramos hacer a ese envío depende de
+la librería de implementación. En nuestro caso, este apartado se centra e
+cómo configurar <a class="reference external" href="https://logback.qos.ch/">Logback</a>.</p>
+</div>
 <p>Pese a que ya sabemos cómo enviar mensajes, no es aún suficiente. Es muy común
 que, además, necesitemos al menos:</p>
 <ul class="simple">
@@ -685,17 +708,11 @@ que, además, necesitemos al menos:</p>
 <li><p>Definir a partir de qué nivel los mensajes se registrarán.</p></li>
 <li><p>Definir el formato de los mensajes.</p></li>
 </ul>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>Como ya se ha explicado, todas estas configuraciones son
-específicas de la implementación. Nos centraremos en cómo se realizan con
-<a class="reference external" href="https://logback.qos.ch/">Logback</a>.</p>
-</div>
 <p>La configuracíón <strong>predeterminada</strong> es la siguiente:</p>
 <ol class="loweralpha">
 <li><p>Los mensajes se escriben en la salida estándar (o sea, en <code class="docutils literal notranslate"><span class="pre">System.out</span></code>).</p></li>
-<li><p>No se filtran mensaje, por lo que el nivel registrable es a partir de
-<strong>DEBUG</strong>.</p></li>
+<li><p>El nivel registrable, esto es, el nivel a partir del cual los mensajes se
+registran en el soporte, es <strong>DEBUG</strong>.</p></li>
 <li><p>El formato de salida tiene este formato:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 </pre></div>
@@ -776,8 +793,8 @@ Maven o Gradle) y denominarse:</p>
 <span class="w">   </span><span class="c1"># Definición de la configuración del logger raíz</span>
 <span class="w">   </span><span class="nt">root</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INFO</span>
-<span class="w">      </span><span class="nt">append-ref</span><span class="p">:</span>
-<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
+<span class="w">      </span><span class="nt">appender-ref</span><span class="p">:</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
 </pre></div>
 </div>
 </div>
@@ -829,7 +846,7 @@ predeterminado: <code class="code docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 </li>
-<li><p>Valores de propiedades del sistema de Java:</p>
+<li><p>Valores de <a class="reference internal" href="../01.archivos/01.gestion.html#system-properties"><span class="std std-ref">propiedades del sistema de Java</span></a>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># En un sistema UNIX esto equivale a /tmp/app.log</span>
 <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${java.io.tmpdir}/app.log</span>
 </pre></div>
@@ -869,13 +886,13 @@ mensajes en los registros del sistema:</p>
 registros los mensajes en varios de ellos:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">root</span><span class="p">:</span>
 <span class="w">   </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INFO</span>
-<span class="w">   </span><span class="nt">append-ref</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FILE</span>
+<span class="w">   </span><span class="nt">appender-ref</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FILE</span>
 </pre></div>
 </div>
 <p>Queda un último aspecto básico por revisar y es cómo configurar un logger
-específicos, ya que recordemos que cuando definíamos los logger en las clases
+específico, ya que recordemos que, cuando hemos definido los logger en las clases
 <a class="reference internal" href="#def-logger"><span class="std std-ref">los referíamos con la propia clase</span></a>. Supongamos que en aquel
 ejemplo la clase <code class="docutils literal notranslate"><span class="pre">CentroSqlDao</span></code> está dentro del paquete
 <code class="docutils literal notranslate"><span class="pre">edu.acceso.test.backend.sql</span></code>. En ese caso:</p>
@@ -886,14 +903,14 @@ ejemplo la clase <code class="docutils literal notranslate"><span class="pre">Ce
 <span class="w">   </span><span class="c1"># Configuración raíz para los logger</span>
 <span class="w">   </span><span class="nt">root</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INFO</span>
-<span class="w">      </span><span class="nt">append-ref</span><span class="p">:</span>
-<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
+<span class="w">      </span><span class="nt">appender-ref</span><span class="p">:</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE</span>
 <span class="w">   </span><span class="nt">logger</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edu.acceso.test.backend.sql</span>
 <span class="w">        </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DEBUG</span>
-<span class="w">        </span><span class="nt">append-ref</span><span class="p">:</span>
-<span class="w">           </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FILE</span>
-<span class="w">        </span><span class="c1"># append-ref por defecto es acomulativa:</span>
+<span class="w">        </span><span class="nt">appender-ref</span><span class="p">:</span>
+<span class="w">           </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FILE</span>
+<span class="w">        </span><span class="c1"># appender-ref por defecto es acomulativa:</span>
 <span class="w">        </span><span class="c1"># additivity implica que lo sea y que no se herede.</span>
 <span class="w">        </span><span class="nt">additivity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edu.acceso.test.backend.sql.sqlite</span>
@@ -903,21 +920,21 @@ ejemplo la clase <code class="docutils literal notranslate"><span class="pre">Ce
 </div>
 <p>En esta configuración, los logs de la aplicación se han aplicado para que se
 registren los mensajes a partir del nivel <strong>INFO</strong> en la consola.
-Peroo, además, se han hecho tres configuraciones adicionales. Tengase presente
-que, en principio, los valores de <code class="docutils literal notranslate"><span class="pre">level</span></code> y <code class="docutils literal notranslate"><span class="pre">append-ref</span></code> se heredan de
+Pero, además, se han hecho tres configuraciones adicionales. Tengase presente
+que, en principio, los valores de <code class="docutils literal notranslate"><span class="pre">level</span></code> y <code class="docutils literal notranslate"><span class="pre">appender-ref</span></code> se heredan de
 padres a hijos. En el caso de <code class="docutils literal notranslate"><span class="pre">level</span></code> un redefinición, cambia el valor; pero
-en el caso de <code class="docutils literal notranslate"><span class="pre">append-ref</span></code>, una redefinición tiene carácter acomulativo. Por
+en el caso de <code class="docutils literal notranslate"><span class="pre">appender-ref</span></code>, una redefinición tiene carácter acomulativo. Por
 tanto:</p>
 <ul class="simple">
 <li><p>El código incluido dentro de una librería externa (<code class="docutils literal notranslate"><span class="pre">jakarta.persistence</span></code>)
 sólo registrará mensajes de advertencia y de error (redefinición de <code class="docutils literal notranslate"><span class="pre">level</span></code>);
-en la consola (no se ha redefinido <code class="docutils literal notranslate"><span class="pre">append-ref</span></code>).</p></li>
+en la consola (no se ha redefinido <code class="docutils literal notranslate"><span class="pre">appender-ref</span></code>).</p></li>
 <li><p>El código incluido en el paquete <code class="docutils literal notranslate"><span class="pre">edu.acceso.test.backend.sql</span></code> (dentro del
 cual está la clase <code class="docutils literal notranslate"><span class="pre">CentroSqlDao</span></code>) registra mensajes a partir del nivel
 <strong>DEBUG</strong> (redefinición de <code class="docutils literal notranslate"><span class="pre">level</span></code>) y en principio debería registrarlos
 tanto en la consola como en el archivo. Pero se ha añadido <code class="docutils literal notranslate"><span class="pre">additivity</span></code> con
 valor <code class="docutils literal notranslate"><span class="pre">false</span></code>. Esta propiedad no es heredable y afecta al valor de
-<code class="docutils literal notranslate"><span class="pre">append-ref</span></code>. Implica que el <em>logger</em> sólo usa los soportes que tenga
+<code class="docutils literal notranslate"><span class="pre">appender-ref</span></code>. Implica que el <em>logger</em> sólo usa los soportes que tenga
 definidos. Por tanto, los registros se escriben exclusivamente en el archivo.</p></li>
 <li><p>El paquete <code class="docutils literal notranslate"><span class="pre">edu.acceso.test.backend.sql.sqlite</span></code> hereda el valor <code class="docutils literal notranslate"><span class="pre">level</span></code>
 del padre; y por tanto, registra mensajes a partir de <strong>DEBUG</strong>. En cuanto a
@@ -1117,9 +1134,9 @@ de ellos. Por ejemplo:</p>
 
 <span class="nt">root</span><span class="p">:</span>
 <span class="w">   </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DEBUG</span>
-<span class="w">   </span><span class="nt">append-ref</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE_ERROR</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE_INFO</span>
+<span class="w">   </span><span class="nt">appender-ref</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE_ERROR</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONSOLE_INFO</span>
 </pre></div>
 </div>
 </div>

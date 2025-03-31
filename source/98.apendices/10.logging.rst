@@ -51,7 +51,7 @@ de este apéndice nos centraremos en aconsejar sin más una posible elección:
       +--------------------+---------------------------------------+
       |  Aspecto           | Definición                            |
       +====================+=======================================+
-      | Envío de mensajes  | Común (definida por la implemntación) |
+      | Envío de mensajes  | Común (definida por la implemtación)  |
       +--------------------+---------------------------------------+
       | Nivel registrable  |                                       |
       +--------------------+                                       |
@@ -80,7 +80,7 @@ En nuestro proyecto deberemos enlazar al menos con:
   log4j-core_, etc. También podemos usar slf4j-simple_ que es una implementación
   muy básica que sólo permite mostrar los mensajes por la salida de errores y no
   nos permite cambiar el :ref:`nivel <loglevel>`, por lo que siempre se
-  mostrarán errores has el nivel *INFO*. Si usamos como implementación |JUL| no
+  mostrarán errores hasta el nivel *INFO*. Si usamos como implementación |JUL| no
   necesitaremos cargar ninguna librería de terceros, puesto que ya está incluida
   en |JDK|.
 * La librería que permite vincular la implementación a |SLF4J|: slf4j-reload4j_
@@ -127,7 +127,7 @@ dos criterios distintos:
      ========= =====================================================
 
   En ausencia de :ref:`configuración adicional <logging-conf>`, el sistema
-  muestra mensajes a partir del nivel *INFO*.
+  muestra mensajes a partir del nivel *DEBUG*.
 
 .. _logging-uso:
 
@@ -204,21 +204,7 @@ frases como las de arriba, sino que incluyen valores:
    logger.debug("Se ha registrado el centro con código {} y nombre {}", centro.getId(), centro.getNombre());
 
 Como se ve, se incluye una sintaxis para poder incluir valores dentro del
-mensaje sin recurrir a ``String.format``. Ahora bien, en el ejemplo dado obtener
-ambos valores es muy económico ya que simplemente invocamos dos *getters*, por
-lo que el hecho de que se evalúen esos dos parámetros, aunque luego no acabe por
-escribirse el mensaje, no penaliza demasiado el rendimiento. Ahora bien, si la
-obtención del valor es costosa, ¿cómo evitaríamos la merma improductiva de
-rendimiento? Para ello |SLF4J| permite usar una expresión lambda como argumento:
-
-.. code-block:: java
-
-   // Se supone que lo que se guarda es la fecha de nacimiento y la edad es calculada.
-   logger.warn(() -> String.format(
-      "Se evita el registro porque el estudiante ID=%d tiene %d años",
-      estudiante.getId(),
-      estudiante.getEdad()
-   ));
+mensaje sin recurrir a ``String.format``.
 
 En todos los casos anteriores, si se quiere proporcionar un error para que se
 registre, puede proporcionarse como argumento adicional al final:
@@ -228,8 +214,25 @@ registre, puede proporcionarse como argumento adicional al final:
    // e es una Excepción.
    logger.debug("Se ha registrado el centro con código {} y nombre {}", centro.getId(), centro.getNombre(), e);
 
-En versiones más modernas existe otro modo de evitar la ejecución previa
-de operaciones costosas
+Ahora bien, en el ejemplo dado obtener ambos valores es muy económico ya que
+simplemente invocamos dos *getters*, por lo que el hecho de que se evalúen esos
+dos parámetros, aunque luego no acabe por escribirse el mensaje, no penaliza
+demasiado el rendimiento. Ahora bien, si la obtención del valor es costosa,
+¿cómo evitaríamos la merma improductiva de rendimiento? Para ello, a partir de
+la versión 2 de |SLF4J|, existe una |API| fluida que permite usar una expresión
+lambda como argumento:
+
+.. code-block:: java
+
+   // Se supone que lo que se guarda es la fecha de nacimiento y la edad es calculada.
+   logger.atWarn().log(() -> String.format(
+      "Se evita el registro porque el estudiante ID=%d tiene %d años",
+      estudiante.getId(),
+      estudiante.getEdad()
+   ));
+
+Una variante a esto último que permite pasar los parámetros como argumento, en
+vez de recurrir a ``String.format`` es:
 
 .. code-block:: java
 
@@ -242,10 +245,28 @@ de operaciones costosas
 Con todo esto, ya sabemos sobradamente enviar mensajes al registro indicando qué
 nivel de gravedad tienen.
 
+.. note:: En versiones anteriores a la 2, la única forma de sortear la
+   evaluación gratuita de expresiones costosas era usar condiciones:
+
+   .. code-block:: java
+
+      if(logger.isWarnEnabled()) {
+         logger.warn(
+            "Se evita el registro porque el estudiante ID={} tiene {} años",
+            estudiante.getId(),
+            estudiante.getEdad()
+         );
+      }
+
 .. _logging-conf:
 
 Configuración adicional
 =======================
+.. caution:: |SLF4J| se limita a especificar el envío de mensajes, por lo que
+   toda la configuración adicional que queramos hacer a ese envío depende de
+   la librería de implementación. En nuestro caso, este apartado se centra e
+   cómo configurar Logback_.
+
 Pese a que ya sabemos cómo enviar mensajes, no es aún suficiente. Es muy común
 que, además, necesitemos al menos:
 
@@ -253,15 +274,11 @@ que, además, necesitemos al menos:
 - Definir a partir de qué nivel los mensajes se registrarán.
 - Definir el formato de los mensajes.
 
-.. caution:: Como ya se ha explicado, todas estas configuraciones son
-   específicas de la implementación. Nos centraremos en cómo se realizan con
-   Logback_.
-
 La configuracíón **predeterminada** es la siguiente:
 
 a. Los mensajes se escriben en la salida estándar (o sea, en ``System.out``).
-#. No se filtran mensaje, por lo que el nivel registrable es a partir de
-   **DEBUG**.
+#. El nivel registrable, esto es, el nivel a partir del cual los mensajes se
+   registran en el soporte, es **DEBUG**.
 #. El formato de salida tiene este formato:
 
    .. code-block:: none
@@ -340,8 +357,8 @@ Un ejemplo sencillo de configuración podría ser este:
       # Definición de la configuración del logger raíz
       root:
          level: INFO
-         append-ref:
-            - ref: CONSOLE
+         appender-ref:
+            - CONSOLE
 
 En caso de querer definir archivos como soporte de salida, podemos hacer:
 
@@ -397,7 +414,7 @@ alternativas:
 
      file: ${env.HOME:-logs}/app.log
 
-* Valores de propiedades del sistema de Java:
+* Valores de :ref:`propiedades del sistema de Java <system-properties>`:
 
   .. code-block:: yaml
 
@@ -438,12 +455,12 @@ registros los mensajes en varios de ellos:
    
    root:
       level: INFO
-      append-ref:
-         - ref: CONSOLE
-         - ref: FILE
+      appender-ref:
+         - CONSOLE
+         - FILE
 
 Queda un último aspecto básico por revisar y es cómo configurar un logger
-específicos, ya que recordemos que cuando definíamos los logger en las clases
+específico, ya que recordemos que, cuando hemos definido los logger en las clases
 :ref:`los referíamos con la propia clase <def-logger>`. Supongamos que en aquel
 ejemplo la clase ``CentroSqlDao`` está dentro del paquete
 ``edu.acceso.test.backend.sql``. En ese caso:
@@ -457,14 +474,14 @@ ejemplo la clase ``CentroSqlDao`` está dentro del paquete
       # Configuración raíz para los logger
       root:
          level: INFO
-         append-ref:
-            - ref: CONSOLE
+         appender-ref:
+            - CONSOLE
       logger:
          - name: edu.acceso.test.backend.sql
            level: DEBUG
-           append-ref:
-              - ref: FILE
-           # append-ref por defecto es acomulativa:
+           appender-ref:
+              - FILE
+           # appender-ref por defecto es acomulativa:
            # additivity implica que lo sea y que no se herede.
            additivity: false
          - name: edu.acceso.test.backend.sql.sqlite
@@ -473,21 +490,21 @@ ejemplo la clase ``CentroSqlDao`` está dentro del paquete
 
 En esta configuración, los logs de la aplicación se han aplicado para que se
 registren los mensajes a partir del nivel **INFO** en la consola.
-Peroo, además, se han hecho tres configuraciones adicionales. Tengase presente
-que, en principio, los valores de ``level`` y ``append-ref`` se heredan de
+Pero, además, se han hecho tres configuraciones adicionales. Tengase presente
+que, en principio, los valores de ``level`` y ``appender-ref`` se heredan de
 padres a hijos. En el caso de ``level`` un redefinición, cambia el valor; pero
-en el caso de ``append-ref``, una redefinición tiene carácter acomulativo. Por
+en el caso de ``appender-ref``, una redefinición tiene carácter acomulativo. Por
 tanto:
 
 * El código incluido dentro de una librería externa (``jakarta.persistence``)
   sólo registrará mensajes de advertencia y de error (redefinición de ``level``);
-  en la consola (no se ha redefinido ``append-ref``).
+  en la consola (no se ha redefinido ``appender-ref``).
 * El código incluido en el paquete ``edu.acceso.test.backend.sql`` (dentro del
   cual está la clase ``CentroSqlDao``) registra mensajes a partir del nivel
   **DEBUG** (redefinición de ``level``) y en principio debería registrarlos
   tanto en la consola como en el archivo. Pero se ha añadido ``additivity`` con
   valor ``false``. Esta propiedad no es heredable y afecta al valor de
-  ``append-ref``. Implica que el *logger* sólo usa los soportes que tenga
+  ``appender-ref``. Implica que el *logger* sólo usa los soportes que tenga
   definidos. Por tanto, los registros se escriben exclusivamente en el archivo.
 * El paquete ``edu.acceso.test.backend.sql.sqlite`` hereda el valor ``level``
   del padre; y por tanto, registra mensajes a partir de **DEBUG**. En cuanto a
@@ -703,9 +720,9 @@ de ellos. Por ejemplo:
 
    root:
       level: DEBUG
-      append-ref:
-         - ref: CONSOLE_ERROR
-         - ref: CONSOLE_INFO
+      appender-ref:
+         - CONSOLE_ERROR
+         - CONSOLE_INFO
 
 Si deseamos hacer una consulta dinámica, es necesario conocer cómo definir el
 filtro y añadirlo al *appender*:

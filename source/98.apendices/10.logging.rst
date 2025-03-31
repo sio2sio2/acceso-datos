@@ -297,25 +297,9 @@ definir la configuración dentro del código en tiempo de ejecución.
 
 Estática
 --------
-La configuración estática se realiza nativamente a través de archivos |XML| en
-principio, pero también pueden usarse |YAML| o |JSON|, si lo prefiere el
-desarrollador, aunque para esto último se necesitan también incluirse como
-dependencias o `snakeyaml
-<https://mvnrepository.com/artifact/org.yaml/snakeyaml>`_ o `jackson-databind
-<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind>`_.
-
-El archivo debe colocarse en el directorio :file:`resources` (en un proyecto
-Maven o Gradle) y denominarse:
-
-========= ====================== ================================
- Formato   Nombre                 Librería
-========= ====================== ================================
-|XML|      :file:`logback.xml`    Ninguna
-|JSON|     :file:`logback.json`   jackson-databind_\ [#]_
-|YAML|     :file:`logback.yaml`   jackson-databind_, snakeyaml_
-========= ====================== ================================
-
-... pero prescindiremos de |JSON|, porque no aporta ninguna ventaja.
+La configuración estática se realiza nativamente a través de un archivo |XML| o
+Groovy. Debe colocarse en el directorio :file:`resources` (en un proyecto
+Maven o Gradle) y denominarse `logback.xml`.
 
 Un ejemplo sencillo de configuración podría ser este:
 
@@ -324,7 +308,7 @@ Un ejemplo sencillo de configuración podría ser este:
    :class: toggle
    :name: logback-basico-xml
 
-   <configuration status="WARN">
+   <configuration debug="true">
       <!-- Definición de un soporte -->
       <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
          <target>System.err</target>
@@ -339,62 +323,66 @@ Un ejemplo sencillo de configuración podría ser este:
       </root>
    </configuration>
 
-.. code-block:: yaml
-   :caption: logback.yaml
-   :class: toggle
-   :name: logback-basico-yaml
+.. tip:: El atributo ``debug`` provoca que se vuelquen en la consola mensajes
+   relacionados con el procesamiento inicial del archivo de configuración. Para
+   una depuración más extensa puede usarse en cambio:
 
-   configuration:
-      # Log interno del propio Logback
-      status: WARN
-      # Definición de soportes de salida
-      appender:
-         - name: CONSOLE
-           class: ch.qos.logback.core.ConsoleAppender
-           target: System.err  # Por defecto es System.out
-           encoder:
-              pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-      # Definición de la configuración del logger raíz
-      root:
-         level: INFO
-         appender-ref:
-            - CONSOLE
+   .. code-block:: xml
+      
+      <configuration>
+         <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+         <!-- Resto de configuración -->
+      </configuration>
+
+   Puede consultarse `ch.qos.logback.core.status
+   <https://logback.qos.ch/apidocs/ch.qos.logback.core/ch/qos/logback/core/status/package-summary.html>`_
+   para ver otras posibles salidas distintas a la consola.
 
 En caso de querer definir archivos como soporte de salida, podemos hacer:
 
-.. code-block:: yaml
+.. code-block:: xml
    :caption: Ejemplo de registros en archivo
    :class: toggle
 
-   appender:
-      - name: FILE
-        class: ch.qos.logback.core.FileAppender
-        file: logs/app.log
-        encoder:
-           pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-        append: true  # Añade registros sin borrar los anteriores.
-      - name: ROLLING_FILE
-        class: ch.qos.logback.core.RollingFileAppender
-        file: logs/app.log
-        encoder:
-           pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-        rollingPolicy:
-           class: ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy
-           fileNamePattern: "logs/app.%d{yyyy-MM-dd}.%i.log"
-           maxFileSize: 10MB  # Rota al alcanzar 10 MB
-           maxHistory: 30     # Conserva hasta 30 días de logs
-           totalSizeCap: 1GB  # Tamaño máximo total de todos los archivos
+   <!-- Appender para archivo simple --> 
+   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+       <file>logs/app.log</file>
+       <append>true</append> <!-- Conserva logs anteriores -->
+       <encoder>
+           <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+       </encoder>
+   </appender>
+
+   <!-- Appender para rotación automática -->
+   <appender name="ROLLING_FILE" class="ch.qos.logback.core.RollingFileAppender">
+       <file>logs/app.log</file>
+       <!-- Este conserva registros anteriores sin necesidad de append: true -->
+       <encoder>
+           <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+       </encoder>
+       <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+           <!-- Formato de archivos rotados: fecha + índice -->
+           <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+           <!-- Máximo 10MB por archivo -->
+           <maxFileSize>10MB</maxFileSize>
+           <!-- Conserva 30 días de logs -->
+           <maxHistory>30</maxHistory>
+           <!-- Tamaño máximo total de todos los archivos -->
+           <totalSizeCap>1GB</totalSizeCap>
+       </rollingPolicy>
+   </appender>
 
 Debe tenerse presente que las rutas son relativas al directorio de trabajo. Las
 rutas podrían ser absolutas, pero en ese caso la configuración dependería de
 cuál fuera el sistema en el que corre la operación. Para evitarlo tenemos
 alternativas:
 
-* Pasar variables a Java al ejecutar la aplicación usando la opción `-D`\ [#]_:
+* Pasar variables a Java al ejecutar la aplicación usando la opción `-D`:
 
-  .. code-block:: yaml
+  .. code-block:: xml
 
-     file: ${LOG_DIR:-logs}/app.log
+     <file>${LOG_DIR}/app.log</file>
 
   En este caso, si hubiéramos ejecutado así la aplicación:
 
@@ -402,62 +390,73 @@ alternativas:
 
      $ java -DLOG_DIR=/var/log -jar app.jar
 
-  La ruta del archivo sería :file:`/var/log/app.log`. La sintaxis que se ha
-  usado se inspira en la de la shell POSIX e indica que, si no se define el valor
-  de la variable, se use como valor \"logs\", por lo que la ruta será la relativa
-  :file:`logs/app.log`. Por supuesto puede evitarse indicar un valor
-  predeterminado: :code:`${LOG_DIR}`.
+  La ruta del archivo sería :file:`/var/log/app.log`. Ahora bien corremos el
+  riesgo de que la aplicación se ejecute sin pasar ningún valor a la variable.
+  Para evitarlo podemos definir un valor predeterminado dentro del archivo de
+  configuración:
+
+  .. code-block:: xml
+
+     <configuration>
+         <property name="LOG_DIR" value="logs">
+
+         <!-- Resto de configuración -->
+
+     </configuration>
 
 * Variables de ambiente (que dependen del sistema, por cierto):
 
-  .. code-block:: yaml
+  .. code-block:: xml
 
-     file: ${env.HOME:-logs}/app.log
+     <file>${env.HOME}/app.log</file>
+
+  Para las variables de ambiente, sin embargo, no es tan fácil fijar un valor
+  predeterminado, porque no se les puede dar valor con ``<property>`` como en el
+  caso anterior.
 
 * Valores de :ref:`propiedades del sistema de Java <system-properties>`:
 
-  .. code-block:: yaml
+  .. code-block:: xml
 
-     # En un sistema UNIX esto equivale a /tmp/app.log
-     file: ${java.io.tmpdir}/app.log
+     <!-- En un sistema UNIX esto equivale a /tmp/app.log -->
+     <file>${java.io.tmpdir}/app.log</file>
 
 .. tip:: En un sistema UNIX también existe la posibilidad de integrar los
    mensajes en los registros del sistema:
 
-   .. code-block:: yaml
+   .. code-block:: xml
       :caption: Ejemplo de registros con syslog
       :class: toggle
 
-      appender:
-           # Syslog clásico.
-         - name: SYSLOG
-           class: ch.qos.logback.classic.net.SyslogAppender
-           syslogHost: localhost
-           port: 514 
-           facility: LOCAL0
-           suffixPattern: "[%thread] %logger{36} - %msg"
-           stackTracePattern: "   %ex{full}"
-           tag: MiApp
-           # Journald con compatibilidad con syslog.
-         - name: JOURNAL_SYSLOG
-           class: ch.qos.logback.classic.net.SyslogAppender
-           syslogHost: /run/systemd/journal/syslog
-           port: -1
-           facility: LOCAL0
-           suffixPattern: "[%thread] %logger{36} - %msg"
-           stackTracePattern: "   %ex{full}"
-           tag: MiApp
+      <!-- Appender para Syslog clásico -->
+      <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+          <syslogHost>localhost</syslogHost>
+          <port>514</port>
+          <facility>LOCAL0</facility>
+          <suffixPattern>[%thread] %logger{36} - %msg</suffixPattern>
+          <stackTracePattern>   %ex{full}</stackTracePattern>
+          <tag>MiApp</tag>
+      </appender>
+
+      <!-- Appender para Journald con syslog -->
+      <appender name="JOURNAL_SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+          <syslogHost>/run/systemd/journal/syslog</syslogHost>
+          <port>-1</port>  <!-- Usa -1 para sockets Unix -->
+          <facility>LOCAL0</facility>
+          <suffixPattern>[%thread] %logger{36} - %msg</suffixPattern>
+          <stackTracePattern>   %ex{full}</stackTracePattern>
+          <tag>MiApp</tag>
+      </appender>
 
 Por supuesto, si hemos definido múltiples soportes, podemos indicar que se
 registros los mensajes en varios de ellos:
 
-.. code-block:: yaml
+.. code-block:: xml
    
-   root:
-      level: INFO
-      appender-ref:
-         - CONSOLE
-         - FILE
+   <root level="INFO">
+      <appender-ref ref="CONSOLE">
+      <appender-ref ref="FILE">
+   </root>
 
 Queda un último aspecto básico por revisar y es cómo configurar un logger
 específico, ya que recordemos que, cuando hemos definido los logger en las clases
@@ -465,28 +464,22 @@ específico, ya que recordemos que, cuando hemos definido los logger en las clas
 ejemplo la clase ``CentroSqlDao`` está dentro del paquete
 ``edu.acceso.test.backend.sql``. En ese caso:
 
-.. code-block:: yaml
+.. code-block:: xml
 
-   configuration:
-      #
-      # ... appenders, status, etc. ...
-      #
-      # Configuración raíz para los logger
-      root:
-         level: INFO
-         appender-ref:
-            - CONSOLE
-      logger:
-         - name: edu.acceso.test.backend.sql
-           level: DEBUG
-           appender-ref:
-              - FILE
-           # appender-ref por defecto es acomulativa:
-           # additivity implica que lo sea y que no se herede.
-           additivity: false
-         - name: edu.acceso.test.backend.sql.sqlite
-         - name: jakarta.persistence
-           level: WARN
+   <!-- appenders, etc. -->
+
+   <root level="INFO">
+       <appender-ref ref="CONSOLE" />
+   </root>
+
+   <!-- Loggers específicos -->
+   <logger name="edu.acceso.test.backend.sql" level="DEBUG" additivity="false">
+       <appender-ref ref="FILE" />
+   </logger>
+
+   <logger name="edu.acceso.test.backend.sql.sqlite" />
+
+   <logger name="jakarta.persistence" level="WARN" />
 
 En esta configuración, los logs de la aplicación se han aplicado para que se
 registren los mensajes a partir del nivel **INFO** en la consola.
@@ -692,37 +685,44 @@ un archivo para mensajes de error (*ERROR* y *WARN*) y otro para el resto. Esto
 se logra definiendo dos *appenders* distintos y definiendo filtros en cada uno
 de ellos. Por ejemplo:
 
-.. code-block:: yaml
+.. code-block:: xml
    :name: logging-filtrado-mensajes
    :class: toggle
    :caption: Soporte según la severidad el mensaje
-   :emphasize-lines: 5-7,13-17
+   :emphasize-lines: 5-7,16-21
 
-   appender:
-      - name: CONSOLE_ERROR
-        class: ch.qos.logback.core.ConsoleAppender
-        target: System.err
-        filter:
-           - class: ch.qos.logback.classic.filter.ThresholdFilter
-             level: WARN
-        encoder:
-           pattern: "%d{HH:mm:ss} [%thread] %highlight(%-5level) - %msg%n"
-      - name: CONSOLE_INFO
-        class: ch.qos.logback.core.ConsoleAppender
-        target: System.out
-        filter:
-           - class: ch.qos.logback.classic.filter.ThresholdFilter
-             level: INFO
-             onMatch: DENY
-             onMismatch: ACCEPT
-        encoder:
-           pattern: "%d{HH:mm:ss} [%thread] %highlight(%-5level) - %msg%n"
+   <configuration>
+       <!-- Appender para errores (WARN y superiores en System.err) -->
+       <appender name="CONSOLE_ERROR" class="ch.qos.logback.core.ConsoleAppender">
+           <target>System.err</target>
+           <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+               <level>WARN</level>
+           </filter>
+           <encoder>
+               <pattern>%d{HH:mm:ss} [%thread] %highlight(%-5level) - %msg%n</pattern>
+           </encoder>
+       </appender>
 
-   root:
-      level: DEBUG
-      appender-ref:
-         - CONSOLE_ERROR
-         - CONSOLE_INFO
+       <!-- Appender para INFO y DEBUG (en System.out) -->
+       <appender name="CONSOLE_INFO" class="ch.qos.logback.core.ConsoleAppender">
+           <target>System.out</target>
+           <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+               <level>INFO</level>
+               <!-- Configuración inversa: DENY en coincidencia (INFO y superiores), ACCEPT en no coincidencia (DEBUG) -->
+               <onMatch>DENY</onMatch>
+               <onMismatch>ACCEPT</onMismatch>
+           </filter>
+           <encoder>
+               <pattern>%d{HH:mm:ss} [%thread] %highlight(%-5level) - %msg%n</pattern>
+           </encoder>
+       </appender>
+
+       <!-- Logger raíz -->
+       <root level="DEBUG">
+           <appender-ref ref="CONSOLE_ERROR" />
+           <appender-ref ref="CONSOLE_INFO" />
+       </root>
+   </configuration>
 
 Si deseamos hacer una consulta dinámica, es necesario conocer cómo definir el
 filtro y añadirlo al *appender*:
@@ -832,37 +832,11 @@ a. Incluir entre las dependencias mi sistema de registro y la librería de
 .. [#] Para una pequeña disertación sobre todas ellas consulter al `artículo de
    Marco Behler <https://www.marcobehler.com/guides/java-logging>`_
 
-.. [#] En realidad, |JSON| es un subconjunto de |YAML| por lo que un procesador
-   de |YAML| debe entender |JSON|. Por tanto, snakeyaml_ debe teóricamente ser
-   capaz de procesar |JSON|. Es así y lo hace, pero ante una extensión `.json`
-   Logback_ comprobará si se tiene disponible jackson-databind_ y, si no es así,
-   no leerá el archivo y cargará la configuración predeterminada. Es posible, eso
-   sí, nombrar el archivo :file:`logback.yaml` y escribirse en formato |JSON|,
-   pero es algo bastante antinatural.
-
-.. [#] El valor de la variable también se puede establecer en el propio archivo
-   de configuración:
-
-   .. code-block:: yaml
-
-      configuration:
-         status: WARN
-         property:
-            - name: LOG_DIR
-              value: /var/log
-         # Resto de configuración
-
-   Pero en este caso no habríamos adelantado mucho, porque la configuración
-   dependería del sistema en el que se ejecuta la aplicación, tal como ocurría
-   cuando lo escribimos directamente.
-
 .. |JUL| replace:: :abbr:`JUL (java.util.logging)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
 .. |SLF4J| replace:: :abbr:`SLF4J (Simple Logging Facade For Java)`
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
-.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
-.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |JLC| replace:: :abbr:`JLC (Apache Commons Logging)`
 
 .. _slf4j-api: https://mvnrepository.com/artifact/org.slf4j/slf4j-api

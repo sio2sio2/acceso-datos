@@ -1,0 +1,212 @@
+.. _java-stream:
+
+Flujos
+******
+Los flujos (:java-stream:`Stream<T> <Stream>`) son secuencias de elementos que se consumen
+al aplicar sobre ellas alguna operación:
+
+.. code-block:: java
+
+   Stream<Integer> st = Stream.of(1, 2, 3 ,4);
+   st.count(); // 4
+   st.count(); // Lo consuminos contando antes, así que se produce un IllegalStateException
+
+Una de sus características fundamentales es que nos permiten implementar las
+típicas operaciones (`map
+<https://en.wikipedia.org/wiki/Map_(higher-order_function)>`_, `filter
+<https://en.wikipedia.org/wiki/Filter_(higher-order_function)>`_, `reduce
+<https://en.wikipedia.org/wiki/Fold_(higher-order_function)>`_) de programación
+funcional.
+
+:ref:`Collection <java-collection>` tiene un método (``stream()``) que convierte
+la colección en un flujo y que, por tanto, nos permitirá aplicar estas
+operaciones a los elementos:
+
+.. code-block:: java
+
+   List<Integer> n = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9));
+   n.stream();  // Flujo con la secuencia completa.
+   n.stream().filter(e -> e % 3 == 0);  // Flujo con los múltiplos de 3.
+   n.stream().filter(e -> e % 3 == 0).toList();  // [3, 6, 9]
+   n.stream().filter(e -> e % 3 == 0).toArray(Integer[]::new); // Igual, pero array.
+
+En cuanto a los arrays, existe :java-util:`Arrays.stream() <Arrays>` que realiza
+la transformación:
+
+.. code-block:: java
+
+   Integer[] numeros = new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9};
+   Arrays.stream(numeros); // Flujo de enteros.
+
+Si el objeto no es una colección ni un array, pero es un iterable, aún podemos
+generar un flujo con él:
+
+.. code-block:: java
+
+   StreamSupport.stream(iterable.splitoperator(), false);
+
+.. _java-stream-operaciones:
+
+Operaciones
+===========
+Sobre un flujo podemos aplicar métodos que implementan operaciones funcionales.
+Algunos son:
+
+``count()``
+   que cuenta los elementos del flujo.
+
+``distinct()``
+   que elimina los elementos repetidos.
+
+``allMatch(Predicate<T> condicion)``
+   que devuelve verdadero si todos los elementos del flujo cumplen la
+   condición.
+
+``anyMatch(Predicate<T> condicion)``
+   que devuelve verdadero si alguno de los elementos del flujo cumple la
+   condición.
+
+``forEach(Consumer<T> action)``
+   que aplica la acción a cada elemento del flujo consumiéndolo por completo
+   (como el equivalente para colecciones). Si prefiriésemos consumir el flujo
+   iterando con un bucle, podríamos interpretarlo como un un iterable\ [#]_:
+
+   .. code-block:: java
+
+      IntStream s = IntStream.range(0,3);
+      // s.forEach(System.out::println);
+      for(Integer i: (Iterable<Integer>) s::iterator) {
+         System.out.println(i)
+      }
+
+``peek(Consumer<T> action)``
+   que aplica la acción a cada elemento del flujo pero deja el flujo intacto
+   para que pueda seguir manipulándose:
+
+   .. code-block::
+
+      n.stream().limit(3).peek(System.out::println).toList(); // [1, 2, 3]
+      1
+      2
+      3
+
+``filter(Predicate<T> filtro)``
+   que genera un nuevo flujo que contiene sólo los elementos que cumplen el
+   filtro.
+
+``map(Function<T, R> transformador)``
+   que genera un nuevo flujo en el que los elemento se generan aplicando la
+   función transformadora a cada elemento del flujo original.
+
+``reduce(T identity, BinaryOperator<T> accumulator)``
+   que obtiene un valor aplicando acomulativamente la operación proporcionada en
+   el segundo argumento. Como valor inicial se usa, el apartado en el primer
+   argumento:
+
+   .. code-block:: java
+
+      n.stream().reduce(0, (e, acc) -> e + acc); // 45, la suma de los elementos.
+
+``sorted()`` y ``sorted(Comparator<T> comparador)``
+   que ordena el flujo bien por el orden natural de sus elementos, bien según la
+   función comparadora que se proporcione.
+
+``limit(long n)``
+   que se queda con los primeros "n"  elementos del flujo y descarta los demás.
+
+``skip(long n)``
+   que desecha los primeros "n" elementos del flujo.
+
+``takeWhile(Predicate<T> condicion)``
+   que toma los elementos del flujo hasta que deje de cumplirse la condición.
+
+   .. code-block:: java
+
+      n.stream().takeWhile(e -> e < 5).toList();  // [1, 2, 3, 4]
+
+``dropWhile(Predicate<T> condicion)``
+   que desecha los elementos del flujo hasta que deje de cumplirse la condición.
+
+   .. code-block:: java
+
+      n.stream().dropWhile(e -> e < 5).toList();  // [5, 6, 7, 8, 9]
+
+``max(Comparator<T> comparador)`` y ``min(Comparator<T> comparador)``
+   que calcula el máximo (o mínimo) valor del flujo según la función comparadora
+   que se suministre:
+
+   .. code-block:: java
+
+      n.stream().max(Comparator.naturalOrder()); // 9
+
+``toList()``
+   que convierte el flujo en una lista.
+
+``toArray()``
+   que es el equivalente al método homónimo de las :ref:`colecciones
+   <java-collection>`.
+
+Generación
+==========
+Los métodos anteriores manipulan (filtran, modifican, etc) flujos ya existentes.
+Si nuestra intención es crear flujos *ex nihilo* aún tenemos algunos métodos
+estáticos:
+
+``Stream.of(T ... values)``
+   que genera un flujo con todos los valores que se proporcionan como argumento.
+
+   .. code-block:: java
+
+      Stream<Integer> s = Stream.of(1, 2, 3, 4);
+      s.toList(); // [1, 2, 3, 4]
+
+``Stream.generate(Supplier<T> s)``
+   que genera un flujo infinito a partir de la función suministradora que se
+   pasa como argumento.
+
+   .. code-block:: java
+
+      int n = 0;
+      Stream<Integer> s = Stream.generate(() -> n++);
+      s.limit(3).toList();  // [0, 1, 2]
+
+   Si quiere limitarse la generación mediante una condición, puede aplicarse el
+   método ``.takeWhile`` ya citado:
+
+   .. code-block:: java
+
+      int n = 0;
+      Stream<Integer> s = Stream.generate(() -> n++);
+      s.takeWhile(i -> i<3);  // [0, 1, 2]
+
+``Stream.iterate(T seed, UnaryOperator<T> proximo)``
+   que genera un flujo infinito de datos de manera que el elemento n-ésimo se
+   obtiene de aplicarle la función al elemento anterior. El primer elemento
+   devuelto es la propia semilla:
+
+   .. code-block:: java
+
+      Stream<Integer> s = Stream.iterate(0, (seed) -> ++seed;);
+      s.limit(3).toList();  // [0, 1, 2]
+
+   Este último método también permite la inclusión de una condición:
+
+``Stream.iterate(T seed, Predicate<T> condición, UnaryOperator<T> proximo)``
+   que funciona como el anterior, pero incorporando la condición:
+
+   .. code-block:: java
+
+      Stream<Integer> s = Stream.iterate(0, i -> i < 3, i -> ++i;);
+      s.toList();  // [0, 1, 2]
+
+.. https://jenkov.com/tutorials/java-collections/streams.html
+.. https://www.sensedia.com.es/post/interfaces-funcionales-con-java-8
+
+.. rubric:: Notas al pie
+
+.. [#] La explicación de este código es que la interfaz Iterable requiere la
+   implementación de un método ``iterator`` que devuelve un objeto ``Iterator``.
+   Como los flujos tienen un método que hace esto mismo (y que se llama también
+   iterator), podemos pasar este método con el operador ``::``, de la misma
+   forma que actuábamos cuando explicamos las :ref:`interfaces funcionales
+   <functional-interface>`.

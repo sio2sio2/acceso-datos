@@ -1,0 +1,843 @@
+
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.1. Gestión de archivos &#8212; documentación de Acceso a datos - rolling</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" href="../_static/general.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=461dccb6"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=677778c1"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '01.archivos/01.gestion';</script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="1.2. Consulta y manipulación de contenidos" href="02.manipulacion.html" />
+    <link rel="prev" title="1. Tratamiento de archivos" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.jpg" class="logo__image only-light" alt="documentación de Acceso a datos - rolling - Home"/>
+    <script>document.write(`<img src="../_static/logo.jpg" class="logo__image only-dark" alt="documentación de Acceso a datos - rolling - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Búsqueda</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">1. Tratamiento de archivos</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.1. Gestión de archivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02.manipulacion.html">1.2. Consulta y manipulación de contenidos</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02.formatos/index.html">2. Formatos de información</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../02.formatos/02.json.html">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/01.gson.html">2.2.1. GSON</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/02.jackson.html">2.2.2. Jackson</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../02.formatos/03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03.xml/index.html">3. <abbr title="eXtensible Markup Language">XML</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03.xml/01.jaxp.html">3.1. <abbr title="Java API for XML Processing">JAXP</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03.xml/02.jackson.html">3.2. Jackson</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03.xml/03.basex.html">3.3. BaseX</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04.conector/index.html">4. Conectores</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/01.basico.html">4.1. Operaciones básicas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/10.extras.html">4.5. Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.6. Programación con conectores</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05.orm/index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/01.conf.html">5.1. Configuración</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/02.basico.html">5.2. Operativa básica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/03.conexion.html">5.3. Conexión</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/04.mapeo.html">5.4. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../05.orm/10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../05.orm/10.crud/01.simples.html">5.6.1. Simples</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../05.orm/10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../05.orm/15.extra.html">5.7. Otros aspectos</a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../99.ejercicios/index.html">Ejercicios</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/01.achivos.html">1. Archivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/02.formatos.html">2. Formatos de información</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/03.xml.html">3. Formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/04.conectores.html">4. <abbr title="Java DataBase Connectivity">JDBC</abbr></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/05.orm.html">5. <abbr title="Java Persistent API">JPA</abbr></a></li>
+</ul>
+</details></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../98.apendices/index.html">Apéndices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../98.apendices/01.funcional.html">1. Java funcional</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/01.function.html">1.1. Interfaces funcionales</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/05.collection.html">1.2. Colecciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html">1.3. Flujos</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/10.logging.html">2. Sistema de registros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/99.ide.html">3. Entorno de desarrollo</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/01.archivos/01.gestion.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Gestión de archivos</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-de-entorno">1.1.1. Variables de entorno</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion">1.1.3. Gestión</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta">1.1.3.1. Consulta</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulacion">1.1.3.2. Manipulación</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="gestion-de-archivos">
+<h1><span class="section-number">1.1. </span>Gestión de archivos<a class="headerlink" href="#gestion-de-archivos" title="Link to this heading">#</a></h1>
+<p>Conocer cómo gestionar archivos con <em>Java</em> nos permite conocer, dentro de una
+aplicación, cómo se encuentran los archivos dentro del sistema de archivos y
+crear nuevos y borrar ya existentes. Por otro lado, estas tareas tienen una
+fuerte dependencia del sistema operativo sobre el que corra la aplicación (p.ej.
+en <em>UNIX</em> el carácter separador es la barra «/» mientras que en <em>Windows</em> es la
+barra invertida «<cite>\</cite>») y uno de nuestros objetivos al crear una aplicación de
+<em>Java</em> es que ésta sea independiente de esta circunstancia. Por tanto, tenemos
+que realizar estas tareas intentando evitar estas dependencias.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p><em>Java</em> tiene dos <abbr title="Application Programming Interface">API</abbr> distintas para llevar a cabo estas tareas:</p>
+<ul class="simple">
+<li><p>La original que se basa en la clase <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/File.html">java.io.File</a>.</p></li>
+<li><p>La surgida a partir de <em>Java7</em> basada en <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">Path</a> (interfaz),
+y <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">Files</a> (clase).</p></li>
+</ul>
+<p>Analizaremos la segunda.</p>
+</div>
+<p>Todo esto, sin embargo, requiere conocer dos aspectos previos:</p>
+<section id="variables-de-entorno">
+<h2><span class="section-number">1.1.1. </span>Variables de entorno<a class="headerlink" href="#variables-de-entorno" title="Link to this heading">#</a></h2>
+<p>Las <em class="dfn">variables de entorno</em> son variables definidas en el sistema operativo
+que heredan las aplicaciones que se ejecutan dentro de él, y que, cuando quieren
+realizarse tareas relacionadas con el propio sistema, es necesario consultar en
+tiempo de programación. Por ejemplo, si quisiéramos acceder a un archivo que
+sabemos situado dentro del directorio personal del usuario, necesitamos conocer
+cuál es esta ruta, para lo cual podemos consultar la <em>variable de entorno</em>
+correspondiente.</p>
+<p>Para acceder a las variables de entorno, <em>Java</em> dispone del método estático<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code> con o sin argumento.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">System.getenv(String</span> <span class="pre">nombre)</span></code></dt><dd><p>devuelve el valor de la variable de entorno o <code class="docutils literal notranslate"><span class="pre">null</span></code> si ésta no existe:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario en mi sistema.</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code></dt><dd><p>devuelve un mapa cada una de cuyas entradas es una variable y su valor
+correspondiente.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">entorno</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">();</span>
+<span class="n">entorno</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// /home/usuario, de nuevo.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>El <strong>problema</strong> crucial de consultar las variables de entorno es el de que el
+nombre cambia entre los distintos sistemas operativos<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> y, por tanto, si nos
+limitamos a usarlas tal como acabamos de ver, nuestra aplicación será
+dependiente del sistema en que se ejecute.</p>
+<p id="system-properties">Una alternativa es consultar las propiedades de nuestro entorno de <em>Java</em>,
+algunas de las cuales recogen los valores de las variables de entorno:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">System.getProperty(String</span> <span class="pre">nombre_propiedad)</span></code></dt><dd><p>devuelve el valor de la propiedad que se indica en su argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// /home/usuario en mi sistema.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Este segundo código es independiente del sistema operativo y siempre devolverá
+la ruta al directorio personal del usuario. Si nuestra intención es saber cuáles
+son las propiedades definidas puede ejecutarse la siguiente orden:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>java<span class="w"> </span>-XshowSettings:properties<span class="w"> </span>-version
+</pre></div>
+</div>
+<p>Si se ejecuta la orden, se verá que apenas hay variables de entorno disponibles
+a través de propiedades, con lo que a veces no quedará más remedio que usarlas.
+En ese caso, tendremos que crear un código que compruebe cuál es el sistema
+operativo y, en función de ello, que obtenga la variable.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Por ejemplo, este artículo expone <a class="reference external" href="https://mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/">cómo detectar el tipo de sistema
+operativo</a>.</p>
+</div>
+</section>
+<section id="rutas">
+<span id="file-path"></span><h2><span class="section-number">1.1.2. </span>Rutas<a class="headerlink" href="#rutas" title="Link to this heading">#</a></h2>
+<p>Antes de entrar de lleno a gestionar archivos, hay que aprender cómo referirnos
+a ellos, esto es, cómo construir rutas, para lo cual usaremos <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">Path</a>. El modo habitual de constituir una es con:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">Path.of(String</span> <span class="pre">path)</span></code></dt><dd><p>que crea una ruta a partir de la cadena que se le proporcione:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;/home/usuario/.config&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Esta, sin embargo, no es una buena estrategia, ya que la ruta que hemos
+definido es una ruta de sistemas <em>UNIX</em> y hará dependiente nuestro código del
+sistema sobre el que se ejecuta. Así que habría sido mucho mejor en este caso
+hacer lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">home</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">);</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">home</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;.config&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>esto es, utilizar una ruta ya hecha que nos proporciona el propio Java y
+corregirla añadiendo los subdirectorios necesarios mediante la adición de
+argumentos (tantos como subdirectorios requiramos).</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Con el mismo fin también puede usarse el método estático <code class="docutils literal notranslate"><span class="pre">get()</span></code>
+de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Paths.html">Paths</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">home</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">);</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Paths</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">home</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;.config&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</dd>
+</dl>
+<p>Una vez que tenemos un objeto que implementa la interfaz <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">Path</a>, podemos usar los métodos que nos brinda para alterarla:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">isAbsolute()</span></code></dt><dd><p>que comprueba si la ruta es absoluta.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getFileName()</span></code></dt><dd><p>que devuelve un objeto con el nombre del archivo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">getFileName</span><span class="p">();</span><span class="w"> </span><span class="c1">// .config (no es un String).</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getParent()</span></code></dt><dd><p>que devuelve un objeto con la misma ruta a la que se le ha eliminado el
+nombre del archivo.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">getParent</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getRoot()</span></code></dt><dd><p>que devuelve el directorio raíz del sistema:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">getRoot</span><span class="p">();</span><span class="w"> </span><span class="c1">// /, ya que es un sistema UNIX. En Windows, devolvería C:\ posiblemente.</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">resolve(String</span> <span class="pre">otro)</span></code> y <code class="docutils literal notranslate"><span class="pre">resolve(Path</span> <span class="pre">otro)</span></code></dt><dd><p>que genera la ruta resultante de añadir a la que se tiene la proporcionada en
+el argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">appdir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;MyApp&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario/.config/MyApp</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="na">getFileName</span><span class="p">();</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="na">getParent</span><span class="p">();</span>
+<span class="n">dir</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="n">config</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">resolveSibling(String</span> <span class="pre">otro)</span></code> y <code class="docutils literal notranslate"><span class="pre">resolveSibling(Path</span> <span class="pre">otro)</span></code></dt><dd><p>que es como los anteriores métodos, pero la ruta se construye sobre el
+directorio padre:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">resolveSibling</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario/.cache</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">toAbsolutePath()</span></code> y <code class="docutils literal notranslate"><span class="pre">toRealPath()</span></code></dt><dd><p>que devuelve la ruta absoluta. El segundo método, resuelve, además, los
+enlaces simbólicos en caso de que existiera alguno:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/.</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></dt><dd><p>que elimina elementos redundantes en la ruta:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">).</span><span class="na">toAbsolutePath</span><span class="p">().</span><span class="na">normalize</span><span class="p">();</span><span class="w"> </span><span class="c1">// /home/usuario/ (sin el punto)</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">relativize(Path</span> <span class="pre">parent)</span></code></dt><dd><p>que construye una ruta relativa tomando como base la ruta que se proporciona
+en el argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">relative</span><span class="p">(</span><span class="n">dir</span><span class="p">.</span><span class="na">getParent</span><span class="p">());</span><span class="w"> </span><span class="c1">// .config</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getNameCount()</span></code></dt><dd><p>que cuenta el número de elementos de la ruta:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">getNameCount</span><span class="p">();</span><span class="w"> </span><span class="c1">// 3</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getName(int</span> <span class="pre">idx)</span></code></dt><dd><p>que devuelve como ruta el elemento de la ruta original que se indique como
+argumento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">dir</span><span class="p">.</span><span class="na">getName</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// usuario</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">subPath(int</span> <span class="pre">idx1,</span> <span class="pre">int</span> <span class="pre">idx2)</span></code></dt><dd><p>que devuelve la subruta que se forma tomando desde el elemento indicado con
+el primer argumento hasta el indicado con el segundo (sin incluir).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">toUri()</span></code></dt><dd><p>que convierte la ruta en una <abbr title="Uniform Resource Identifier">URI</abbr> (o sea, comenzará por <code class="file docutils literal notranslate"><span class="pre">file:/</span></code>), lo
+que nos permitirá tratar la lectura del archivo del mismo modo que si fuera
+un enlace:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">URI</span><span class="w"> </span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="na">toUri</span><span class="p">();</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uri</span><span class="p">.</span><span class="na">toURL</span><span class="p">().</span><span class="na">openStream</span><span class="p">();</span>
+<span class="c1">// etc.</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Más adelante trataremos la <a class="reference internal" href="02.manipulacion.html#iotext-r"><span class="std std-ref">lectura de archivos</span></a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Si tenemos una <abbr title="Uniform Resource Identifier">URI</abbr> que refiere un archivo local, podremos obtener
+su <code class="docutils literal notranslate"><span class="pre">Path</span></code> con <code class="docutils literal notranslate"><span class="pre">Path.of</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">uri</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</dd>
+</dl>
+<p>Por último, <code class="docutils literal notranslate"><span class="pre">Path</span></code> implemente la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable</a>, así que
+podemos hacer construcciones como esta:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="p">(</span><span class="n">Path</span> <span class="n">p</span><span class="p">:</span> <span class="nb">dir</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
+<p>Con estas herramientas sólo construimos rutas, así que tales rutas
+no tienen por qué existir.</p>
+</div>
+</section>
+<section id="gestion">
+<span id="file-files"></span><h2><span class="section-number">1.1.3. </span>Gestión<a class="headerlink" href="#gestion" title="Link to this heading">#</a></h2>
+<p>Discutido lo anterior, ahora sí podemos centrarnos en gestionar archivos de
+disco. Para ello utilizaremos <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">java.nio.file.Files</a> y todos los métodos estáticos
+que trae definidos. Téngase en cuenta que para expresar las rutas no acepta
+cadenas, sino rutas de tipo <a class="reference internal" href="#file-path"><span class="std std-ref">Path</span></a>:</p>
+<section id="consulta">
+<h3><span class="section-number">1.1.3.1. </span>Consulta<a class="headerlink" href="#consulta" title="Link to this heading">#</a></h3>
+<p>Para comprobar la <strong>existencia</strong> de una ruta:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">home</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">));</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">exists</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obviamente, true</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">exists</span><span class="p">(</span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;.bashrc&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true, uso bash.</span>
+</pre></div>
+</div>
+<p>Para consultar su <strong>tamaño</strong>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">size</span><span class="p">(</span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;.bashrc&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Tamaño en bytes.</span>
+</pre></div>
+</div>
+<p>Para comprobar la <strong>naturaleza</strong> del archivo hay varios métodos distintos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">isDirectory</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w"> </span><span class="c1">// true</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">isRegularFile</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w"> </span><span class="c1">// false</span>
+</pre></div>
+</div>
+<p>Y para comprobar el <strong>tipo</strong> <abbr title="Multipurpose Internet Mail Extensions">MIME</abbr>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">probeContentType</span><span class="p">(</span><span class="s">&quot;/path/a/settings.json&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;application/json&quot;</span>
+</pre></div>
+</div>
+<p>Para comprobar <strong>permisos</strong>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">isReadable</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">isWritable</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">isWritable</span><span class="p">(</span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">));</span><span class="w">  </span><span class="c1">// false</span>
+</pre></div>
+</div>
+<p>Para consultar el <strong>propietario</strong>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">getOwner</span><span class="p">(</span><span class="n">home</span><span class="p">);</span><span class="w">  </span><span class="c1">// usuario</span>
+</pre></div>
+</div>
+<p>Para comprobar si dos archivos son el mismo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Estoy trabajando en mi directorio personal</span>
+<span class="n">home</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// false, porque home es ruta absoluta.</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">isSameFile</span><span class="p">(</span><span class="n">home</span><span class="p">,</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">));</span><span class="w">  </span><span class="c1">// true.</span>
+</pre></div>
+</div>
+<p>Y varios otros métodos para consultar fechas, si es ejecutable, si está oculto,
+etc. También es posible listar directorios sin recursividad:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;</span><span class="w"> </span><span class="n">archivos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">list</span><span class="p">(</span><span class="n">home</span><span class="p">);</span>
+<span class="n">archivos</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>o con ella:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;</span><span class="w"> </span><span class="n">archivos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">walk</span><span class="p">(</span><span class="n">home</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">FileVisitOption</span><span class="p">.</span><span class="na">FOLLOW_LINKS</span><span class="p">);</span>
+<span class="n">archivos</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>En este caso, se devuelven todos los archivos dentro del directorio personal,
+hasta una profundidad de 3 y, si un enlace simbólico es un directorio, se entra
+dentro de él. Los dos últimos argumentos son opcionales.</p>
+</section>
+<section id="manipulacion">
+<h3><span class="section-number">1.1.3.2. </span>Manipulación<a class="headerlink" href="#manipulacion" title="Link to this heading">#</a></h3>
+<p>Por manipulación entendemos, simplemente, la copia y traslado de archivos o el
+cambio de sus propiedades (permisos, propietarios, etc) y no la alteración del
+contenido, que reservamos para el <a class="reference internal" href="02.manipulacion.html#manipulacion-archivos"><span class="std std-ref">próximo epígrafe sobre manipulación</span></a>.</p>
+<p>Para <strong>crear</strong> un archivo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">createFile</span><span class="p">(</span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>lo que creará el archivo vacío <code class="file docutils literal notranslate"><span class="pre">caca.txt</span></code> dentro de nuestro directorio
+natural con los permisos que determine la máscara del sistema. Podríamos haber
+definido otros permisos, pero para ello tendríamos que haber incluido argumentos
+adicionales (véase <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/attribute/FileAttribute.html">FileAttribute</a>), pero no
+entraremos en tanto detalle. También existe <code class="docutils literal notranslate"><span class="pre">Files.createDirectory(Path</span> <span class="pre">dir)</span></code>
+para crear un directorio.</p>
+<p>Podemos también copiar, mover o borrar archivos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">));</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">caca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Copia en /tmp/kk.txt</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Error, el destino ya existe.</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">StandardCopyOption</span><span class="p">.</span><span class="na">REPLACE_EXISTING</span><span class="p">);</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">caca</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>También se pueden copiar flujos (<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>)
+a archivo.</p>
+</div>
+<p>Para cambiar el usuario o los atributos del archivo también existen métodos.</p>
+<p>Los métodos que nos queda por revisar son aquellos que permiten leer y escribir
+contenido, pero los dejamos para el siguiente epígrafe.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>A diferencia de lo que ocurre al usar en una terminal las órdenes
+<a class="reference external" href="https://sio2sio2.github.io/doc-linux/02.conbas/02.informacion/03.ficheros.html#cp" title="(en Linuxnomicón versión rolling)"><span class="xref std std-ref">cp</span></a> o <a class="reference external" href="https://sio2sio2.github.io/doc-linux/02.conbas/02.informacion/03.ficheros.html#mv" title="(en Linuxnomicón versión rolling)"><span class="xref std std-ref">mv</span></a>, no basta con poner el directorio
+de destino, cuando queremos conservar el nombre original.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Por supuesto, estas acciones pueden generar excepciones (p.ej. al
+intentar crear un archivo dentro de un directorio en el que no tenemos
+permisos), así que en la programación deberemos estar atentos a tratarlas.</p>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Es probable que a lo largo del texto se le escape al redactor el término
+<em>función</em> al referir un método estático.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>De hecho, para conseguir lo mismo en <em>Windows</em> deberíamos haber hecho:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HomeDrive&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HomePath&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Tratamiento de archivos</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02.manipulacion.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">1.2. </span>Consulta y manipulación de contenidos</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-de-entorno">1.1.1. Variables de entorno</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion">1.1.3. Gestión</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta">1.1.3.1. Consulta</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulacion">1.1.3.2. Manipulación</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por José Miguel Sánchez Alés
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright CC BY 4.0, 2024-2025, José Miguel Sánchez Alés.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

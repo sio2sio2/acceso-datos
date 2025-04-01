@@ -1,0 +1,18 @@
+.. _yaml:
+
+|YAML|
+******
+|YAML| es un superconjunto de |JSON| (véase una :ref:`explicación detallada del
+formato aquí <lm:yaml>`), por lo que si usamos el `proyecto Jackson
+<https://github.com/FasterXML/jackson>`_ nos es válido absolutamente todo
+:ref:`lo indicado para json <json-jackson>`. Simplemente, tendremos que cargar
+`la librería adecuada
+<https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml>`_
+y modificar la forma en que definimos el mapeador:
+
+.. code-block:: java
+
+   ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
+.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`

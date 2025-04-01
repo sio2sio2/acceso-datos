@@ -1,0 +1,131 @@
+.. _orm-bas:
+
+Operativa básica
+****************
+Una vez configurada, el uso básico de la herramienta se compone de cuatro elementos:
+
+#. :dfn:`Mapear objetos`, esto es, informar de cómo se hará la traducción de
+   las clases al modelo relacional.
+#. Registrar cada clase para que la tome en consideración el |ORM|.
+#. Crear la *fábrica* que nos permitirá crear los gestores para las distintas
+   entidades.
+#. Realizar operaciones |CRUD|.
+
+.. _orm-bas-map:
+
+Mapeo
+=====
+Se basa en las anotaciones que define la especificación |JPA|:
+
+.. literalinclude:: files/Centro.java
+   :language: java
+   :start-at: @Entity
+
+En este ejemplo:
+
++ Anotamos la clase con ``@Entity`` y con ``@Table`` en caso de que la tabla en
+  la base de datos no tenga el mismo nombre que la clase.
++ El identificador se anota con ``@Id`` y dependiendo de cómo se genere podemos
+  añadir una anotación extra:
+
+  - Si es tarea del usuario definir el identificador, no añadimos ninguna.
+  - Si el identificador es autoincremental y no puede definirlo el usuario
+    (``GENERATED ALWAYS BY IDENTITY`` en el estándar |SQL|), se incluye la
+    anotación comentada en el código de más arriba.
+  - Si el identificador puede ser definido por el usuario y, si no lo hace, el
+    |SGBD| se encarga de adjudicar uno (``GENERATED AS DEFAULT BY IDENTITY``),
+    no hay manera de expresarlo con Hibernate_.
+
++ Los atributos que son campos se notan con ``@Column`` y pueden añadirse
+  parámetros para afinar la definición (nombre del campo si no coincide con el
+  del atributo, restricciones adicionales, longitud si es una cadena). Un
+  atributo sin la anotación, no obstante, se añadirá a la tabla como campo, a
+  menos que sea ``static`` o ``transient``. Si se quiere forzar su exclusión,
+  puede usarse la anotación ``@Transient``.
+
++ Si el identificador no lo fija el usuario, puede ser buena idea restringir la
+  visibilidad de su *setter* (``protected``).
+
+.. _orm-bas-reg:
+
+Registro
+========
+Para registrar la clase para el mapeo hay que añadir a
+:file:`persistence.xml` la línea:
+
+.. code-block:: xml
+
+   <!-- Clases mapeadas -->
+   <class>edu.acceso.test_hibernate.modelo.Centro</class>
+
+.. _orm-bas-conn:
+
+Conexión
+========
+Registrada y anotada la clase, ya podemos realizar una conexión muy básica para
+ilustrar cómo operar con la base de datos:
+
+.. code-block:: java
+
+   try(EntityManagerFactory emf = Persistence.createEntityManagerFactory("MiUnidadP")) {
+
+      try(EntityManager em = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+            em.persist(centro);
+            tr.commit();
+         }
+         catch(Exception err) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al almacenar el centro", err);
+         }
+      }
+
+      try(EntityManager em = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = em.find(Centro.class, 11004866);
+            centro.setNombre("I.E.S. Castillo de Luna");  // Modificamos el objeto.
+            tr.commit();
+         }
+         catch(Exception err) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al modificar el centro", err);
+         }
+      }
+
+   }
+   catch(Exception e) {
+      throw new RuntimeException("Imposible conectar a la base de datos");
+   }
+
+   
+Como puede verse:
+
+* A partir de la configuración, debemos crear una fábrica de gestores
+  (:jakarta-persistence:`EntityManagerFactory`). Este es un proceso costoso, así
+  que deberíamos evitar crear más de una\ [#]_. El código no es realista, ya que
+  muy probablemente en una aplicación se requiera obtener y crear objetos en
+  distintos archivos, con lo que la estructura *try-with-resources* no podremos
+  usarla. Sin embargo, nos sirve para ilustrar este ejemplo tan simple.
+
+* Es conveniente no reutilizar los objetos :jakarta-persistence:`EntityManager`,
+  de suerte que cada transacción debería usar uno nuevo.
+
+.. rubric:: Notas al pie
+
+.. [#] Más adelante sugerimos :ref:`cómo crear una fábrica que asegure su
+   unicidad <orm-conn>`.
+
+.. _Hibernate: https://www.hibernate.org
+
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

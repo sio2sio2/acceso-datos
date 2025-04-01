@@ -1,0 +1,64 @@
+.. _orm-conn:
+
+Conexión
+========
+En el apartado dedicado a :ref:`operaciones básicas <orm-bas>` ya adelantamos
+que la creación del objeto :jakarta-persistence:`EntityManagerFactory` es muy
+costosa, puesto que implica el establecimiento y validación de la conexión. Por
+consiguiente, conviene asegurarnos de que su creación sólo se realiza una vez
+para lo cual nos valdremos del `patrón Singleton`_ modificado para crear una
+:download:`clase con utilidades <files/JpaEMUtils.java>`:
+
+.. literalinclude:: files/JpaEMUtils.java
+   :language: java
+   :start-at: public class
+
+La clase:
+
+* Implementa un `patrón Singleton`_, de modo que para la misma configuración
+  de conexión, siempre se devuelve la misma fábrica.
+* En caso de que sólo se haya creado una fábrica, es posible recuperarla sin
+  necesidad de facilitar la configuración.
+
+.. note:: Los métodos dedicados a las transacciones :ref:`los trararemos más
+   adelante <orm-transaction>`.
+
+De este modo:
+
+.. code-block:: java
+   :name: orm-uso-sf
+
+   public static main(String[] args) throws Exception {
+      // Propiedades configuradas en tiempo de ejecución.
+      Map<String, String> props = new HashMap<>();
+      props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
+      props.put("hibernate.show_sql", "true");
+
+      try(EntityManagerFactory emf = JpaEmFactory.getInstance("MiUnidadP", props)) {
+         operaciones();
+      }
+   }
+
+   private static operaciones() {
+      // ¡Ojo! No hay que cerrarlo.
+      emf = JpaEmFactory.getInstance(); // Devuelve el mismo objeto.
+
+      try(em EntityFactory = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+            em.persist(centro);
+            tr.commit();
+         }
+         catch(Exception e) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al almacenar el centro", err);
+         }
+      }
+   }
+
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+
+.. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
+

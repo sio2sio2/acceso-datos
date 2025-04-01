@@ -1,0 +1,190 @@
+.. _orm-simple-crud:
+
+Simples
+*******
+Antes de comenzar a desglosar las cuatro operacioness |CRUD| básicas, es
+necesario introducir otro concepto, el de :dfn:`vinculación a la sesión`: un
+objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
+la sesión activa, lo cual ocurre cuando:
+
+a. Lo hemos obtenido previamente de la base de datos en esa misma sesión.
+#. Hemos usando con él un método que supone su vinculación:
+
+   * ``.persist``, que agrega un nuevo objeto a la base de datos y, por su propia
+     naturaleza se usa con un objeto creado *ex novo* y, por tanto, no vinculado.
+   * ``.merge``, que expresamente vincula un objeto a la base de datos, existiera
+     en ella (pudimos obtenerlo en una sesión ya cerrada) o no (es un objeto *ex
+     novo*).
+
+.. note:: Hemos preferido acatar la terminología emanada del acrónimo |CRUD|,
+   por lo que incluimos cada uno de los términos en los epígrafes. Tenga
+   presente, pues, que *CREATE* hace referencia a \"crear\" datos en la base de
+   datos, esto es, añadir o insertar datos; y no con crear el esquema (```CREATE
+   TABLE``, etc). De hecho, no hemos de preocuparnos por el esquema, ya que éste
+   es capaz de generarse sólo a partir de las clases anotadas.
+
+.. _orm-crud-create:
+
+CREATE
+======
+Para agregar objetos (o sea, registros) a la base de datos, debe utilizarse
+el método ``.persist``:
+
+.. code-block:: java
+   :emphasize-lines: 9
+
+   // Supongamos que el objeto ya se instanció antes y se creó.
+   EntityManagerFactory emf = JpaEMUtils.getEntityManagerFactory();
+
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+         em.persist(centro);
+         tx.commit();
+      }
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         throw new RuntimeException("Error al guardar el centro", e);
+      }
+   }
+
+.. note:: Una vez vinculado, podríamos en esta misma sesión realizar otras
+   operaciones que exigen que el objeto esté vinculado (como :ref:`actualizar
+   <orm-crud-update>` o :ref:`eliminar <orm-crud-delete>`).
+
+.. _orm-crud-read:
+
+READ
+====
+La operación de lectura más sencilla es obtener un objeto a partir de su
+identificador, para lo cual se usa el método ``.find``:
+
+.. code-block:: java
+   :emphasize-lines: 3
+
+   try(EntityManager em = emf.createEntityManager()) {
+      // No es necesaria transacción, puesto que no se escribe.
+       Centro centro = em.find(Centro.class, 11004866L);
+       System.out.println(centro);
+   }
+   catch(Exception e) {
+       e.printStackTrace();
+   }
+
+.. seealso:: La obtención de todos los objetos requiere el :ref:`uso de JLQ
+   <orm-jpql-select-all>` o :ref:`Criteria API <orm-criteria-select-all>`.
+
+También podemos considerar una operación de lectura la que se hace a través del
+método ``.refresh`` que consiste en volver a tomar un objeto de la base de
+datos, desechando todos los cambios que haya podido sufrir en memoria:
+
+.. code-block:: java
+   :emphasize-lines: 9
+
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         Centro castillo = sesion.find(Centro.class, 11004866L);
+         // Hacemos cambios en el objeto
+         castillo.setNombre("Pongo otro");
+         castillo.setTitularidad(Centro.Titularidad.PRIVADA);
+         em.refresh(castillo); // Se vuelve a la versión de la BD
+         tx.commit(); // En realidad no cambia nada.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         e.printStackTrace();
+      }
+   }
+
+.. _orm-crud-update:
+
+UPDATE
+======
+Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
+
+.. code-block:: java
+   :emphasize-lines: 6
+
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
+         castillo.setNombre("I.E.S. Castillo de Luna");
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         e.printStackTrace();
+      }
+   }
+
+En cambio, si el objeto no está vinculado, aún podremos hacer las
+actualizaciones con los *setters*, si lo vinculamos con ``.merge``.
+
+.. code-block:: java
+   :emphasize-lines: 10, 11
+
+   Centro castillo = null;
+   try(EntityManager em = emf.createEntityManager()) {
+       centro = em.find(Centro.class, 11004866L);
+   }
+
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         castillo.setNombre("I.E.S. Castillo de Luna");
+         em.merge(castillo);  // Vincula el objeto a la sesión.
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         e.printStackTrace();
+      }
+   }
+
+En caso de que no exista ningún objeto en la base de datos con el identificador
+del objeto que se usa como argumento, éste se agregará (tiene el mismo efecto
+que ``.persist``).
+
+.. note:: En esta operación es irrelevante hacer cambios y luego vincular que
+   vincular y luego hacer cambios: los cambios se reflejarán en la base de datos
+   al confirmarlos.
+
+.. warning:: Evite cambiar el identificador del objeto.
+
+.. _orm-crud-delete:
+
+DELETE
+======
+Para borrar un objeto **vinculado** a la sesión debe usarse el método
+``.remove``:
+
+.. code-block:: java
+   :emphasize-lines: 6
+
+   try(EntityManager em = emf.createEntityManager()) {
+      EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
+         em.remove(castillo);
+         tx.commit(); // Se guarda el cambio.
+      }      
+      catch(Exception e) {
+         if(tx != null && tx.isActive()) tx.rollback();
+         e.printStackTrace();
+      }
+   }
+
+.. tip:: Si el objeto no está vinculado, podremos vincularlo usando **previamente**
+   ``.merge``.
+
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. _Hibernate: https://www.hibernate.org
+

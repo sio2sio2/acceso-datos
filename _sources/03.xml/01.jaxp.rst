@@ -1,0 +1,395 @@
+.. _jaxp:
+
+|JAXP|
+******
+La librería viene incluida en el |JDK| y tiene soporte para :ref:`XPath 1.0
+<lm:xpath>` y :ref:`XSLT 1.0 <lm:xslt>`. Para :ref:`XQuery <xquery>` no tiene
+soporte alguno.
+
+.. _jaxp-read:
+
+Lectura
+=======
+Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
+
+.. code-block:: java
+
+   Path ruta = Path.of(System.getProperty("user.home"), "claustro.xml");
+   DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+   // La siguiente línea puede provocar un ParseConfigurationException
+   DocumentBuilder builder = factory.newDocumentBuilder();
+
+   try (InputStream st = Files.newInputStream(ruta)) {
+      // La línea posterior también puede generar una excepción.
+      Document xml = builder.parse(st);
+      // Accedemos a la información del documento a través de su DOM.
+      // ...
+   }
+
+.. caution:: Con este código se producirá un error si el |XML| no es bien
+   formado, pero no se realizará con un |DTD| ninguna comprobación sobre su
+   validez. Sin embargo, si hay una declaración de tipo de documento:
+
+   .. code-block:: xml
+
+      <!DOCTYPE claustro SYSTEM "claustro.dtd">
+
+   y el |DTD| no existe, se generará un error por no encontrar la referencia.
+   Evite incluir esta cláusula hasta que :ref:`estudiemos la validación
+   <jaxp-dtd>`.
+
+Una vez tenemos disponible el objeto `Document` ya podremos acceder a los nodos
+del documento. En principio, los nodos se modelan mediante la clase `Node
+<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html>`_ sobre la que
+construyen subsclases que modelan los distintos tipos de nodos (`Element
+<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html>`_, `Text
+<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Text.html>`_, `Attr
+<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html>`_, etc.). Cada
+uno de estos tipos de nodos está asociado a un número entero al que se da 
+nombre mediante un atributo estático de `Node`_. Por ejemplo:
+
+.. code-block:: java
+
+   Element root = xml.getDocumentElement();  // Obtiene el nodo raíz.
+   root.getNodeType() == Node.ELEMENT_NODE   // true.
+
+El propio documento (la variable `xml`) es un tipo de nodo:
+
+.. code-block:: java
+
+   xml.getNodeType() == Node.DOCUMENT_NODE  // true
+
+A partir de un nodo (y el propio documento se considera como tal) se pueden
+hacer diversas pesquisas:
+
+``hasChildNodes()``
+   devuelve verdadero si el nodo tiene algún hijo.
+
+``hasAttributes()``
+   devuelve verdadero si el nodo tiene algún atributo.
+
+``getNodeName()``
+   devuelve el nombre del nodo (si es un elemento, el nombre de la etiqueta).
+
+``getNodeValue()``
+   devuelve el valor del nodo. Dependiendo del tipo de nodo, así será su valor
+   (al comienzo de la explicación sobre Node_ hay una tabla que indica qué valor
+   devuelve cada tipo).
+
+``getTextContent()``
+   devuelve el valor de texto del elemento\ [#]_, que es la concatenación de los nodos de
+   texto del propio elemento y de todos sus descendientes. Obsérvese que para un
+   nodo así:
+
+   .. code-block:: xml
+
+      <apelativo>Paco</apelativo>
+
+   resulta que:
+
+   .. code-block:: java
+
+      // apelativo es una variable que contiene el elemento apelativo comentado
+      apelativo.getTextContent() == apelativo.firstChild().getNodeValue();
+
+``getFirstChild()`` o ``getLastChild()``
+   Devuelve el primero o el último **nodo** hijo de aquel. Se ha remarcado nodo,
+   porque el nodo no tiene que ser forzosamente un elemento (téngase, pues,
+   cuidado con los documentos indentados)
+
+``getParentNode()`` o ``getPreviousSibling()`` o ``getFollowingSibling()``
+   devuelve el nodo padre o el hermano previo o el hermano siguiente.
+
+``getChildNodes()``
+   devuelve un objeto `NodeList
+   <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html>`_  con
+   los nodos hijos. A pesar de su naturaleza no implementa la interfaz
+   :java-lang:`Iterable <Iterable>` y sólo presenta un método (``getLength()``)
+   que devuelve la cantidad de hijos y un método ``item(int index)`` que
+   devuelve el i-ésimo nodo de la lista. Por tanto, si se quiere quiere recorrer
+   la colección, habrá que usar un `for` clásico:
+
+   .. code-block:: java
+
+      NodeList hijos = root.getChildNodes();
+      for(int i=0; i<hijos.getLength(); i++) {
+         Node nodo = hijos.item(i);
+         switch(nodo.getNodeType()) {
+            case Node.ELEMENT_NODE:
+               System.out.println(nodo.getNodeName());
+               break;
+            default:
+               break;
+         }
+      }
+
+  .. tip:: Pese a que, a priori, sólo podemos utilizar el `for` tradicional
+     para recorrer NodeList_, podemos buscarnos las vueltas para convertirlo
+     en un flujo y poder usar con él técnicas de :ref:`Java funcional <funcional>`:
+
+     .. code-block:: Java
+
+        NodeList hijos = root.getChildNodes();
+        Stream<Node> streamNode = IntStream.range(0, hijos.getLength()).mapToObj(hijos::item);
+
+``getAttributes()``
+   devuelve los atributos del elemento en forma de `NamedNodeMap
+   <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html>`_
+   que como NodeList_ tampoco implemente la interfaz :java-lang:`Iterable
+   <Iterable>`. Además de ``item(int index)`` y ``getLength()``, dispone también
+   de ``getNamedItem(String name)`` que permite obtener el nodo atributo a
+   partir de su nombre:
+
+   .. code-block:: java
+
+      NodeList profesores = xml.getElementsByTagName("profesores");
+      Element p4 = (Element) profesores.item(3);
+      NamedNodeMap attrs = p4.getAttributes();
+      for(int i=0; i< attrs.getLength(); i++) {
+         Attr attr = (Attr) attrs.item(i);
+         System.out.printf("%s: %s\n", attr.getNodeName(), attr.getNodeValue());
+      }
+
+Por otra parte, los tipos de nodos tiene también sus métodos específicos. Por
+ejemplo, Element_:
+
+``getElementsByTagName(String name)``
+   devuelve los elementos descendientes cuyo nombre de etiqueta es el
+   suministrado en el argumento. El método también existe para los nodo
+   `Document <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html>`_:
+
+   .. code-block:: java
+
+      NodeList profesores = xml.getElementsByTagName("profesores");
+
+``getElementById(String id)``
+   devuelve el elemento con el identificador suministrado como argumento.
+   Evidentemente el procesador debe conocer cuáles son los atributos de tipo
+   identificador, por lo que es necesario que el documento se haya validado.
+
+   .. code-block:: java
+
+      Element p17 = xml.getElementById("p17"); // null, porque no estamos usando el DTD
+
+``getAttributeNode(String name)`` o ``getAttribute(String name)``
+   devuelve el atributo (Attr_) o el valor del atributo cuyo nombre se
+   proporciona en el argumento.
+
+.. _jaxp-dtd:
+
+.. rubric:: Validación
+
+Hemos evitado validar el documento hasta ahora. Sin embargo, la validación puede
+ser interesante o incluso, puede ser preciso, intentar que ni siquiera se haga
+ninguna comprobación en caso de que la declaración exista, pero el |DTD| no.
+
+En primer lugar, si queremos que la validación se lleve a cabo debemos añadir:
+
+.. code-block:: java
+
+   factory.setValidating(true);
+
+Otro aspecto importante es el de la manipulación de la validación, que se lleva
+cabo definiendo un \"*resolutor de entidades*\".
+
+.. code-block:: java
+   :emphasize-lines: 1,13,14,27
+
+   builder.setEntityResolver(new EntityResolver2() {
+       @Override
+       public InputSource getExternalSubset(String name, String baseURI) {
+           return null;
+       }
+
+       @Override
+       public InputSource resolveEntity(String publicID, String systemID) throws SAXException, IOException {
+           return resolveEntity(null, publicID, null, systemID);
+       }
+
+       @Override
+       public InputSource resolveEntity(String name, String publicID, String baseURI, String systemID)
+           throws SAXException, IOException {
+               if(systemID == null) return null;
+
+               try {
+                   if(!new URI(systemID).isAbsolute()) {
+                       // Se supone que "ruta" ya se definió como Path.
+                       systemID = ruta.getParent().resolve(systemID).toString();
+                   }
+               }
+               catch(URISyntaxException err) {
+                   return null;
+               }
+
+               return new InputSource(systemID);
+       }       
+   });
+
+Debemos fijarnos en el último método. Cuando devuelve `null`, es como, si no
+hubiéramos definido nada, y el procesador obrará como lo hace habitualmente para
+llevar a cabo la validación. En cambio, si devolvemos un :code:`new
+InputSource(cadena)` utilizará el |DTD| que indique esa cadena (puede ser una
+|URL| o un archivo local) con independencia de lo que expresase la declaración
+original.
+
+.. admonition:: Advertencia
+
+   El código incluye una variable ``ruta``, que es un objeto ``Path`` que
+   contiene la ruta del archivo |XML| en consonancia con :ref:`el ejemplo
+   ilustrativo que escribimos sobre lectura <jaxp-read>`.
+
+   Si en cambio, ``ruta`` fuera una objeto ``URI`` podríamos obtener la cadena
+   con la ruta del |DTD| de este otro modo:
+
+   .. code-block:: java
+
+      systemID = ruta.resolve(systemID).toString();
+
+¿Qué hace exactamente el código que hemos propuesto? En principio, si
+no hay definido ninguno, no hace nada. En cambio, si hay definido uno,
+comprueba si el |DTD| se proporcionó con ruta absoluta (lo cual incluye una
+|URL| completa). Si fue así, respeta el valor y la validación se hará con el
+valor expresado en el archivo. En cambio, si la ruta era relativa, hay un
+problema: la librería entiende la ruta relativa no respecto al |XML| (que sería
+lo esperable), sino respecto al directorio de trabajo. Lo que hace nuestro
+código en este caso, es hacerla relativa respecto al |XML|.
+
+.. tip:: El argumento del constructor de `InputSource` también puede ser un
+   :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
+   escupa nunca un error (incluso aunque el |DTD| de la declaración no se
+   encuentre), podemos hacer hacer lo siguiente:
+
+   .. code-block:: java
+
+      @Override
+      public InputSource resolveEntity(String name, String publicID, String baseURI, String systemID)
+          throws SAXException, IOException {
+              return new InputSource(new StringReader(""));
+      }
+
+.. todo:: ¿Cómo forzar una validación, aunque no haya declaración DOCTYPE?
+
+.. _jaxp-write:
+
+Escritura
+=========
+Bajo el epígrafe anterior hemos tratado únicamente cómo acceder a información,
+pero no cómo crear nueva información en formato |XML|. Para ello debemos
+construir primero un |DOM| y luego escribirlo a un archivo.
+
+Generación del |DOM|
+--------------------
+Podemos tomar uno ya existente resultado de haber leído una archivo previo o
+crearlo *ex novo*:
+
+.. code-block:: java
+
+   DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+   DocumentBuilder builder = factory.newDocumentBuilder();
+
+   Document xml = builder.newDocument();
+   Element root = xml.createElement("claustro");
+   root.setAttribute("centro", "IES Castillo de Luna");
+
+   Element profesor = xml.createElement("profesor");
+   profesor.setAttribute("id", "p1");
+   profesor.setIdAttribute("id", true);  // Es un identificador
+
+   Text texto = xml.createTextNode("Me he hartado de crear elementos");
+
+   profesor.appendChild(texto);
+   root.appendChild(profesor);
+   xml.appendChild(root);
+
+Escritura a archivo
+-------------------
+Partamos de que ya tenemos un Document_ construido como queremos que quede
+(véase el apartado anterior) y queremos ahora generar el |XML| correspondiente:
+
+.. code-block:: java
+
+   DOMSource source = new DOMSource(xml);
+
+   TransformerFactory tfactory = TransformerFactory.newInstance();
+   Transformer transformer = tfactory.newTransformer();  // Puede provocar excepción.
+
+   Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "claustro.xml");
+
+   try (
+       OutputStream st = Files.newOutputStream(ruta);
+       OutputStreamWriter sw = new OutputStreamWriter(st);
+   ) {
+       StreamResult result = new StreamResult(sw);
+       transformer.transform(source, result);
+   }
+   catch(IOException | TransformerException err) {
+      err.printStackTrace();
+   }
+
+En cambio, si simplemente quisiéramos volcar el |XML| como una cadena:
+
+.. code-block:: java
+
+   StringWriter sw = new StringWriter();
+   StreamResult result = new StreamResult(sw);
+   transformer.transform(source, result);
+
+   String contenido = sw.toString();
+
+Podemos, además, manipular cómo se escribe el |XML| resultante y qué
+declaraciones incluirá su cabecera:
+
+.. code-block:: java
+
+   transformer.setOutputProperty(OutputKeys.INDENT, "yes");  // Salida bonita.
+   transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "claustro.dtd");  // Añadimos DOCTYPE
+
+.. seealso:: Para otras propiedades, consúltese `OutputKeys
+   <https://docs.oracle.com/javase/8/docs/api/javax/xml/transform/OutputKeys.html>`_.
+
+.. _jaxp-xpath:
+
+XPath
+=====
+Hemos visto :ref:`una lectura bastante torpe <jaxp-read>` en que el único
+criterio para acceder de forma selectivas a los nodos es mediante un
+identificador (``getElementById``) o mediante el nombre de la etiqueta
+(``getElementsByTagName``). Sin embargo, si conocemos :ref:`XPath <lm:xpath>`,
+podemos seleccionar nodos usando esta tecnología:
+
+.. code-block:: java
+
+   XPath xPath = XPathFactory.newInstance().newXPath();
+
+   XPathExpression expresion = xpath.compile("//profesor[@casillero]");
+   // xml es el Document del ejemplo anterior.
+   NodeList profesores = (NodeList) expresion.evaluate(xml, XPathConstants.NODESET); 
+   // ... Consultamos la lista de profesores con atributo casillero
+
+No puede ser más fácil... si se conoce *XPath* y se sabe cómo construir la
+expresión pertinente. También podemos usar una expresión sin compilarla primero,
+si nuestra intención es usarla una sola vez:
+
+.. code-block:: java
+
+   Element profesor = (Element) xPath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); 
+   System.out.println(profesor.getTagName());  // profesor
+   
+   String apelativo = (String) xPath.evaluate("//profesor[@id='p81']/apelativo", xml, XPathConstants.STRING); 
+   System.out.println(apelativo);  // Verónica
+
+   int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.STRING)).intValue();
+   System.out.println(cantidad);
+
+.. rubric:: Notas al pie
+
+.. [#] En realidad el método tiene sentido para otros nodos que no sean
+   elementos. Véase la tabla que resume sus significados en la explicación del
+   método que ofrece la documentación original de Node_.
+
+.. |JAXP| replace:: :abbr:`JAXP (Java API for XML Processing)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |DOM| replace:: :abbr:`DOM (Document Object Model)`
+.. |DTD| replace:: :abbr:`DTD (Document Type Definition)`
+.. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
+.. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE biblioteca SYSTEM "dtd/biblioteca.dtd">
+<biblioteca nombre="Biblioteca municipal">
+   <!-- Este es el catálogo de libros de la biblioteca -->
+   <catalogo>
+      <libro isbn="id85-359-0277-5">
+         <nombre>Don Quijote de la Mancha</nombre>
+         <autor>Miguel de Cercantes Saavedra</autor>
+         <año>1997</año>
+         <editorial>Castalia</editorial>
+         <ejemplares>
+            <ejemplar codigo="e01" />
+            <ejemplar codigo="e02" />
+            <!-- Resto de ejemplares de este libro -->
+         </ejemplares>
+      </libro>
+
+
+      <libro isbn="id85-359-0277-6">
+         <nombre>Historia de la vida del Buscón</nombre>
+         <autor>Francisco de Quevedo</autor>
+         <año>2002</año>
+         <editorial>Alianza</editorial>
+         <ejemplares>
+            <ejemplar codigo="e06" />
+            <ejemplar codigo="e07" />
+            <!-- Resto de ejemplares de este libro -->
+         </ejemplares>
+      </libro>
+   </catalogo>
+
+   <!-- Socios incritos en la biblioteca -->
+   <socios>
+      <lector registro="l01">
+         <dni>12345678Z</dni>
+         <nombre>Perico de los Palotes</nombre>
+         <direccion>
+            <domicilio>c/ AAAAA. 22.</domicilio>
+            <cp>12345</cp>
+            <poblacion>Villaarriba</poblacion>
+         </direccion>
+      </lector>
+
+      <lector registro="l02">
+         <dni>01234567L</dni>
+         <nombre>Mercedes Verdugo Cordero</nombre>
+         <direccion>
+            <domicilio>c/ BBBBB. 21.</domicilio>
+            <cp>21435</cp>
+            <poblacion>Villaabajo</poblacion>
+         </direccion>
+      </lector>
+
+      <!-- Resto de lectores -->
+   </socios>
+
+   <!-- El plazo se mide en días -->
+   <prestamo ejemplar="e01" lector="l01" fecha="2018-10-02" plazo="10" entrega="2018-10-10" />
+   <prestamo ejemplar="e07" lector="l02" fecha="2018-09-01" plazo="15" />
+   <prestamo ejemplar="e06" lector="l01" fecha="2018-10-15" plazo="1" />
+
+   <!-- Más prestamos -->
+</biblioteca>

@@ -74,7 +74,7 @@ Esta es la lectura más simple que podemos hacer:
      CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
          .setIgnoreSurroundingSpaces(true)
          .setHeaderName("Nombre", "Edad")  // Define los nombres de las columnas.
-         .build();
+         .get();
 
   En este caso, hemos tomado como base el formato anterior y hemos añadido que
   no se tengan en consideración los espacios que pueda haber alrededor del
@@ -115,7 +115,7 @@ La creación de archivos |CSV| también es bastante sencilla utilizando
 
    try (
       OutputStream st = Files.newOutputStream(ruta);
-      CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(st), formato);
+      CSVPrinter printer = formato.print(new OutputStreamWriter(st));
    ) {
       for(String[] registro: datos) {
          //printer.printRecord(registro[0], registro[1]);

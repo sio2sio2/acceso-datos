@@ -485,7 +485,7 @@ conviene redefinir el formato así:</p>
 <span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 <span class="w">    </span><span class="p">.</span><span class="na">setHeader</span><span class="p">()</span><span class="w">                </span><span class="c1">// Respetamos los nombres incluidos.</span>
 <span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">  </span><span class="c1">// Saltamos la primera línea al leer.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -505,7 +505,7 @@ conviene redefinir el formato así:</p>
 <span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
 <span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Incluirá los nombres en la salida.</span>
-<span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="w">   </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>

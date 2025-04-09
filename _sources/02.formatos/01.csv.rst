@@ -93,7 +93,7 @@ Esta es la lectura más simple que podemos hacer:
             .setIgnoreSurroundingSpaces(true)
             .setHeader()                // Respetamos los nombres incluidos.
             .setSkipHeaderRecord(true)  // Saltamos la primera línea al leer.
-            .build();
+            .get();
 
 Escritura
 =========
@@ -111,7 +111,7 @@ La creación de archivos |CSV| también es bastante sencilla utilizando
    Path ruta = Path.of(System.getProperty("user.home"), "caca.csv");
    CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
       .setHeader("Nombre", "Edad")  // Incluirá los nombres en la salida.
-      .build();
+      .get();
 
    try (
       OutputStream st = Files.newOutputStream(ruta);

@@ -16,7 +16,7 @@ Acceso a datos
     Ciclo            `Desarrollo de Aplicaciones Multiplataforma`_
    ================ ==========================================================
 
-.. rubric:: Normativa
+.. rubric:: Normativa específica.
 
 * `Real Decreto 450/2010`_, que establece el título.
 * `Real Decreto 405/2023`_, que modifica el anterior actualizando sus módulos.

@@ -140,7 +140,9 @@ Algunos son:
       n.stream().max(Comparator.naturalOrder()); // 9
 
 ``toList()``
-   que convierte el flujo en una lista.
+   que convierte el flujo en una lista **inmutable**, por lo que no podremos
+   añadirle o eliminarle elementos. Para que la lista sea mutable es necesario
+   hacer: ``collect(Collectors.toList())``.
 
 ``toArray()``
    que es el equivalente al método homónimo de las :ref:`colecciones

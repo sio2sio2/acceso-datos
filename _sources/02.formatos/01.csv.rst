@@ -26,26 +26,69 @@ podemos obtener fácilmente `un JAR listo para su uso
 .. note:: Una alternativa interesante es `OpenCSV
    <https://opencsv.sourceforge.net/>`_.
 
-Lectura
-=======
-Veamos cómo leer un |CSV| que se obtiene como flujo de entrada\ [#]_:
+Escritura
+=========
+La creación de archivos |CSV| es bastante sencilla utilizando
+`CSVPrinter <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVPrinter.html>`_:
 
 .. code-block:: java
-   :emphasize-lines: 5, 7
 
-   Path ruta = Path.of(System.getProperty("user.home"), "caca.csv");
+   // Supongamos que tenemos un clase Persona que almacena nombre y edad.
+   Persona[] personas = new Persona[] {
+      new Persona("Pepe", 13),
+      new Persona("Manolo", 25)
+   };
+
+   Path ruta = Path.of(System.getProperty("user.home"), "personas.csv");
+   CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+      .setHeader("Nombre", "Edad")  // Incluirá los nombres de las columnas en la salida.
+      .get();
+
+   try (
+      OutputStream st = Files.newOutputStream(ruta);
+      CSVPrinter printer = formato.print(new OutputStreamWriter(st));
+   ) {
+      for(Persona persona: personas) {
+         printer.printRecord(
+            persona.getNombre(),
+            // Si la transformación a String es sencilla, no hay problema
+            persona.getEdad()
+         );
+      }
+      printer.flush();
+   }
+   catch(IOException err) {
+      // Tratar el error.
+   }
+
+.. note:: Los ``Enum`` no presentan ningún problema al ser almacenados.
+
+Lectura
+=======
+Para leer un |CSV| que se obtiene como flujo de entrada\ [#]_:
+
+.. code-block:: java
+   :emphasize-lines: 10, 12
+
+   // El archivo de antes
+   Path ruta = Path.of(System.getProperty("user.home"), "personas.csv");
+   CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+      .setHeader()                 // Nos valen los nombres de las columnas incluidos.
+      .setSkipHeaderRecord(true)   // La primera columna no son datos.
+      .get();
 
    try (
       InputStream st = Files.newInputStream(ruta);
-      CSVParser parse = new CSVParser(new InputStreamReader(st), CSVFormat.DEFAULT);
+      CSVParser parser = CSVParser.parse(new InputStreamReader(st), CSVFormat.DEFAULT);
    ) {
-      for(CSVRecord registro: parse) {
+      for(CSVRecord registro: parser) {
          // Tratamos cada registro del archivo. Por ejemplo:
-         long num = parse.getRecordNumber(); // Número de registro.
-         int cantidad = registro.size(); // Cantidad de campos en el registro.
-         // Unimos los campos con " -- ".
-         String contenido = StreamSupport.stream(registro.spliterator(), false).collect(Collectors.joining(" -- "));
-         System.out.printf("%d: [%d]  %s\n", num, cantidad, contenido);
+         long num = parse.getRecordNumber();       // Número de registro.
+         int cantidad = registro.size();           // Cantidad de campos en el registro.
+         String nombre = registro.get("Nombre");   // También .get(0)
+         int edad = Integer.parseInt(registro.get("Edad"));
+         Persona persona = new Persona(nombre, edad);
+         System.out.printf("%d: [%d]  %s\n", num, cantidad, persona);
       }
    }
    catch(IOException err) {
@@ -63,17 +106,30 @@ Esta es la lectura más simple que podemos hacer:
   <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html>`_.
   Podemos acceder a cada elemento por separado (con el método ``.get``), pero es
   a su vez también iterable, lo que hemos preferido usar en este caso.
-* Al procesar el |CSV| hemos declarado que el archivo cumple estrictamente el
-  :rfc:`4180` con la salvedad de que permite líneas vacías. `CSVFormat
+* Como es iterable, además de un bucle, podríamos haber usado un enfoque funcional:
+
+   .. code-block:: java
+
+      Persona[] personas = StreamSupport.stream(registro.spliterator(), false)
+         .map(registro -> {
+               String nombre = registro.get("Nombre");
+               int edad = Integer.parseInt(registro.get("Edad"));
+               return new Persona(nombre, edad);
+         }).toArray(Persona[]::new);
+
+* ``CSVFormat.DEFAULT`` significa que el formato cumple estrictamente el
+  :rfc:`4180` con la salvedad de que se permiten líneas vacías. `CSVFormat
   <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html>`_
   lista otras variantes del estándar predefinidas indicando cuál es su
   definición. En cualquier caso, podemos definir nosotros mismos el formato:
 
   .. code-block:: java
+     :emphasize-lines: 4
 
      CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+         .setHeaderName("nombre", "edad")  // Define otros nombres de columna
+         .setSkipHeaderRecord(true)
          .setIgnoreSurroundingSpaces(true)
-         .setHeaderName("Nombre", "Edad")  // Define los nombres de las columnas.
          .get();
 
   En este caso, hemos tomado como base el formato anterior y hemos añadido que
@@ -81,60 +137,7 @@ Esta es la lectura más simple que podemos hacer:
   carácter separador\ [#]_. Además definimos los nombres de las columnas, con lo
   que podremos acceder a los valores de los campos usando ``get`` no sólo con el
   índice (:code:`registro.get(0)`), sino también con el propio nombre
-  (:code:`registro.get("Nombre")`).
-
-  .. note:: En realidad, lo recomendable es que la primera línea del |CSV| no
-     sean valores, sino los nombres de las columnas, por lo que muy comúnmente
-     conviene redefinir el formato así:
-
-     .. code-block:: java
-
-        CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-            .setIgnoreSurroundingSpaces(true)
-            .setHeader()                // Respetamos los nombres incluidos.
-            .setSkipHeaderRecord(true)  // Saltamos la primera línea al leer.
-            .get();
-
-Escritura
-=========
-La creación de archivos |CSV| también es bastante sencilla utilizando
-`CSVPrinter <https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVPrinter.html>`_:
-
-.. code-block:: java
-
-   // Datos que se han generado de alguna manera.
-   String[][] datos = {
-      {"Pepe", "13"},
-      {"Manolo", "22,5"}
-   };
-
-   Path ruta = Path.of(System.getProperty("user.home"), "caca.csv");
-   CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-      .setHeader("Nombre", "Edad")  // Incluirá los nombres en la salida.
-      .get();
-
-   try (
-      OutputStream st = Files.newOutputStream(ruta);
-      CSVPrinter printer = formato.print(new OutputStreamWriter(st));
-   ) {
-      for(String[] registro: datos) {
-         //printer.printRecord(registro[0], registro[1]);
-         printer.printRecord(registro); // Puede ser cualquier objeto iterable. 
-      }
-      printer.flush();
-   }
-   catch(IOException err) {
-      // Lo puede provocar la apertura del flujo o los lectores.
-   }
-
-.. hint:: No es necesario escribir registro a registro. Si disponemos los datos
-   en un flujo, una colección o una lista, podemos usar ``printRecords``:
-
-   .. code-block:: java
-
-      printer.printRecords(Arrays.stream(datos));
-
-.. note:: Los ``Enum`` no presentan ningún problema al ser almacenados o leídos.
+  (:code:`registro.get("nombre")`).
 
 .. rubric:: Notas al pie
 

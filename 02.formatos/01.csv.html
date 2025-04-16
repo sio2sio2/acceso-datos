@@ -392,8 +392,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.1. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.2. Lectura</a></li>
 </ul>
             </nav>
         </div>
@@ -428,22 +428,66 @@ en el sistema (p.e. <a class="extlink-deb reference external" href="https://pack
 <p class="admonition-title">Nota</p>
 <p>Una alternativa interesante es <a class="reference external" href="https://opencsv.sourceforge.net/">OpenCSV</a>.</p>
 </div>
+<section id="escritura">
+<h2><span class="section-number">2.1.1. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<p>La creación de archivos <abbr title="Comma-Separated Values">CSV</abbr> es bastante sencilla utilizando
+<a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVPrinter.html">CSVPrinter</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Supongamos que tenemos un clase Persona que almacena nombre y edad.</span>
+<span class="n">Persona</span><span class="o">[]</span><span class="w"> </span><span class="n">personas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="s">&quot;Pepe&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">),</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="s">&quot;Manolo&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">)</span>
+<span class="p">};</span>
+
+<span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;personas.csv&quot;</span><span class="p">);</span>
+<span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Incluirá los nombres de las columnas en la salida.</span>
+<span class="w">   </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
+<span class="w">   </span><span class="n">CSVPrinter</span><span class="w"> </span><span class="n">printer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">formato</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">));</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Persona</span><span class="w"> </span><span class="n">persona</span><span class="p">:</span><span class="w"> </span><span class="n">personas</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">printer</span><span class="p">.</span><span class="na">printRecord</span><span class="p">(</span>
+<span class="w">         </span><span class="n">persona</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span>
+<span class="w">         </span><span class="c1">// Si la transformación a String es sencilla, no hay problema</span>
+<span class="w">         </span><span class="n">persona</span><span class="p">.</span><span class="na">getEdad</span><span class="p">()</span>
+<span class="w">      </span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="n">printer</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// Tratar el error.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Los <code class="docutils literal notranslate"><span class="pre">Enum</span></code> no presentan ningún problema al ser almacenados.</p>
+</div>
+</section>
 <section id="lectura">
-<h2><span class="section-number">2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
-<p>Veamos cómo leer un <abbr title="Comma-Separated Values">CSV</abbr> que se obtiene como flujo de entrada<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
+<h2><span class="section-number">2.1.2. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
+<p>Para leer un <abbr title="Comma-Separated Values">CSV</abbr> que se obtiene como flujo de entrada<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// El archivo de antes</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;personas.csv&quot;</span><span class="p">);</span>
+<span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">setHeader</span><span class="p">()</span><span class="w">                 </span><span class="c1">// Nos valen los nombres de las columnas incluidos.</span>
+<span class="w">   </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">   </span><span class="c1">// La primera columna no son datos.</span>
+<span class="w">   </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="hll"><span class="w">   </span><span class="n">CSVParser</span><span class="w"> </span><span class="n">parse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CSVParser</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="hll"><span class="w">   </span><span class="n">CSVParser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVParser</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">CSVRecord</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">parse</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">CSVRecord</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">parser</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">      </span><span class="c1">// Tratamos cada registro del archivo. Por ejemplo:</span>
-<span class="w">      </span><span class="kt">long</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse</span><span class="p">.</span><span class="na">getRecordNumber</span><span class="p">();</span><span class="w"> </span><span class="c1">// Número de registro.</span>
-<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="c1">// Cantidad de campos en el registro.</span>
-<span class="w">      </span><span class="c1">// Unimos los campos con &quot; -- &quot;.</span>
-<span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">registro</span><span class="p">.</span><span class="na">spliterator</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">).</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">joining</span><span class="p">(</span><span class="s">&quot; -- &quot;</span><span class="p">));</span>
-<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;%d: [%d]  %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">cantidad</span><span class="p">,</span><span class="w"> </span><span class="n">contenido</span><span class="p">);</span>
+<span class="w">      </span><span class="kt">long</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse</span><span class="p">.</span><span class="na">getRecordNumber</span><span class="p">();</span><span class="w">       </span><span class="c1">// Número de registro.</span>
+<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">cantidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w">           </span><span class="c1">// Cantidad de campos en el registro.</span>
+<span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">);</span><span class="w">   </span><span class="c1">// También .get(0)</span>
+<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;Edad&quot;</span><span class="p">));</span>
+<span class="w">      </span><span class="n">Persona</span><span class="w"> </span><span class="n">persona</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">edad</span><span class="p">);</span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;%d: [%d]  %s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">cantidad</span><span class="p">,</span><span class="w"> </span><span class="n">persona</span><span class="p">);</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 <span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -460,14 +504,27 @@ método <code class="docutils literal notranslate"><span class="pre">getRecords<
 <li><p>Cada elemento de la iteración es un objeto <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVRecord.html">CSVRecord</a>.
 Podemos acceder a cada elemento por separado (con el método <code class="docutils literal notranslate"><span class="pre">.get</span></code>), pero es
 a su vez también iterable, lo que hemos preferido usar en este caso.</p></li>
-<li><p>Al procesar el <abbr title="Comma-Separated Values">CSV</abbr> hemos declarado que el archivo cumple estrictamente el
-<span class="target" id="index-0"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4180.html"><strong>RFC 4180</strong></a> con la salvedad de que permite líneas vacías. <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html">CSVFormat</a>
+<li><p>Como es iterable, además de un bucle, podríamos haber usado un enfoque funcional:</p>
+<blockquote>
+<div><div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Persona</span><span class="o">[]</span><span class="w"> </span><span class="n">personas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">registro</span><span class="p">.</span><span class="na">spliterator</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">registro</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="kt">int</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;Edad&quot;</span><span class="p">));</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Persona</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">edad</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}).</span><span class="na">toArray</span><span class="p">(</span><span class="n">Persona</span><span class="o">[]</span><span class="p">::</span><span class="k">new</span><span class="p">);</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CSVFormat.DEFAULT</span></code> significa que el formato cumple estrictamente el
+<span class="target" id="index-0"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4180.html"><strong>RFC 4180</strong></a> con la salvedad de que se permiten líneas vacías. <a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html">CSVFormat</a>
 lista otras variantes del estándar predefinidas indicando cuál es su
 definición. En cualquier caso, podemos definir nosotros mismos el formato:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define los nombres de las columnas.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define otros nombres de columna</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="hll"><span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</span><span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>En este caso, hemos tomado como base el formato anterior y hemos añadido que
@@ -475,65 +532,9 @@ no se tengan en consideración los espacios que pueda haber alrededor del
 carácter separador<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Además definimos los nombres de las columnas, con lo
 que podremos acceder a los valores de los campos usando <code class="docutils literal notranslate"><span class="pre">get</span></code> no sólo con el
 índice (<code class="code docutils literal notranslate"><span class="pre">registro.get(0)</span></code>), sino también con el propio nombre
-(<code class="code docutils literal notranslate"><span class="pre">registro.get(&quot;Nombre&quot;)</span></code>).</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En realidad, lo recomendable es que la primera línea del <abbr title="Comma-Separated Values">CSV</abbr> no
-sean valores, sino los nombres de las columnas, por lo que muy comúnmente
-conviene redefinir el formato así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setHeader</span><span class="p">()</span><span class="w">                </span><span class="c1">// Respetamos los nombres incluidos.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">  </span><span class="c1">// Saltamos la primera línea al leer.</span>
-<span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
-</pre></div>
-</div>
-</div>
+(<code class="code docutils literal notranslate"><span class="pre">registro.get(&quot;nombre&quot;)</span></code>).</p>
 </li>
 </ul>
-</section>
-<section id="escritura">
-<h2><span class="section-number">2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
-<p>La creación de archivos <abbr title="Comma-Separated Values">CSV</abbr> también es bastante sencilla utilizando
-<a class="reference external" href="https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVPrinter.html">CSVPrinter</a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Datos que se han generado de alguna manera.</span>
-<span class="n">String</span><span class="o">[][]</span><span class="w"> </span><span class="n">datos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="p">{</span><span class="s">&quot;Pepe&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;13&quot;</span><span class="p">},</span>
-<span class="w">   </span><span class="p">{</span><span class="s">&quot;Manolo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;22,5&quot;</span><span class="p">}</span>
-<span class="p">};</span>
-
-<span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.csv&quot;</span><span class="p">);</span>
-<span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">   </span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Incluirá los nombres en la salida.</span>
-<span class="w">   </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
-
-<span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">   </span><span class="n">CSVPrinter</span><span class="w"> </span><span class="n">printer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">formato</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">));</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">datos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">//printer.printRecord(registro[0], registro[1]);</span>
-<span class="w">      </span><span class="n">printer</span><span class="p">.</span><span class="na">printRecord</span><span class="p">(</span><span class="n">registro</span><span class="p">);</span><span class="w"> </span><span class="c1">// Puede ser cualquier objeto iterable.</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="n">printer</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
-<span class="p">}</span>
-<span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Lo puede provocar la apertura del flujo o los lectores.</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition hint">
-<p class="admonition-title">Consejo</p>
-<p>No es necesario escribir registro a registro. Si disponemos los datos
-en un flujo, una colección o una lista, podemos usar <code class="docutils literal notranslate"><span class="pre">printRecords</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">printer</span><span class="p">.</span><span class="na">printRecords</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">datos</span><span class="p">));</span>
-</pre></div>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Los <code class="docutils literal notranslate"><span class="pre">Enum</span></code> no presentan ningún problema al ser almacenados o leídos.</p>
-</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id4" role="doc-footnote">
@@ -607,8 +608,8 @@ que:</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.1. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.1.1. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.1.2. Lectura</a></li>
 </ul>
   </nav></div>
 

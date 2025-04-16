@@ -438,7 +438,7 @@ arrays y los valores son directamente traducibles a un tipo primitivo de <abbr t
 </pre></div>
 </div>
 <p>Si, en cambio, quisiéramos generar una lista de grupos y no un array:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="p">(){};</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;&gt;</span><span class="p">(){};</span>
 <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
 </pre></div>
 </div>

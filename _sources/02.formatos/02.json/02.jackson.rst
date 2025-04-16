@@ -44,7 +44,7 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
 
 .. code-block:: java
 
-   TypeReference GrupoLista =  new TypeReference<ArrayList<Grupo>>(){};
+   TypeReference<ArrayList<Grupo>> GrupoLista =  new TypeReference<>(){};
    ArrayList<Grupo> grupos = mapper.readValue(sr, GrupoLista);
 
 .. note:: Que los miembros de cada grupo sean un array o una lista es

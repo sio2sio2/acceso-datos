@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Entorno de desarrollo &#8212; documentación de Acceso a datos - rolling</title>
+    <title>4. Visual Studio Code &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -58,7 +58,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="Orientaciones pedagógicas" href="../97.orientaciones/index.html" />
-    <link rel="prev" title="2. Sistema de registros" href="10.logging.html" />
+    <link rel="prev" title="3. Maven" href="80.maven.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -238,7 +238,8 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="10.logging.html">2. Sistema de registros</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">3. Entorno de desarrollo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="80.maven.html">3. Maven</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4. Visual Studio Code</a></li>
 </ul>
 </details></li>
 </ul>
@@ -369,7 +370,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -380,11 +383,36 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Entorno de desarrollo</h1>
+    <h1>Visual Studio Code</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalidades">4.1. Generalidades</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#personalizacion">4.2. Personalización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">4.3. Preliminares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integracion-con-git">4.4. Integración con Git</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requisitos">4.4.1. Requisitos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inicializacion">4.4.2. Inicialización</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sincronizacion">4.4.3. Sincronización</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ramas">4.4.4. Ramas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#java">4.5. Java</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-previa">4.5.1. Configuración previa</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-proyecto">4.5.2. Creación del proyecto</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#maven">4.5.3. Maven</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion">4.5.4. Ejecución</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#otros-aspectos">4.5.5. Otros aspectos</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -394,12 +422,1050 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="entorno-de-desarrollo">
-<h1><span class="section-number">3. </span>Entorno de desarrollo<a class="headerlink" href="#entorno-de-desarrollo" title="Link to this heading">#</a></h1>
+  <section id="visual-studio-code">
+<span id="vscode"></span><h1><span class="section-number">4. </span>Visual Studio Code<a class="headerlink" href="#visual-studio-code" title="Link to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La mayor parte de las instrucciones generales para el <abbr title="Integrated Development Environment">IDE</abbr> están
+fusiladas muy indisimuladamente del <a class="reference external" href="https://sio2sio2.github.io/LM/98.apendices/99.tools/10-vscode.html#vscode" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">apéndice correspondiente</span></a> de los <span class="xref std std-ref">apuntes para el módulo de Lenguajes de Marcas</span>.</p>
+</div>
 <p>Como entorno de desarrollo para el seguimiento del módulo recomendamos <a class="reference external" href="https://code.visualstudio.com/">Visual
-Studio Code</a>. Unas pautas para su utilización
-en general y, en particular, para la escritura de código con Java pueden
-encontrarse en el <a class="reference external" href="https://sio2sio2.github.io/LM/98.apendices/99.tools/10-vscode.html#vscode" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">manual para Lenguajes de Marcas</span></a>.</p>
+Studio Code</a>, el cual es un <abbr title="Integrated Development Environment">IDE</abbr>, con innumerables extensiones, especialmente
+diseñado para la escritura de código, y con versiones para los principales
+sistemas operativos. Esta disponible para su descarga gratuita en su página web
+y su código fuente en <a class="reference external" href="https://github.com/microsoft/vscode">su página de GitHub</a>.</p>
+<section id="generalidades">
+<h2><span class="section-number">4.1. </span>Generalidades<a class="headerlink" href="#generalidades" title="Link to this heading">#</a></h2>
+<dl id="vscode-language">
+<dt><strong>Idioma</strong></dt><dd><p>Si la instalación trae el programa en inglés, puede instalarse el paquete
+de nuestra lengua pulsando <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd> (o
+seleccionando <code class="docutils literal notranslate"><span class="pre">File&gt;Preferences&gt;Settings</span></code>) y escribiendo la palabra
+«<em>display</em>» para reducir los términos de búsqueda:</p>
+<img alt="../_images/00-vscode-lang.png" src="../_images/00-vscode-lang.png" />
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El idioma es, en realidad, una <a class="reference internal" href="#vscode-extensions"><span class="std std-ref">extensión</span></a>
+que se habilita al realizar esta operación.</p>
+</div>
+</dd>
+<dt><strong>Áreas especiales</strong></dt><dd><p>Podemos abrir algunas áreas especiales que nos permiten consultar o realizar
+ciertas actividades interesantes:</p>
+<ul class="simple">
+<li><p><kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd>, abre un pequeño cuadro que nos
+permite introducir instrucciones<a class="footnote-reference brackets" href="#id10" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
+<li><p><kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">M</kbd>, abre en la parte inferior una
+consola que muestra los errores derivados de una determinada acción. Por
+ejemplo, los errores de validación.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="personalizacion">
+<h2><span class="section-number">4.2. </span>Personalización<a class="headerlink" href="#personalizacion" title="Link to this heading">#</a></h2>
+<p>El entorno es muy, muy configurable y permite alterar su comportamiento
+mediante la manipulación de varios aspectos cuya descripción se almacena en
+archivos de configuración <abbr>JavaScript Object Notation</abbr>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Los <a class="reference internal" href="#vscode-config"><span class="std std-ref">parámetros de configuración</span></a> propiamente dichos</dt><dd><p>(<code class="file docutils literal notranslate"><span class="pre">settings.json</span></code>).</p>
+</dd>
+</dl>
+</li>
+<li><p>Las <a class="reference internal" href="#vscode-extensions"><span class="std std-ref">extensiones</span></a> (<code class="file docutils literal notranslate"><span class="pre">extensions.json</span></code>).</p></li>
+<li><p>Las <a class="reference internal" href="#vscode-tasks"><span class="std std-ref">tareas</span></a> (<code class="file docutils literal notranslate"><span class="pre">tasks.json</span></code>).</p></li>
+<li><p>La <a class="reference internal" href="#vscode-launch"><span class="std std-ref">depuración</span></a> (<code class="file docutils literal notranslate"><span class="pre">launch.json</span></code>).</p></li>
+<li><p>Los <a class="reference internal" href="#vscode-atajos"><span class="std std-ref">atajos de teclado</span></a> (<code class="file docutils literal notranslate"><span class="pre">keybindings.json</span></code>).</p></li>
+</ul>
+<dl>
+<dt><strong>Niveles de personalización</strong></dt><dd><p>Además, estas personalizaciones podemos hacerlas a dos niveles:</p>
+<dl id="vscode-profile">
+<dt><strong>Perfiles</strong></dt><dd><p>El nivel superior de configuración es el <em class="dfn">perfil</em>, cada uno de los
+cuales se corresponde con un distinto <em>perfil de desarrollador</em>. Esto es
+debido a que, cuando programamos por ejemplo en <em>Python</em>, no necesitamos
+exactamente el mismo entorno de desarrollo que cuando programamos en
+Javascript*. En consecuencia necesitaremos unas extensiones distintas,
+unas preferencias distintas, etc. <strong class="program">Visual Studio Code</strong> nos
+permite lidiar con estas diferencias, permitiendo crear distintos
+<em>perfiles</em>, que escogeremos a voluntad dependiendo qué pretendamos
+desarrollar.</p>
+<p>En principio, existe unicamente un perfil «Predeterminado» («Default», si
+usamos el original inglés), que se identifica porque aparece en la esquina
+inferior izquierda una ruedecita dentada como icono asociado a este
+perfil:</p>
+<img alt="../_images/predeterminado.png" src="../_images/predeterminado.png" />
+<p>Pulsando sobre el icono podemos cambiar de perfil o crear uno nuevo:</p>
+<img alt="../_images/predeterminado2.png" src="../_images/predeterminado2.png" />
+<p>Para crear tenemos dos estrategias:</p>
+<ul>
+<li><p>Crear uno, o bien de cero o bien copiando otro ya existente. En este
+segundo caso, se nos permitirá elegir de forma grosera qué aspectos
+queremos excluir de la copia.</p>
+<img alt="../_images/crear_perfiles.png" src="../_images/crear_perfiles.png" />
+</li>
+<li><p>En caso de que queramos ser más específicos, al escoger los aspectos que
+queremos transladar de un perfil ya existente, podemos escoger «Mostrar
+los contenidos del perfil»  y señalar aquello que queremos transferir al
+nuevo perfil. El resultado será un archivo <code class="file docutils literal notranslate"><span class="pre">.profile</span></code>, que puede
+importarse luego a fin de crear el nuevo perfil.</p></li>
+</ul>
+<p>Al crear un nuevo perfil puede asociarse un icono identificativo, lo que
+nos ayuda a saber siempre de un vistazo qué perfil estamos utilizando.</p>
+<p>Los archivos <abbr>JavaScript Object Notation</abbr> que caracterizan el perfil se almacenan bajo la ruta
+<code class="file docutils literal notranslate"><span class="pre">$CONFIG/Code/User/profiles</span></code>, donde <code class="docutils literal notranslate"><span class="pre">$CONFIG</span></code> es la localización
+en que el sistema operativo almacena las configuraciones de programas:</p>
+<ul class="simple">
+<li><p>En Linux, <code class="file docutils literal notranslate"><span class="pre">$XDG_CONFIG</span></code> (habitualmente, <code class="file docutils literal notranslate"><span class="pre">~/.config</span></code>).</p></li>
+<li><p>En Windows, <code class="file docutils literal notranslate"><span class="pre">%APPDATA%</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl id="vscode-workspace">
+<dt><strong>Áreas de trabajo</strong></dt><dd><p>El segundo nivel de personalización son el <em class="dfn">área de trabajo</em> que podemos
+asimilarlas a los <em>proyectos</em>: para desarrollar un proyecto de <em>Python</em>
+debe abrirse el área de trabajo asociada al directorio en que se
+encuentra:</p>
+<img alt="../_images/01-vscode-abrir.png" src="../_images/01-vscode-abrir.png" />
+<p>Las áreas de trabajo también se pueden personalizar, de modo que la
+personalización que disfrutemos al trabajar será la suma de la que hayamos
+hecho para el perfil que estamos usando más la que apliquemos al área de
+trabajo. De hecho, <strong class="program">Visual Studio Code</strong> recuerda el perfil que se
+usó la última vez que se estuvo trabajando sobre un área de trabajo a fin
+de que, cuando abramos un área, se cambie automáticamente de perfil, si es
+necesario.</p>
+<p>Los archivos <abbr>JavaScript Object Notation</abbr> de personalización del área de trabajo se almacenan
+dentro del subdirectorio <code class="file docutils literal notranslate"><span class="pre">.vscode/</span></code> incluido en la carpeta raíz del
+área de trabajo.</p>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>En principio, para generar un área de trabajo no es necesario más
+que abrir un directorio (vacío, en principio) y comenzar a trabajar
+sobre él. En la práctica, sin embargo, hacer un proyecto en un
+lenguaje de programación moderno implica en muchas ocasiones usar un
+gestor de proyectos (como <a class="reference internal" href="80.maven.html#maven"><span class="std std-ref">Maven</span></a> o <a class="reference external" href="https://gradle.org/">Gradle</a> si programamos en
+<strong class="program">Java</strong>); lo cual exige una inicialización del directorio.
+Por ese motivo, es posible que la creación de un nuevo
+proyecto no se limite a crear un nuevo directorio y abrirlo como se ha
+ilustrado, sino a <a class="reference internal" href="#vscode-java-mk-maven"><span class="std std-ref">crear un proyecto</span></a>
+gracias al uso de <a class="reference internal" href="#vscode-extensions"><span class="std std-ref">una extensión instalada</span></a>.</p>
+</div>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Por hacer</p>
+<p>Tratar las área de trabajo de múltiples directorios.</p>
+</div>
+<p>La estrategia, pues, para la personalización es tener distintos perfiles,
+uno para cada uno de los distintos tipos de desarrollo que pretendamos
+hacer; y, para cada proyecto concreto, definir un área de trabajo
+distinta, la cual podremos o no personalizar en un segundo nivel de
+concreción:</p>
+<img alt="../_images/perfiles_areas.png" src="../_images/perfiles_areas.png" />
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Véanse más adelante los <a class="reference internal" href="#vscode-start"><span class="std std-ref">Preliminares</span></a>.</p>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl id="vscode-config">
+<dt><strong>Configuración</strong></dt><dd><p>Para modificar parámetros de configuración podemos pulsar <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">,</kbd>:</p>
+<img alt="../_images/02-vscode-conf.png" src="../_images/02-vscode-conf.png" />
+<p>Este tipo de personalización puede hacerse tanto <a class="reference external" href="#vscode-profile">a nivel de perfil</a>
+como de <a class="reference external" href="#vscode-workspace">área de trabajo</a>. Como
+alternativa, podemos directamente editar los <code class="file docutils literal notranslate"><span class="pre">settings.json</span></code>
+correspondientes.</p>
+</dd>
+</dl>
+<dl id="vscode-extensions">
+<dt><strong>Extensiones</strong></dt><dd><p>Las extensiones permiten aumentar las funcionalidades de la aplicación  y se
+instalan sólo <a class="reference external" href="#vscode-profile">a nivel de perfil</a>. Ahora bien, su
+activación (o desactivación) sí puede hacerse <a class="reference internal" href="#vscode-workspace"><span class="std std-ref">a nivel de área de
+trabajo</span></a>.</p>
+<p>Una indispensable para quien se haya criado editando archivos en <a class="reference external" href="https://www.vim.org/">vim</a> es <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscodevim.vim">VSCodeVim</a>, que
+permite editar archivos como se hace en el veterano editor.</p>
+<p>Para gestionar las extensiones, basta con pinchar sobre el icono lateral
+izquierdo  señalado:</p>
+<img alt="../_images/03-vscode-ext.png" src="../_images/03-vscode-ext.png" />
+<p>Dentro de las extensiones existe un tipo especial de ellas denominado
+<em class="dfn">paquete de extensiones</em> (<em>Extension Pack</em>), que no es más que una
+extensión cuya instalación (o desinstalación) supone la instalación de varias
+extensiones conjuntas. Por ejemplo, <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack">Extension Pack for Java</a>
+instala hasta seis extensiones que facilitan el trabajo con <em>Java</em><a class="footnote-reference brackets" href="#id11" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+</dd>
+</dl>
+<dl id="vscode-atajos">
+<dt><strong>Atajos de teclado</strong></dt><dd><p><a class="reference external" href="#vscode-profile">A nivel de perfil</a> (y no de <a class="reference external" href="#vscode-workspace">área de trabajo</a>), el programa ofrece la
+posibilidad de asociar combinaciones de teclas a las distintas tareas
+definidas. Las asociaciones se puede hacer de distintos modos:</p>
+<ol class="loweralpha simple">
+<li><p>Pulsando <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd> para abrir el diálogo
+que permite ejecutar tareas, pero en vez de ejecutarla pulsar sobre la
+ruedecilla dentada asociada:</p>
+<img alt="../_images/task-addkeybinding.png" src="../_images/task-addkeybinding.png" />
+</li>
+<li><p>Pulsando <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">k</kbd>-<kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">s</kbd> para ver la
+lista de asociaciones a tareas y buscar en ella la tarea que nos interese.</p></li>
+<li><p>Editar directamente el archivo <code class="file docutils literal notranslate"><span class="pre">keybindings.json</span></code> del perfil. Lo más
+cómodo, en vez de buscarlo en el sistema de archivos, es acceder a la lista
+de asociaciones que se acaba de citar, y pulsar aquí:</p>
+<img alt="../_images/addkeybinding.png" src="../_images/addkeybinding.png" />
+<p>El archivo contiene un array en que cada <em>ítem</em> es una de esas
+asociaciones. Más adelante se sugerirán algunos.</p>
+</li>
+</ol>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>La ayuda oficial del programa tiene <a class="reference external" href="https://code.visualstudio.com/docs/getstarted/keybindings">una buena explicación sobre
+estos atajos</a>.</p>
+</div>
+</dd>
+</dl>
+<dl id="vscode-tasks">
+<dt><strong>Tareas</strong></dt><dd><p>El programa permite definir <em>tareas de usuario</em> tanto <a class="reference external" href="#vscode-profile">a nivel de perfil</a>
+como <a class="reference external" href="#vscode-workspace">a nivel de área de trabajo</a> editando los respectivos
+<code class="file docutils literal notranslate"><span class="pre">tasks.json</span></code>. El segundo es fácil de editar (se debe crear bajo el
+subdirectorio <code class="file docutils literal notranslate"><span class="pre">.vscode</span></code>), mientras que para lo primero lo más
+conveniente es pulsar <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd> y buscar la
+orden <cite>Abrir tareas de usuario</cite>:</p>
+<img alt="../_images/usertasks.png" src="../_images/usertasks.png" />
+<p>Una vez abierto el archivo, deben definirse la tareas en formato <abbr>JavaScript Object Notation</abbr>. Por
+ejemplo, para abrir el archivo activo en el navegador <strong class="program">Brave</strong>
+deberíamos definir una tarea así:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;tasks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Abrir en Brave&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;brave-browser&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;windows&quot;</span><span class="p">:</span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C:\\Program Files\\Brave Software\\etc...&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;${file}&quot;</span><span class="w"> </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;presentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;reveal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;never&quot;</span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;problemMatcher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>La etiqueta (<code class="docutils literal notranslate"><span class="pre">label</span></code>) nos sirve para identificar la tarea y <code class="docutils literal notranslate"><span class="pre">command</span></code> y
+<code class="docutils literal notranslate"><span class="pre">args</span></code> para definir cuál es la aplicación externa  que abriremos y con qué
+parámetros se ejecutará. Pueden también definirse campos específicos para
+sistemas específicos concretos como en el ejemplo se hace para dar soporte
+también a <em>Windows</em>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para ver cuáles son las variables que pueden usarse (como
+<code class="docutils literal notranslate"><span class="pre">${file}</span></code> en el ejemplo), consúltese <a class="reference external" href="https://code.visualstudio.com/docs/editor/variables-reference">Variables Reference</a> de la
+documentación oficial.</p>
+</div>
+<p>Para ejecutar la tarea habrá que volver a abrir el cajetín para ejecutar
+ordenes y buscar <cite>Ejecutar tarea</cite>:</p>
+<img alt="../_images/runtask.png" src="../_images/runtask.png" />
+<p>Aparecerá a continuación la lista de tareas definidas y podemos ejecutar
+la que deseemos. Una alternativa más cómoda es asociarle un <a class="reference internal" href="#vscode-atajos"><span class="std std-ref">atajo de
+teclado</span></a>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ctrl+l b&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;workbench.action.tasks.runTask&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Abrir en Brave&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>En este caso, se abrirá <a class="reference external" href="https://brave.com">Brave</a> al pulsar <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">l</kbd>-<kbd class="kbd docutils literal notranslate">b</kbd>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para más información, consulte <a class="reference external" href="https://code.visualstudio.com/docs/editor/tasks">cómo crear tareas</a>.</p>
+</div>
+</dd>
+</dl>
+<dl id="vscode-launch">
+<dt><strong>Depuración</strong></dt><dd><p><strong class="program">Visual Studio Code</strong> también está preparado para permitir la
+ejecución y depuración de código con las técnicas habituales de ejecución
+paso a paso, puntos de ruptura, puntos de ruptura condicionales, etc. Para
+ello es necesario dotarlo de soporte para la depuración del lenguaje de
+programación concreto en el que queramos hacer nuestros desarrollos. Esto se
+logra instalando las extensiones de depuración propias de cada lenguaje
+(<a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug">Debugger for Java</a>, <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug-nightly">Javascript Debugger</a>,
+<a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy">Python Debugger</a>,
+etc).</p>
+<p>De inicio, sin configuración adicional, podremos establecer puntos de
+ruptura, etc. usando el editor y podremos ejecutar sin atender ninguno
+pulsando <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">F5</kbd>, y ejecutar depurando pulsando <kbd class="kbd docutils literal notranslate">F5</kbd>.</p>
+<p>También es posible la depuración abriendo la barra lateral para ello:</p>
+<img alt="../_images/debug.png" src="../_images/debug.png" />
+<p>En esa barra puede escogerse, en caso de existir varias formas, cómo
+queremos lanzar el programa; y podrán vigilarse y manipularse los valores de
+las variables durante la depuración.</p>
+<p id="vscode-launch-json">En principio, cuando se pulsan <kbd class="kbd docutils literal notranslate">F5</kbd> o <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">F5</kbd>, el
+<abbr title="Integrated Development Environment">IDE</abbr> intenta ejecutar el archivo activo<a class="footnote-reference brackets" href="#id12" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. Esto es un problema cuando
+escribimos un proyecto, que contiene múltiples archivos y cuando, además,
+necesitamos pasar parámetros al programa<a class="footnote-reference brackets" href="#id13" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>. Por ese motivo, debe
+escribirse un archivo <code class="file docutils literal notranslate"><span class="pre">.vscode/launch.json</span></code> en el directorio de
+proyecto con un aspecto como este<a class="footnote-reference brackets" href="#id14" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (help)&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">// ¿Qué clase es la principal?</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--help&quot;</span><span class="p">]</span><span class="w">    </span><span class="c1">// ¿Con qué argumento lanzamos el programa?</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (terminal)&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (terminal - assert)&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;vmArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-ea&quot;</span><span class="p">]</span><span class="w">       </span><span class="c1">// Activa los asserts.</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>En este caso, hemos definido tres mecanismos de ejecución: uno que muestra
+ayuda, otro que ejecuta el programa utilizando un argumento y el último que
+hace lo mismo al anterior pero comprobando las <a class="reference external" href="https://es.wikipedia.org/wiki/Aserci%C3%B3n_(inform%C3%A1tica)">aserciones</a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>A la configuración básica citada, se le puede añadir otra
+adicional dentro de <code class="file docutils literal notranslate"><span class="pre">.vscode/launch.json</span></code>, cuyos principios pueden
+leerse en el artículo <a class="reference external" href="https://gigi.nullneuron.net/gigilabs/working-with-vs-code-launch-configurations/">Working with VSCode launch configurations</a>.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para aprender a depurar lea el artículo <a class="reference external" href="https://code.visualstudio.com/docs/editor/debugging">Debugging</a> de la página
+oficial.</p>
+</div>
+</dd>
+</dl>
+</section>
+<section id="preliminares">
+<span id="vscode-start"></span><h2><span class="section-number">4.3. </span>Preliminares<a class="headerlink" href="#preliminares" title="Link to this heading">#</a></h2>
+<p>Antes de empezar cualquier configuración específica a un lenguaje determinado es
+conveniente preparar en el <a class="reference internal" href="#vscode-profile"><span class="std std-ref">perfil Predeterminado</span></a> todo
+aquellas configuraciones que deseemos que sean universales independientemente de
+la herramienta que utilicemos. En particular, nos puede interesar:</p>
+<ul class="simple">
+<li><p>La <a class="reference internal" href="#vscode-language"><span class="std std-ref">configuración del idioma</span></a>.</p></li>
+<li><p>Los aspectos relacionados con el editor (tamaño de la fuente, <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscodevim.vim">emulación de
+vim</a>).</p></li>
+<li><p>Los <a class="reference internal" href="#vscode-atajos"><span class="std std-ref">atajos generales de teclado</span></a>.</p></li>
+<li><p>La instalación de <a class="reference internal" href="#vscode-extensions"><span class="std std-ref">extensiones</span></a> que consideremos
+útiles para todos o gran parte de los perfiles (p.e. alguna relativa a
+<a class="reference external" href="https://github.com">Github</a>). En caso de que alguna no sea útil para todos, podemos tenerla
+deshabilitada para perfiles específicos.</p></li>
+</ul>
+</section>
+<section id="integracion-con-git">
+<h2><span class="section-number">4.4. </span>Integración con Git<a class="headerlink" href="#integracion-con-git" title="Link to this heading">#</a></h2>
+<p>Un aspecto fundamental del desarrollo de aplicaciones es tener un adecuado
+control de versiones. Si decidimos usar <a class="reference external" href="https://packages.debian.org/stable/git">Git</a>, <strong class="program">Visual Studio Code</strong> nos
+proporcionará una excelente integración.</p>
+<section id="requisitos">
+<h3><span class="section-number">4.4.1. </span>Requisitos<a class="headerlink" href="#requisitos" title="Link to this heading">#</a></h3>
+<p>Previamente, sin embargo, necesitaremos:</p>
+<ul class="simple">
+<li><p>Tener instalada la orden <a class="reference external" href="https://packages.debian.org/stable/git">git</a> en el
+sistema.</p></li>
+<li><p>Tener creada una cuenta en <a class="reference external" href="https://github.com">Github</a>.</p></li>
+</ul>
+</section>
+<section id="inicializacion">
+<h3><span class="section-number">4.4.2. </span>Inicialización<a class="headerlink" href="#inicializacion" title="Link to this heading">#</a></h3>
+<p>Cumplido eso podemos partir de dos comienzos distintos para convertir el espacio
+de trabajo en un repositorio de Git también:</p>
+<ol class="arabic simple">
+<li><p>Definir el control de versiones en un espacio de trabajo que antes careciera
+de él.</p></li>
+<li><p>Clonar un repositorio ya existente para constituir con su contenido un
+espacio de trabajo.</p></li>
+</ol>
+<p>Para <strong>lo primero</strong> basta abrir un área de trabajo y, ya con el área abierta,
+pinchar sobre el icono de «bifurcación de ruta» que se puede ver a la izquierda:</p>
+<img alt="../_images/git-init.png" src="../_images/git-init.png" />
+<p>Hecho esto, si el espacio de trabajo carecía de control de versiones, nos dará
+la posibilidad de iniciarlo<a class="footnote-reference brackets" href="#id15" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> y crear un <em>commit</em> inicial (el campo nos
+permite indicar con qué mensaje queremos identificarlo):</p>
+<img alt="../_images/git-vi.png" src="../_images/git-vi.png" />
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>El <em>commit</em> necesita realizarse bajo una identidad. Si no hay
+definida ninguna en el archivo de configuración de <em>Git</em>
+(<code class="file docutils literal notranslate"><span class="pre">~/.gitconfig</span></code> en <em>Linux</em> o <code class="file docutils literal notranslate"><span class="pre">%USERPROFILE%\.gitconfig</span></code> en
+<em>Windows</em>) la acción no se llevará a cabo, así que tendremos que realizarla
+antes:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[user]</span>
+<span class="w">   </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Perico de los Palotes&quot;</span>
+<span class="w">   </span><span class="na">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;perico@example.com&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>Si, además, queremos sincronizar con un repositorio de <em>Github</em>, deberemos
+volver a pinchar sobre el icono de «bifurcación de ruta» y escoger <em>Publicar la
+rama</em>:</p>
+<img alt="../_images/git-push.png" src="../_images/git-push.png" />
+<p>En este caso, deberemos validarnos con nuestra cuenta (en caso de que no lo
+hubiéramos hecho antes) y escoger el nombre para el nuevo repositorio:</p>
+<img alt="../_images/git-name.png" src="../_images/git-name.png" />
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>El programa atiende a lo que se haya indicado en la configuración
+de git (<em>Linux</em> la almacena en <code class="file docutils literal notranslate"><span class="pre">~/.gitconfig</span></code>), si es que el usuario ya
+ha usado y configurado anteriormente <strong class="program">git</strong> fuera de <strong class="program">Visual
+Studio Code</strong>. Si deseáramos que fuera el propio programa el que se encargara
+de la autenticación de modo independiente distinto** podríamos hacer lo
+siguiente:</p>
+<ol class="arabic">
+<li><dl class="simple">
+<dt>Llevar a cabo todos los desarrollos con este programa bajo un mismo</dt><dd><p>directorio (pongamos que <code class="file docutils literal notranslate"><span class="pre">~/Programacion/VSCode</span></code>).</p>
+</dd>
+</dl>
+</li>
+<li><p>Utilizar la <a class="reference external" href="https://github.blog/2017-05-10-git-2-13-has-been-released/#conditional-configuration">configuración condicional</a>
+para modificar qué usuario realiza cambios y de qué forma se gestionan las
+credenciales. Así en <code class="file docutils literal notranslate"><span class="pre">~/.gitconfig</span></code> podemos escribir:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[user]</span>
+<span class="w">   </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Yo cuando uso Git</span>
+<span class="w">   </span><span class="na">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">cuenta1@example.com</span>
+<span class="k">[credential]</span>
+<span class="w">   </span><span class="c1"># Supongamos que usamos OAuth</span>
+<span class="w">   </span><span class="na">helper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cache --timeout=7200&quot;</span>
+<span class="w">   </span><span class="na">helper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">oauth</span>
+<span class="k">[includeIf &quot;gitdir:~/Documentos/VSCode/&quot;]</span>
+<span class="w">   </span><span class="na">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">~/Documentos/VSCode/.gitconfig</span>
+</pre></div>
+</div>
+<p>Y en <code class="file docutils literal notranslate"><span class="pre">~/Documentos/VSCode/.gitconfig</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[credential]</span>
+<span class="w">   </span><span class="c1"># helper es acomulativo y dejarlo en blanco,</span>
+<span class="w">   </span><span class="c1"># borra las configuraciones anteriores.</span>
+<span class="w">   </span><span class="c1"># Por tanto, Visual Studio Code se encarga de la autenticación.</span>
+<span class="w">   </span><span class="na">helper</span><span class="w"> </span><span class="o">=</span>
+<span class="k">[user]</span>
+<span class="w">   </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Yo cuando uso vscode</span>
+<span class="w">   </span><span class="na">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">cuenta2@example.com</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>El problema de obrar así es que no tendremos definido ningún sistema de
+autenticación fuera de <strong class="program">Visual Studio Code</strong> para los proyectos que
+hayamos desarrollado con él. Por tanto, no podremos sincronizar con <a class="reference external" href="https://github.com">GitHub</a>
+desde la consola de texto, aunque sí desde la consola integrada en el propio
+<abbr title="Integrated Development Environment">IDE</abbr>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para más información consulte este <a class="reference external" href="https://gist.github.com/sio2sio2/7a5d3bc79b69ed82cc8ae334a0d63b32/#varias-cuentas">gist que trata este
+aspecto</a>.</p>
+</div>
+</div>
+<p>La otra opción para comenzar es <strong>clonar un repositorio</strong> para lo cual no
+tenemos más que declarar nuestro propósito y especificar cuál es la dirección
+del repositorio:</p>
+<img alt="../_images/git-clone.png" src="../_images/git-clone.png" />
+<p>En este caso, podemos escribir directamente la dirección del repositorio (como
+se observa en la captura) o pinchar sobre «Clonar desde GitHub» para
+identificarnos con un usuario. En este segundo caso (o si ya hubiéramos estado
+identificados previamente), se sustituirá esa leyenda por la lista de
+repositorios del usuario y podremos elegirlos directamente.</p>
+</section>
+<section id="sincronizacion">
+<h3><span class="section-number">4.4.3. </span>Sincronización<a class="headerlink" href="#sincronizacion" title="Link to this heading">#</a></h3>
+<p>Una vez que tengamos asociado el directorio local con un repositorio remoto, el
+programa será capaz de marcarnos qué archivos hemos cambiado respecto a la
+versión del último <em>commit</em>, nos lo mostrará en el propio editor e incluso
+podremos consultar en qué consiste ese cambio y revocarlo:</p>
+<img alt="../_images/git-mod.png" src="../_images/git-mod.png" />
+<p>Con el soporte nativo para <em>Git</em> de <strong class="program">Visual Studio Code</strong> sólo podremos
+hacer comparaciones entre la última versión moficiada y la última confirmada
+(<em>commit</em>). Sin embargo, si instalamos la extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens">Gitlens</a> podremos
+hacer estas comparaciones con todas las versiones anteriores:</p>
+<img alt="../_images/git-gitlens.png" src="../_images/git-gitlens.png" />
+<p>Otra circunstancia con la que nos podemos encontrar es que un área de trabajo
+que ya tenemos asociada a un repositorio remoto, quede desfasada y queramos,
+antes de comenzar a programar, sincronizarla para que quede en el estado más
+avanzado del repositorio. Para ello, simplemente, podemos hacer un «<em>pull</em>» tal
+como haríamos manualmente con <strong class="program">git</strong>:</p>
+<img alt="../_images/git-pull.png" src="../_images/git-pull.png" />
+<p>Existe, no obstante, la posibilidad de ejecutar periódicamente un <code class="code docutils literal notranslate"><span class="pre">git</span>
+<span class="pre">fetch</span></code> si configuramos:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;git.autofetch&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;git.autofetchPeriod&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1800000</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>en que la segunda opción indica la frecuencia con la que se hace la comprobación
+(500 horas, o sea, nunca). Esto provoca que al abrir el programa se compruebe si
+ha habido algún cambio en el respositorio desde la última vez que accedimos al
+área de trabajo y ya no se vuelva a realizar otra comprobación mientras estamos
+trabajando<a class="footnote-reference brackets" href="#id16" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>:</p>
+<img alt="../_images/git-fetch.png" src="../_images/git-fetch.png" />
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La captura muestra directamente lo que se ve en la barra lateral
+izquierda cuando pulsamos el icono de <em>Git</em> (<em>bifurcación de ruta</em>). Sin
+embargo, antes de pulsar, podemos conocer que existen cambios en el
+repositorio remoto, porque en la barra de estado de la parte inferior se verá
+que hay cambios pendientes (en este caso, 1 de bajada y ninguno de subida).</p>
+</div>
+</section>
+<section id="ramas">
+<h3><span class="section-number">4.4.4. </span>Ramas<a class="headerlink" href="#ramas" title="Link to this heading">#</a></h3>
+<p>El soporte nativo también nos permite tratar con ramas, cambiar entre ellas y
+mezclarlas de forma bastante intuitiva. En la parte izquierda de la barra
+inferior de estado podemos ver en qué rama estamos trabajando y, si pulsamos
+sobre ella, se nos abrirá un cuadro para escoger otra rama entre las existentes
+o crear una nueva:</p>
+<img alt="../_images/git-branch.png" src="../_images/git-branch.png" />
+<p>Para otras operaciones, como mezclar ramas, habría que acudir al menú de la
+sección de control de versiones:</p>
+<img alt="../_images/git-branch-menu.png" src="../_images/git-branch-menu.png" />
+</section>
+</section>
+<section id="java">
+<span id="vscode-java"></span><h2><span class="section-number">4.5. </span>Java<a class="headerlink" href="#java" title="Link to this heading">#</a></h2>
+<p>Obviamente, para programar en <em>Java</em>, sea con <strong class="program">Visual Studio Code</strong> o
+con cualquier otro <abbr title="Integrated Development Environment">IDE</abbr>, debemos tener instalado <abbr title="Java Development Kit">JDK</abbr> (o sea, el <em>paquete de
+desarrollo para Java</em>). Lo más juicioso en este caso es usar la versión
+desarrollada por <a class="reference external" href="https://openjdk.org/">OpenJDK</a>, que publica para distintas plataformas y sistemas
+operativos. En los sistemas <em>Linux</em> sus versiones son las versiones de
+referencia<a class="footnote-reference brackets" href="#id17" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>, así que podremos instalarla mediante el sistema de paquetería;
+mientras que en <em>Windows</em> podemos utilizar los instalables que nos ofrece
+<a class="reference external" href="https://adoptium.net/">Adoptium</a>.</p>
+<section id="configuracion-previa">
+<h3><span class="section-number">4.5.1. </span>Configuración previa<a class="headerlink" href="#configuracion-previa" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="vscode-extensions table" id="id20">
+<caption><span class="caption-text">Extensiones recomendadas</span><a class="headerlink" href="#id20" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=redhat.java">Language Support for Java by Red Hat</a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency">Project Manager for Java</a></p></td>
+<td><p>Facilita la gestión de proyectos de Java, permitiendo directamente la creación de un
+proyecto, que es un área de  trabajo con una estructura básica ya definida y una
+configuración básica.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug">Debugger for Java</a></p></td>
+<td><p>Permite depurar los programas de Java (puntos de ruptura, ejecución condicional,
+ejecución paso a paso, etc).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode">IntelliCode</a></p></td>
+<td><p>Proporciona sugerencias basadas en <abbr title="Inteligencia Artificial">IA</abbr>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven">Maven for Java</a></p></td>
+<td><p>Si usamos Maven como gestor de proyecto incorpora utilizades interesantes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test">Test Runner for Java</a></p></td>
+<td><p>Permite ejecutar casos de prueba.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p id="vscode-java-settings">Además de estas extensiones, puede interesarnos añadir configuración adicional:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;files.exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;target/&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">           </span><span class="c1">// No ver compilaciones si usamos Maven.</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="c1">// Evita los inlay hints para los parámetros de las funciones.</span>
+<span class="w">   </span><span class="nt">&quot;editor.inlayHints.enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;off&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Además, durante la codificación puede interesarnos hacer alguna prueba
+individual de cómo funciona método a través de la consola interactiva <a class="reference external" href="https://docs.oracle.com/en/java/javase/22/jshell/introduction-jshell.html">JShell</a>.
+Podemos, por supuesto, abrir una terminal (<kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">`</kbd>) y escribir
+directamente la orden en ella, pero sin duda es más cómodo <a class="reference internal" href="#vscode-tasks"><span class="std std-ref">crear una tarea</span></a> y asociarla a una <a class="reference internal" href="#vscode-atajos"><span class="std std-ref">combinación de teclas</span></a>.
+La tarea podemos definirla con este código <abbr>JavaScript Object Notation</abbr>:</p>
+<div class="highlight-json notranslate" id="vscode-definir-jshell"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Shell para Java&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jshell&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;windows&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Adoption al instalar Java no define la variable JAVA_HOME,</span>
+<span class="w">      </span><span class="c1">// sino quue añade la localización del programa al PATH. De lo</span>
+<span class="w">      </span><span class="c1">// contrario habría que hacer algo así:</span>
+<span class="w">      </span><span class="c1">// &quot;command&quot;: &quot;${env:JAVA_HOME}\\bin\\jshell.exe&quot;</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="c1">// Sin argumentos.</span>
+<span class="w">   </span><span class="nt">&quot;presentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;reveal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;always&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;panel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;new&quot;</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;problemMatcher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>y la asociación a la combinación <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">J</kbd> de
+este modo:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ctrl+shift+j&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;workbench.action.tasks.runTask&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Shell para Java&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="creacion-del-proyecto">
+<span id="vscode-java-mk-maven"></span><h3><span class="section-number">4.5.2. </span>Creación del proyecto<a class="headerlink" href="#creacion-del-proyecto" title="Link to this heading">#</a></h3>
+<p>Para comenzar un proyecto, en vez de abrir directamente un <a class="reference external" href="#vscode-workspace">área de trabajo</a>,
+lo mejor es <em>crear un nuevo proyecto</em> a través de la extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency">Project Manager
+for Java</a>, lo que definirá directamente en la nueva área de trabajo una estructura
+de directorios apropiada para el gestor de proyectos que seleccionemos. En
+el caso de Maven, <a class="reference internal" href="#estruct-maven"><span class="std std-ref">la que se expone a continuación</span></a>. A
+esta estructura, podemos añadir a mano según nuestras necesidades:</p>
+<ol class="loweralpha">
+<li><p>Archivos de licencia (<code class="file docutils literal notranslate"><span class="pre">LICENCE</span></code>) e información (<code class="file docutils literal notranslate"><span class="pre">README.md</span></code> o
+<code class="file docutils literal notranslate"><span class="pre">README.rst</span></code>, según prefiramos).</p></li>
+<li><p>Un subdirectorio <code class="file docutils literal notranslate"><span class="pre">.vscode/</span></code> para configuración relacionada con
+<strong class="program">Visual Studio Code</strong> y que puede incluir:</p>
+<dl class="simple">
+<dt><code class="file docutils literal notranslate"><span class="pre">settings.json</span></code>,</dt><dd><p>que contiene la configuración adicional del <a class="reference external" href="#vscode-workspace">área de trabajo</a>.</p>
+</dd>
+<dt><code class="file docutils literal notranslate"><span class="pre">launch.json</span></code>,</dt><dd><p>en que incluiremos información relativa a la <a class="reference internal" href="#vscode-launch-json"><span class="std std-ref">ejecución y la
+depuración del código</span></a>.</p>
+</dd>
+</dl>
+</li>
+<li><p>Un archivo <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code> para evitar que <a class="reference external" href="https://packages.debian.org/stable/git">Git</a> vigile algunas partes
+del directorio de proyecto (por ejemplo, allí donde se guardan las clases
+compiladas).</p></li>
+<li><p>Un subdirectorio <code class="file docutils literal notranslate"><span class="pre">.github/</span></code> con configuración relativa a a la
+sincronización del repositorio con <a class="reference external" href="https://github.com">GitHub</a>.</p></li>
+</ol>
+</section>
+<section id="maven">
+<h3><span class="section-number">4.5.3. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h3>
+<p>Como gestor del proyecto, podemos de decantarnos por <a class="reference internal" href="80.maven.html#maven"><span class="std std-ref">Maven</span></a>.  Para ello,
+necesitaremos haber instalado la extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven">Maven for Java</a>.</p>
+<p>Al escoger la creación de un proyecto con <a class="reference internal" href="80.maven.html#maven"><span class="std std-ref">Maven</span></a> se nos pedirá escoger un
+<em>groupID</em> y un <em>artifactID</em> (véanse <a class="reference external" href="https://maven.apache.org/guides/mini/guide-naming-conventions.html">las explicaciones al respecto en la
+página del propio software</a>).  El
+proyecto tendrá esta estructura:</p>
+<div class="highlight-none notranslate" id="estruct-maven"><div class="highlight"><pre><span></span>+- .github/  (... contenido relativo a la sincronización ...)
++- .vscode/
+|      +-- launch.json
+|      +-- settings.json
+<span class="hll">+- src/
+</span><span class="hll">|   +-- main/java
+</span><span class="hll">|   |     +-- java
+</span><span class="hll">|   |     |     +-- /edu/accesodatos/miapp
+</span><span class="hll">|   |     |                            +-- Main.java
+</span><span class="hll">|   |     |                            +-- ... (archivos del proyecto)
+</span><span class="hll">|   |     +-- resources/
+</span><span class="hll">|   +-- test/ (pruebas de software)
+</span><span class="hll">+- target/ (aquí dentro se guardan los .class)
+</span>+- .gitignore
++- LICENSE
+<span class="hll">+- pom.xml (configuración de Maven)
+</span>+- README.md
+</pre></div>
+</div>
+<p>donde las línea enfatizadas son las que generará el <em>plugin</em>, mientras que lo
+demás es probable que lo vayamos creando nosotros según nuestras necesidades.</p>
+<p>La creación de proyecto, define archivo <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> que podemos
+revisar. Inicialmente puede interesarnos añadir:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span><span class="w">          </span><span class="cm">&lt;!-- Podemos modificar el valor --&gt;</span>
+<span class="nt">&lt;name&gt;</span>MiPrimeraAplicacion<span class="nt">&lt;/name&gt;</span><span class="w">  </span><span class="cm">&lt;!-- Podemos añadir esto --&gt;</span>
+
+<span class="nt">&lt;developers&gt;</span>
+<span class="w">   </span><span class="nt">&lt;developer&gt;</span>
+<span class="w">      </span><span class="nt">&lt;id&gt;</span>perico-midnick<span class="nt">&lt;/id&gt;</span>
+<span class="w">      </span><span class="nt">&lt;name&gt;</span>Perico<span class="w"> </span>de<span class="w"> </span>los<span class="w"> </span>Palotes<span class="nt">&lt;/name&gt;</span>
+<span class="w">      </span><span class="nt">&lt;email&gt;</span>perico.palotes@gmail.com<span class="nt">&lt;/email&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/developer&gt;</span>
+<span class="nt">&lt;/developers&gt;</span>
+</pre></div>
+</div>
+<p>Ya hemos indicado que una de las ventajas de usar <em>Maven</em> es no tener que
+rompernos la cabeza con las dependencias del proyecto; y añadir al
+<code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> el <a class="reference external" href="https://mvnrepository.com/">repositorio de Maven</a>
+apropiado.  La tarea, además, se puede simplificar mucho si la búsqueda del
+paquete necesario la realizamos dentro del propio <cite>Visual Studio Code</cite> con la
+extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven">Maven for Java</a>:</p>
+<img alt="../_images/mavenEnVSCode.png" src="../_images/mavenEnVSCode.png" />
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para más información, consulte <a class="reference external" href="https://maven.apache.org/plugins/maven-javadoc-plugin/usage.html">las explicaciones de Maven al
+respecto</a>.</p>
+</div>
+</section>
+<section id="ejecucion">
+<span id="vscode-java-debug"></span><h3><span class="section-number">4.5.4. </span>Ejecución<a class="headerlink" href="#ejecucion" title="Link to this heading">#</a></h3>
+<p>Ya hemos dicho que para ejecutar la aplicación podemos pulsar:kbd:<cite>Ctrl</cite>+
+<kbd class="kbd docutils literal notranslate">F5</kbd> (si no queremos atender a los puntos de ruptura que hayamos definido)
+o, simplemente, <kbd class="kbd docutils literal notranslate">F5</kbd> si sí queremos hacerlo y depurar el programa paso a
+paso. Además, podemos instruir al <abbr title="Integrated Development Environment">IDE</abbr> de cómo ejecutar el programa dándole
+instrucciones en <code class="file docutils literal notranslate"><span class="pre">.vscode/launch.json</span></code>. A todo lo ya dicho es conveniente
+añadir algunas notas:</p>
+<dl>
+<dt><strong>Argumentos</strong></dt><dd><p>Si se quiere dejar que el programador escriba a mano en cada ejecución los
+argumentos puede usarse:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${command:SpecifyProgramArgs}&quot;</span>
+</pre></div>
+</div>
+<p>Y si se quiere que haya algumnos argumentos predeterminados y otros escritos a
+mano:</p>
+<blockquote>
+<div><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cli&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${command:SpecifyProgramArgs}&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>También se pueden definir valores en <code class="file docutils literal notranslate"><span class="pre">settings.xml</span></code> y usarlos como
+argumentos:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="c1">// En settings.xml</span>
+
+<span class="p">{</span>
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="w">   </span><span class="nt">&quot;miapp.args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;ui&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cli&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Que podremos usar como:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="c1">// En launch.json</span>
+<span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">   </span><span class="nt">&quot;--ui&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${config:miapp.args.ui}&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;--format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${config:miapp.args.format}&quot;</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Otra posibilidad es definir un conjunto discreto de valores, y posibilitar
+que se elija de la lista al ejecutar:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;inputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;interface&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pickString&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;options&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cli&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;gui&quot;</span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Seleccione la interfaz de usuario&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">],</span>
+<span class="w">   </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (help)&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">// ¿Qué clase es la principal?</span>
+<span class="hll"><span class="w">         </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--uid&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${input:interface}&quot;</span><span class="p">]</span>
+</span><span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>Clase principal</strong></dt><dd><p>Al indicar cómo ejecutar un programa, debe indicarse cuál es la clase
+principal de ejecución:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp.Main&quot;</span>
+</pre></div>
+</div>
+<p>Sin embargo, cuando sólo hay una posible clase, podemos dejar que el <abbr title="Integrated Development Environment">IDE</abbr>
+intente averiguarla con:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span>
+</pre></div>
+</div>
+<p>lo cual será eficaz en la mayor parte de las ocasiones. Cuando no sea así,
+aún podemos hacer los siguiente para intentar generalizar la configuración de
+<code class="file docutils literal notranslate"><span class="pre">launch.json</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="c1">// En settings.json</span>
+
+<span class="p">{</span>
+<span class="w">   </span><span class="c1">// ...</span>
+<span class="w">   </span><span class="nt">&quot;miapp.package&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${config:miapp.package}.Main&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="otros-aspectos">
+<h3><span class="section-number">4.5.5. </span>Otros aspectos<a class="headerlink" href="#otros-aspectos" title="Link to this heading">#</a></h3>
+<p>Aún hay otros aspectos en los que conviene reparar.</p>
+<p class="rubric">Versión de Java</p>
+<p>El <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> que se genera automáticamente tiene definidas estas
+propiedades:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;maven.compiler.source&gt;</span>17<span class="nt">&lt;/maven.compiler.source&gt;</span>
+<span class="w">    </span><span class="nt">&lt;maven.compiler.target&gt;</span>17<span class="nt">&lt;/maven.compiler.target&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+</pre></div>
+</div>
+<p>que define qué sintaxis comprobará el analizador sintáctico (<code class="docutils literal notranslate"><span class="pre">source</span></code>) y para
+qué versión de Java se generará el <em>bytecode</em> (<code class="docutils literal notranslate"><span class="pre">target</span></code>). Pero a partir de
+Java 9 (y posiblemente queramos compilar para versiones posteriores) el
+compilador <strong class="command">javac</strong> introdujo la opción <code class="docutils literal notranslate"><span class="pre">--release</span></code> en sustitución de
+las dos antedichas (que siguen funcionando por otra parte). Por ese motivo es
+conveniente reescribir así:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+
+<span class="nt">&lt;build&gt;</span>
+<span class="w">   </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">      </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">              </span><span class="nt">&lt;release&gt;</span>${maven.compiler.release}<span class="nt">&lt;/release&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+<p class="rubric">Documentación para desarrolladores</p>
+<p>El estándar para crear la documentación de la <abbr title="Application Programming Inteface">API</abbr> de un programa escrito en
+<em>Java</em> es <a class="reference external" href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html">Javadoc</a>. No forma parte del propósito de esta guía redactar una guía
+sobre cómo escribir los comentarios en el código para generar la documentación
+con esta herramienta, pero sí indicar cómo posibilitar su ejecución.</p>
+<p>En un proyecto gestionado con <a class="reference internal" href="#maven">Maven</a> será necesario añadir el plugin
+<a class="reference external" href="https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin">maven-javadoc-plugin</a>
+a <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
+<span class="w">    </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">        </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">            </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>maven-javadoc-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="cm">&lt;!-- La última versión puede consultarse en el repositorio de Maven --&gt;</span>
+<span class="w">            </span><span class="nt">&lt;version&gt;</span>3.11.2<span class="nt">&lt;/version&gt;</span>
+<span class="w">            </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">               </span><span class="nt">&lt;source&gt;</span>${maven.compiler.source}<span class="nt">&lt;/source&gt;</span><span class="w"> </span><span class="cm">&lt;!-- o ${maven.compiler.release} --&gt;</span>
+<span class="w">               </span><span class="nt">&lt;show&gt;</span>private<span class="nt">&lt;/show&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Muestra también atributos privados --&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+<p>Lo cual creará la documentación dentro de <code class="file docutils literal notranslate"><span class="pre">target/reports/apidocs/</span></code> con
+que sólo ejecutemos:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>javadoc:javadoc
+</pre></div>
+</div>
+<p>El problema de esto es que una vez generada la documentación es probable que al
+cambiar comentarios e intentar regenerar la documentación, ésta no cambie; y nos veamos
+forzados a limpiar primero. Para ello <strong class="command">mvn</strong> trae el subcomando
+<code class="docutils literal notranslate"><span class="pre">clean</span></code>, que implica borrar absolutamente todo, incluidas las clases ya
+compiladas. Por ese motivo, es conveniente crear un perfil que borre únicamente
+la documentación y no el resto del contenido generado por <strong class="command">mvn</strong>. De
+nuevo, tendremos que añadir a <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;profiles&gt;</span>
+<span class="w">    </span><span class="nt">&lt;profile&gt;</span>
+<span class="w">        </span><span class="nt">&lt;id&gt;</span>clean-javadoc-only<span class="nt">&lt;/id&gt;</span>
+<span class="w">        </span><span class="nt">&lt;build&gt;</span>
+<span class="w">            </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">                </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;artifactId&gt;</span>maven-clean-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;excludeDefaultDirectories&gt;</span>true<span class="nt">&lt;/excludeDefaultDirectories&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;filesets&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;fileset&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;directory&gt;</span>${project.build.directory}/reports/apidocs<span class="nt">&lt;/directory&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/fileset&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;/filesets&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/build&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/profile&gt;</span>
+<span class="nt">&lt;/profiles&gt;</span>
+</pre></div>
+</div>
+<p>De este modo, podremos generar la documentación siempre así:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>clean:clean<span class="w"> </span>javadoc:javadoc<span class="w"> </span>-Pclean-javadoc-only
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>Si <a class="reference internal" href="#vscode-tasks"><span class="std std-ref">creamos una tarea</span></a> y le asociamos una
+<a class="reference internal" href="#vscode-atajos"><span class="std std-ref">combinación de teclas</span></a>, tal <a class="reference internal" href="#vscode-definir-jshell"><span class="std std-ref">como hicimos con
+jshell</span></a>. todo será muy cómodo.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El directorio en que se genera la documentación puede cambiarse, si se
+desea:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">     </span><span class="nt">&lt;source&gt;</span>${maven.compiler.source}<span class="nt">&lt;/source&gt;</span>
+<span class="w">     </span><span class="nt">&lt;show&gt;</span>private<span class="nt">&lt;/show&gt;</span>
+<span class="w">     </span><span class="nt">&lt;outputDirectory&gt;</span>${project.basedir}/docs<span class="nt">&lt;/outputDirectory&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Para saber cómo generar y publicar automáticamente la documentación al
+sincronizar con el repositorio de <a class="reference external" href="https://github.com">GitHub</a>, consulte <a class="reference external" href="https://gist.github.com/sio2sio2/0fa7f78405933c04b494831de41b7021/">este gist</a>.</p>
+</div>
+<p class="rubric">Empaquetamiento de la aplicación</p>
+<p>Otro aspecto interesante es el empaquetamiento del proyecto en un archivo <abbr title="Java ARchive">JAR</abbr>:</p>
+<ul class="simple">
+<li><p>Cuando es una librería, es probable que nos interese empaquetarla sin
+dependencias.</p></li>
+<li><p>Cuando es una aplicación para usuario final, muy probablemente queramos un
+paquete autosuficiente que contenga todas las dependencias.</p></li>
+</ul>
+<p><strong class="program">Visual Studio Code</strong> permite empaquetar la aplicación pinchando el
+icono remarcado:</p>
+<img alt="../_images/exportJavaSC.png" src="../_images/exportJavaSC.png" />
+<p>o, simplemente, escribir la orden (<kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd>)
+«Export Jar». En ambos casos, se pedirá el archivo que contiene  la clase
+principal y las dependencias que queremos incluir. El <cite>.jar</cite> quedará guardado en
+el directorio de proyecto y ya podremos ejecutar la aplicación con:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>java<span class="w"> </span>-jar<span class="w"> </span>nombreProyecto.jar
+</pre></div>
+</div>
+<p>Si, por el contrario, queremos generar manualmente un paquete, podemos ejecutar:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>package
+<span class="gp">$ </span>mvn<span class="w"> </span>clean<span class="w"> </span>package<span class="w">   </span><span class="c1"># Si queremos borrar antes la compilación y que se regenere</span>
+</pre></div>
+</div>
+<p>Pero esto no es suficiente, también deberemos tocar <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> según sea
+nuestro propósito.</p>
+<dl>
+<dt><strong>Librería</strong></dt><dd><p>En este caso, nos interesará no incluir las dependencias:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>maven-jar-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.4.2<span class="nt">&lt;/version&gt;</span><span class="w"> </span><span class="cm">&lt;!-- La última versión --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">        </span><span class="nt">&lt;finalName&gt;</span>package<span class="nt">&lt;/finalName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</pre></div>
+</div>
+<p>El resultado es el archivo <code class="file docutils literal notranslate"><span class="pre">target/package.jar</span></code>. Si no definimos
+el elemento <code class="docutils literal notranslate"><span class="pre">&lt;finalName&gt;</span></code>, tiene como valor predeterminado
+<code class="docutils literal notranslate"><span class="pre">${project.artifactId}-{project.version}</span></code>.</p>
+</dd>
+<dt><strong>Aplicación final</strong></dt><dd><p>En este caso nos interesa incluir todas las dependencias y tendremos que
+configurar de distinta forma:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- ... --&gt;</span>
+
+<span class="nt">&lt;properties&gt;</span>
+<span class="w">   </span><span class="nt">&lt;main.class&gt;</span>edu.acceso.miapp.Main<span class="nt">&lt;/main.class&gt;</span>
+<span class="w">   </span><span class="cm">&lt;!-- Otras propiedades --&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+
+<span class="cm">&lt;!-- ... ---&gt;</span>
+
+<span class="nt">&lt;build&gt;</span>
+<span class="w">   </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">      </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>maven-shade-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.6.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">              </span><span class="nt">&lt;createDependencyReducedPom&gt;</span>false<span class="nt">&lt;/createDependencyReducedPom&gt;</span>
+<span class="w">              </span><span class="nt">&lt;outputFile&gt;</span>target/package.jar<span class="nt">&lt;/outputFile&gt;</span>
+<span class="w">              </span><span class="nt">&lt;minimizeJar&gt;</span>true<span class="nt">&lt;/minimizeJar&gt;</span>
+<span class="w">              </span><span class="nt">&lt;transformers&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;transformer</span><span class="w"> </span><span class="na">implementation=</span><span class="s">&quot;org.apache.maven.plugins.shade.resource.ManifestResourceTransformer&quot;</span><span class="nt">&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;mainClass&gt;</span>${main.class}<span class="nt">&lt;/mainClass&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/transformer&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/transformers&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">          </span><span class="nt">&lt;executions&gt;</span>
+<span class="w">              </span><span class="nt">&lt;execution&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;goals&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;goal&gt;</span>shade<span class="nt">&lt;/goal&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/goals&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/execution&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/executions&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+<p>que generará el paquete con idéntico nombre. El predeterminado habría sido el
+mismo que en el caso anterior.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Si quiere generar un paquete automácamente al crear una <em>release</em>
+en GitHub, eche un ojo a <a class="reference external" href="https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/">este gist al respecto</a>.</p>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>En realidad, las instrucciones se caracterizan por empezar a escribirse
+con <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, por lo que, si pulsamos <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">P</kbd> y luego
+escribimos <kbd class="kbd docutils literal notranslate">&gt;</kbd>, obtendremos el mismo efecto.</p>
+</aside>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Cuatro de las cuales sí instalaremos de forma individual nosotros.</p>
+</aside>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p>El <code class="file docutils literal notranslate"><span class="pre">launch.json</span></code> predeterminado de <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug">Debugger for Java</a> es como el
+que propondremos a continuación pero con:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${file}&quot;</span>
+</pre></div>
+</div>
+<p>de ahí que se espere encontrar activo el archivo que contiene la clase
+principal.</p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">4</a><span class="fn-bracket">]</span></span>
+<p>Un programa funcional en <em>Java</em> suele ejecutarse a mano así:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>java<span class="w"> </span>-jar<span class="w"> </span>miprograma.jar<span class="w"> </span>--ui<span class="w"> </span>gui<span class="w"> </span>--input<span class="w"> </span>archivo.txt
+</pre></div>
+</div>
+<p>supuesto que hayamos creado un paquete <abbr title="Java ARchive">JAR</abbr> con la aplicación. Los
+argumentos que habremos definido para que el programact arranque deben
+proprocionarse al programa en el momento de su ejecución.</p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">5</a><span class="fn-bracket">]</span></span>
+<p>Son ejemplos para proyectos escritos en <em>Java</em>. En proyectos escritos en
+otros lenguajes, puedenm cambiar las propiedades ligeramente. Por ejemplo,
+para <em>Python</em> no habrá una propiedad <code class="docutils literal notranslate"><span class="pre">mainClass</span></code>, sino otra llamada
+<code class="docutils literal notranslate"><span class="pre">program</span></code>, que identifica el archivo que debe ejecutarse.</p>
+</aside>
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">6</a><span class="fn-bracket">]</span></span>
+<p>O sea, de que internamente se haga el equivalente a un <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">init</span></code>
+que deberíamos ejecutar nosotros si realizáramos a mano esta acción.</p>
+</aside>
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">7</a><span class="fn-bracket">]</span></span>
+<p>Lo cual es útil si es un proyecto personal que sólo desarrollamos
+nosotros. Si hay otros desarrolladores trabajando, quizás sea más conveniente
+que no deshabilitemos la comprobación periódica (por defecto, el valor es 180
+segundos). Por tanto, quizás la primera línea de configuración es útil a
+nivel de perfil, pero la segunda debería ser más propia del nivel de área de
+trabajo.</p>
+</aside>
+<aside class="footnote brackets" id="id17" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">8</a><span class="fn-bracket">]</span></span>
+<p>En <em>Debian</em>, por ejemplo, los paquetes <a class="extlink-deb reference external" href="https://packages.debian.org/stable/default-jre">default-jre</a> y
+<a class="extlink-deb reference external" href="https://packages.debian.org/stable/default-jdk">default-jdk</a> apuntan a los paquetes creados con el <em>software</em> de
+<a class="reference external" href="https://openjdk.org/">OpenJDK</a>.</p>
+</aside>
+</aside>
+</section>
+</section>
 </section>
 
 
@@ -414,12 +1480,12 @@ encontrarse en el <a class="reference external" href="https://sio2sio2.github.io
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="10.logging.html"
+       href="80.maven.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Sistema de registros</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Maven</p>
       </div>
     </a>
     <a class="right-next"
@@ -437,6 +1503,38 @@ encontrarse en el <a class="reference external" href="https://sio2sio2.github.io
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalidades">4.1. Generalidades</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#personalizacion">4.2. Personalización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">4.3. Preliminares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integracion-con-git">4.4. Integración con Git</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requisitos">4.4.1. Requisitos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inicializacion">4.4.2. Inicialización</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sincronizacion">4.4.3. Sincronización</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ramas">4.4.4. Ramas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#java">4.5. Java</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-previa">4.5.1. Configuración previa</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-proyecto">4.5.2. Creación del proyecto</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#maven">4.5.3. Maven</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion">4.5.4. Ejecución</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#otros-aspectos">4.5.5. Otros aspectos</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

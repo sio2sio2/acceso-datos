@@ -1,8 +1,1172 @@
-Entorno de desarrollo
-=====================
-Como entorno de desarrollo para el seguimiento del módulo recomendamos `Visual
-Studio Code <https://code.visualstudio.com/>`_. Unas pautas para su utilización
-en general y, en particular, para la escritura de código con Java pueden
-encontrarse en el :ref:`manual para Lenguajes de Marcas <lm:vscode>`.
+.. _vscode:
 
+Visual Studio Code
+******************
+.. note:: La mayor parte de las instrucciones generales para el |IDE| están
+   fusiladas muy indisimuladamente del :ref:`apéndice correspondiente
+   <lm:vscode>` de los :ref:`apuntes para el módulo de Lenguajes de Marcas <lm:mod-lm>`.
+
+Como entorno de desarrollo para el seguimiento del módulo recomendamos `Visual
+Studio Code`_, el cual es un |IDE|, con innumerables extensiones, especialmente
+diseñado para la escritura de código, y con versiones para los principales
+sistemas operativos. Esta disponible para su descarga gratuita en su página web
+y su código fuente en `su página de GitHub
+<https://github.com/microsoft/vscode>`_.
+
+Generalidades
+=============
+.. _vscode-language:
+
+**Idioma**
+  Si la instalación trae el programa en inglés, puede instalarse el paquete
+  de nuestra lengua pulsando :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`P` (o
+  seleccionando ``File>Preferences>Settings``) y escribiendo la palabra
+  "*display*" para reducir los términos de búsqueda:
+
+  .. image:: files/00-vscode-lang.png
+
+  .. note:: El idioma es, en realidad, una :ref:`extensión <vscode-extensions>`
+     que se habilita al realizar esta operación.
+
+**Áreas especiales**
+   Podemos abrir algunas áreas especiales que nos permiten consultar o realizar
+   ciertas actividades interesantes:
+
+   * :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`P`, abre un pequeño cuadro que nos
+     permite introducir instrucciones\ [#]_.
+   * :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`M`, abre en la parte inferior una
+     consola que muestra los errores derivados de una determinada acción. Por
+     ejemplo, los errores de validación.
+
+Personalización
+===============
+El entorno es muy, muy configurable y permite alterar su comportamiento
+mediante la manipulación de varios aspectos cuya descripción se almacena en
+archivos de configuración |JSON|:
+
++ Los :ref:`parámetros de configuración <vscode-config>` propiamente dichos
+    (:file:`settings.json`).
++ Las :ref:`extensiones <vscode-extensions>` (:file:`extensions.json`).
++ Las :ref:`tareas <vscode-tasks>` (:file:`tasks.json`).
++ La :ref:`depuración <vscode-launch>` (:file:`launch.json`).
++ Los :ref:`atajos de teclado <vscode-atajos>` (:file:`keybindings.json`).
+
+**Niveles de personalización**
+   Además, estas personalizaciones podemos hacerlas a dos niveles:
+
+   .. _vscode-profile:
+
+   **Perfiles**
+      El nivel superior de configuración es el :dfn:`perfil`, cada uno de los
+      cuales se corresponde con un distinto *perfil de desarrollador*. Esto es
+      debido a que, cuando programamos por ejemplo en *Python*, no necesitamos
+      exactamente el mismo entorno de desarrollo que cuando programamos en
+      Javascript*. En consecuencia necesitaremos unas extensiones distintas,
+      unas preferencias distintas, etc. :program:`Visual Studio Code` nos
+      permite lidiar con estas diferencias, permitiendo crear distintos
+      *perfiles*, que escogeremos a voluntad dependiendo qué pretendamos
+      desarrollar.
+
+      En principio, existe unicamente un perfil "Predeterminado" ("Default", si
+      usamos el original inglés), que se identifica porque aparece en la esquina
+      inferior izquierda una ruedecita dentada como icono asociado a este
+      perfil:
+
+      .. image:: files/predeterminado.png
+
+      Pulsando sobre el icono podemos cambiar de perfil o crear uno nuevo:
+
+      .. image:: files/predeterminado2.png
+
+      Para crear tenemos dos estrategias:
+
+      + Crear uno, o bien de cero o bien copiando otro ya existente. En este
+        segundo caso, se nos permitirá elegir de forma grosera qué aspectos
+        queremos excluir de la copia.
+
+        .. image:: files/crear_perfiles.png
+
+      + En caso de que queramos ser más específicos, al escoger los aspectos que
+        queremos transladar de un perfil ya existente, podemos escoger "Mostrar
+        los contenidos del perfil"  y señalar aquello que queremos transferir al
+        nuevo perfil. El resultado será un archivo :file:`.profile`, que puede
+        importarse luego a fin de crear el nuevo perfil.
+
+      Al crear un nuevo perfil puede asociarse un icono identificativo, lo que
+      nos ayuda a saber siempre de un vistazo qué perfil estamos utilizando.
+
+      Los archivos |JSON| que caracterizan el perfil se almacenan bajo la ruta
+      :file:`$CONFIG/Code/User/profiles`, donde ``$CONFIG`` es la localización
+      en que el sistema operativo almacena las configuraciones de programas:
+
+      + En Linux, :file:`$XDG_CONFIG` (habitualmente, :file:`~/.config`).
+      + En Windows, :file:`%APPDATA%`.
+
+   .. _vscode-workspace:
+
+   **Áreas de trabajo**
+      El segundo nivel de personalización son el :dfn:`área de trabajo` que podemos
+      asimilarlas a los *proyectos*: para desarrollar un proyecto de *Python*
+      debe abrirse el área de trabajo asociada al directorio en que se
+      encuentra:
+
+      .. image:: files/01-vscode-abrir.png
+
+      Las áreas de trabajo también se pueden personalizar, de modo que la
+      personalización que disfrutemos al trabajar será la suma de la que hayamos
+      hecho para el perfil que estamos usando más la que apliquemos al área de
+      trabajo. De hecho, :program:`Visual Studio Code` recuerda el perfil que se
+      usó la última vez que se estuvo trabajando sobre un área de trabajo a fin
+      de que, cuando abramos un área, se cambie automáticamente de perfil, si es
+      necesario.
+
+      Los archivos |JSON| de personalización del área de trabajo se almacenan
+      dentro del subdirectorio :file:`.vscode/` incluido en la carpeta raíz del
+      área de trabajo.
+
+      .. hint:: En principio, para generar un área de trabajo no es necesario más
+         que abrir un directorio (vacío, en principio) y comenzar a trabajar
+         sobre él. En la práctica, sin embargo, hacer un proyecto en un
+         lenguaje de programación moderno implica en muchas ocasiones usar un
+         gestor de proyectos (como :ref:`maven` o Gradle_ si programamos en
+         :program:`Java`); lo cual exige una inicialización del directorio.
+         Por ese motivo, es posible que la creación de un nuevo
+         proyecto no se limite a crear un nuevo directorio y abrirlo como se ha
+         ilustrado, sino a :ref:`crear un proyecto <vscode-java-mk-maven>`
+         gracias al uso de :ref:`una extensión instalada <vscode-extensions>`.
+
+      .. todo:: Tratar las área de trabajo de múltiples directorios.
+
+      La estrategia, pues, para la personalización es tener distintos perfiles,
+      uno para cada uno de los distintos tipos de desarrollo que pretendamos
+      hacer; y, para cada proyecto concreto, definir un área de trabajo
+      distinta, la cual podremos o no personalizar en un segundo nivel de
+      concreción:
+
+      .. image:: files/perfiles_areas.png
+
+      .. seealso:: Véanse más adelante los :ref:`vscode-start`.
+
+.. _vscode-config:
+
+**Configuración**
+   Para modificar parámetros de configuración podemos pulsar :kbd:`Ctrl`\ +\
+   :kbd:`,`:
+
+   .. image:: files/02-vscode-conf.png
+
+   Este tipo de personalización puede hacerse tanto `a nivel de perfil`_
+   como de `área de trabajo`_. Como
+   alternativa, podemos directamente editar los :file:`settings.json`
+   correspondientes.
+
+.. _vscode-extensions:
+
+**Extensiones**
+   Las extensiones permiten aumentar las funcionalidades de la aplicación  y se
+   instalan sólo `a nivel de perfil`_. Ahora bien, su
+   activación (o desactivación) sí puede hacerse :ref:`a nivel de área de
+   trabajo <vscode-workspace>`.
+
+   Una indispensable para quien se haya criado editando archivos en `vim
+   <https://www.vim.org/>`_ es `VSCodeVim
+   <https://marketplace.visualstudio.com/items?itemName=vscodevim.vim>`_, que
+   permite editar archivos como se hace en el veterano editor.
+
+   Para gestionar las extensiones, basta con pinchar sobre el icono lateral
+   izquierdo  señalado:
+
+   .. image:: files/03-vscode-ext.png
+
+   Dentro de las extensiones existe un tipo especial de ellas denominado
+   :dfn:`paquete de extensiones` (*Extension Pack*), que no es más que una
+   extensión cuya instalación (o desinstalación) supone la instalación de varias
+   extensiones conjuntas. Por ejemplo, `Extension Pack for Java
+   <https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack>`_
+   instala hasta seis extensiones que facilitan el trabajo con *Java*\ [#]_.
+
+.. _vscode-atajos:
+
+**Atajos de teclado**
+   `A nivel de perfil`_ (y no de `área de trabajo`_), el programa ofrece la
+   posibilidad de asociar combinaciones de teclas a las distintas tareas
+   definidas. Las asociaciones se puede hacer de distintos modos:
+
+   .. rst-class:: simple
+
+   a. Pulsando :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`P` para abrir el diálogo
+      que permite ejecutar tareas, pero en vez de ejecutarla pulsar sobre la
+      ruedecilla dentada asociada:
+
+      .. image:: files/task-addkeybinding.png
+
+   #. Pulsando :kbd:`Ctrl`\ +\ :kbd:`k`\ -\ :kbd:`Ctrl`\ +\ :kbd:`s` para ver la
+      lista de asociaciones a tareas y buscar en ella la tarea que nos interese.
+
+   #. Editar directamente el archivo :file:`keybindings.json` del perfil. Lo más
+      cómodo, en vez de buscarlo en el sistema de archivos, es acceder a la lista
+      de asociaciones que se acaba de citar, y pulsar aquí:
+
+      .. image:: files/addkeybinding.png
+
+      El archivo contiene un array en que cada *ítem* es una de esas
+      asociaciones. Más adelante se sugerirán algunos.
+
+   .. seealso:: La ayuda oficial del programa tiene `una buena explicación sobre
+      estos atajos <https://code.visualstudio.com/docs/getstarted/keybindings>`_.
+
+.. _vscode-tasks:
+
+**Tareas**
+   El programa permite definir *tareas de usuario* tanto `a nivel de perfil`_
+   como `a nivel de área de trabajo`_ editando los respectivos
+   :file:`tasks.json`. El segundo es fácil de editar (se debe crear bajo el
+   subdirectorio :file:`.vscode`), mientras que para lo primero lo más
+   conveniente es pulsar :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`P` y buscar la
+   orden `Abrir tareas de usuario`:
+      
+   .. image:: files/usertasks.png
+
+   Una vez abierto el archivo, deben definirse la tareas en formato |JSON|. Por
+   ejemplo, para abrir el archivo activo en el navegador :program:`Brave`
+   deberíamos definir una tarea así:
+
+   .. code-block:: json
+
+      {
+          "version":"2.0.0",
+          "tasks": [
+              {
+                  "label": "Abrir en Brave",
+                  "type": "shell",
+                  "command": "brave-browser",
+                  "windows":  { "command": "C:\\Program Files\\Brave Software\\etc..." },
+                  "args": [ "${file}" ],
+                  "presentation": {"reveal": "never"},
+                  "problemMatcher": []
+              }
+          ]
+      }
+
+   La etiqueta (``label``) nos sirve para identificar la tarea y ``command`` y
+   ``args`` para definir cuál es la aplicación externa  que abriremos y con qué
+   parámetros se ejecutará. Pueden también definirse campos específicos para
+   sistemas específicos concretos como en el ejemplo se hace para dar soporte
+   también a *Windows*.
+
+   .. seealso:: Para ver cuáles son las variables que pueden usarse (como
+      ``${file}`` en el ejemplo), consúltese `Variables Reference
+      <https://code.visualstudio.com/docs/editor/variables-reference>`_ de la
+      documentación oficial.
+
+   Para ejecutar la tarea habrá que volver a abrir el cajetín para ejecutar
+   ordenes y buscar `Ejecutar tarea`:
+
+   .. image:: files/runtask.png
+
+   Aparecerá a continuación la lista de tareas definidas y podemos ejecutar
+   la que deseemos. Una alternativa más cómoda es asociarle un :ref:`atajo de
+   teclado <vscode-atajos>`:
+
+   .. code-block:: json
+
+      [
+          {
+              "key": "ctrl+l b",
+              "command": "workbench.action.tasks.runTask",
+              "args": "Abrir en Brave"
+          }
+      ]
+
+   En este caso, se abrirá Brave_ al pulsar :kbd:`Ctrl`\ +\ :kbd:`l`\ -\
+   :kbd:`b`.
+
+   .. seealso:: Para más información, consulte `cómo crear tareas
+      <https://code.visualstudio.com/docs/editor/tasks>`_.
+
+.. _vscode-launch:
+
+**Depuración**
+   :program:`Visual Studio Code` también está preparado para permitir la
+   ejecución y depuración de código con las técnicas habituales de ejecución
+   paso a paso, puntos de ruptura, puntos de ruptura condicionales, etc. Para
+   ello es necesario dotarlo de soporte para la depuración del lenguaje de
+   programación concreto en el que queramos hacer nuestros desarrollos. Esto se
+   logra instalando las extensiones de depuración propias de cada lenguaje
+   (`Debugger for Java`_, `Javascript Debugger
+   <https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug-nightly>`_,
+   `Python Debugger
+   <https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy>`_,
+   etc).
+
+   De inicio, sin configuración adicional, podremos establecer puntos de
+   ruptura, etc. usando el editor y podremos ejecutar sin atender ninguno
+   pulsando :kbd:`Ctrl`\ +\ :kbd:`F5`, y ejecutar depurando pulsando :kbd:`F5`.
+
+   También es posible la depuración abriendo la barra lateral para ello:
+
+   .. image:: files/debug.png
+
+   En esa barra puede escogerse, en caso de existir varias formas, cómo
+   queremos lanzar el programa; y podrán vigilarse y manipularse los valores de
+   las variables durante la depuración.
+
+   .. _vscode-launch-json:
+
+   En principio, cuando se pulsan :kbd:`F5` o :kbd:`Ctrl`\ +\ :kbd:`F5`, el
+   |IDE| intenta ejecutar el archivo activo\ [#]_. Esto es un problema cuando
+   escribimos un proyecto, que contiene múltiples archivos y cuando, además,
+   necesitamos pasar parámetros al programa\ [#]_. Por ese motivo, debe
+   escribirse un archivo :file:`.vscode/launch.json` en el directorio de
+   proyecto con un aspecto como este\ [#]_:
+
+   .. code-block:: json
+
+      {
+          "version": "0.2.0",
+          "configurations": [
+              {
+                  "type": "java",
+                  "name": "MiApp (help)",
+                  "request": "launch",
+                  "mainClass": "${java:mainClass}",  // ¿Qué clase es la principal?
+                  "args": ["--help"]    // ¿Con qué argumento lanzamos el programa?
+              },
+              {
+                  "type": "java",
+                  "name": "MiApp (terminal)",
+                  "request": "launch",
+                  "mainClass": "${java:mainClass}",
+                  "args": ["--ui", "console"],
+              },
+              {
+                  "type": "java",
+                  "name": "MiApp (terminal - assert)",
+                  "request": "launch",
+                  "mainClass": "${java:mainClass}",
+                  "args": ["--ui", "console"],
+                  "vmArgs": ["-ea"]       // Activa los asserts.
+              }
+          ]
+      }
+
+   En este caso, hemos definido tres mecanismos de ejecución: uno que muestra
+   ayuda, otro que ejecuta el programa utilizando un argumento y el último que
+   hace lo mismo al anterior pero comprobando las `aserciones
+   <https://es.wikipedia.org/wiki/Aserci%C3%B3n_(inform%C3%A1tica)>`_.
+
+   .. seealso:: A la configuración básica citada, se le puede añadir otra
+      adicional dentro de :file:`.vscode/launch.json`, cuyos principios pueden
+      leerse en el artículo `Working with VSCode launch configurations
+      <https://gigi.nullneuron.net/gigilabs/working-with-vs-code-launch-configurations/>`_.
+
+   .. seealso:: Para aprender a depurar lea el artículo `Debugging
+      <https://code.visualstudio.com/docs/editor/debugging>`_ de la página
+      oficial.
+
+.. _vscode-start:
+
+Preliminares
+============
+Antes de empezar cualquier configuración específica a un lenguaje determinado es
+conveniente preparar en el :ref:`perfil Predeterminado <vscode-profile>` todo
+aquellas configuraciones que deseemos que sean universales independientemente de
+la herramienta que utilicemos. En particular, nos puede interesar:
+
++ La :ref:`configuración del idioma <vscode-language>`.
++ Los aspectos relacionados con el editor (tamaño de la fuente, `emulación de
+  vim <https://marketplace.visualstudio.com/items?itemName=vscodevim.vim>`_).
++ Los :ref:`atajos generales de teclado <vscode-atajos>`.
++ La instalación de :ref:`extensiones <vscode-extensions>` que consideremos
+  útiles para todos o gran parte de los perfiles (p.e. alguna relativa a
+  Github_). En caso de que alguna no sea útil para todos, podemos tenerla
+  deshabilitada para perfiles específicos.
+
+Integración con Git
+===================
+Un aspecto fundamental del desarrollo de aplicaciones es tener un adecuado
+control de versiones. Si decidimos usar Git_, :program:`Visual Studio Code` nos
+proporcionará una excelente integración.
+
+Requisitos
+----------
+Previamente, sin embargo, necesitaremos:
+
+* Tener instalada la orden `git <https://packages.debian.org/stable/git>`_ en el
+  sistema.
+* Tener creada una cuenta en Github_.
+
+Inicialización
+--------------
+Cumplido eso podemos partir de dos comienzos distintos para convertir el espacio
+de trabajo en un repositorio de Git también:
+
+#. Definir el control de versiones en un espacio de trabajo que antes careciera
+   de él.
+#. Clonar un repositorio ya existente para constituir con su contenido un
+   espacio de trabajo.
+
+Para **lo primero** basta abrir un área de trabajo y, ya con el área abierta,
+pinchar sobre el icono de "bifurcación de ruta" que se puede ver a la izquierda:
+
+.. image:: files/git-init.png
+
+Hecho esto, si el espacio de trabajo carecía de control de versiones, nos dará
+la posibilidad de iniciarlo\ [#]_ y crear un *commit* inicial (el campo nos
+permite indicar con qué mensaje queremos identificarlo):
+
+.. image:: files/git-vi.png
+
+.. caution:: El *commit* necesita realizarse bajo una identidad. Si no hay
+   definida ninguna en el archivo de configuración de *Git*
+   (:file:`~/.gitconfig` en *Linux* o :file:`%USERPROFILE%\\.gitconfig` en
+   *Windows*) la acción no se llevará a cabo, así que tendremos que realizarla
+   antes:
+
+   .. code-block:: ini
+
+      [user]
+         name = "Perico de los Palotes"
+         email = "perico@example.com"
+
+Si, además, queremos sincronizar con un repositorio de *Github*, deberemos
+volver a pinchar sobre el icono de "bifurcación de ruta" y escoger *Publicar la
+rama*:
+
+.. image:: files/git-push.png
+
+En este caso, deberemos validarnos con nuestra cuenta (en caso de que no lo
+hubiéramos hecho antes) y escoger el nombre para el nuevo repositorio:
+
+.. image:: files/git-name.png
+
+.. caution:: El programa atiende a lo que se haya indicado en la configuración
+   de git (*Linux* la almacena en :file:`~/.gitconfig`), si es que el usuario ya
+   ha usado y configurado anteriormente :program:`git` fuera de :program:`Visual
+   Studio Code`. Si deseáramos que fuera el propio programa el que se encargara
+   de la autenticación de modo independiente distinto** podríamos hacer lo
+   siguiente:
+
+   #. Llevar a cabo todos los desarrollos con este programa bajo un mismo
+         directorio (pongamos que :file:`~/Programacion/VSCode`).
+
+   #. Utilizar la `configuración condicional
+      <https://github.blog/2017-05-10-git-2-13-has-been-released/#conditional-configuration>`_
+      para modificar qué usuario realiza cambios y de qué forma se gestionan las
+      credenciales. Así en :file:`~/.gitconfig` podemos escribir:
+
+      .. code-block:: ini
+
+         [user]
+            name = Yo cuando uso Git
+            email = cuenta1@example.com
+         [credential]
+            # Supongamos que usamos OAuth
+            helper = "cache --timeout=7200"
+            helper = oauth
+         [includeIf "gitdir:~/Documentos/VSCode/"]
+            path = ~/Documentos/VSCode/.gitconfig
+
+      Y en :file:`~/Documentos/VSCode/.gitconfig`:
+
+      .. code-block:: ini
+
+         [credential]
+            # helper es acomulativo y dejarlo en blanco,
+            # borra las configuraciones anteriores.
+            # Por tanto, Visual Studio Code se encarga de la autenticación.
+            helper =
+         [user]
+            name = Yo cuando uso vscode
+            email = cuenta2@example.com
+
+   El problema de obrar así es que no tendremos definido ningún sistema de
+   autenticación fuera de :program:`Visual Studio Code` para los proyectos que
+   hayamos desarrollado con él. Por tanto, no podremos sincronizar con GitHub_
+   desde la consola de texto, aunque sí desde la consola integrada en el propio
+   |IDE|.
+
+   .. seealso:: Para más información consulte este `gist que trata este
+      aspecto
+      <https://gist.github.com/sio2sio2/7a5d3bc79b69ed82cc8ae334a0d63b32/#varias-cuentas>`_.
+
+La otra opción para comenzar es **clonar un repositorio** para lo cual no
+tenemos más que declarar nuestro propósito y especificar cuál es la dirección
+del repositorio:
+
+.. image:: files/git-clone.png
+
+En este caso, podemos escribir directamente la dirección del repositorio (como
+se observa en la captura) o pinchar sobre "Clonar desde GitHub" para
+identificarnos con un usuario. En este segundo caso (o si ya hubiéramos estado
+identificados previamente), se sustituirá esa leyenda por la lista de
+repositorios del usuario y podremos elegirlos directamente.
+
+Sincronización
+--------------
+Una vez que tengamos asociado el directorio local con un repositorio remoto, el
+programa será capaz de marcarnos qué archivos hemos cambiado respecto a la
+versión del último *commit*, nos lo mostrará en el propio editor e incluso
+podremos consultar en qué consiste ese cambio y revocarlo:
+
+.. image:: files/git-mod.png
+
+Con el soporte nativo para *Git* de :program:`Visual Studio Code` sólo podremos
+hacer comparaciones entre la última versión moficiada y la última confirmada
+(*commit*). Sin embargo, si instalamos la extensión `Gitlens
+<https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens>`_ podremos
+hacer estas comparaciones con todas las versiones anteriores:
+
+.. image:: files/git-gitlens.png
+
+Otra circunstancia con la que nos podemos encontrar es que un área de trabajo
+que ya tenemos asociada a un repositorio remoto, quede desfasada y queramos,
+antes de comenzar a programar, sincronizarla para que quede en el estado más
+avanzado del repositorio. Para ello, simplemente, podemos hacer un "*pull*" tal
+como haríamos manualmente con :program:`git`:
+
+.. image:: files/git-pull.png
+
+Existe, no obstante, la posibilidad de ejecutar periódicamente un :code:`git
+fetch` si configuramos:
+
+.. code-block:: json
+
+   {
+        "git.autofetch": true,
+        "git.autofetchPeriod": 1800000
+   }
+
+en que la segunda opción indica la frecuencia con la que se hace la comprobación
+(500 horas, o sea, nunca). Esto provoca que al abrir el programa se compruebe si
+ha habido algún cambio en el respositorio desde la última vez que accedimos al
+área de trabajo y ya no se vuelva a realizar otra comprobación mientras estamos
+trabajando\ [#]_:
+
+.. image:: files/git-fetch.png
+
+.. note:: La captura muestra directamente lo que se ve en la barra lateral
+   izquierda cuando pulsamos el icono de *Git* (*bifurcación de ruta*). Sin
+   embargo, antes de pulsar, podemos conocer que existen cambios en el
+   repositorio remoto, porque en la barra de estado de la parte inferior se verá
+   que hay cambios pendientes (en este caso, 1 de bajada y ninguno de subida).
+
+Ramas
+-----
+El soporte nativo también nos permite tratar con ramas, cambiar entre ellas y
+mezclarlas de forma bastante intuitiva. En la parte izquierda de la barra
+inferior de estado podemos ver en qué rama estamos trabajando y, si pulsamos
+sobre ella, se nos abrirá un cuadro para escoger otra rama entre las existentes
+o crear una nueva:
+
+.. image:: files/git-branch.png
+
+Para otras operaciones, como mezclar ramas, habría que acudir al menú de la
+sección de control de versiones:
+
+.. image:: files/git-branch-menu.png
+
+.. _vscode-java:
+
+Java
+====
+Obviamente, para programar en *Java*, sea con :program:`Visual Studio Code` o
+con cualquier otro |IDE|, debemos tener instalado |JDK| (o sea, el *paquete de
+desarrollo para Java*). Lo más juicioso en este caso es usar la versión
+desarrollada por OpenJDK_, que publica para distintas plataformas y sistemas
+operativos. En los sistemas *Linux* sus versiones son las versiones de
+referencia\ [#]_, así que podremos instalarla mediante el sistema de paquetería;
+mientras que en *Windows* podemos utilizar los instalables que nos ofrece
+`Adoptium <https://adoptium.net/>`_.
+
+Configuración previa
+--------------------
+.. table:: Extensiones recomendadas
+   :class: vscode-extensions
+
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `Language Support for Java by Red Hat`_ |                                                                                       |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `Project Manager for Java`_             | Facilita la gestión de proyectos de Java, permitiendo directamente la creación de un  |
+   |                                         | proyecto, que es un área de  trabajo con una estructura básica ya definida y una      |
+   |                                         | configuración básica.                                                                 |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `Debugger for Java`_                    | Permite depurar los programas de Java (puntos de ruptura, ejecución condicional,      |
+   |                                         | ejecución paso a paso, etc).                                                          |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `IntelliCode`_                          | Proporciona sugerencias basadas en |IA|.                                              |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `Maven for Java`_                       | Si usamos Maven como gestor de proyecto incorpora utilizades interesantes.            |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+   | `Test Runner for Java`_                 | Permite ejecutar casos de prueba.                                                     |
+   +-----------------------------------------+---------------------------------------------------------------------------------------+
+
+.. _vscode-java-settings:
+
+Además de estas extensiones, puede interesarnos añadir configuración adicional:
+
+.. code-block:: json
+
+   {
+      "files.exclude": {
+         "target/": true,           // No ver compilaciones si usamos Maven.
+      },
+      // Evita los inlay hints para los parámetros de las funciones.
+      "editor.inlayHints.enabled": "off"
+   }
+
+Además, durante la codificación puede interesarnos hacer alguna prueba
+individual de cómo funciona método a través de la consola interactiva `JShell
+<https://docs.oracle.com/en/java/javase/22/jshell/introduction-jshell.html>`_.
+Podemos, por supuesto, abrir una terminal (:kbd:`Ctrl`\ +\ :kbd:`\``) y escribir
+directamente la orden en ella, pero sin duda es más cómodo :ref:`crear una tarea
+<vscode-tasks>` y asociarla a una :ref:`combinación de teclas <vscode-atajos>`.
+La tarea podemos definirla con este código |JSON|:
+
+.. _vscode-definir-jshell:
+
+.. code:: json
+
+   {
+      "label": "Shell para Java",
+      "type": "shell",
+      "command": "jshell",
+      "windows": {
+         // Adoption al instalar Java no define la variable JAVA_HOME,
+         // sino quue añade la localización del programa al PATH. De lo
+         // contrario habría que hacer algo así:
+         // "command": "${env:JAVA_HOME}\\bin\\jshell.exe"
+      },
+      "args": [], // Sin argumentos.
+      "presentation": {
+         "reveal": "always",
+         "panel": "new"
+      },
+      "problemMatcher": []
+   }
+
+y la asociación a la combinación :kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`J` de
+este modo:
+
+.. code-block:: json
+
+   {
+      "key": "ctrl+shift+j",
+      "command": "workbench.action.tasks.runTask",
+      "args": "Shell para Java"
+   }
+
+.. _vscode-java-mk-maven:
+
+Creación del proyecto
+---------------------
+Para comenzar un proyecto, en vez de abrir directamente un `área de trabajo`_,
+lo mejor es *crear un nuevo proyecto* a través de la extensión `Project Manager
+for Java`_, lo que definirá directamente en la nueva área de trabajo una estructura
+de directorios apropiada para el gestor de proyectos que seleccionemos. En
+el caso de Maven, :ref:`la que se expone a continuación <estruct-maven>`. A
+esta estructura, podemos añadir a mano según nuestras necesidades:
+
+a. Archivos de licencia (:file:`LICENCE`) e información (:file:`README.md` o
+   :file:`README.rst`, según prefiramos).
+
+#. Un subdirectorio :file:`.vscode/` para configuración relacionada con
+   :program:`Visual Studio Code` y que puede incluir:
+
+   :file:`settings.json`,
+      que contiene la configuración adicional del `área de trabajo`_.
+
+   :file:`launch.json`,
+      en que incluiremos información relativa a la :ref:`ejecución y la
+      depuración del código <vscode-launch-json>`.
+
+#. Un archivo :file:`.gitignore` para evitar que Git_ vigile algunas partes
+   del directorio de proyecto (por ejemplo, allí donde se guardan las clases
+   compiladas).
+
+#. Un subdirectorio :file:`.github/` con configuración relativa a a la
+   sincronización del repositorio con GitHub_.
+
+Maven
+-----
+Como gestor del proyecto, podemos de decantarnos por :ref:`maven`.  Para ello,
+necesitaremos haber instalado la extensión `Maven for Java`_.
+
+Al escoger la creación de un proyecto con :ref:`maven` se nos pedirá escoger un
+*groupID* y un *artifactID* (véanse `las explicaciones al respecto en la
+página del propio software
+<https://maven.apache.org/guides/mini/guide-naming-conventions.html>`_).  El
+proyecto tendrá esta estructura:
+
+.. code-block:: none
+   :name: estruct-maven
+   :emphasize-lines: 5-13, 16
+
+   +- .github/  (... contenido relativo a la sincronización ...)
+   +- .vscode/
+   |      +-- launch.json
+   |      +-- settings.json
+   +- src/
+   |   +-- main/java
+   |   |     +-- java
+   |   |     |     +-- /edu/accesodatos/miapp
+   |   |     |                            +-- Main.java
+   |   |     |                            +-- ... (archivos del proyecto)
+   |   |     +-- resources/
+   |   +-- test/ (pruebas de software)
+   +- target/ (aquí dentro se guardan los .class)
+   +- .gitignore
+   +- LICENSE
+   +- pom.xml (configuración de Maven)
+   +- README.md
+
+donde las línea enfatizadas son las que generará el *plugin*, mientras que lo
+demás es probable que lo vayamos creando nosotros según nuestras necesidades.
+
+La creación de proyecto, define archivo :file:`pom.xml` que podemos
+revisar. Inicialmente puede interesarnos añadir:
+
+.. code-block:: xml
+
+   <version>1.0.0</version>          <!-- Podemos modificar el valor -->
+   <name>MiPrimeraAplicacion</name>  <!-- Podemos añadir esto -->
+
+   <developers>
+      <developer>
+         <id>perico-midnick</id>
+         <name>Perico de los Palotes</name>
+         <email>perico.palotes@gmail.com</email>
+      </developer>
+   </developers>
+
+Ya hemos indicado que una de las ventajas de usar *Maven* es no tener que
+rompernos la cabeza con las dependencias del proyecto; y añadir al
+:file:`pom.xml` el `repositorio de Maven <https://mvnrepository.com/>`_
+apropiado.  La tarea, además, se puede simplificar mucho si la búsqueda del
+paquete necesario la realizamos dentro del propio `Visual Studio Code` con la
+extensión `Maven for Java`_:
+
+.. image:: files/mavenEnVSCode.png
+
+.. seealso:: Para más información, consulte `las explicaciones de Maven al
+   respecto
+   <https://maven.apache.org/plugins/maven-javadoc-plugin/usage.html>`_.
+
+.. _vscode-java-debug:
+
+Ejecución
+---------
+Ya hemos dicho que para ejecutar la aplicación podemos pulsar:kbd:`Ctrl`\ +
+:kbd:`F5` (si no queremos atender a los puntos de ruptura que hayamos definido)
+o, simplemente, :kbd:`F5` si sí queremos hacerlo y depurar el programa paso a
+paso. Además, podemos instruir al |IDE| de cómo ejecutar el programa dándole
+instrucciones en :file:`.vscode/launch.json`. A todo lo ya dicho es conveniente
+añadir algunas notas:
+
+**Argumentos**
+   Si se quiere dejar que el programador escriba a mano en cada ejecución los
+   argumentos puede usarse:
+
+   .. code-block:: json
+
+      "args": "${command:SpecifyProgramArgs}"
+
+   Y si se quiere que haya algumnos argumentos predeterminados y otros escritos a
+   mano:
+
+     .. code-block:: json
+
+        "args": ["--ui", "cli", "${command:SpecifyProgramArgs}"]
+
+   También se pueden definir valores en :file:`settings.xml` y usarlos como
+   argumentos:
+
+   .. code-block:: json
+
+      // En settings.xml
+
+      {
+         // ...
+         "miapp.args": {
+            "ui": "cli",
+            "format": "json"
+         }
+      }
+
+
+   Que podremos usar como:
+
+   .. code-block:: json
+
+      // En launch.json
+      "args": [
+         "--ui": "${config:miapp.args.ui}",
+         "--format": "${config:miapp.args.format}"
+      ]
+
+   Otra posibilidad es definir un conjunto discreto de valores, y posibilitar
+   que se elija de la lista al ejecutar:
+
+   .. code-block:: json
+      :emphasize-lines: 17
+
+      {
+         "version": "0.2.0",
+         "inputs": [
+            {
+               "id": "interface",
+               "type": "pickString",
+               "options": ["auto", "cli", "gui"],
+               "description": "Seleccione la interfaz de usuario"
+            }
+         ],
+         "configurations": [
+            {
+               "type": "java",
+               "name": "MiApp (help)",
+               "request": "launch",
+               "mainClass": "${java:mainClass}",  // ¿Qué clase es la principal?
+               "args": ["--uid", "${input:interface}"]    
+            }
+         ]
+      }
+
+**Clase principal**
+   Al indicar cómo ejecutar un programa, debe indicarse cuál es la clase
+   principal de ejecución:
+
+   .. code-block:: json
+
+      "mainClass": "edu.acceso.miapp.Main"
+
+   Sin embargo, cuando sólo hay una posible clase, podemos dejar que el |IDE|
+   intente averiguarla con:
+
+   .. code-block:: json
+
+      "mainClass": "${java:mainClass}"
+
+   lo cual será eficaz en la mayor parte de las ocasiones. Cuando no sea así,
+   aún podemos hacer los siguiente para intentar generalizar la configuración de
+   :file:`launch.json`:
+
+   .. code-block:: json
+
+      // En settings.json
+
+      {
+         // ...
+         "miapp.package": "edu.acceso.miapp"
+      }
+
+   .. code-block:: json
+
+      "mainClass": "${config:miapp.package}.Main"
+
+Otros aspectos
+--------------
+Aún hay otros aspectos en los que conviene reparar.
+
+.. rubric:: Versión de Java
+
+El :file:`pom.xml` que se genera automáticamente tiene definidas estas
+propiedades:
+
+.. code-block:: xml
+
+   <properties>
+       <maven.compiler.source>17</maven.compiler.source>
+       <maven.compiler.target>17</maven.compiler.target>
+   </properties>
+
+que define qué sintaxis comprobará el analizador sintáctico (``source``) y para
+qué versión de Java se generará el *bytecode* (``target``). Pero a partir de
+Java 9 (y posiblemente queramos compilar para versiones posteriores) el
+compilador :command:`javac` introdujo la opción ``--release`` en sustitución de
+las dos antedichas (que siguen funcionando por otra parte). Por ese motivo es
+conveniente reescribir así:
+
+.. code-block:: xml
+
+   <properties>
+       <maven.compiler.release>21</maven.compiler.release>
+   </properties>
+
+   <build>
+      <plugins>
+         <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-compiler-plugin</artifactId>
+             <configuration>
+                 <release>${maven.compiler.release}</release>
+             </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+
+.. rubric:: Documentación para desarrolladores
+
+El estándar para crear la documentación de la |API| de un programa escrito en
+*Java* es Javadoc_. No forma parte del propósito de esta guía redactar una guía
+sobre cómo escribir los comentarios en el código para generar la documentación
+con esta herramienta, pero sí indicar cómo posibilitar su ejecución.
+
+En un proyecto gestionado con Maven_ será necesario añadir el plugin
+`maven-javadoc-plugin
+<https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin>`_
+a :file:`pom.xml`:
+
+.. code-block:: xml
+
+   <build>
+       <plugins>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-javadoc-plugin</artifactId>
+               <!-- La última versión puede consultarse en el repositorio de Maven -->
+               <version>3.11.2</version>
+               <configuration>
+                  <source>${maven.compiler.source}</source> <!-- o ${maven.compiler.release} -->
+                  <show>private</show> <!-- Muestra también atributos privados -->
+               </configuration>
+           </plugin>
+       </plugins>
+   </build>
+
+Lo cual creará la documentación dentro de :file:`target/reports/apidocs/` con
+que sólo ejecutemos:
+
+.. code-block:: console
+
+   $ mvn javadoc:javadoc
+
+El problema de esto es que una vez generada la documentación es probable que al
+cambiar comentarios e intentar regenerar la documentación, ésta no cambie; y nos veamos
+forzados a limpiar primero. Para ello :command:`mvn` trae el subcomando
+``clean``, que implica borrar absolutamente todo, incluidas las clases ya
+compiladas. Por ese motivo, es conveniente crear un perfil que borre únicamente
+la documentación y no el resto del contenido generado por :command:`mvn`. De
+nuevo, tendremos que añadir a :file:`pom.xml`:
+
+.. code-block:: xml
+
+   <profiles>
+       <profile>
+           <id>clean-javadoc-only</id>
+           <build>
+               <plugins>
+                   <plugin>
+                       <artifactId>maven-clean-plugin</artifactId>
+                       <configuration>
+                           <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                           <filesets>
+                               <fileset>
+                                   <directory>${project.build.directory}/reports/apidocs</directory>
+                               </fileset>
+                           </filesets>
+                       </configuration>
+                   </plugin>
+               </plugins>
+           </build>
+       </profile>
+   </profiles>
+   
+De este modo, podremos generar la documentación siempre así:
+
+.. code-block:: console
+
+   $ mvn clean:clean javadoc:javadoc -Pclean-javadoc-only
+
+.. hint:: Si :ref:`creamos una tarea <vscode-tasks>` y le asociamos una
+   :ref:`combinación de teclas <vscode-atajos>`, tal :ref:`como hicimos con
+   jshell <vscode-definir-jshell>`. todo será muy cómodo.
+
+.. note:: El directorio en que se genera la documentación puede cambiarse, si se
+   desea:
+
+   .. code-block:: xml
+
+      <configuration>
+           <source>${maven.compiler.source}</source>
+           <show>private</show>
+           <outputDirectory>${project.basedir}/docs</outputDirectory>
+      </configuration>
+      
+.. seealso:: Para saber cómo generar y publicar automáticamente la documentación al
+   sincronizar con el repositorio de GitHub_, consulte `este gist
+   <https://gist.github.com/sio2sio2/0fa7f78405933c04b494831de41b7021/>`_.
+
+.. rubric:: Empaquetamiento de la aplicación
+
+Otro aspecto interesante es el empaquetamiento del proyecto en un archivo |JAR|:
+
++ Cuando es una librería, es probable que nos interese empaquetarla sin
+  dependencias.
++ Cuando es una aplicación para usuario final, muy probablemente queramos un
+  paquete autosuficiente que contenga todas las dependencias.
+
+:program:`Visual Studio Code` permite empaquetar la aplicación pinchando el
+icono remarcado:
+
+.. image:: files/exportJavaSC.png
+
+o, simplemente, escribir la orden (:kbd:`Ctrl`\ +\ :kbd:`Shift`\ +\ :kbd:`P`)
+"Export Jar". En ambos casos, se pedirá el archivo que contiene  la clase
+principal y las dependencias que queremos incluir. El `.jar` quedará guardado en
+el directorio de proyecto y ya podremos ejecutar la aplicación con:
+
+.. code-block:: console
+
+   $ java -jar nombreProyecto.jar
+
+Si, por el contrario, queremos generar manualmente un paquete, podemos ejecutar:
+
+.. code-block:: console
+
+   $ mvn package
+   $ mvn clean package   # Si queremos borrar antes la compilación y que se regenere
+
+Pero esto no es suficiente, también deberemos tocar :file:`pom.xml` según sea
+nuestro propósito.
+
+**Librería**
+   En este caso, nos interesará no incluir las dependencias:
+
+   .. code-block:: xml
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.4.2</version> <!-- La última versión -->
+          <configuration>
+              <finalName>package</finalName>
+          </configuration>
+      </plugin>
+      
+   El resultado es el archivo :file:`target/package.jar`. Si no definimos
+   el elemento ``<finalName>``, tiene como valor predeterminado
+   ``${project.artifactId}-{project.version}``.
+
+**Aplicación final**
+   En este caso nos interesa incluir todas las dependencias y tendremos que
+   configurar de distinta forma:
+
+   .. code-block:: xml
+
+      <!-- ... -->
+
+      <properties>
+         <main.class>edu.acceso.miapp.Main</main.class>
+         <!-- Otras propiedades -->
+      </properties>
+
+      <!-- ... --->
+      
+      <build>
+         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <outputFile>target/package.jar</outputFile>
+                    <minimizeJar>true</minimizeJar>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>${main.class}</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+         </plugins>
+      </build>
+   
+   que generará el paquete con idéntico nombre. El predeterminado habría sido el
+   mismo que en el caso anterior.
+
+.. seealso:: Si quiere generar un paquete automácamente al crear una *release*
+   en GitHub, eche un ojo a `este gist al respecto
+   <https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/>`_.
+
+.. rubric:: Notas al pie
+
+.. [#] En realidad, las instrucciones se caracterizan por empezar a escribirse
+   con ``>``, por lo que, si pulsamos :kbd:`Ctrl`\ +\ :kbd:`P` y luego
+   escribimos :kbd:`>`, obtendremos el mismo efecto.
+
+.. [#] Cuatro de las cuales sí instalaremos de forma individual nosotros.
+
+.. [#] El :file:`launch.json` predeterminado de `Debugger for Java`_ es como el
+   que propondremos a continuación pero con:
+
+   .. code-block:: json
+
+      "mainClass": "${file}"
+
+   de ahí que se espere encontrar activo el archivo que contiene la clase
+   principal.
+
+.. [#] Un programa funcional en *Java* suele ejecutarse a mano así:
+
+   .. code-block:: console
+
+      $ java -jar miprograma.jar --ui gui --input archivo.txt
+
+   supuesto que hayamos creado un paquete |JAR| con la aplicación. Los
+   argumentos que habremos definido para que el programact arranque deben
+   proprocionarse al programa en el momento de su ejecución.
+
+.. [#] Son ejemplos para proyectos escritos en *Java*. En proyectos escritos en
+   otros lenguajes, puedenm cambiar las propiedades ligeramente. Por ejemplo,
+   para *Python* no habrá una propiedad ``mainClass``, sino otra llamada
+   ``program``, que identifica el archivo que debe ejecutarse.
+
+.. [#] O sea, de que internamente se haga el equivalente a un :code:`git init`
+   que deberíamos ejecutar nosotros si realizáramos a mano esta acción.
+
+.. [#] Lo cual es útil si es un proyecto personal que sólo desarrollamos
+   nosotros. Si hay otros desarrolladores trabajando, quizás sea más conveniente
+   que no deshabilitemos la comprobación periódica (por defecto, el valor es 180
+   segundos). Por tanto, quizás la primera línea de configuración es útil a
+   nivel de perfil, pero la segunda debería ser más propia del nivel de área de
+   trabajo.
+
+.. [#] En *Debian*, por ejemplo, los paquetes :deb:`default-jre` y
+   :deb:`default-jdk` apuntan a los paquetes creados con el *software* de
+   OpenJDK_.
+
+.. |JSON| replace:: :abbr:`JavaScript Object Notation`
 .. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
+.. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
+.. |IA| replace:: :abbr:`IA (Inteligencia Artificial)`
+.. |HTML| replace:: :abbr:`HTML (HyperText Markup Language)`
+.. |JAR| replace:: :abbr:`JAR (Java ARchive)`
+.. |API| replace:: :abbr:`API (Application Programming Inteface)`
+
+.. _Visual Studio Code: https://code.visualstudio.com/
+.. _Gradle: https://gradle.org/
+.. _perfil: #vscode-profile
+.. _a nivel de perfil: #vscode-profile
+.. _área de trabajo: #vscode-workspace
+.. _a nivel de área de trabajo: #vscode-workspace
+.. _Brave: https://brave.com
+.. _Debugger for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug
+.. _Github: https://github.com
+.. _Language Support for Java by Red Hat: https://marketplace.visualstudio.com/items?itemName=redhat.java
+.. _OpenJDK: https://openjdk.org/
+.. _IntelliCode: https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode
+.. _Project Manager for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency
+.. _Debugger for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug
+.. _Test Runner for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test
+.. _Maven for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven
+.. _Javadoc: https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html

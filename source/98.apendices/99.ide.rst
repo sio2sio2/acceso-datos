@@ -329,21 +329,21 @@ archivos de configuración |JSON|:
                   "type": "java",
                   "name": "MiApp (help)",
                   "request": "launch",
-                  "mainClass": "${java:mainClass}",  // ¿Qué clase es la principal?
+                  "mainClass": "edu.acceso.miapp.Main",  // ¿Qué clase es la principal?
                   "args": ["--help"]    // ¿Con qué argumento lanzamos el programa?
               },
               {
                   "type": "java",
                   "name": "MiApp (terminal)",
                   "request": "launch",
-                  "mainClass": "${java:mainClass}",
+                  "mainClass": "edu.acceso.miapp.Main",
                   "args": ["--ui", "console"],
               },
               {
                   "type": "java",
                   "name": "MiApp (terminal - assert)",
                   "request": "launch",
-                  "mainClass": "${java:mainClass}",
+                  "mainClass": "edu.acceso.miapp.Main",
                   "args": ["--ui", "console"],
                   "vmArgs": ["-ea"]       // Activa los asserts.
               }
@@ -662,10 +662,11 @@ Creación del proyecto
 ---------------------
 Para comenzar un proyecto, en vez de abrir directamente un `área de trabajo`_,
 lo mejor es *crear un nuevo proyecto* a través de la extensión `Project Manager
-for Java`_, lo que definirá directamente en la nueva área de trabajo una estructura
-de directorios apropiada para el gestor de proyectos que seleccionemos. En
-el caso de Maven, :ref:`la que se expone a continuación <estruct-maven>`. A
-esta estructura, podemos añadir a mano según nuestras necesidades:
+for Java`_, lo que definirá directamente en la nueva área de trabajo una
+estructura de directorios apropiada para el gestor de proyectos que
+seleccionemos. En el caso de Maven_, :ref:`la que se expone
+a continuación <estruct-maven>`. A esta estructura, podemos añadir a mano según
+nuestras necesidades:
 
 a. Archivos de licencia (:file:`LICENCE`) e información (:file:`README.md` o
    :file:`README.rst`, según prefiramos).
@@ -686,6 +687,8 @@ a. Archivos de licencia (:file:`LICENCE`) e información (:file:`README.md` o
 
 #. Un subdirectorio :file:`.github/` con configuración relativa a a la
    sincronización del repositorio con GitHub_.
+
+.. _vscode-maven:
 
 Maven
 -----
@@ -738,6 +741,11 @@ revisar. Inicialmente puede interesarnos añadir:
          <email>perico.palotes@gmail.com</email>
       </developer>
    </developers>
+
+.. tip:: Si al crear el proyecto, se acostumbra a no usar ningún arquetipo; el
+   |IDE| no preguntará si se quiere abrir el directorio de proyecto, sino el
+   directorio padre; lo cual es un engorro. Así que es mejor, configurar el
+   plugin `a nivel de perfil`_ para que ni siquiera haga la pregunta.
 
 Ya hemos indicado que una de las ventajas de usar *Maven* es no tener que
 rompernos la cabeza con las dependencias del proyecto; y añadir al
@@ -839,29 +847,20 @@ añadir algunas notas:
 
       "mainClass": "edu.acceso.miapp.Main"
 
-   Sin embargo, cuando sólo hay una posible clase, podemos dejar que el |IDE|
-   intente averiguarla con:
+   Una alternativa es definir una propiedad en :file:`settings.json`:
 
    .. code-block:: json
-
-      "mainClass": "${java:mainClass}"
-
-   lo cual será eficaz en la mayor parte de las ocasiones. Cuando no sea así,
-   aún podemos hacer los siguiente para intentar generalizar la configuración de
-   :file:`launch.json`:
-
-   .. code-block:: json
-
-      // En settings.json
 
       {
-         // ...
-         "miapp.package": "edu.acceso.miapp"
+         "app.package": "edu.acceso.miapp"
       }
+
+   y usarla luego en :file:`launch.json`
+
 
    .. code-block:: json
 
-      "mainClass": "${config:miapp.package}.Main"
+      "mainClass": "${config:app.package}.Main"
 
 Otros aspectos
 --------------

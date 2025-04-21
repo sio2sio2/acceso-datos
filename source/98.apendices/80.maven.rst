@@ -2,3 +2,90 @@
 
 Maven
 *****
+:dfn:`Maven` es un gestor de proyectos escritos en Java, esto es, una
+herramienta que automatiza la construcción y la gestión de aplicaciones escritas
+en *Java*, lo cual implica simplificar las tareas de creación, gestión de
+dependencias,  compilación, pruebas, empaquetado y despliegue de la aplicación.
+
+Para ello provee de una orden (:command:`mvn`) provista de subórdenes que
+modularizan las distintas tareas de las que se encarga.
+
+Creación
+========
+Se impone una estructura estandarizada para el proyecto que podemos resumir en
+el siguiente gráfico:
+
+.. code-block:: none
+
+   +-- src
+   |    +-- main/
+   |    |     +-- java/edu/acceso/miapp/  (Código de la aplicación)
+   |    |     +-- resources/              Archivos de configuración, etc.
+   |    |
+   |    +-- test/                         Reproduce la estruct. de main para pruebas
+   |
+   +-- target/                            Código generado
+   +-- pom.xml                            Configuración del proyecto.
+
+El subcomando asociado a esta fase es ``archetype:generate``:
+
+.. code-block:: console
+
+   $ mvn archetype:generate -DgroupId=edu.acceso.test \
+       -DartifactId=miapp
+       -DarchetypeArtifactId=maven-archetype-quickstart \
+       -Dversion=1.0.0 \
+       -DinteractiveMode=false
+
+Pero lo habitual es que el |IDE| nos abstraiga de esta fase y se encargue el
+mismo de ejecutar la orden cuando le pidamos iniciar el proyecto.
+
+Dependencias
+============
+También facilita el gestor la tarea de obtener las dependencias de nuestro
+proyecto descargándolas directamente del `Repositorio General de Maven`_. Basta
+incluirla en :file:`pom.xml`. Por ejemplo:
+
+.. code-block:: xml
+
+   <dependencies>
+      <dependency>
+          <groupId>jakarta.persistence</groupId>
+          <artifactId>jakarta.persistence-api</artifactId>
+          <version>3.2.0</version>
+      </dependency>
+
+      <!-- Otras dependencias -->
+   </dependencies>
+
+La página tiene un buscador y puede buscarse a través de él la librería. La del
+ejemplo se haya en la dirección `persistence-api
+<https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api>`_,
+y escogiendo la versión deseada, se obtiene el código exacto que debe añadirse
+al archivo. Las librerías, además, pueden a su vez contener dependencias, pero
+se calculan si necesidad de incluirlas explícitamente.
+
+La suborden asociada a la obtención de dependencias es:
+
+.. code-block:: console
+
+   $ mvn dependency:resolve
+   $ mvn dependency:tree         # Muestra el árbol de dependencias.
+
+Sin embargo, no es necesario efectuar esta operación explícitamente, porque se
+realiza automáticamente al realizar operaciones posteriores.
+
+Compilación
+===========
+
+Pruebas
+=======
+
+Empaquetado
+===========
+
+Despliegue
+==========
+
+.. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
+.. _Repositorio General de Maven: https://mvnrepository.com/

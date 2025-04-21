@@ -710,21 +710,21 @@ proyecto con un aspecto como este<a class="footnote-reference brackets" href="#i
 <span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (help)&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">// ¿Qué clase es la principal?</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp.Main&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">// ¿Qué clase es la principal?</span>
 <span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--help&quot;</span><span class="p">]</span><span class="w">    </span><span class="c1">// ¿Con qué argumento lanzamos el programa?</span>
 <span class="w">        </span><span class="p">},</span>
 <span class="w">        </span><span class="p">{</span>
 <span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (terminal)&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp.Main&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
 <span class="w">        </span><span class="p">},</span>
 <span class="w">        </span><span class="p">{</span>
 <span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;java&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MiApp (terminal - assert)&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp.Main&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
 <span class="w">            </span><span class="nt">&quot;vmArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-ea&quot;</span><span class="p">]</span><span class="w">       </span><span class="c1">// Activa los asserts.</span>
 <span class="w">        </span><span class="p">}</span>
@@ -1020,10 +1020,11 @@ este modo:</p>
 <span id="vscode-java-mk-maven"></span><h3><span class="section-number">4.5.2. </span>Creación del proyecto<a class="headerlink" href="#creacion-del-proyecto" title="Link to this heading">#</a></h3>
 <p>Para comenzar un proyecto, en vez de abrir directamente un <a class="reference external" href="#vscode-workspace">área de trabajo</a>,
 lo mejor es <em>crear un nuevo proyecto</em> a través de la extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency">Project Manager
-for Java</a>, lo que definirá directamente en la nueva área de trabajo una estructura
-de directorios apropiada para el gestor de proyectos que seleccionemos. En
-el caso de Maven, <a class="reference internal" href="#estruct-maven"><span class="std std-ref">la que se expone a continuación</span></a>. A
-esta estructura, podemos añadir a mano según nuestras necesidades:</p>
+for Java</a>, lo que definirá directamente en la nueva área de trabajo una
+estructura de directorios apropiada para el gestor de proyectos que
+seleccionemos. En el caso de <a class="reference internal" href="#maven">Maven</a>, <a class="reference internal" href="#estruct-maven"><span class="std std-ref">la que se expone
+a continuación</span></a>. A esta estructura, podemos añadir a mano según
+nuestras necesidades:</p>
 <ol class="loweralpha">
 <li><p>Archivos de licencia (<code class="file docutils literal notranslate"><span class="pre">LICENCE</span></code>) e información (<code class="file docutils literal notranslate"><span class="pre">README.md</span></code> o
 <code class="file docutils literal notranslate"><span class="pre">README.rst</span></code>, según prefiramos).</p></li>
@@ -1045,7 +1046,7 @@ sincronización del repositorio con <a class="reference external" href="https://
 </ol>
 </section>
 <section id="maven">
-<h3><span class="section-number">4.5.3. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h3>
+<span id="vscode-maven"></span><h3><span class="section-number">4.5.3. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h3>
 <p>Como gestor del proyecto, podemos de decantarnos por <a class="reference internal" href="80.maven.html#maven"><span class="std std-ref">Maven</span></a>.  Para ello,
 necesitaremos haber instalado la extensión <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven">Maven for Java</a>.</p>
 <p>Al escoger la creación de un proyecto con <a class="reference internal" href="80.maven.html#maven"><span class="std std-ref">Maven</span></a> se nos pedirá escoger un
@@ -1086,6 +1087,13 @@ revisar. Inicialmente puede interesarnos añadir:</p>
 <span class="w">   </span><span class="nt">&lt;/developer&gt;</span>
 <span class="nt">&lt;/developers&gt;</span>
 </pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Si al crear el proyecto, se acostumbra a no usar ningún arquetipo; el
+<abbr title="Integrated Development Environment">IDE</abbr> no preguntará si se quiere abrir el directorio de proyecto, sino el
+directorio padre; lo cual es un engorro. Así que es mejor, configurar el
+plugin <a class="reference external" href="#vscode-profile">a nivel de perfil</a> para que ni siquiera haga la pregunta.</p>
 </div>
 <p>Ya hemos indicado que una de las ventajas de usar <em>Maven</em> es no tener que
 rompernos la cabeza con las dependencias del proyecto; y añadir al
@@ -1172,23 +1180,14 @@ principal de ejecución:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp.Main&quot;</span>
 </pre></div>
 </div>
-<p>Sin embargo, cuando sólo hay una posible clase, podemos dejar que el <abbr title="Integrated Development Environment">IDE</abbr>
-intente averiguarla con:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${java:mainClass}&quot;</span>
-</pre></div>
-</div>
-<p>lo cual será eficaz en la mayor parte de las ocasiones. Cuando no sea así,
-aún podemos hacer los siguiente para intentar generalizar la configuración de
-<code class="file docutils literal notranslate"><span class="pre">launch.json</span></code>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="c1">// En settings.json</span>
-
-<span class="p">{</span>
-<span class="w">   </span><span class="c1">// ...</span>
-<span class="w">   </span><span class="nt">&quot;miapp.package&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp&quot;</span>
+<p>Una alternativa es definir una propiedad en <code class="file docutils literal notranslate"><span class="pre">settings.json</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;app.package&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;edu.acceso.miapp&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${config:miapp.package}.Main&quot;</span>
+<p>y usarla luego en <code class="file docutils literal notranslate"><span class="pre">launch.json</span></code></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;mainClass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${config:app.package}.Main&quot;</span>
 </pre></div>
 </div>
 </dd>

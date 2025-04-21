@@ -370,7 +370,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -386,6 +388,19 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">3.1. Creación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.2. Dependencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#despliegue">3.6. Despliegue</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -397,6 +412,79 @@ document.write(`
                   
   <section id="maven">
 <span id="id1"></span><h1><span class="section-number">3. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h1>
+<p><em class="dfn">Maven</em> es un gestor de proyectos escritos en Java, esto es, una
+herramienta que automatiza la construcción y la gestión de aplicaciones escritas
+en <em>Java</em>, lo cual implica simplificar las tareas de creación, gestión de
+dependencias,  compilación, pruebas, empaquetado y despliegue de la aplicación.</p>
+<p>Para ello provee de una orden (<strong class="command">mvn</strong>) provista de subórdenes que
+modularizan las distintas tareas de las que se encarga.</p>
+<section id="creacion">
+<h2><span class="section-number">3.1. </span>Creación<a class="headerlink" href="#creacion" title="Link to this heading">#</a></h2>
+<p>Se impone una estructura estandarizada para el proyecto que podemos resumir en
+el siguiente gráfico:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>+-- src
+|    +-- main/
+|    |     +-- java/edu/acceso/miapp/  (Código de la aplicación)
+|    |     +-- resources/              Archivos de configuración, etc.
+|    |
+|    +-- test/                         Reproduce la estruct. de main para pruebas
+|
++-- target/                            Código generado
++-- pom.xml                            Configuración del proyecto.
+</pre></div>
+</div>
+<p>El subcomando asociado a esta fase es <code class="docutils literal notranslate"><span class="pre">archetype:generate</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>archetype:generate<span class="w"> </span>-DgroupId<span class="o">=</span>edu.acceso.test<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DartifactId<span class="o">=</span>miapp
+<span class="go">    -DarchetypeArtifactId=maven-archetype-quickstart \</span>
+<span class="go">    -Dversion=1.0.0 \</span>
+<span class="go">    -DinteractiveMode=false</span>
+</pre></div>
+</div>
+<p>Pero lo habitual es que el <abbr title="Integrated Development Environment">IDE</abbr> nos abstraiga de esta fase y se encargue el
+mismo de ejecutar la orden cuando le pidamos iniciar el proyecto.</p>
+</section>
+<section id="dependencias">
+<h2><span class="section-number">3.2. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h2>
+<p>También facilita el gestor la tarea de obtener las dependencias de nuestro
+proyecto descargándolas directamente del <a class="reference external" href="https://mvnrepository.com/">Repositorio General de Maven</a>. Basta
+incluirla en <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>. Por ejemplo:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+<span class="w">   </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">       </span><span class="nt">&lt;groupId&gt;</span>jakarta.persistence<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">       </span><span class="nt">&lt;artifactId&gt;</span>jakarta.persistence-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">       </span><span class="nt">&lt;version&gt;</span>3.2.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Otras dependencias --&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<p>La página tiene un buscador y puede buscarse a través de él la librería. La del
+ejemplo se haya en la dirección <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">persistence-api</a>,
+y escogiendo la versión deseada, se obtiene el código exacto que debe añadirse
+al archivo. Las librerías, además, pueden a su vez contener dependencias, pero
+se calculan si necesidad de incluirlas explícitamente.</p>
+<p>La suborden asociada a la obtención de dependencias es:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>dependency:resolve
+<span class="gp">$ </span>mvn<span class="w"> </span>dependency:tree<span class="w">         </span><span class="c1"># Muestra el árbol de dependencias.</span>
+</pre></div>
+</div>
+<p>Sin embargo, no es necesario efectuar esta operación explícitamente, porque se
+realiza automáticamente al realizar operaciones posteriores.</p>
+</section>
+<section id="compilacion">
+<h2><span class="section-number">3.3. </span>Compilación<a class="headerlink" href="#compilacion" title="Link to this heading">#</a></h2>
+</section>
+<section id="pruebas">
+<h2><span class="section-number">3.4. </span>Pruebas<a class="headerlink" href="#pruebas" title="Link to this heading">#</a></h2>
+</section>
+<section id="empaquetado">
+<h2><span class="section-number">3.5. </span>Empaquetado<a class="headerlink" href="#empaquetado" title="Link to this heading">#</a></h2>
+</section>
+<section id="despliegue">
+<h2><span class="section-number">3.6. </span>Despliegue<a class="headerlink" href="#despliegue" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -434,6 +522,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">3.1. Creación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.2. Dependencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#despliegue">3.6. Despliegue</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

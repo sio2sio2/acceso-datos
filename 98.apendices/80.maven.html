@@ -398,7 +398,6 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#despliegue">3.6. Despliegue</a></li>
 </ul>
             </nav>
         </div>
@@ -418,6 +417,12 @@ en <em>Java</em>, lo cual implica simplificar las tareas de creación, gestión 
 dependencias,  compilación, pruebas, empaquetado y despliegue de la aplicación.</p>
 <p>Para ello provee de una orden (<strong class="command">mvn</strong>) provista de subórdenes que
 modularizan las distintas tareas de las que se encarga.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><a class="reference internal" href="99.ide.html#vscode"><span class="std std-ref">Visual Studio Code</span></a> tiene una extensión que nos abstrae de todos estos
+comandos, por lo que este apéndice no tiene más interés qué tener una idea de
+qué es lo que subyace por debajo.</p>
+</div>
 <section id="creacion">
 <h2><span class="section-number">3.1. </span>Creación<a class="headerlink" href="#creacion" title="Link to this heading">#</a></h2>
 <p>Se impone una estructura estandarizada para el proyecto que podemos resumir en
@@ -475,15 +480,101 @@ realiza automáticamente al realizar operaciones posteriores.</p>
 </section>
 <section id="compilacion">
 <h2><span class="section-number">3.3. </span>Compilación<a class="headerlink" href="#compilacion" title="Link to this heading">#</a></h2>
+<p>La compilación, esto es, la generación de <em>bytecode</em> se realiza a través del
+plugin <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin">maven-compiler-plugin</a>. Hacer la operación, en principio, es sencillo:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>compile<span class="w">                  </span><span class="c1"># Genera el bytecode.</span>
+<span class="gp">$ </span>mvn<span class="w"> </span>clean<span class="w"> </span>compile<span class="w">            </span><span class="c1"># Genera borrando antes el código generado previo</span>
+</pre></div>
+</div>
+<p>Ahora bien, hay distintas versiones de <em>Java</em> y, al respecto, el compilador
+(<strong class="command">javac</strong>) necesita que se le indiquen dos cosas:</p>
+<ol class="arabic simple">
+<li><p>Para qué versión de <em>Java</em> se realiza la comprobación estática de código.</p></li>
+<li><p>Para qué versión de <em>Java</em> se genera el <em>bytecode</em><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
+</ol>
+<p>En ausencia de configuración al respecto, el <em>plugin</em> le indica al compilador
+que use para ambas cosas la antigua version 1.7<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, por lo que es muy
+recomendable indicar explícitamente en el archivo <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> una versión
+algo más moderna, e indispensable si se van a usar características del lenguaje
+más modernas. Puede hacerse como una propiedad:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
+<span class="w">   </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+</pre></div>
+</div>
+<p>o directamente configurando explíciamente el <em>plugin</em> (que en principio no
+necesita ser declarado):</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
+<span class="w">    </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">        </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">            </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;version&gt;</span>3.14.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">            </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">                </span><span class="nt">&lt;release&gt;</span>21<span class="nt">&lt;/release&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>Configurarlo como propiedad permite usar el valor declarado de la
+versión en otras partes del archivo, que necesiten indicar también la
+versión. Por ejemplo, al configurar el <em>plugin</em> para <a class="reference internal" href="99.ide.html#vscode-javadoc"><span class="std std-ref">generar la
+documentación con Javadoc</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">--release</span></code> que engloba ambos aspectos de la compilación
+apareció en Java 9. Antes no existía y se usaban en su lugar <code class="docutils literal notranslate"><span class="pre">--source</span></code> y
+<code class="docutils literal notranslate"><span class="pre">--target</span></code> (que, no obstante, siguen existiendo), por lo que si se quiere
+mantener compatibilidad con un <abbr title="Java Development Kit">JDK</abbr> antiguo podemos hacer:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
+<span class="w">   </span><span class="nt">&lt;maven.compiler.source&gt;</span>21<span class="nt">&lt;/maven.compiler.source&gt;</span>
+<span class="w">   </span><span class="nt">&lt;maven.compiler.target&gt;</span>21<span class="nt">&lt;/maven.compiler.target&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+</pre></div>
+</div>
+<p>o la configuración correspondiente directamente en el <em>plugin</em>.</p>
+</div>
 </section>
 <section id="pruebas">
 <h2><span class="section-number">3.4. </span>Pruebas<a class="headerlink" href="#pruebas" title="Link to this heading">#</a></h2>
+<p>El código que prueba la aplicación debe escribirse bajo <code class="file docutils literal notranslate"><span class="pre">src/test/</span></code> con
+la misma estructura que se uso en <code class="file docutils literal notranslate"><span class="pre">src/main/</span></code>.</p>
+<p>Las subórdenes asociadas a esta fases son:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span><span class="nb">test</span><span class="w">              </span><span class="c1"># Compila todo el código (principal y pruebas) y ejecuta las pruebas</span>
+<span class="gp">$ </span>mvn<span class="w"> </span>test-compile<span class="w">      </span><span class="c1"># Sólo compila las pruebas sin llegar a ejecutarlas.</span>
+</pre></div>
+</div>
 </section>
 <section id="empaquetado">
 <h2><span class="section-number">3.5. </span>Empaquetado<a class="headerlink" href="#empaquetado" title="Link to this heading">#</a></h2>
-</section>
-<section id="despliegue">
-<h2><span class="section-number">3.6. </span>Despliegue<a class="headerlink" href="#despliegue" title="Link to this heading">#</a></h2>
+<p>El software compilado suele distribuirse en formato <abbr title="Java ARchive">JAR</abbr>, un archivo zip que
+contiene las clases compiladas (archivos <code class="file docutils literal notranslate"><span class="pre">.class</span></code>) y algunos otros
+archivos adicionales. Para crearlo:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>clean<span class="w"> </span>package
+</pre></div>
+</div>
+<p>Para la generación del paquete, <a class="reference internal" href="#maven"><span class="std std-ref">Maven</span></a> usa el plugin <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin">maven-jar-plugin</a>,
+que no incluye dependencias. Para más información sobre ello y cómo incluirlas
+consulte este <a class="reference external" href="https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/">gist sobre generación de paquetes</a>.</p>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>El <em>bytecode</em> es retrocompatible, es decir, el <em>bytecode</em> generado para
+una versión inferior de <em>Java</em> siempre podrá ejecutarse en una <abbr title="Java Virtual Machine">JVM</abbr> de
+versión igual o superior. Lo contrario, sin embargo, no sucede.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>El compilador si no fuera por el <em>plugin</em> escogería la versión de la
+<abbr title="Java Development Kit">JDK</abbr> que está utilizando el desarrollador.</p>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -537,7 +628,6 @@ realiza automáticamente al realizar operaciones posteriores.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#despliegue">3.6. Despliegue</a></li>
 </ul>
   </nav></div>
 

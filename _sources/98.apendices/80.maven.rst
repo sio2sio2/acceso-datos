@@ -10,6 +10,10 @@ dependencias,  compilación, pruebas, empaquetado y despliegue de la aplicación
 Para ello provee de una orden (:command:`mvn`) provista de subórdenes que
 modularizan las distintas tareas de las que se encarga.
 
+.. note:: :ref:`vscode` tiene una extensión que nos abstrae de todos estos
+   comandos, por lo que este apéndice no tiene más interés qué tener una idea de
+   qué es lo que subyace por debajo.
+
 Creación
 ========
 Se impone una estructura estandarizada para el proyecto que podemos resumir en
@@ -77,15 +81,109 @@ realiza automáticamente al realizar operaciones posteriores.
 
 Compilación
 ===========
+La compilación, esto es, la generación de *bytecode* se realiza a través del
+plugin `maven-compiler-plugin`_. Hacer la operación, en principio, es sencillo:
+
+.. code-block:: console
+
+   $ mvn compile                  # Genera el bytecode.
+   $ mvn clean compile            # Genera borrando antes el código generado previo
+
+Ahora bien, hay distintas versiones de *Java* y, al respecto, el compilador
+(:command:`javac`) necesita que se le indiquen dos cosas:
+
+#. Para qué versión de *Java* se realiza la comprobación estática de código.
+#. Para qué versión de *Java* se genera el *bytecode*\ [#]_.
+
+En ausencia de configuración al respecto, el *plugin* le indica al compilador
+que use para ambas cosas la antigua version 1.7\ [#]_, por lo que es muy
+recomendable indicar explícitamente en el archivo :file:`pom.xml` una versión
+algo más moderna, e indispensable si se van a usar características del lenguaje
+más modernas. Puede hacerse como una propiedad:
+
+.. code-block:: xml
+
+   <properties>
+      <maven.compiler.release>21</maven.compiler.release>
+   </properties>
+
+o directamente configurando explíciamente el *plugin* (que en principio no
+necesita ser declarado):
+
+.. code-block:: xml
+
+   <build>
+       <plugins>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>3.14.0</version>
+               <configuration>
+                   <release>21</release>
+               </configuration>
+           </plugin>
+       </plugins>
+   </build>
+   
+.. hint:: Configurarlo como propiedad permite usar el valor declarado de la
+   versión en otras partes del archivo, que necesiten indicar también la
+   versión. Por ejemplo, al configurar el *plugin* para :ref:`generar la
+   documentación con Javadoc <vscode-javadoc>`.
+
+.. note:: La opción ``--release`` que engloba ambos aspectos de la compilación
+   apareció en Java 9. Antes no existía y se usaban en su lugar ``--source`` y
+   ``--target`` (que, no obstante, siguen existiendo), por lo que si se quiere
+   mantener compatibilidad con un |JDK| antiguo podemos hacer:
+
+   .. code-block:: xml
+
+      <properties>
+         <maven.compiler.source>21</maven.compiler.source>
+         <maven.compiler.target>21</maven.compiler.target>
+      </properties>
+
+   o la configuración correspondiente directamente en el *plugin*.
 
 Pruebas
 =======
+El código que prueba la aplicación debe escribirse bajo :file:`src/test/` con
+la misma estructura que se uso en :file:`src/main/`.
+
+Las subórdenes asociadas a esta fases son:
+
+.. code-block:: console
+
+   $ mvn test              # Compila todo el código (principal y pruebas) y ejecuta las pruebas
+   $ mvn test-compile      # Sólo compila las pruebas sin llegar a ejecutarlas.
 
 Empaquetado
 ===========
+El software compilado suele distribuirse en formato |JAR|, un archivo zip que
+contiene las clases compiladas (archivos :file:`.class`) y algunos otros
+archivos adicionales. Para crearlo:
 
-Despliegue
-==========
+.. code-block:: console
+
+   $ mvn clean package
+
+Para la generación del paquete, :ref:`maven` usa el plugin `maven-jar-plugin`_,
+que no incluye dependencias. Para más información sobre ello y cómo incluirlas
+consulte este `gist sobre generación de paquetes
+<https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/>`_.
+
+.. rubric:: Notas al pie
+
+.. [#] El *bytecode* es retrocompatible, es decir, el *bytecode* generado para
+   una versión inferior de *Java* siempre podrá ejecutarse en una |JVM| de
+   versión igual o superior. Lo contrario, sin embargo, no sucede.
+
+.. [#] El compilador si no fuera por el *plugin* escogería la versión de la
+   |JDK| que está utilizando el desarrollador.
 
 .. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
+.. |JVM| replace:: :abbr:`JVM (Java Virtual Machine)`
+.. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
+.. |JAR| replace:: :abbr:`JAR (Java ARchive)`
 .. _Repositorio General de Maven: https://mvnrepository.com/
+.. _maven-compiler-plugin: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin
+.. _maven-jar-plugin: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin

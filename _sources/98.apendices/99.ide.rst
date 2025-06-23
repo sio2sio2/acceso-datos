@@ -4,14 +4,18 @@ Visual Studio Code
 ******************
 .. note:: La mayor parte de las instrucciones generales para el |IDE| están
    fusiladas muy indisimuladamente del :ref:`apéndice correspondiente
-   <lm:vscode>` de los :ref:`apuntes para el módulo de Lenguajes de Marcas <lm:mod-lm>`.
+   <lm:vscode>` de los :ref:`apuntes para el módulo de Lenguajes de Marcas <lm:apuntes-lm>`.
 
 Como entorno de desarrollo para el seguimiento del módulo recomendamos `Visual
-Studio Code`_, el cual es un |IDE|, con innumerables extensiones, especialmente
-diseñado para la escritura de código, y con versiones para los principales
-sistemas operativos. Esta disponible para su descarga gratuita en su página web
-y su código fuente en `su página de GitHub
-<https://github.com/microsoft/vscode>`_.
+Studio Code`_, por varios motivos:
+
+* Es *software* libre (`licencia MIT <https://es.wikipedia.org/wiki/Licencia_MIT>`_) y
+  está dispoible para su descarga gratuita en su página web y su código fuente
+  en `su página de GitHub <https://github.com/microsoft/vscode>`_.
+* Está especialmente diseñado para la escritura de código y dispone de
+  innumerables extensión que le dan soporte para muchos lenguajes de
+  programación.
+* Tiene versiones en los principales sistemas operativos.
 
 Generalidades
 =============
@@ -61,7 +65,7 @@ archivos de configuración |JSON|:
       cuales se corresponde con un distinto *perfil de desarrollador*. Esto es
       debido a que, cuando programamos por ejemplo en *Python*, no necesitamos
       exactamente el mismo entorno de desarrollo que cuando programamos en
-      Javascript*. En consecuencia necesitaremos unas extensiones distintas,
+      *Javascript*. En consecuencia necesitaremos unas extensiones distintas,
       unas preferencias distintas, etc. :program:`Visual Studio Code` nos
       permite lidiar con estas diferencias, permitiendo crear distintos
       *perfiles*, que escogeremos a voluntad dependiendo qué pretendamos
@@ -158,7 +162,28 @@ archivos de configuración |JSON|:
    Este tipo de personalización puede hacerse tanto `a nivel de perfil`_
    como de `área de trabajo`_. Como
    alternativa, podemos directamente editar los :file:`settings.json`
-   correspondientes.
+   correspondientes. Para ello puede pulsarse sobre el icono remarcado arriba a
+   la derecha.
+
+   .. _vscode-utf8-term-win:
+
+   Por ejemplo, es común que utilicemos UTF-8 para la codificación de caracteres
+   y, si usamos Windows, nos encontraremos con el inconveniente que la terminal
+   de éste no utilice esta codificación. Para paliarlo podemos añadir:
+
+   .. code-block:: json
+
+      {
+         "terminal.integrated.profiles.windows": {
+             "PowerShell": {
+                "source": "PowerShell",
+                "icon": "terminal-powershell",
+                "args": ["-NoExit", "-Command", "chcp 65001"]
+             },
+         },
+         "terminal.integrated.defaultProfile.windows": "PowerShell"
+      }
+       
 
 .. _vscode-extensions:
 
@@ -374,6 +399,9 @@ aquellas configuraciones que deseemos que sean universales independientemente de
 la herramienta que utilicemos. En particular, nos puede interesar:
 
 + La :ref:`configuración del idioma <vscode-language>`.
++ Si trabajamos en *Windows* y creamos aplicaciones que utilizan como interfaz
+  de usuario la consola, :ref:`configurar la codificación de ésta para que sea
+  UTF-8 <vscode-utf8-term-win>`.
 + Los aspectos relacionados con el editor (tamaño de la fuente, `emulación de
   vim <https://marketplace.visualstudio.com/items?itemName=vscodevim.vim>`_).
 + Los :ref:`atajos generales de teclado <vscode-atajos>`.
@@ -764,7 +792,7 @@ extensión `Maven for Java`_:
 
 Ejecución
 ---------
-Ya hemos dicho que para ejecutar la aplicación podemos pulsar:kbd:`Ctrl`\ +
+Ya hemos dicho que para ejecutar la aplicación podemos pulsar :kbd:`Ctrl`\ +
 :kbd:`F5` (si no queremos atender a los puntos de ruptura que hayamos definido)
 o, simplemente, :kbd:`F5` si sí queremos hacerlo y depurar el programa paso a
 paso. Además, podemos instruir al |IDE| de cómo ejecutar el programa dándole

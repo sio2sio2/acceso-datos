@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Maven &#8212; documentación de Acceso a datos - rolling</title>
+    <title>4. Maven &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -57,8 +57,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '98.apendices/80.maven';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="4. Visual Studio Code" href="99.ide.html" />
-    <link rel="prev" title="2. Sistema de registros" href="10.logging.html" />
+    <link rel="next" title="5. Visual Studio Code" href="99.ide.html" />
+    <link rel="prev" title="3. Sistema de registros" href="10.logging.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -237,9 +237,10 @@
 <li class="toctree-l3"><a class="reference internal" href="01.funcional/10.flujos.html">1.3. Flujos</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="10.logging.html">2. Sistema de registros</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">3. Maven</a></li>
-<li class="toctree-l2"><a class="reference internal" href="99.ide.html">4. Visual Studio Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05.pattern.html">2. Patrones de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10.logging.html">3. Sistema de registros</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4. Maven</a></li>
+<li class="toctree-l2"><a class="reference internal" href="99.ide.html">5. Visual Studio Code</a></li>
 </ul>
 </details></li>
 </ul>
@@ -393,11 +394,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">3.1. Creación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.2. Dependencias</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">4.1. Creación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">4.2. Dependencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">4.3. Compilación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">4.4. Pruebas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">4.5. Empaquetado</a></li>
 </ul>
             </nav>
         </div>
@@ -410,7 +411,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="maven">
-<span id="id1"></span><h1><span class="section-number">3. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1><span class="section-number">4. </span>Maven<a class="headerlink" href="#maven" title="Link to this heading">#</a></h1>
 <p><em class="dfn">Maven</em> es un gestor de proyectos escritos en Java, esto es, una
 herramienta que automatiza la construcción y la gestión de aplicaciones escritas
 en <em>Java</em>, lo cual implica simplificar las tareas de creación, gestión de
@@ -424,7 +425,7 @@ comandos, por lo que este apéndice no tiene más interés qué tener una idea d
 qué es lo que subyace por debajo.</p>
 </div>
 <section id="creacion">
-<h2><span class="section-number">3.1. </span>Creación<a class="headerlink" href="#creacion" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.1. </span>Creación<a class="headerlink" href="#creacion" title="Link to this heading">#</a></h2>
 <p>Se impone una estructura estandarizada para el proyecto que podemos resumir en
 el siguiente gráfico:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>+-- src
@@ -450,7 +451,7 @@ el siguiente gráfico:</p>
 mismo de ejecutar la orden cuando le pidamos iniciar el proyecto.</p>
 </section>
 <section id="dependencias">
-<h2><span class="section-number">3.2. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.2. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h2>
 <p>También facilita el gestor la tarea de obtener las dependencias de nuestro
 proyecto descargándolas directamente del <a class="reference external" href="https://mvnrepository.com/">Repositorio General de Maven</a>. Basta
 incluirla en <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>. Por ejemplo:</p>
@@ -479,7 +480,7 @@ se calculan si necesidad de incluirlas explícitamente.</p>
 realiza automáticamente al realizar operaciones posteriores.</p>
 </section>
 <section id="compilacion">
-<h2><span class="section-number">3.3. </span>Compilación<a class="headerlink" href="#compilacion" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.3. </span>Compilación<a class="headerlink" href="#compilacion" title="Link to this heading">#</a></h2>
 <p>La compilación, esto es, la generación de <em>bytecode</em> se realiza a través del
 plugin <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin">maven-compiler-plugin</a>. Hacer la operación, en principio, es sencillo:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>compile<span class="w">                  </span><span class="c1"># Genera el bytecode.</span>
@@ -541,7 +542,7 @@ mantener compatibilidad con un <abbr title="Java Development Kit">JDK</abbr> ant
 </div>
 </section>
 <section id="pruebas">
-<h2><span class="section-number">3.4. </span>Pruebas<a class="headerlink" href="#pruebas" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.4. </span>Pruebas<a class="headerlink" href="#pruebas" title="Link to this heading">#</a></h2>
 <p>El código que prueba la aplicación debe escribirse bajo <code class="file docutils literal notranslate"><span class="pre">src/test/</span></code> con
 la misma estructura que se uso en <code class="file docutils literal notranslate"><span class="pre">src/main/</span></code>.</p>
 <p>Las subórdenes asociadas a esta fases son:</p>
@@ -551,7 +552,7 @@ la misma estructura que se uso en <code class="file docutils literal notranslate
 </div>
 </section>
 <section id="empaquetado">
-<h2><span class="section-number">3.5. </span>Empaquetado<a class="headerlink" href="#empaquetado" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">4.5. </span>Empaquetado<a class="headerlink" href="#empaquetado" title="Link to this heading">#</a></h2>
 <p>El software compilado suele distribuirse en formato <abbr title="Java ARchive">JAR</abbr>, un archivo zip que
 contiene las clases compiladas (archivos <code class="file docutils literal notranslate"><span class="pre">.class</span></code>) y algunos otros
 archivos adicionales. Para crearlo:</p>
@@ -595,7 +596,7 @@ versión igual o superior. Lo contrario, sin embargo, no sucede.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Sistema de registros</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Sistema de registros</p>
       </div>
     </a>
     <a class="right-next"
@@ -603,7 +604,7 @@ versión igual o superior. Lo contrario, sin embargo, no sucede.</p>
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">4. </span>Visual Studio Code</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Visual Studio Code</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -623,11 +624,11 @@ versión igual o superior. Lo contrario, sin embargo, no sucede.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">3.1. Creación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.2. Dependencias</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">3.3. Compilación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">3.4. Pruebas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">3.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion">4.1. Creación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">4.2. Dependencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">4.3. Compilación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">4.4. Pruebas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">4.5. Empaquetado</a></li>
 </ul>
   </nav></div>
 

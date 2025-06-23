@@ -237,9 +237,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html">1.3. Flujos</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../98.apendices/10.logging.html">2. Sistema de registros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../98.apendices/80.maven.html">3. Maven</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../98.apendices/99.ide.html">4. Visual Studio Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/05.pattern.html">2. Patrones de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/10.logging.html">3. Sistema de registros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/80.maven.html">4. Maven</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../98.apendices/99.ide.html">5. Visual Studio Code</a></li>
 </ul>
 </details></li>
 </ul>
@@ -441,7 +442,7 @@ tiempo de programación. Por ejemplo, si quisiéramos acceder a un archivo que
 sabemos situado dentro del directorio personal del usuario, necesitamos conocer
 cuál es esta ruta, para lo cual podemos consultar la <em>variable de entorno</em>
 correspondiente.</p>
-<p>Para acceder a las variables de entorno, <em>Java</em> dispone del método estático<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code> con o sin argumento.</p>
+<p>Para acceder a las variables de entorno, <em>Java</em> dispone del método estático<a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">System.getenv()</span></code> con o sin argumento.</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">System.getenv(String</span> <span class="pre">nombre)</span></code></dt><dd><p>devuelve el valor de la variable de entorno o <code class="docutils literal notranslate"><span class="pre">null</span></code> si ésta no existe:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// /home/usuario en mi sistema.</span>
@@ -456,11 +457,12 @@ correspondiente.</p>
 </div>
 </dd>
 </dl>
-<p>El <strong>problema</strong> crucial de consultar las variables de entorno es el de que el
-nombre cambia entre los distintos sistemas operativos<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> y, por tanto, si nos
-limitamos a usarlas tal como acabamos de ver, nuestra aplicación será
-dependiente del sistema en que se ejecute.</p>
-<p id="system-properties">Una alternativa es consultar las propiedades de nuestro entorno de <em>Java</em>,
+<p>El <strong>problema</strong> de consultar variables de entorno es que su existencia y sus
+nombres dependen del sistema operativo<a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, por lo que, si nos limitamos a
+usarlas como acabamos de ver, la aplicación será dependiente del
+sistema sobre el que se ejecute e incumpliremos nuestro propósito de
+independizar la aplicación de la plataforma.</p>
+<p id="system-properties">Una <em>alternativa</em> es consultar las propiedades de nuestro entorno de <em>Java</em>,
 algunas de las cuales recogen los valores de las variables de entorno:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">System.getProperty(String</span> <span class="pre">nombre_propiedad)</span></code></dt><dd><p>devuelve el valor de la propiedad que se indica en su argumento:</p>
@@ -616,6 +618,17 @@ podemos hacer construcciones como esta:</p>
 <p>Con estas herramientas sólo construimos rutas, así que tales rutas
 no tienen por qué existir.</p>
 </div>
+<div class="admonition-conclusion admonition">
+<p class="admonition-title">Conclusión</p>
+<p>Debemos siempre independizar el código de la plataforma subyacente para lo
+cual debemos:</p>
+<ol class="loweralpha simple">
+<li><p>Construir las rutas con las herramientas proporcionadas por <em>Java</em>.</p></li>
+<li><p>Intentar utilizar las <a class="reference internal" href="#system-properties"><span class="std std-ref">propiedades del sistema</span></a> para resolver las particularidades.</p></li>
+<li><p>En caso de no que no baste con ellas será necesario obtener la plataforma<a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> y crear código condicional que implemente la solución dependiendo
+cuál sea.</p></li>
+</ol>
+</div>
 </section>
 <section id="gestion">
 <span id="file-files"></span><h2><span class="section-number">1.1.3. </span>Gestión<a class="headerlink" href="#gestion" title="Link to this heading">#</a></h2>
@@ -677,15 +690,16 @@ dentro de él. Los dos últimos argumentos son opcionales.</p>
 </section>
 <section id="manipulacion">
 <h3><span class="section-number">1.1.3.2. </span>Manipulación<a class="headerlink" href="#manipulacion" title="Link to this heading">#</a></h3>
-<p>Por manipulación entendemos, simplemente, la copia y traslado de archivos o el
-cambio de sus propiedades (permisos, propietarios, etc) y no la alteración del
-contenido, que reservamos para el <a class="reference internal" href="02.manipulacion.html#manipulacion-archivos"><span class="std std-ref">próximo epígrafe sobre manipulación</span></a>.</p>
+<p>Por <em class="dfn">manipulación</em> entendemos, simplemente, la copia y traslado de archivos
+o el cambio de sus propiedades (permisos, propietarios, etc) y no la alteración
+del contenido, que reservamos para el <a class="reference internal" href="02.manipulacion.html#manipulacion-archivos"><span class="std std-ref">próximo epígrafe sobre manipulación
+de contenidos</span></a>.</p>
 <p>Para <strong>crear</strong> un archivo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Files</span><span class="p">.</span><span class="na">createFile</span><span class="p">(</span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>lo que creará el archivo vacío <code class="file docutils literal notranslate"><span class="pre">caca.txt</span></code> dentro de nuestro directorio
-natural con los permisos que determine la máscara del sistema. Podríamos haber
+personal con los permisos que determine la máscara del sistema. Podríamos haber
 definido otros permisos, pero para ello tendríamos que haber incluido argumentos
 adicionales (véase <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/attribute/FileAttribute.html">FileAttribute</a>), pero no
 entraremos en tanto detalle. También existe <code class="docutils literal notranslate"><span class="pre">Files.createDirectory(Path</span> <span class="pre">dir)</span></code>
@@ -693,9 +707,9 @@ para crear un directorio.</p>
 <p>Podemos también copiar, mover o borrar archivos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">));</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">caca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">home</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
-<span class="n">Files</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Copia en /tmp/kk.txt</span>
-<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Error, el destino ya existe.</span>
-<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;caca.txt&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">StandardCopyOption</span><span class="p">.</span><span class="na">REPLACE_EXISTING</span><span class="p">);</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;kk.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Copia en /tmp/kk.txt</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;kk.txt&quot;</span><span class="p">));</span><span class="w"> </span><span class="c1">// Error, el destino ya existe.</span>
+<span class="n">Files</span><span class="p">.</span><span class="na">move</span><span class="p">(</span><span class="n">caca</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="s">&quot;kk.txt&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">StandardCopyOption</span><span class="p">.</span><span class="na">REPLACE_EXISTING</span><span class="p">);</span>
 <span class="n">Files</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">caca</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -711,7 +725,8 @@ contenido, pero los dejamos para el siguiente epígrafe.</p>
 <p class="admonition-title">Prudencia</p>
 <p>A diferencia de lo que ocurre al usar en una terminal las órdenes
 <a class="reference external" href="https://sio2sio2.github.io/doc-linux/02.conbas/02.informacion/03.ficheros.html#cp" title="(en Linuxnomicón versión rolling)"><span class="xref std std-ref">cp</span></a> o <a class="reference external" href="https://sio2sio2.github.io/doc-linux/02.conbas/02.informacion/03.ficheros.html#mv" title="(en Linuxnomicón versión rolling)"><span class="xref std std-ref">mv</span></a>, no basta con poner el directorio
-de destino, cuando queremos conservar el nombre original.</p>
+de destino, aunque queramos conservar el nombre original: siempre debe
+escribirse la ruta completa, incluido el nombre del archivo de destino.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
@@ -721,17 +736,22 @@ permisos), así que en la programación deberemos estar atentos a tratarlas.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Es probable que a lo largo del texto se le escape al redactor el término
 <em>función</em> al referir un método estático.</p>
 </aside>
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>De hecho, para conseguir lo mismo en <em>Windows</em> deberíamos haber hecho:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HomeDrive&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;HomePath&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Por ejemplo, <code class="docutils literal notranslate"><span class="pre">System.getProperty(&quot;os.name&quot;)</span></code> devuelve el nombre del
+sistema operativo.</p>
 </aside>
 </aside>
 </section>

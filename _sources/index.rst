@@ -18,12 +18,13 @@ Acceso a datos
 
 .. rubric:: Normativa específica.
 
-* `Real Decreto 450/2010`_, que establece el título.
-* `Real Decreto 405/2023`_, que modifica el anterior actualizando sus módulos.
+* `Real Decreto 450/2010`_, que establece el título y al cual actualiza el
+  currículo de sus módulos el `Real Decreto 405/2023`_.
 * `Real Decreto 500/2024`_, que compatibiliza el currículo de los ciclos
   formativos de grado superior con el `Real Decreto 659/2023`_ de 18 de julio, que
   desarrolla la `Ley Orgánica 3/2022`_.
-* `Orden de 16 de junio de 2011`_, que transpone en la Comunidad Autónoma de Andalucía el Real Decreto.
+* `Orden de 16 de junio de 2011`_, que transpone en la Comunidad Autónoma de
+  Andalucía el Real Decreto.
 
 .. rubric:: Contenidos del curso
 

@@ -48,14 +48,15 @@ Para acceder a las variables de entorno, *Java* dispone del método estático\
       Map<String, String> entorno = System.getenv();
       entorno.get("HOME");  // /home/usuario, de nuevo.
 
-El **problema** crucial de consultar las variables de entorno es el de que el
-nombre cambia entre los distintos sistemas operativos\ [#]_ y, por tanto, si nos
-limitamos a usarlas tal como acabamos de ver, nuestra aplicación será
-dependiente del sistema en que se ejecute.
+El **problema** de consultar variables de entorno es que su existencia y sus
+nombres dependen del sistema operativo\ [#]_, por lo que, si nos limitamos a
+usarlas como acabamos de ver, la aplicación será dependiente del
+sistema sobre el que se ejecute e incumpliremos nuestro propósito de
+independizar la aplicación de la plataforma.
 
 .. _system-properties:
 
-Una alternativa es consultar las propiedades de nuestro entorno de *Java*,
+Una *alternativa* es consultar las propiedades de nuestro entorno de *Java*,
 algunas de las cuales recogen los valores de las variables de entorno:
 
 ``System.getProperty(String nombre_propiedad)``
@@ -240,6 +241,18 @@ podemos hacer construcciones como esta:
 .. attention:: Con estas herramientas sólo construimos rutas, así que tales rutas
    no tienen por qué existir.
 
+.. admonition:: Conclusión
+
+   Debemos siempre independizar el código de la plataforma subyacente para lo
+   cual debemos:
+
+   a. Construir las rutas con las herramientas proporcionadas por *Java*.
+   #. Intentar utilizar las :ref:`propiedades del sistema
+      <system-properties>` para resolver las particularidades.
+   #. En caso de no que no baste con ellas será necesario obtener la plataforma\
+      [#]_ y crear código condicional que implemente la solución dependiendo
+      cuál sea.
+
 .. _file.files:
 
 Gestión
@@ -321,10 +334,10 @@ dentro de él. Los dos últimos argumentos son opcionales.
 
 Manipulación
 ------------
-Por manipulación entendemos, simplemente, la copia y traslado de archivos o el
-cambio de sus propiedades (permisos, propietarios, etc) y no la alteración del
-contenido, que reservamos para el :ref:`próximo epígrafe sobre manipulación
-<manipulacion-archivos>`.
+Por :dfn:`manipulación` entendemos, simplemente, la copia y traslado de archivos
+o el cambio de sus propiedades (permisos, propietarios, etc) y no la alteración
+del contenido, que reservamos para el :ref:`próximo epígrafe sobre manipulación
+de contenidos <manipulacion-archivos>`.
 
 Para **crear** un archivo:
 
@@ -333,7 +346,7 @@ Para **crear** un archivo:
    Files.createFile(home.resolve("caca.txt"));
 
 lo que creará el archivo vacío :file:`caca.txt` dentro de nuestro directorio
-natural con los permisos que determine la máscara del sistema. Podríamos haber
+personal con los permisos que determine la máscara del sistema. Podríamos haber
 definido otros permisos, pero para ello tendríamos que haber incluido argumentos
 adicionales (véase :java-nio:`FileAttribute <attribute/FileAttribute>`), pero no
 entraremos en tanto detalle. También existe ``Files.createDirectory(Path dir)``
@@ -345,9 +358,9 @@ Podemos también copiar, mover o borrar archivos:
 
    Path tmp = Path.of(System.getProperty("java.io.tmpdir"));
    Path caca = home.resolve("caca.txt");
-   Files.copy(caca, tmp.resolve("caca.txt")); // Copia en /tmp/kk.txt
-   Files.move(caca, tmp.resolve("caca.txt")); // Error, el destino ya existe.
-   Files.move(caca, tmp.resolve("caca.txt"), StandardCopyOption.REPLACE_EXISTING);
+   Files.copy(caca, tmp.resolve("kk.txt")); // Copia en /tmp/kk.txt
+   Files.move(caca, tmp.resolve("kk.txt")); // Error, el destino ya existe.
+   Files.move(caca, tmp.resolve("kk.txt"), StandardCopyOption.REPLACE_EXISTING);
    Files.delete(caca);
 
 .. tip:: También se pueden copiar flujos (:java-io:`InputStream <InputStream>`)
@@ -360,7 +373,8 @@ contenido, pero los dejamos para el siguiente epígrafe.
 
 .. caution:: A diferencia de lo que ocurre al usar en una terminal las órdenes
    :ref:`cp <linux:cp>` o :ref:`mv <linux:mv>`, no basta con poner el directorio
-   de destino, cuando queremos conservar el nombre original.
+   de destino, aunque queramos conservar el nombre original: siempre debe
+   escribirse la ruta completa, incluido el nombre del archivo de destino.
 
 .. warning:: Por supuesto, estas acciones pueden generar excepciones (p.ej. al
    intentar crear un archivo dentro de un directorio en el que no tenemos
@@ -376,6 +390,9 @@ contenido, pero los dejamos para el siguiente epígrafe.
    .. code-block:: java
 
       System.getenv("HomeDrive") + System.getenv("HomePath");
+
+.. [#] Por ejemplo, ``System.getProperty("os.name")`` devuelve el nombre del
+   sistema operativo.
 
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |MIME| replace:: :abbr:`MIME (Multipurpose Internet Mail Extensions)`

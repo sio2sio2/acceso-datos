@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. Sistema de registros &#8212; documentación de Acceso a datos - rolling</title>
+    <title>3. Sistema de registros &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -57,8 +57,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '98.apendices/10.logging';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="3. Maven" href="80.maven.html" />
-    <link rel="prev" title="1.3. Flujos" href="01.funcional/10.flujos.html" />
+    <link rel="next" title="4. Maven" href="80.maven.html" />
+    <link rel="prev" title="2. Patrones de diseño" href="05.pattern.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -237,9 +237,10 @@
 <li class="toctree-l3"><a class="reference internal" href="01.funcional/10.flujos.html">1.3. Flujos</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">2. Sistema de registros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="80.maven.html">3. Maven</a></li>
-<li class="toctree-l2"><a class="reference internal" href="99.ide.html">4. Visual Studio Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05.pattern.html">2. Patrones de diseño</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3. Sistema de registros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="80.maven.html">4. Maven</a></li>
+<li class="toctree-l2"><a class="reference internal" href="99.ide.html">5. Visual Studio Code</a></li>
 </ul>
 </details></li>
 </ul>
@@ -393,20 +394,20 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">2.1. Preliminares</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">2.1.1. Dependencias</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clasificacion-de-mensajes">2.1.2. Clasificación de mensajes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">3.1. Preliminares</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.1.1. Dependencias</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clasificacion-de-mensajes">3.1.2. Clasificación de mensajes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#envio-de-mensajes">2.2. Envío de mensajes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-adicional">2.3. Configuración adicional</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estatica">2.3.1. Estática</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dinamica">2.3.2. Dinámica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#envio-de-mensajes">3.2. Envío de mensajes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-adicional">3.3. Configuración adicional</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estatica">3.3.1. Estática</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dinamica">3.3.2. Dinámica</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particularidades">2.4. Particularidades</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtrado-por-severidad">2.4.1. Filtrado por severidad</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#puenteo-de-librerias">2.4.2. Puenteo de librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particularidades">3.4. Particularidades</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtrado-por-severidad">3.4.1. Filtrado por severidad</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#puenteo-de-librerias">3.4.2. Puenteo de librerías</a></li>
 </ul>
 </li>
 </ul>
@@ -421,7 +422,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="sistema-de-registros">
-<span id="logging"></span><h1><span class="section-number">2. </span>Sistema de registros<a class="headerlink" href="#sistema-de-registros" title="Link to this heading">#</a></h1>
+<span id="logging"></span><h1><span class="section-number">3. </span>Sistema de registros<a class="headerlink" href="#sistema-de-registros" title="Link to this heading">#</a></h1>
 <p>Un aspecto fundamental en cualquier aplicación es que incluya un sistema sólido
 de registros (<em>logs</em> como se dice habitualmente en inglés), a fin de que el
 usuario pueda comprobar su funcionamiento. Téngase presente que, además de
@@ -490,11 +491,11 @@ Java</a> incluido en las
 tomado inicialmente como base.</p>
 </div>
 <section id="preliminares">
-<h2><span class="section-number">2.1. </span>Preliminares<a class="headerlink" href="#preliminares" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.1. </span>Preliminares<a class="headerlink" href="#preliminares" title="Link to this heading">#</a></h2>
 <p>Antes de empezar de lleno conviene saber cómo empezar a usar el sistema de
 registros.</p>
 <section id="dependencias">
-<h3><span class="section-number">2.1.1. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.1.1. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h3>
 <p>En nuestro proyecto deberemos enlazar al menos con:</p>
 <ul class="simple">
 <li><p>La interfaz de la especificación de <abbr title="Simple Logging Facade For Java">SLF4J</abbr>, esto es, <a class="reference external" href="https://mvnrepository.com/artifact/org.slf4j/slf4j-api">slf4j-api</a>.</p></li>
@@ -544,7 +545,7 @@ necesitan ninguna vinculación adicional.</p></li>
 </div>
 </section>
 <section id="clasificacion-de-mensajes">
-<span id="loglevel"></span><h3><span class="section-number">2.1.2. </span>Clasificación de mensajes<a class="headerlink" href="#clasificacion-de-mensajes" title="Link to this heading">#</a></h3>
+<span id="loglevel"></span><h3><span class="section-number">3.1.2. </span>Clasificación de mensajes<a class="headerlink" href="#clasificacion-de-mensajes" title="Link to this heading">#</a></h3>
 <p>En estos sistemas los mensajes se envían para su registro clasificándolos con
 dos criterios distintos:</p>
 <ul>
@@ -584,7 +585,7 @@ muestra mensajes a partir del nivel <em>DEBUG</em>.</p>
 </section>
 </section>
 <section id="envio-de-mensajes">
-<span id="logging-uso"></span><h2><span class="section-number">2.2. </span>Envío de mensajes<a class="headerlink" href="#envio-de-mensajes" title="Link to this heading">#</a></h2>
+<span id="logging-uso"></span><h2><span class="section-number">3.2. </span>Envío de mensajes<a class="headerlink" href="#envio-de-mensajes" title="Link to this heading">#</a></h2>
 <p>Para enviar mensajes lo primero es obtener una instancia <a class="extlink-java-slf4j reference external" href="https://www.slf4j.org/api/org/slf4j/Logger.html">Logger</a> a
 partir de <a class="extlink-java-slf4j reference external" href="https://www.slf4j.org/api/org/slf4j/LoggerFactory.html">LoggerFactory</a>. La convención es que se cree una
 instancia por clase y pasar como parámetro la propia clase para identificar lo
@@ -696,7 +697,7 @@ evaluación gratuita de expresiones costosas era usar condiciones:</p>
 </div>
 </section>
 <section id="configuracion-adicional">
-<span id="logging-conf"></span><h2><span class="section-number">2.3. </span>Configuración adicional<a class="headerlink" href="#configuracion-adicional" title="Link to this heading">#</a></h2>
+<span id="logging-conf"></span><h2><span class="section-number">3.3. </span>Configuración adicional<a class="headerlink" href="#configuracion-adicional" title="Link to this heading">#</a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p><abbr title="Simple Logging Facade For Java">SLF4J</abbr> se limita a especificar el envío de mensajes, por lo que
@@ -730,7 +731,7 @@ registran en el soporte, es <strong>DEBUG</strong>.</p></li>
 primeras consisten en leer un archivo, mientras que las segundas permiten
 definir la configuración dentro del código en tiempo de ejecución.</p>
 <section id="estatica">
-<h3><span class="section-number">2.3.1. </span>Estática<a class="headerlink" href="#estatica" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.3.1. </span>Estática<a class="headerlink" href="#estatica" title="Link to this heading">#</a></h3>
 <p>La configuración estática se realiza nativamente a través de un archivo <abbr title="eXtensible Markup Language">XML</abbr> o
 Groovy. Debe colocarse en el directorio <code class="file docutils literal notranslate"><span class="pre">resources</span></code> (en un proyecto
 Maven o Gradle) y denominarse <cite>logback.xml</cite>.</p>
@@ -928,7 +929,7 @@ a <code class="docutils literal notranslate"><span class="pre">false</span></cod
 </ul>
 </section>
 <section id="dinamica">
-<h3><span class="section-number">2.3.2. </span>Dinámica<a class="headerlink" href="#dinamica" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.3.2. </span>Dinámica<a class="headerlink" href="#dinamica" title="Link to this heading">#</a></h3>
 <p>La configuración estática que acabamos de ver permite configurar el sistema de
 registros a priori. Sin embargo, es posible que deseemos realizar alguna
 configuración adicional en tiempo de ejecución debido, por ejemplo, a que
@@ -1082,12 +1083,12 @@ particular:</p>
 </section>
 </section>
 <section id="particularidades">
-<h2><span class="section-number">2.4. </span>Particularidades<a class="headerlink" href="#particularidades" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.4. </span>Particularidades<a class="headerlink" href="#particularidades" title="Link to this heading">#</a></h2>
 <p>Con lo tratado hasta aquí, podemos hacer una configuración sólida del sistema de
 registros de nuestra aplicación. Hay, sin embargo, algunas particularidades que
 en algún momento nos pueden resultar interesantes.</p>
 <section id="filtrado-por-severidad">
-<h3><span class="section-number">2.4.1. </span>Filtrado por severidad<a class="headerlink" href="#filtrado-por-severidad" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.4.1. </span>Filtrado por severidad<a class="headerlink" href="#filtrado-por-severidad" title="Link to this heading">#</a></h3>
 <p>En ocasiones nos interesa escoger el soporte en que se registrarán los mensajes
 dependiendo de su gravedad. Por ejemplo, separar en dos archivos los registros:
 un archivo para mensajes de error (<em>ERROR</em> y <em>WARN</em>) y otro para el resto. Esto
@@ -1145,7 +1146,7 @@ filtro y añadirlo al <em>appender</em>:</p>
 </div>
 </section>
 <section id="puenteo-de-librerias">
-<h3><span class="section-number">2.4.2. </span>Puenteo de librerías<a class="headerlink" href="#puenteo-de-librerias" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.4.2. </span>Puenteo de librerías<a class="headerlink" href="#puenteo-de-librerias" title="Link to this heading">#</a></h3>
 <p>Un problema muy recurrente con el que nos podemos encontrar se da cuando una
 librería de terceros que queremos integrar en nuestra aplicación, usa una
 implementación distinta (p.e. <a class="reference external" href="https://logging.apache.org/log4j/2.x/index.html">Log4J</a> o <abbr title="java.util.logging">JUL</abbr>) a la que hemos escogido nosotros
@@ -1262,12 +1263,12 @@ Marco Behler</a></p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="01.funcional/10.flujos.html"
+       href="05.pattern.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">1.3. </span>Flujos</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Patrones de diseño</p>
       </div>
     </a>
     <a class="right-next"
@@ -1275,7 +1276,7 @@ Marco Behler</a></p>
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">3. </span>Maven</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Maven</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1295,20 +1296,20 @@ Marco Behler</a></p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">2.1. Preliminares</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">2.1.1. Dependencias</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clasificacion-de-mensajes">2.1.2. Clasificación de mensajes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminares">3.1. Preliminares</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">3.1.1. Dependencias</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clasificacion-de-mensajes">3.1.2. Clasificación de mensajes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#envio-de-mensajes">2.2. Envío de mensajes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-adicional">2.3. Configuración adicional</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estatica">2.3.1. Estática</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dinamica">2.3.2. Dinámica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#envio-de-mensajes">3.2. Envío de mensajes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-adicional">3.3. Configuración adicional</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estatica">3.3.1. Estática</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dinamica">3.3.2. Dinámica</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particularidades">2.4. Particularidades</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtrado-por-severidad">2.4.1. Filtrado por severidad</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#puenteo-de-librerias">2.4.2. Puenteo de librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particularidades">3.4. Particularidades</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtrado-por-severidad">3.4.1. Filtrado por severidad</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#puenteo-de-librerias">3.4.2. Puenteo de librerías</a></li>
 </ul>
 </li>
 </ul>

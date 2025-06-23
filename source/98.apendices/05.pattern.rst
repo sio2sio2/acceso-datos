@@ -1,0 +1,114 @@
+.. _design-patterns:
+
+Patrones de diseño
+******************
+Un :dfn:`patron de diseño` es una plantilla de codificación que se ha demostrado
+eficaz para resolver un problema habitual. Es útil conocerlos, porque si en
+nuestro programa nos enfrentamos a un problema que ya ha sido resuelto mediante
+uno de estos patrones, podremos ponerlo en práctica.
+
+En este apéndice, explicaremos algunos que 
+
+.. _singleton-pattern:
+
+Singleton
+=========
+Es un patrón que garantiza que de una clase sólo pueda existir una única
+instancia.
+
+Puede sernos muy útil,por ejemplo, si creamos una aplicación constituida por
+diversos paquetes y queremos que la configuración esté disponible en todos ellos
+sin tener que pasar constantemente los parámetros de configuración.
+
+Caso simple
+-----------
+En Java se implementa así:
+
+.. literalinclude:: files/Singleton.java
+   :language: java
+   :start-at: public class
+
+Es decir, básicamente ocultamos el constructor para que la instancia sólo sea
+accesible a través del método estático ``.getInstance``. De este modo, la única
+forma de acceder al constructor es a través de ``.initialize``, pero sólo
+podremos inicializar una vez.
+
+.. tip:: Una variante de este patrón es que queramos crear no una instancia,
+   sino varias, dependiendo del valor de uno de los argumentos. En ese caso, el
+   atributo ``instance`` se puede convertir en un mapa cuyas claves son
+   esos valores.
+
+Programas multihilo
+-------------------
+En caso de que nuestro programa sea multihilo entonces tendremos que complicar
+un poco el código:
+
+.. literalinclude:: files/Singleton-synchro.java
+   :language: java
+   :start-at: public class
+
+
+.. _factory-pattern:
+
+*Factory*
+=========
+El :dfn:`patrón Factory` es un patrón utilizado para creación de objetos que se
+utiliza para poder escoger en tiempo de ejecución qué objeto crear entre varios
+que cumplen con una misma interfaz (o pertenecen a subclases de una misma
+clase).
+
+Implementación
+--------------
+Para ilustrarlo imaginemos que en nuestra aplicación necesitamos traducir datos
+a distintos formatos. En una traducción básicamente hay dos operaciones:
+
+* *Leer*, que consiste en convertir la información que está almacenada en un
+  determinado formato en datos internos del programa.
+* *Escribir*, que consiste transformar los datos internos al formato
+  especificado.
+
+Por tanto, queramos traducir a lo que queramos traducir, la clase reponsable
+de la traducción tendrá que implementar la siguiente interfaz:
+
+.. literalinclude:: files/Traductor.java
+   :language: java
+   :class: toggle
+   :start-at: public interface
+
+en la que hemos supuesto que los datos los almacenamos en memoria en forma de
+una lista. Hemos considerado una lista del ``Object`` genérico, aunque en un
+ejemplo real concreto la lista será de alguna clase que hayamos definido. El
+caso es que ahora definiremos diferentes clases las cuales implementarán esta
+interfaz para distintos formatos (:ref:`XML <xml>`, :ref:`CSV <csv>`, :ref:`JSON
+<json>`, etc.). Imaginemos que las clases se denominan ``TXml``, ``TCvs``,
+``TJson``, etc.
+
+Con todo esto, podemos poner en práctica este patrón así:
+
+.. literalinclude:: files/TraductorFactory.java
+   :language: java
+   :start-at: public class
+
+En definitiva, la clase tiene un método estático que se limita a devolver el
+objeto de traducción apropiado según sea el formato. En el código principal no
+habrá más que hacer lo siguiente:
+
+.. code-block:: java
+
+   // El formato se proporcionará de alguna manera...
+   String formato = "json";
+
+   Traductor traductor = TraductorFactory.crearTraductor(formato);
+
+   // Suponiendo que en "data" estén los datos, esto generará una salida JSON.
+   traductor.escribir(System.out, data);
+
+Obsérvese que el código de ``TraductorFactory`` depende de qué clases
+traductoras hallamos creado realmente; y, si se crea una nueva (o se elimina una
+ya creada por algún motivo), habrá que editar la clase para que se refleje este
+cambio. El siguiente apartado complica un poco la implementación, pero permite
+escribir una clase sin esta dependencia, de manera que podemos reaprovecharla,
+sea cual sea el caso.
+
+Automatización
+--------------

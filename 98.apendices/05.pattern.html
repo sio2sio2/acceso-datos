@@ -522,12 +522,15 @@ especificado.</p></li>
 </ul>
 <p>Por tanto, queramos traducir a lo que queramos traducir, la clase reponsable
 de la traducción tendrá que implementar la siguiente interfaz:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Interface Traductor</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Posiblemente sea una lista de un tipo determinado, no el genérico Object.</span>
 <span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">leer</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">;</span>
 <span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">escribir</span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
+</div>
 </div>
 <p>en la que hemos supuesto que los datos los almacenamos en memoria en forma de
 una lista. Hemos considerado una lista del <code class="docutils literal notranslate"><span class="pre">Object</span></code> genérico, aunque en un
@@ -569,7 +572,7 @@ habrá más que hacer lo siguiente:</p>
 </pre></div>
 </div>
 <p>Obsérvese que el código de <code class="docutils literal notranslate"><span class="pre">TraductorFactory</span></code> depende de qué clases
-traductoras hallamos creado realmente; y, si se crea una nueva (o se elimina una
+traductoras hayamos creado realmente; y, si se crea una nueva (o se elimina una
 ya creada por algún motivo), habrá que editar la clase para que se refleje este
 cambio. El siguiente apartado complica un poco la implementación, pero permite
 escribir una clase sin esta dependencia, de manera que podemos reaprovecharla,
@@ -577,6 +580,178 @@ sea cual sea el caso.</p>
 </section>
 <section id="automatizacion">
 <h3><span class="section-number">2.2.2. </span>Automatización<a class="headerlink" href="#automatizacion" title="Link to this heading">#</a></h3>
+<p>La idea es evitar que tengamos que escribir y reescribir la clase que
+implementa el patrón Factory constantemente; y además crear un código que nos
+sirva en cualquier aplicación:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Clase Factory</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Factory</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">Factory</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;alias&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * Mapa cuyas claves son los nombres asociados a una clase</span>
+<span class="cm">     * que implementa la interfaz {@link I} y cuyos valores son las propias clases</span>
+<span class="cm">     * que implementan dicha interfaz.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">classes</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Escanea un paquete para obtener clases.</span>
+<span class="cm">     * @param &lt;I&gt; El tipo de la interfaz.</span>
+<span class="cm">     * @param packageName El nombre del paquete.</span>
+<span class="cm">     * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Factory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">packageName</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Reflections</span><span class="w"> </span><span class="n">reflections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Reflections</span><span class="p">(</span><span class="n">packageName</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reflections</span><span class="p">.</span><span class="na">getSubTypesOf</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">flatMap</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">getAliases</span><span class="p">(</span><span class="n">clazz</span><span class="p">).</span><span class="na">stream</span><span class="p">().</span><span class="na">map</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AbstractMap</span><span class="p">.</span><span class="na">SimpleEntry</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span><span class="w"> </span><span class="n">clazz</span><span class="p">)))</span>
+<span class="w">            </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span>
+<span class="w">                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getKey</span><span class="p">,</span>
+<span class="w">                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getValue</span><span class="p">,</span>
+<span class="w">                </span><span class="p">(</span><span class="n">existing</span><span class="p">,</span><span class="w"> </span><span class="n">replacement</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">existing</span><span class="p">,</span>
+<span class="w">                </span><span class="n">HashMap</span><span class="p">::</span><span class="k">new</span>
+<span class="w">            </span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Lista los nombres por los que se puede referir una clase (el propio nombre</span>
+<span class="cm">     * de la clase más todos los que contenga el atributo alias)</span>
+<span class="cm">     * @param clazz La clase que se inspecciona</span>
+<span class="cm">     * @return El listado de clases.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getAliases</span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">clazz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">aliases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">clazz</span><span class="p">.</span><span class="na">getSimpleName</span><span class="p">()));</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Field</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clazz</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="n">alias</span><span class="p">);</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">field</span><span class="p">.</span><span class="na">canAccess</span><span class="p">(</span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="n">field</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">field</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="p">((</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">value</span><span class="p">).</span><span class="na">isBlank</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">aliases</span><span class="p">.</span><span class="na">add</span><span class="p">((</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">aliases</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">((</span><span class="n">String</span><span class="o">[]</span><span class="p">)</span><span class="w"> </span><span class="n">value</span><span class="p">));</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">NoSuchFieldException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IllegalAccessException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">aliases</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">alias</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">alias</span><span class="p">.</span><span class="na">trim</span><span class="p">().</span><span class="na">toLowerCase</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">!</span><span class="n">alias</span><span class="p">.</span><span class="na">isBlank</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">distinct</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">toList</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene el traductor.</span>
+<span class="cm">     * @param formato El formato en el que se quiere traducir.</span>
+<span class="cm">     * @return El objeto traductor.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">&quot;null&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="nf">getObject</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">formato</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">formato</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">());</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">formatos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="na">keySet</span><span class="p">().</span><span class="na">stream</span><span class="p">().</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">joining</span><span class="p">(</span><span class="s">&quot;\n - &quot;</span><span class="p">));</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;&#39;{}&#39;: Formato desconocido. Disponibles:\n - {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">formato</span><span class="p">,</span><span class="w"> </span><span class="n">formatos</span><span class="p">);</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">clazz</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">().</span><span class="na">newInstance</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InstantiationException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IllegalAccessException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">InvocationTargetException</span>
+<span class="w">                </span><span class="o">|</span><span class="w"> </span><span class="n">NoSuchMethodException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">SecurityException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene un mapa que asocia cada clases con su lista de alias a partir del mapa que relaciona cada alias con su clase corrspondiente</span>
+<span class="cm">     * @param &lt;T&gt; El tipo de la interfaz</span>
+<span class="cm">     * @return Otro mapa en que cada clase está relacionada con todos los alias que tiene.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">[]&gt;</span><span class="w"> </span><span class="nf">getAliasesByClass</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="na">entrySet</span><span class="p">().</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">groupingBy</span><span class="p">(</span>
+<span class="w">                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getValue</span><span class="p">,</span>
+<span class="w">                </span><span class="n">Collectors</span><span class="p">.</span><span class="na">mapping</span><span class="p">(</span>
+<span class="w">                    </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getKey</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">Collectors</span><span class="p">.</span><span class="na">collectingAndThen</span><span class="p">(</span>
+<span class="w">                        </span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">(),</span>
+<span class="w">                        </span><span class="n">list</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="n">Collections</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+<span class="w">                            </span><span class="k">return</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">toArray</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="p">::</span><span class="k">new</span><span class="p">);</span>
+<span class="w">                        </span><span class="p">}</span>
+<span class="w">                    </span><span class="p">)</span>
+<span class="w">                </span><span class="p">)</span>
+<span class="w">            </span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">getClasses</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">classes</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>La principal diferencia (además de ser mucho más complicado que el anterior) es
+que esta clase sí se instancia con el constructor <code class="docutils literal notranslate"><span class="pre">Factory(String</span> <span class="pre">packageName,</span>
+<span class="pre">Class&lt;I&gt;</span> <span class="pre">interfaceClass)</span></code> para indicar en qué paquete se encuentran las clases
+que implementan la interfaz y cuál es esta. En el ejemplo de nuestros
+traductores:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Factory</span><span class="o">&lt;</span><span class="n">Traductor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">trFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Factory</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="s">&quot;edu.acceso.ejemplo.traductor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Traductor</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>La creación de este objeto <em>Factory</em> provoca que gracias a la reflexión se
+analice el paquete y se localicen las clases que implementan la interfaz
+(<code class="docutils literal notranslate"><span class="pre">Traductor</span></code> en este caso). El objetivo es relacionar estas clases con su
+nombre y, en su caso, con los nombres alternativos contenidos en el atributo
+<code class="docutils literal notranslate"><span class="pre">aliases</span></code>. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TYaml</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Traductor</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">// También podría ser String si sólo hay una alternativa</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;yml&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;yaml&quot;</span><span class="p">};</span>
+
+<span class="w">   </span><span class="c1">// Implementación de la traducción para YAML...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Esta definición relacionaría las cadenas «<cite>tyaml</cite>», «<cite>yml</cite>» y «<cite>yaml</cite>» con la
+clase <code class="docutils literal notranslate"><span class="pre">TYaml</span></code>, por lo que, cuando quisiéramos crear el objeto adecuado de
+traducción, nos bastaría con hacer:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yml&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Por ejemplo.</span>
+
+<span class="n">Factory</span><span class="o">&lt;</span><span class="n">Traductor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">trFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Factory</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="s">&quot;edu.acceso.ejemplo.traductor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Traductor</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Traductor</span><span class="w"> </span><span class="n">traductor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">trFactory</span><span class="p">.</span><span class="na">getObject</span><span class="p">(</span><span class="n">formato</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>La clase tiene, además, dos métodos adicionales que sirven básicamente para
+brindar información:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">getClasses()</span></code></dt><dd><p>que devuelve un mapa en que las claves son las cadenas y los valores las
+clases correspondientes.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">getAliasesByClass()</span></code></dt><dd><p>que devuelve un mapa en que cada clave es una clase y los valores un array
+con todos los nombres con los que está relacionada.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>El ćodigo tiene una limitación: el constructor de las clases no
+puede tener argumentos. En caso de que debiera tenerlos, no obstante, es
+fácil soslayar la limitación: bastaría con incluir en la interfaz un método
+inicializador. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Foobar</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="w"> </span><span class="cm">/* Los argumentos que sea */</span><span class="w"> </span><span class="p">);</span>
+<span class="w">   </span><span class="c1">// Resto de métodos que definen la interfaz.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </section>
 </section>
 </section>

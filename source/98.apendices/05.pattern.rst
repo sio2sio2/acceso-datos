@@ -73,6 +73,7 @@ de la traducción tendrá que implementar la siguiente interfaz:
 .. literalinclude:: files/Traductor.java
    :language: java
    :class: toggle
+   :caption: Interface Traductor
    :start-at: public interface
 
 en la que hemos supuesto que los datos los almacenamos en memoria en forma de
@@ -104,7 +105,7 @@ habrá más que hacer lo siguiente:
    traductor.escribir(System.out, data);
 
 Obsérvese que el código de ``TraductorFactory`` depende de qué clases
-traductoras hallamos creado realmente; y, si se crea una nueva (o se elimina una
+traductoras hayamos creado realmente; y, si se crea una nueva (o se elimina una
 ya creada por algún motivo), habrá que editar la clase para que se refleje este
 cambio. El siguiente apartado complica un poco la implementación, pero permite
 escribir una clase sin esta dependencia, de manera que podemos reaprovecharla,
@@ -112,3 +113,73 @@ sea cual sea el caso.
 
 Automatización
 --------------
+La idea es evitar que tengamos que escribir y reescribir la clase que
+implementa el patrón Factory constantemente; y además crear un código que nos
+sirva en cualquier aplicación:
+
+.. literalinclude:: files/Factory.java
+   :language: java
+   :class: toggle
+   :caption: Clase Factory
+   :start-at: public class
+
+La principal diferencia (además de ser mucho más complicado que el anterior) es
+que esta clase sí se instancia con el constructor ``Factory(String packageName,
+Class<I> interfaceClass)`` para indicar en qué paquete se encuentran las clases
+que implementan la interfaz y cuál es esta. En el ejemplo de nuestros
+traductores:
+
+.. code-block:: java
+
+   Factory<Traductor> trFactory = new Factory<>("edu.acceso.ejemplo.traductor", Traductor.class);
+
+La creación de este objeto *Factory* provoca que gracias a la reflexión se
+analice el paquete y se localicen las clases que implementan la interfaz
+(``Traductor`` en este caso). El objetivo es relacionar estas clases con su
+nombre y, en su caso, con los nombres alternativos contenidos en el atributo
+``aliases``. Por ejemplo:
+
+.. code-block:: java
+
+   public class TYaml implements Traductor {
+      // También podría ser String si sólo hay una alternativa
+      private static final String[] = {"yml", "yaml"};
+
+      // Implementación de la traducción para YAML...
+   }
+
+
+Esta definición relacionaría las cadenas "`tyaml`", "`yml`" y "`yaml`" con la
+clase ``TYaml``, por lo que, cuando quisiéramos crear el objeto adecuado de
+traducción, nos bastaría con hacer:
+
+.. code-block:: java
+
+   String formato = "yml"; // Por ejemplo.
+
+   Factory<Traductor> trFactory = new Factory<>("edu.acceso.ejemplo.traductor", Traductor.class);
+   Traductor traductor = trFactory.getObject(formato);
+
+La clase tiene, además, dos métodos adicionales que sirven básicamente para
+brindar información:
+
+``getClasses()``
+   que devuelve un mapa en que las claves son las cadenas y los valores las
+   clases correspondientes.
+
+``getAliasesByClass()``
+   que devuelve un mapa en que cada clave es una clase y los valores un array
+   con todos los nombres con los que está relacionada.
+
+.. warning:: El ćodigo tiene una limitación: el constructor de las clases no
+   puede tener argumentos. En caso de que debiera tenerlos, no obstante, es
+   fácil soslayar la limitación: bastaría con incluir en la interfaz un método
+   inicializador. Por ejemplo:
+
+   .. code-block:: java
+
+      public interface Foobar {
+
+         public void initialize( /* Los argumentos que sea */ );
+         // Resto de métodos que definen la interfaz.
+      }

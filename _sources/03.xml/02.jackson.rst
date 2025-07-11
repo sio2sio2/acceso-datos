@@ -205,39 +205,6 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
       err.printStackTrace();
    }
 
-.. _jackson-mixin:
-
-Anotaciones
-===========
-La librería, sobre todo si la usamos para leer o escribir |XML| pero no sólo,
-requiere en muchas ocasiones que anotemos las clases del modelo. Si no se
-quiere (o no se puede) hacer anotaciones directamente sobre las clases,
-*Jackson* proporciona un mecanismo para evitarlo: la mezcla. Ilustrémoslo con el
-caso de la clase Profesor original:
-
-.. literalinclude:: files/Profesor.java
-   :language: java
-   :class: toggle
-   :caption: Profesor.java
-
-Necesitamos anotar los atributos ``id``, ``sustituye`` y ``casillero``, porque
-los tres deben ser atributos |XML|. Pues bien, podemos definir una clase que
-incluya sólo la parte anotada:
-
-.. literalinclude:: files/ProfesorMixIn.java
-   :language: java
-   :class: toggle
-   :caption: ProfesorMixIn.java
-
-Y, luego, al crear el *mapper* para leer o escribir, podemos indicar que
-queremos mezclar la clase original con esta parcial anotada:
-
-.. code-block:: java
-   :emphasize-lines: 2
-
-   ObjectMapper mapper = new XmlMapper();
-   mapper.addMixIn(Profesor.class, ProfesorMixIn.class);
-
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`

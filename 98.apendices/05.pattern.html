@@ -602,6 +602,7 @@ sirva en cualquier aplicación:</p>
 <span class="cm">     * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Factory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">packageName</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">checkPackage</span><span class="p">(</span><span class="n">packageName</span><span class="p">);</span>
 <span class="w">        </span><span class="n">Reflections</span><span class="w"> </span><span class="n">reflections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Reflections</span><span class="p">(</span><span class="n">packageName</span><span class="p">);</span>
 
 <span class="w">        </span><span class="n">classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reflections</span><span class="p">.</span><span class="na">getSubTypesOf</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">)</span>
@@ -613,6 +614,23 @@ sirva en cualquier aplicación:</p>
 <span class="w">                </span><span class="p">(</span><span class="n">existing</span><span class="p">,</span><span class="w"> </span><span class="n">replacement</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">existing</span><span class="p">,</span>
 <span class="w">                </span><span class="n">HashMap</span><span class="p">::</span><span class="k">new</span>
 <span class="w">            </span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Verifica que el paquete existe.</span>
+<span class="cm">     * @param packageName El nombre del paquete a verificar.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">checkPackage</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">packageName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">packageName</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">packageName</span><span class="p">.</span><span class="na">replace</span><span class="p">(</span><span class="sc">&#39;.&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;/&#39;</span><span class="p">);</span>
+<span class="w">            </span><span class="n">URL</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getContextClassLoader</span><span class="p">().</span><span class="na">getResource</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">resource</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;El paquete &#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">packageName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&#39; no existe.&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;El nombre del paquete no puede ser nulo.&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>

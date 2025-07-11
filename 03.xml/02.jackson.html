@@ -396,7 +396,6 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.1. Escritura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.2. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">3.2.3. Anotaciones</a></li>
 </ul>
             </nav>
         </div>
@@ -725,82 +724,6 @@ lectura del formato es <a class="reference internal" href="../02.formatos/02.jso
 </pre></div>
 </div>
 </section>
-<section id="anotaciones">
-<span id="jackson-mixin"></span><h2><span class="section-number">3.2.3. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h2>
-<p>La librería, sobre todo si la usamos para leer o escribir <abbr title="eXtensible Markup Language">XML</abbr> pero no sólo,
-requiere en muchas ocasiones que anotemos las clases del modelo. Si no se
-quiere (o no se puede) hacer anotaciones directamente sobre las clases,
-<em>Jackson</em> proporciona un mecanismo para evitarlo: la mezcla. Ilustrémoslo con el
-caso de la clase Profesor original:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Profesor</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Profesor</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-
-<span class="w">    </span><span class="c1">// Deberíamos tratar &quot;casillero&quot; y &quot;sustituye&quot;...</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Profesor</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">setId</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setApelativo</span><span class="p">(</span><span class="n">apelativo</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setApellidos</span><span class="p">(</span><span class="n">apellidos</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setDepartamento</span><span class="p">(</span><span class="n">departamento</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">id</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setId</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getSustituye</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setSustituye</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">sustituye</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getCasillero</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCasillero</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">casillero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getApelativo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setApelativo</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">apelativo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getApellidos</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setApellidos</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">apellidos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getDepartamento</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setDepartamento</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">departamento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s, %s [%s] (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">apellidos</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">departamento</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<p>Necesitamos anotar los atributos <code class="docutils literal notranslate"><span class="pre">id</span></code>, <code class="docutils literal notranslate"><span class="pre">sustituye</span></code> y <code class="docutils literal notranslate"><span class="pre">casillero</span></code>, porque
-los tres deben ser atributos <abbr title="eXtensible Markup Language">XML</abbr>. Pues bien, podemos definir una clase que
-incluya sólo la parte anotada:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">ProfesorMixIn.java</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ProfesorMixIn</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-<span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<p>Y, luego, al crear el <em>mapper</em> para leer o escribir, podemos indicar que
-queremos mezclar la clase original con esta parcial anotada:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">XmlMapper</span><span class="p">();</span>
-<span class="hll"><span class="n">mapper</span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Profesor</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">ProfesorMixIn</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-</span></pre></div>
-</div>
-</section>
 </section>
 
 
@@ -850,7 +773,6 @@ queremos mezclar la clase original con esta parcial anotada:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.1. Escritura</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.2. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">3.2.3. Anotaciones</a></li>
 </ul>
   </nav></div>
 

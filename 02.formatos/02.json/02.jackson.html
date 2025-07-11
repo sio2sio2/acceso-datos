@@ -395,7 +395,10 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.2.2.1. Anotaciones</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.2.3. Tipos no primitivos</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas">2.2.2.4. Fechas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.5. Traductor específico</a></li>
@@ -440,8 +443,8 @@ arrays y los valores son directamente traducibles a un tipo primitivo de <abbr t
 </pre></div>
 </div>
 <p>Si, en cambio, quisiéramos generar una lista de grupos y no un array:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;&gt;</span><span class="p">(){};</span>
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;&gt;</span><span class="p">(){};</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -497,6 +500,86 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 </pre></div>
 </div>
 </div>
+<section id="anotaciones">
+<span id="json-jackson-annotations"></span><h3><span class="section-number">2.2.2.2.1. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h3>
+<p>Hemos visto muy por encima cómo trasladar objetos a <abbr title="JavaScript Object Notation">JSON</abbr> y viceversa. La regla
+es que cada atributo del objeto se traduce en una propiedad <abbr title="JavaScript Object Notation">JSON</abbr> con el mismo
+nombre y que conserva el mismo valor<a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Centrémonos en <code class="docutils literal notranslate"><span class="pre">Grupo</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// Atributos</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Resto de la implementación</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>La serialización de un objeto <code class="docutils literal notranslate"><span class="pre">Grupo</span></code> será esta:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;nivel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;etapa&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;grupo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;tutor&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Serialización de un tutor</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;miembros&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="c1">// Serialización de los alumnos</span>
+<span class="w">   </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Ahora bien, ¿cómo puede personalizarse la serialización para cambiar el nombre
+de un atributo o no serializarlo? La librería para ello utiliza <a class="reference external" href="https://www.geeksforgeeks.org/java/annotations-in-java/">anotaciones</a> que permiten indicar
+todos estos particulares:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// Atributos</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;etapa_educativa&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Resto de la implementación</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>De esta forma logramos que en el <abbr title="JavaScript Object Notation">JSON</abbr> la propiedad no sea  <code class="docutils literal notranslate"><span class="pre">etapa</span></code>, sino
+<code class="docutils literal notranslate"><span class="pre">etapa_educativa</span></code>. Si nuestra intención fuera que algún atributo no pasará al
+archivo, tendríamos que anotarlo con <code class="docutils literal notranslate"><span class="pre">&#64;JsonIgnore</span></code>. El problema de anotar
+directamente la clase es que quizás no nos resulte elegante o directamente no
+podamos, porque no dependa de nosotros la definición. Para poder añadir
+anotaciones sin modificar la clase original, <em>Jackson</em> proporciona un mecanismo:
+la mezcla. Para ello podríamos definir aparte otra clase distinta que contenga
+exclusivamente los atributos que necesitan anotación:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GrupoMixin</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;etapa_educativo&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Luego, al definir el mapeo. se declara que deseamos mezclar la clase original
+con la clase abstracta anotada:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">();</span>
+<span class="hll"><span class="n">mapper</span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Grupo</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Al <a class="reference internal" href="../../03.xml/02.jackson.html#xml-jackson"><span class="std std-ref">serializar en formato XML</span></a> con esta librería,
+las anotaciones se vuelven imprescindibles, porque es la única forma de
+indicar, entre otras cosas, si un atributo de la clase será un elemento o un
+atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p>
+</div>
+</section>
 </section>
 <section id="tipos-no-primitivos">
 <span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.2.3. </span>Tipos no primitivos<a class="headerlink" href="#tipos-no-primitivos" title="Link to this heading">#</a></h2>
@@ -504,7 +587,7 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>, ya que las cadenas son cadenas,
 los números, números, y los arrays o <code class="docutils literal notranslate"><span class="pre">ArrayList</span></code> los traduce directamente
 Jackson como secuencias. Incluso si usamos los valores de una enumeración para
-codificarla en el <abbr title="JavaScript Object Notation">JSON</abbr><a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la librería será capaz de traducir sin
+codificarla en el <abbr title="JavaScript Object Notation">JSON</abbr><a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, la librería será capaz de traducir sin
 instrucciones por nuestra parte.</p>
 </section>
 <section id="fechas">
@@ -578,12 +661,6 @@ que da soporte a fechas:</p>
 <p>En este segundo caso, necesitamos importar el paquete aparte
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations">jackson-annotations</a>.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Más adelante, al <a class="reference internal" href="../../03.xml/02.jackson.html#xml-jackson"><span class="std std-ref">tratar XML con esta librería</span></a>, veremos
-que tenemos la <a class="reference internal" href="../../03.xml/02.jackson.html#jackson-mixin"><span class="std std-ref">posibilidad de anotar sin necesidad de tocar la clase
-original</span></a>.</p>
-</div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
 <p>Al usar esta anotación puede haber desajustes al serializar las fechas
@@ -605,7 +682,7 @@ que no puede usarse el método para obtener el huso horario del sistema.</p>
 </div>
 </li>
 </ul>
-<div class="admonition-todo admonition" id="id2">
+<div class="admonition-todo admonition" id="id4">
 <p class="admonition-title">Por hacer</p>
 <p>Comprobar si es preciso incorporar:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">.</span><span class="na">disable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">WRITE_DATES_AS_TIMESTAMPS</span><span class="p">);</span>
@@ -640,7 +717,7 @@ el módulo <code class="docutils literal notranslate"><span class="pre">setDateF
 </div>
 </li>
 </ul>
-<div class="admonition-todo admonition" id="id3">
+<div class="admonition-todo admonition" id="id5">
 <p class="admonition-title">Por hacer</p>
 <p>Comprobar que no aporta nada a este respecto usar JavaTimeModule en
 vez de SimpleModule.</p>
@@ -653,7 +730,7 @@ de cualquier tipo que se nos pueda ocurrir, Basta con añadir, en principio, la
 librería <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core">jackson-core</a>)
 para poder hacer cualquier definición. Ilustrémoslo con la serialización y
 deserialización artesanal de una tipo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a>, aunque ya esté resuelto dentro de
-la propia librería. Sin embargo, nos sirve para ilustrarlo<a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
+la propia librería. Sin embargo, nos sirve para ilustrarlo<a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 
 <span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
@@ -714,8 +791,14 @@ clases serializadoras y deserializadoras para los tipos incluidos en
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Siempre que el tipo, claro está, sea un primitivo de <abbr title="JavaScript Object Notation">JSON</abbr> (p. ej. una
+cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
+cosa que expondremos en <a class="reference internal" href="#json-jackson-no-primitivos"><span class="std std-ref">Tipos no primitivos</span></a>.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p>Es decir, que si se tiene:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Enumeracion</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">UNO</span><span class="p">,</span>
@@ -726,8 +809,8 @@ clases serializadoras y deserializadoras para los tipos incluidos en
 <p>se usan las cadenas <em>UNO</em> y <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>. En caso contrario,
 habría que hacer un traductor como se expone bajo este epígrafe.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">3</a><span class="fn-bracket">]</span></span>
 <p><code class="docutils literal notranslate"><span class="pre">SimpleDateFormat</span></code> no es <em>thread-safe</em> por lo que habría que mejorar
 algo el código en caso de utilizarse hilos. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SimpleDateFormat</span><span class="o">&gt;</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span>
@@ -787,7 +870,10 @@ algo el código en caso de utilizarse hilos. Por ejemplo:</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1. Lectura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.2. Escritura</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.2.2.1. Anotaciones</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipos-no-primitivos">2.2.2.3. Tipos no primitivos</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fechas">2.2.2.4. Fechas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.5. Traductor específico</a></li>

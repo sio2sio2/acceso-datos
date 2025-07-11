@@ -44,8 +44,8 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
 
 .. code-block:: java
 
-   TypeReference<ArrayList<Grupo>> GrupoLista =  new TypeReference<>(){};
-   ArrayList<Grupo> grupos = mapper.readValue(sr, GrupoLista);
+   TypeReference<List<Grupo>> GrupoLista =  new TypeReference<>(){};
+   List<Grupo> grupos = mapper.readValue(sr, GrupoLista);
 
 .. note:: Que los miembros de cada grupo sean un array o una lista es
    absolutamente indiferente: la traducción se hará de igual forma.
@@ -101,6 +101,98 @@ Al escribir, es indiferente si usamos arrays o listas.
 
       String contenido = mapper.writeValueAsString(grupos);
 
+.. _json-jackson-annotations:
+
+Anotaciones
+-----------
+Hemos visto muy por encima cómo trasladar objetos a |JSON| y viceversa. La regla
+es que cada atributo del objeto se traduce en una propiedad |JSON| con el mismo
+nombre y que conserva el mismo valor\ [#]_. Centrémonos en ``Grupo``:
+
+.. code-block:: java
+
+   public class Grupo implements Serializable {
+
+       // Atributos
+       private short nivel;
+       private String etapa;
+       private char grupo;
+       private Tutor tutor;
+       private Alumno[] miembros;
+
+       // Resto de la implementación
+   }
+
+La serialización de un objeto ``Grupo`` será esta:
+
+.. code-block:: json
+
+   {
+      "nivel": 1,
+      "etapa": "ESO",
+      "grupo": "C",
+      "tutor": { 
+         // Serialización de un tutor
+      },
+      "miembros": [
+         // Serialización de los alumnos
+      ]
+   }
+
+Ahora bien, ¿cómo puede personalizarse la serialización para cambiar el nombre
+de un atributo o no serializarlo? La librería para ello utiliza `anotaciones
+<https://www.geeksforgeeks.org/java/annotations-in-java/>`_ que permiten indicar
+todos estos particulares:
+
+.. code-block:: java
+   :emphasize-lines: 6-7
+
+   public class Grupo implements Serializable {
+
+       // Atributos
+       private short nivel;
+
+       @JsonProperty("etapa_educativa")
+       private String etapa;
+       private char grupo;
+       private Tutor tutor;
+       private Alumno[] miembros;
+
+       // Resto de la implementación
+      
+   }
+
+De esta forma logramos que en el |JSON| la propiedad no sea  ``etapa``, sino
+``etapa_educativa``. Si nuestra intención fuera que algún atributo no pasará al
+archivo, tendríamos que anotarlo con ``@JsonIgnore``. El problema de anotar
+directamente la clase es que quizás no nos resulte elegante o directamente no
+podamos, porque no dependa de nosotros la definición. Para poder añadir
+anotaciones sin modificar la clase original, *Jackson* proporciona un mecanismo:
+la mezcla. Para ello podríamos definir aparte otra clase distinta que contenga
+exclusivamente los atributos que necesitan anotación:
+
+.. code-block:: java
+
+   public abstract class GrupoMixin {
+
+      @JsonProperty("etapa_educativo")
+      private String etapa;
+   }
+
+Luego, al definir el mapeo. se declara que deseamos mezclar la clase original
+con la clase abstracta anotada:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   ObjectMapper mapper = new ObjectMapper();
+   mapper.addMixIn(Grupo.class, GrupoMixin.class);
+
+.. note:: Al :ref:`serializar en formato XML <xml-jackson>` con esta librería,
+   las anotaciones se vuelven imprescindibles, porque es la única forma de
+   indicar, entre otras cosas, si un atributo de la clase será un elemento o un
+   atributo |XML|.
+
 .. _json-jackson-no-primitivos:
 
 Tipos no primitivos
@@ -153,10 +245,6 @@ y podemos usar dos estrategias:
   .. note:: En este segundo caso, necesitamos importar el paquete aparte
      `jackson-annotations
      <https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations>`_.
-
-  .. note:: Más adelante, al :ref:`tratar XML con esta librería <xml-jackson>`, veremos
-     que tenemos la :ref:`posibilidad de anotar sin necesidad de tocar la clase
-     original <jackson-mixin>`.
 
   .. warning:: Al usar esta anotación puede haber desajustes al serializar las fechas
      como consecuencia de la zona horaria, por lo que habría que especificarla
@@ -294,6 +382,10 @@ cada uno de los atributos y hacer lo siguiente:
 
 .. rubric:: Notas al pie
 
+.. [#] Siempre que el tipo, claro está, sea un primitivo de |JSON| (p. ej. una
+   cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
+   cosa que expondremos en :ref:`json-jackson-no-primitivos`.
+
 .. [#] Es decir, que si se tiene:
 
        .. code-block:: java
@@ -320,4 +412,5 @@ cada uno de los atributos y hacer lo siguiente:
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |Date| replace:: :java-util:`Date <Date>`
 .. |LocalDate| replace:: :java-time:`LocalDate <LocalDate>`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 

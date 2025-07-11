@@ -1,7 +1,8 @@
-package edu.acceso.almacenestudiantes.core;
+package edu.acceso.example.core;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ public class Factory<I> {
      * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.
      */
     public Factory(String packageName, Class<I> interfaceClass) {
+        checkPackage(packageName);
         Reflections reflections = new Reflections(packageName);
 
         classes = reflections.getSubTypesOf(interfaceClass)
@@ -46,6 +48,23 @@ public class Factory<I> {
                 (existing, replacement) -> existing,
                 HashMap::new
             ));
+    }
+
+    /**
+     * Verifica que el paquete existe.
+     * @param packageName El nombre del paquete a verificar.
+     */
+    private void checkPackage(String packageName) {
+        if(packageName != null) {
+            String path = packageName.replace('.', '/');
+            URL resource = Thread.currentThread().getContextClassLoader().getResource(path);
+            if(resource == null) {
+                throw new IllegalArgumentException("El paquete '" + packageName + "' no existe.");
+            }
+        }
+        else {
+            throw new IllegalArgumentException("El nombre del paquete no puede ser nulo.");
+        }
     }
 
     /**

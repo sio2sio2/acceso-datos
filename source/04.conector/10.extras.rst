@@ -170,7 +170,7 @@ de él, en vez de encontrarse incrustadas en el código.
 
 Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
 guión |SQL| completo y que pasemos una cadena larga con todas instrucciones
-separadas por comas, no aegura que el |SGBD| las descomponga y ejecute
+separadas por comas, no asegura que el |SGBD| las descomponga y ejecute
 individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
@@ -179,15 +179,14 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
   capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
   se compone.
 
-+ Si el guión no es complejo y seguimos algunas premisas:
++ Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
+  algunas premisas:
 
   a. Los ';' que completan sentencias deben encontrarse a final de línea.
   #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
      valores, etc.
   #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
      (pero sí usarse el estándar ``CASE``).
-
-  podemos escribir una solución artesanal, que es la que proponemos.
 
 .. literalinclude:: files/splitSQL.java
    :language: java

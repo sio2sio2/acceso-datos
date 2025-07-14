@@ -129,25 +129,33 @@ El código tiene dos aspectos:
   + Las ejecutamos usando el método ``executeUpdate``, puesto que su función es
     modificar el contenido de la base de datos, no obtener información.
 
-Tampoco las sentencias de inserción devuelven resultados, por lo que también
+Tampoco las sentencias de inserción devuelven resultados, por lo que supuesto
+que hayamos definido la clase ``Centro``:
+
+.. literalinclude:: files/CentroS.java
+   :language: java
+   :class: toggle
+   :caption: Centro.java
+
 podemos hacer:
 
 .. code-block:: java
    :name: ej-insert-sin-par
 
-      // Agregamos algunos centros
+      // Estos son los INSERT que quedaron pendientes en el código anterior
       stmt.executeUpdate("INSERT INTO Centro VALUES (11004866, 'IES Castillo de Luna', 'pública')");
 
-      Object[] registros = new Object[][] {
-         new Object[] {11007533, "IES Arroyo Hondo", "pública"},
-         new Object[] {11701164, "IES Astaroth", "pública"}
-      };
+      Centro[] centros = new Centro[] {
+         new Centro(11007533, "IES Arroyo Hondo", "pública"),
+         new Centro(11701164, "IES Astaroth", "pública")
+      }
+
       String sqlString = "INSERT INTO Centro VALUES (%d, '%s', '%s');"
-      for(Object[] registro: registros) {
+      for(Centro centro: centros) {
           stmt.executeUpdate(String.format(sqlString,
-            (Integer) registro[0],
-            (String) registro[1],
-            (String) registro[2]
+            centro.getId(),
+            centro.getNombre(),
+            centro.getTitularidad()
           ));
       }
 
@@ -191,29 +199,22 @@ objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él
 
 En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
 pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
-de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
-``Centro`` así:
-
-.. literalinclude:: files/CentroS.java
-   :language: java
-   :class: toggle
-   :caption: Centro.java
-
-podríamos hacer esto:
+de objetos de Java, Por ejemplo, podríamos hacer esto:
 
 .. code-block:: java
 
 
+   Lista<Centro> centros = null;
    try(ResultSet rs = stmt.executeQuery("SELECT * FROM Centro")) {
-      List<Centro> centros = new ArrayList<>(); 
+      centros = new ArrayList<>(); 
 
-       while(rs.next()) {
-           int id = rs.getInt("id");
-           String nombre = rs.getString("nombre");
-           String titularidad = rs.getString("titularidad");
-           // Posiblemente titularidad debería ser un enum.
-           centros.add(new Centros(id, nombre, titularidad));
-       }
+      while(rs.next()) {
+          int id = rs.getInt("id");
+          String nombre = rs.getString("nombre");
+          String titularidad = rs.getString("titularidad");
+          // Posiblemente titularidad debería ser un enum.
+          centros.add(new Centro(id, nombre, titularidad));
+      }
    }
 
 .. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
@@ -249,19 +250,19 @@ mecanismo para parametrizar sentencias; y, en el caso de |JDBC|, se hace uso de
    :name: ej-insert-par
    :emphasize-lines: 8, 11-13
 
-   Object[] registros = new Object[][] {
-      new Object[] {11004866, "IES Castillo de Luna", "pública"},
-      new Object[] {11007533, "IES Arroyo Hondo", "pública"},
-      new Object[] {11701164, "IES Astaroth", "pública"}
-   };
+   Centro[] centros = new Centro[] {
+      new Centro(11004866, "IES Castillo de Luna", "pública"),
+      new Centro(11007533, "IES Arroyo Hondo", "pública"),
+      new Centro(11701164, "IES Astaroth", "pública")
+   }
 
    try(
       PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Centro (id, nombre, titulacion) VALUES (?, ?, ?)")
    ) {
-       for(Object[] registro: registros) {
-           pstmt.setInt(1, (int) registro[0]);        // id
-           pstmt.setString(2, (String) registro[1]);  // nombre
-           pstmt.setString(3, (String) registro[2]);  // titulación
+       for(Centro centro: centros) {
+           pstmt.setInt(1, centro.getId());
+           pstmt.setString(2, centro.getNombre());
+           pstmt.setString(3, centro.getTitularidad());
            pstmt.executeUpdate();
        }
    }
@@ -281,9 +282,9 @@ identificador se definió. Para ello podemos hacer lo siguiente:
 
    TimeDateFormatter df = TimeDateFormatter.ofPattern("dd/MM/yyyy");
    // centro es un centro que ya tenemos definido.
-   Object[][] registros = new Object[][] {
-      new Object[] {"Perico de los Palotes", LocalDate.parse("12/06/1995", df), centro},
-      new Object[] {"Mariquilla de la O", LocalDate.parse("07/09/1999", df), centro}
+   Profesor[] profesores = new Profesor[] {
+      new Profesor ("Perico de los Palotes", LocalDate.parse("12/06/1995", df), centro),
+      new Profesor ("Mariquilla de la O", LocalDate.parse("07/09/1999", df), centro)
    };
 
    try(
@@ -292,11 +293,11 @@ identificador se definió. Para ello podemos hacer lo siguiente:
          Statement.RETURN_GENERATED_KEYS
       )
    ) {
-       for(Object[] registro: registros) {
-           pstmt.setString(1, registro[0]); 
-           pstmt.setDate(2, registro[1] == null?null:Date.valueOf(registro[1]));
+       for(Profesor profesor: profesores) {
+           pstmt.setString(1, profesor.getNombre()); 
+           pstmt.setDate(2, profesor.getNacimiento() == null?null:Date.valueOf(profesor.getNacimiento()));
            pstmt.setObject(3, centro == null?null:centro.getId(), Types.INTEGER);
-           pstmt.setNull(4, Types.INTEGER);
+           pstmt.setNull(4, Types.INTEGER);  // Lo debe generar automáticamente el SGBD
            pstmt.executeUpdate();
            try(ResultSet rs = pstmt.getGeneratedKeys())  {
               if(rs.next()) System.out.printf("'%s' se registró con ID=%d\n", registro[0], rs.getInt(1));
@@ -309,7 +310,7 @@ identificador se definió. Para ello podemos hacer lo siguiente:
    Necesitaremos :ref:`más adelante <conn-batch>` darle al menos una vuelta más.
 
 Obsérvese que al definir los valores de los parámetros de una consulta,
-necesitamos cambiar de método según sea el tipo del campos. Sin embargo,
+necesitamos cambiar de método según sea el tipo del campo. Sin embargo,
 |JDBC| permite usar un método genérico (``setObject``) que se encargará de
 inferir el tipo |SQL| correcto a partir del tipo de *Java*. La razón por la que
 en el ejemplo se añade un tercer parámetro se debe a que el valor puede ser nulo

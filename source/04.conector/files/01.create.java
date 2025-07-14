@@ -1,12 +1,6 @@
 final String dbProtocol = "jdbc:sqlite:";
 
 String dbUrl = String.format("%s%s", dbProtocol, ":memory:");  // Base de datos en la memoria
-// Algunos centros para agregar a la base de datos.
-Object[][] registros = {
-    new Object[] {11004866, "IES Castillo de Luna", "pública"},
-    new Object[] {11007533, "IES Arroyo Hondo", "pública"},
-    new Object[] {11701164, "IES Astaroth", "pública"}
-};
 
 try(Connection conn = DriverManager.getConnection(dbUrl)) {
 
@@ -33,6 +27,8 @@ try(Connection conn = DriverManager.getConnection(dbUrl)) {
                    on UPDATE CASCADE
            );                       
        """);
+
+       // --->AQUÍ PODEMOS AÑADIR INSTRUCCIONES PARA INSERT (ver después)
    }
    catch(SQLException err) {
       err.printStackTrace();

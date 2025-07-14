@@ -25,8 +25,8 @@ import edu.acceso.test_dao.modelo.Centro.Titularidad;
  */
 public class CentroSqlDao implements Crud<Centro> {
 
-    /** Proveedor de conexiones. */
-    private final ConnProvider cp;
+    /** Pool de conexiones */
+    private final DataSource cp;
 
     /**
      * Constructor que inicializa el proveedor de conexiones con un {@link DataSource}.
@@ -34,15 +34,7 @@ public class CentroSqlDao implements Crud<Centro> {
      * @param ds Fuente de datos para obtener conexiones.
      */
     public CentroSqlDao(DataSource ds) {
-        cp = new ConnProvider(ds);
-    }
-
-    /**
-     * Constructor que inicializa el proveedor de conexiones con una conexión existente.
-     * @param conn Conexión existente para el proveedor de conexiones.
-     */
-    public CentroSqlDao(Connection conn) {
-        cp = new ConnProvider(conn);
+        this.cp = ds;
     }
 
     /**
@@ -52,7 +44,7 @@ public class CentroSqlDao implements Crud<Centro> {
      * @return Un objeto {@link Centro} con los datos del {@link ResultSet}.
      * @throws SQLException Si ocurre un error al acceder a los datos del {@link ResultSet}.
      */
-    private static Centro resultSetToCentro(ResultSet rs) throws SQLException {
+    public static Centro resultSetToCentro(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id_centro");
         String nombre = rs.getString("nombre");
         Titularidad titularidad = Titularidad.fromString(rs.getString("titularidad"));
@@ -66,7 +58,7 @@ public class CentroSqlDao implements Crud<Centro> {
      * @param centro El objeto {@link Centro} cuyos datos se usarán para establecer los parámetros.
      * @throws SQLException Si ocurre un error al establecer los parámetros en el {@link PreparedStatement}.
      */
-    private static void centroToParams(PreparedStatement pstmt, Centro centro) throws SQLException {
+    public static void centroToParams(PreparedStatement pstmt, Centro centro) throws SQLException {
         pstmt.setString(1, centro.getNombre());
         pstmt.setString(2, centro.getTitularidad().toString());
         // En este caso el ID siempre tiene valor, con lo que puede usarse directamente setInt.
@@ -77,7 +69,7 @@ public class CentroSqlDao implements Crud<Centro> {
     public Optional<Centro> get(Long id) throws DataAccessException {
         String sqlString = "SELECT * FROM Centro WHERE id_centro = ?";
 
-        try(Connection conn = cp.getConnection();) {
+        try(Connection conn = cp.getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 pstmt.setLong(1, id);
                 try(ResultSet rs = pstmt.executeQuery()) {

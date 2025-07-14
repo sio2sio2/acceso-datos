@@ -15,6 +15,9 @@ las particularidades del acceso a datos estén reducidas a un paquete dentro de
 la aplicación (p.ej. llamado *backend*), fuera del cual no haya otra cosa que
 objetos.
 
+Patrón |DAO|
+============
+
 Uno de los patrones más usados para lograr la abstracción es el `patrón DAO
 <https://www.baeldung.com/java-dao-pattern>`_, que se carga de tomar los objetos
 de la capa de negocio y transladarlos al soporte de persistencia o viceversa.
@@ -36,7 +39,7 @@ Este patrón básicamente:
   ajena a la implementación para un soporte particular.
 
 .. seealso:: Todo el código que se describe y comenta en este apartado está en el
-   `repositorio de GitHub test_dao <https://github.com/josem-dam/test_dao>`_. Se
+   `repositorio de GitHub TestDAO <https://github.com/josem-dam/TestDAO>`_. Se
    recomienda descargarlo para repasar mejor las explicaciones.
 
 Por lo general, aunque no forzosamente, cada clase del modelo tendrá asociada
@@ -113,29 +116,32 @@ establecimiento de la conexión, que bien podría ser :ref:`ConnectionPool
     Estudiante         EstudianteSqlDao   Acceso a la tabla Estudiante.
    ================== ================== ============================================
 
-La implementación de ambas clases es muy semejante y ambas necesitarán que les
-pasemos en su construcción un objeto |DataSource| o un objeto |Connection| para
-que puedan llevar a cabo sus operaciones. ¿Qué les pasamos? Analicémoslo:
+Así pues, podemos codificar las dos clases DAO que implementa la interfaz
+|CRUD|:
 
-* Si decidimos que se construyan pasando un objeto |Connection|, corremos el
-  riesgo de que este objeto se cierre en algún momento, con lo que los objetos
-  dejarán de poder realizar operaciones.
-* Si pasando un objeto |DataSource|, podemos crear una nueva conexión dedicada
-  cada vez que hagamos una operación, pero nos quedamos sin la posibilidad de
-  hacer transacciones que incluyan dos o más operaciones.
+.. literalinclude:: files/CentroSqlDaoPre.java
+   :language: java
+   :class: toggle
+   :name: clase-centrosqldao-pre
+   :caption: CentroSqlDao.java
+   :start-at: public class
 
-La mejor solución es permitir que se pase una u otra cosa, de manera que cuando
-tengamos que hacer una operación podamos obrar así:
+.. note:: Como la clase es tan sencilla (también la relativa a ``Estudiante``),
+   usa |SQL| estándar y, por consiguiente, el código no depende del |SGBD|
+   particular. De ahí que hayamos elegido nombres que hacen referencia a |SQL| y
+   no a :program:`SQLite`.
+
+Y ``EstudianteSqlDao`` se implementará de modo análogo. Obsérvese que para
+cualquier operación se opera del mismo modo:
 
 .. code-block:: java
-   :emphasize-lines: 5, 6
+   :name: dao-delete
 
    @Override
    public boolean delete(Long id) throws DataAccessException {
        String sqlString = "DELETE FROM Centro WHERE id_centro = ?";
 
-       try(ConnWrapper cw = cp.getConnWrapper()) {
-           Connection conn = cw.getConnection(); // ¡Ojo! No debe cerrarse directamente
+       try(Connection conn = cp.getConnection()) {
            try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                pstmt.setLong(1, id);
                return pstmt.executeUpdate() > 0;
@@ -146,59 +152,15 @@ tengamos que hacer una operación podamos obrar así:
        }
    }
    
-Básicamente, tenemos un objeto ``cp`` (ya veremos que de tipo ``ConnProvider``)
-que nos permite crear un objeto envoltorio (``cw``). A partir de este objeto
-envoltorio podemos obtener la conexión en sí para hacer la operación. La
-particularidad de este envoltorio es que al cerrar el objeto se cierra el objeto
-|Connection| asociado, si se tomó para construir el objeto ``cp`` un
-|DataSource|; pero no se cerrará, si lo que se tomó para construir fue el propio
-|Connection|.
+O sea, abrimos una conexión gracias al pool, realizamos la operación y cerramos.
 
-.. note:: Toda esta argucia es necesaria si queremos habilitar transacción que
-   incluyan varias operaciones. Si no es así, podríamos construir los objetos
-   |DAO| con el |DataSource|.
+.. caution:: Hay un grave carencia en la clase |DAO| que tendremos que resolver
+   aún, pero es mejor no adelantarse.
 
-Por tanto, tenemos que implementar estos dos tipos de objetos:
-
-.. literalinclude:: files/ConnProvider.java
-   :language: java
-   :name: clase-connprovider
-   :class: toggle
-   :caption: ConnProvider.java
-   :start-at: public class
-
-Ya están listos los preliminares. Hechos, podemos implementar por completo las
-dos clases |DAO|:
-
-.. literalinclude:: files/CentroSqlDao.java
-   :language: java
-   :name: clase-centrosqldao
-   :class: toggle
-   :caption: CentroSqlDao.java
-   :start-at: public class
-
-.. literalinclude:: files/EstudianteSqlDao.java
-   :language: java
-   :name: clase-estudiantesqldao
-   :class: toggle
-   :caption: EstudianteSqlDao.java
-   :start-at: public class
-
-Nótese que al crear estos objetos, podemos pasar un |DataSource| o un
-|Connection|. Lo primero será lo habitual, pero lo segundo lo podemos hacer
-cuando queremos que todas las operaciones pueden compartir conexión para formar
-parte de una misma transacción.
-
-Otra particularidad de estas clases es que cómo son tan sencillas, usan |SQL|
-estándar y, por consiguiente, el código no depende del |SGBD| particular. De ahí
-que hayamos elegido nombres que hacen referencia a |SQL| y no a
-:program:`SQLite`.
-
-Sea como sea, estas clases nos permiten que el resto del código se abstraiga de
-cómo se hacen persistentes los datos. De este modo, hacer persistente un nuevo
-centro puede hacerse así:
+Veamos cómo operar, por ejemplo, para hacer persistente un nuevo centro:
 
 .. code-block::  java
+   :name: notransaccion-dao
 
    // cpool es un objeto ConnectionPool y obtengo de él el DataSource.
    DataSource ds = cpool.getDataSource();
@@ -206,15 +168,13 @@ centro puede hacerse así:
    Centro astaroth = new Centro(11701164L, "IES Astaroth",Titularidad.PUBLICA);
    centroDao.insert(astaroth);
 
-Hay, por último, un detalle que no debe pasarse por alto: la relación entre
-``Estudiante`` y ``Centro``. En el código se resuelve de la manera más sencilla
-posible: al cargar un objeto ``Estudiante`` también se carga el objeto ``Centro``
-al que está asociado, ya que una carga perezosa, esto es, que el centro se
-cargue sólo cuando se requiere de forma efectiva con su *getter*
-correspondiente, complica mucho el código.
-
-Para terminar, si tuviéramos que crear una transacción, podríamos construir los
-objetos |DAO| con una conexión ya abierta:
+Hay, sin embargo, un **grave problema**: cada operación crea, usa y cierra su
+propia conexión, lo que provoca que dos o más conexiones no puedan pertenecer a
+una mismo conexión, es decir, no tenemos **soporte para transacciones**. Lo
+interesante sería que, además de poder pasar un |DataSource| para crear un
+objeto |DAO| y que este lo usara para crear sus propias construcciones,
+pudiéramos también poder pasar directamente una conexión y que este la usara sin
+llegar a cerrarla nunca. De este modo podríamos hacer:
 
 .. code-block:: java
    :name: transaccion-dao
@@ -243,11 +203,94 @@ objetos |DAO| con una conexión ya abierta:
        }
    }
 
-En el código anterior la eliminación del centro no llega a ser efectiva porque
-una operación posterior incluida en la misma transacción falla.
+En el código anterior, las operaciones no deberían cerrar la conexión común, por
+lo que las dos pertenecerían a una misma conexión y la eliminación del centro
+nunca llegaría a producirse porque la inserción posterior incluida en la misma
+transacción falla. Además, el código de implementación de las clases |DAO| no
+debería complicarse para que el programador no tenga que estar atento a si
+cierra o no conexiones.
+
+La solución es permitir que los objetos |DAO| se construyan tanto con un
+|DataSource| como con un objeto |Connection|, para que se puedan usar como hemos
+ilustrado :ref:`arriba <transaccion-dao>` (transacción) o :ref:`aún más arriba
+<notransaccion-dao>` (sin transacción); y crear una clase auxiliar
+``ConnProvider`` que abstraiga al escribir el |DAO| de la naturaleza del objeto
+con se creó. De esta manera podremos seguir implementando las operaciones |CRUD|
+tal como :ref:`ilustramos la de delete <dao-delete>`, esto es, *cerrando*
+aparentemente la conexión. En definitiva, ``CentroSqlDao`` debe implementarse
+exactamente como ilustramos antes, excepto la parte referente a la construcción
+y el atributo ``cp`` que ya no es un |DataSource|, sino de esta clase
+``ConnProvider``:
+
+.. literalinclude:: files/CentroSqlDao.java
+   :language: java
+   :name: clase-centrosqldao
+   :start-at: public class
+   :end-before: private static
+
+Por su parte, la clase auxiliar es la que técnicamente requiere que nos comamos
+más la cabeza:
+
+.. literalinclude:: files/ConnProvider.java
+   :language: java
+   :name: clase-connprovider
+   :class: toggle
+   :caption: ConnProvider.java
+   :start-at: public class
+
+Básicamente este objeto se construye con un |DataSource| o un |Connection| y
+tiene un método ``.getConnection()``. Cuando se construye con |DataSource| se
+limita a generar una nueva conexión del *pool* y devolver el objeto; en cambio (y
+esta es la magia), cuando se construye con un |Connection| no devuelve el propio
+objeto sino un objeto envoltorio que se comporta del mismo modo, excepto por el
+hecho de que tiene deshabilitado el método ``.close()``: cuando se invoca no
+hace nada y, en consecuencia, no se cierra la conexión. De esta forma, podemos
+implementar las operaciones en las clases |DAO| con la cláusula
+`try-with-resources
+<https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html>`_,
+y las conexiones se cerrarán cuando se construye el |DAO| con un |DataSource| y
+no lo harán cuando se construye con un |Connection|.
+
+.. note:: La magia se logra gracias al uso del `patrón Proxy
+   <https://medium.com/@AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01>`_
+   que permite interceptar los métodos definidos en una interfaz (y |Connection|
+   lo es).
+
+Finalmente hay un último detalle para el cual conviene que mostremos la
+implementación de ``EstudianteSqlDao``:
+
+.. literalinclude:: files/EstudianteSqlDao.java
+   :language: java
+   :name: clase-estudiantesqldao
+   :class: toggle
+   :caption: EstudianteSqlDao.java
+   :start-at: public class
+
+El detalle por revisar es la relación entre ``Estudiante`` y ``Centro``. En el
+código se resuelve de la manera más sencilla posible: al cargar un objeto
+``Estudiante`` también se carga el objeto ``Centro`` al que está asociado, ya
+que una carga perezosa, esto es, que el centro se cargue sólo cuando se requiere
+de forma efectiva con su *getter* correspondiente, complica mucho el código.
 
 .. seealso:: El repositorio SqlUtils_ incluye otra implementación del patrón
-   algo más elaborada, cuyo uso se ilustra en el código de prueba.
+   |DAO| bastante más elaborada que permite la carga perezosa y cuyo uso se
+   ilustra en el código de prueba del propio paquete.
+
+Conclusiones
+============
+Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
+
++ Es indispensable usar un **pool de conexiones** para mejorar el rendimiento. De
+  este modo, podemos cerrar las conexiones según la lógica de la aplicación sin
+  preocuparnos  de la penalización del rendimiento.
++ El soporte para **transacciones** es indispensable.
++ Debe separarse el acceso a la fuente de datos del resto de la aplicación. Un
+  patrón muy socorrido, sobre todo en bases de datos, es el patrón |DAO|.
++ Gran parte de los retos que debemos resolver al programar con *conectores*, ya
+  los resuelven las :ref:`herramientas ORM <orm>`, que trataremos a
+  continuación, por lo que en en muchas ocasiones en las que o bien el
+  programador no es avezado o bien, aunque lo sea, el rendimiento no es crítico,
+  es más inteligente utilizarlas.
 
 .. _sqlutils: https://github.com/sio2sio2/sqlutils
 .. _Singleton: https://es.wikipedia.org/wiki/Singleton

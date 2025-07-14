@@ -797,14 +797,15 @@ las sentencias necesarias se encuentren en un guión <abbr title="Structured Que
 de él, en vez de encontrarse incrustadas en el código.</p>
 <p>Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> no tiene definido un método que nos permita ejecutar un
 guión <abbr title="Structured Query Language">SQL</abbr> completo y que pasemos una cadena larga con todas instrucciones
-separadas por comas, no aegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
+separadas por comas, no asegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
 individualmente<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. La única forma segura de poder ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
-<ul>
+<ul class="simple">
 <li><p><a class="reference external" href="https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser">JSQLParser</a> que es
 capaz de procesar el código <abbr title="Structured Query Language">SQL</abbr> y, por tanto, reconocer los elementos de que
 se compone.</p></li>
-<li><p>Si el guión no es complejo y seguimos algunas premisas:</p>
+<li><p>Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
+algunas premisas:</p>
 <ol class="loweralpha simple">
 <li><p>Los “;” que completan sentencias deben encontrarse a final de línea.</p></li>
 <li><p>No pueden usarse las palabras <code class="docutils literal notranslate"><span class="pre">begin</span></code> o <code class="docutils literal notranslate"><span class="pre">end</span></code> en comentarios, nombres,
@@ -812,7 +813,6 @@ valores, etc.</p></li>
 <li><p>No pueden usarse bloques <code class="docutils literal notranslate"><span class="pre">IF</span></code> en aquellos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que los implementen
 (pero sí usarse el estándar <code class="docutils literal notranslate"><span class="pre">CASE</span></code>).</p></li>
 </ol>
-<p>podemos escribir una solución artesanal, que es la que proponemos.</p>
 </li>
 </ul>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>

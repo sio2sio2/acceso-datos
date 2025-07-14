@@ -427,12 +427,12 @@ escribir distintos formatos.</p></li>
 <li><p>Mayor control sobre las operaciones, al definirse manualmente, lo que
 permite ajustar más la solución al problema concreto o utilizar
 características avanzadas de <abbr title="Structured Query Language">SQL</abbr>.</p></li>
-<li><p>Al haber menos abstracción, suele ser una estrategia de mayor rendimiento.</p></li>
+<li><p>Al haber menos abstracción, suele ser una estrategia de mayor rendimiento,
+siempre, claro está, que el programador sea hábil. Si no lo es, puede
+resultar todo lo contrario.</p></li>
 <li><p>Es una solución más fácilmente depurable.</p></li>
-<li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr> son independientes del lenguaje de programación en que
-se escriba la aplicación, pese a lo cual habrá que traducir el código al
-nuevo lenguaje.</p></li>
-<li><p>Son más sencillos de usar que un <abbr title="Object-Relational Mapping">ORM</abbr>.</p></li>
+<li><p>Son más sencillos de aprender que un <abbr title="Object-Relational Mapping">ORM</abbr>, aunque luego sea más laborioso
+escribir con ellos la aplicación.</p></li>
 <li><p>Los conectores suelen formar parte de las librerías básicas del lenguaje,
 por lo que no necesitaremos usar una librería de terceros (la librería
 <abbr title="Object-Relational Mapping">ORM</abbr>) ni tendremos que reescribir el código si decidimos cambiar a un
@@ -440,16 +440,18 @@ por lo que no necesitaremos usar una librería de terceros (la librería
 </ol>
 </dd>
 <dt><strong>Ventajas</strong> de las herramientas <abbr title="Object-Relational Mapping">ORM</abbr></dt><dd><ol class="loweralpha simple">
-<li><p>Al proveer un mecanismo para traducir el modelo relacional al modelo de
-datos del lenguaje de programación (modelo de objetos), son herramientas
-más productivas.</p></li>
+<li><p>Evitan al programador que tenga que codificar la traducción entre el
+modelo tradicional y el modelo de datos del lenguaje de programación,
+por lo que son herramientas más productivas.</p></li>
 <li><p>El programador trata los datos directamente como objetos, lo que hace el
 código más sencillo y manipulable.</p></li>
 <li><p>Generalmente, cambiar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> es trivial, puesto que la herramienta
 nos abstrae de sus particularidades. Su uso, por tanto, nos independiza
 de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que gestione los datos frente a los conectores que
 usan sentencias <abbr title="Structured Query Language">SQL</abbr>, generalmente dependientes de cuál es el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. En
-contrapartida, puede resultar muy trabajoso cambiar de <abbr title="Object-Relational Mapping">ORM</abbr>.</p></li>
+contrapartida, puede resultar muy trabajoso cambiar de <abbr title="Object-Relational Mapping">ORM</abbr><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Con
+conectores, en cambio, hay que usar sentecias <abbr title="Structured Query Language">SQL</abbr> y estas dependen del
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> por lo que un cambio en éste obligará a repasar el código.</p></li>
 </ol>
 </dd>
 </dl>
@@ -537,6 +539,15 @@ Estudiante(*id*, nombre, nacimiento, _centro_)
 <li class="toctree-l1"><a class="reference internal" href="15.dao.html">4.6. Programación con conectores</a></li>
 </ul>
 </div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>En <em>Java</em>, sin embargo, disponemos de una especificación oficial
+propuesta para las herramientas <abbr title="Object-Relational Mapping">ORM</abbr> llamada <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">JPA</span></a>, por lo que es
+trivial cambiar de herramienta <abbr title="Object-Relational Mapping">ORM</abbr> entre todas las que la soportan.</p>
+</aside>
+</aside>
 </section>
 
 

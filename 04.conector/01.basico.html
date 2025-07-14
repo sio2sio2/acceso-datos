@@ -537,12 +537,6 @@ ella.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
 
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:memory:&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Base de datos en la memoria</span>
-<span class="c1">// Algunos centros para agregar a la base de datos.</span>
-<span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
-<span class="p">};</span>
 
 <span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 
@@ -569,6 +563,8 @@ ella.</p>
 <span class="s">                   on UPDATE CASCADE</span>
 <span class="s">           );                       </span>
 <span class="s">       &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">       </span><span class="c1">// ---&gt;AQUÍ PODEMOS AÑADIR INSTRUCCIONES PARA INSERT (ver después)</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
@@ -609,65 +605,8 @@ ejecutarlas todas.</p></li>
 modificar el contenido de la base de datos, no obtener información.</p></li>
 </ul>
 </div></blockquote>
-<p>Tampoco las sentencias de inserción devuelven resultados, por lo que también
-podemos hacer:</p>
-<div class="highlight-java notranslate" id="ej-insert-sin-par"><div class="highlight"><pre><span></span><span class="w">   </span><span class="c1">// Agregamos algunos centros</span>
-<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;INSERT INTO Centro VALUES (11004866, &#39;IES Castillo de Luna&#39;, &#39;pública&#39;)&quot;</span><span class="p">);</span>
-
-<span class="w">   </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
-<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
-<span class="w">   </span><span class="p">};</span>
-<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro VALUES (%d, &#39;%s&#39;, &#39;%s&#39;);&quot;</span>
-<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span>
-<span class="w">         </span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span>
-<span class="w">         </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span>
-<span class="w">         </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span>
-<span class="w">       </span><span class="p">));</span>
-<span class="w">   </span><span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>Aún estamos empezando y sabemos poco, así que estas sentencias son
-torpes por dos razones:</p>
-<ul class="simple">
-<li><p>Estamos ejecutando repetidamente (tres veces) la misma sentencia y no es
-eficiente. Ya aprenderemos cómo hacer <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">operaciones masivas</span></a>.</p></li>
-<li><p>Las sentencias usan valores almacenados en variables y hay que construirlas
-incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
-usado <code class="docutils literal notranslate"><span class="pre">String.format</span></code>. Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> ya viene con un mecanismo
-específico para realizar esta labor: las <a class="reference internal" href="#conn-preparedstatement"><span class="std std-ref">sentencias parametrizadas</span></a>.</p></li>
-</ul>
-<p>Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
-mejor.</p>
-</div>
-<p class="rubric">Consultas</p>
-<p>Las consultas, en cambio, sí devuelven resultados que deberán procesarse luego:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;Código: %d -- Nombre: %s (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
-objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que obtenemos registros de él.</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>El objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> hay también que cerrarlo, aunque debería
-cerrarse automáticamente al cerrarse la sentencia que lo originó. En
-cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
-sernos útil.</p>
-</div>
-<p>En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
-pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
-de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
-<code class="docutils literal notranslate"><span class="pre">Centro</span></code> así:</p>
+<p>Tampoco las sentencias de inserción devuelven resultados, por lo que supuesto
+que hayamos definido la clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id9">
 <div class="code-block-caption"><span class="caption-text">Centro.java</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">edu.acceso.borrarlo.modelo</span><span class="p">;</span>
@@ -752,17 +691,75 @@ de objetos de Java, Por ejemplo, suponiendo que hubiéramos definido una clase
 </pre></div>
 </div>
 </div>
-<p>podríamos hacer esto:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<p>podemos hacer:</p>
+<div class="highlight-java notranslate" id="ej-insert-sin-par"><div class="highlight"><pre><span></span><span class="w">   </span><span class="c1">// Estos son los INSERT que quedaron pendientes en el código anterior</span>
+<span class="w">   </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s">&quot;INSERT INTO Centro VALUES (11004866, &#39;IES Castillo de Luna&#39;, &#39;pública&#39;)&quot;</span><span class="p">);</span>
 
-<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Centro</span><span class="o">[]</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">),</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro VALUES (%d, &#39;%s&#39;, &#39;%s&#39;);&quot;</span>
+<span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span>
+<span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span>
+<span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span>
+<span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">()</span>
+<span class="w">       </span><span class="p">));</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Aún estamos empezando y sabemos poco, así que estas sentencias son
+torpes por dos razones:</p>
+<ul class="simple">
+<li><p>Estamos ejecutando repetidamente (tres veces) la misma sentencia y no es
+eficiente. Ya aprenderemos cómo hacer <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">operaciones masivas</span></a>.</p></li>
+<li><p>Las sentencias usan valores almacenados en variables y hay que construirlas
+incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
+usado <code class="docutils literal notranslate"><span class="pre">String.format</span></code>. Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> ya viene con un mecanismo
+específico para realizar esta labor: las <a class="reference internal" href="#conn-preparedstatement"><span class="std std-ref">sentencias parametrizadas</span></a>.</p></li>
+</ul>
+<p>Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
+mejor.</p>
+</div>
+<p class="rubric">Consultas</p>
+<p>Las consultas, en cambio, sí devuelven resultados que deberán procesarse luego:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// Posiblemente titularidad debería ser un enum.</span>
-<span class="w">        </span><span class="n">centros</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Centros</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;Código: %d -- Nombre: %s (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
+objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que obtenemos registros de él.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> hay también que cerrarlo, aunque debería
+cerrarse automáticamente al cerrarse la sentencia que lo originó. En
+cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
+sernos útil.</p>
+</div>
+<p>En el ejemplo, nos hemos limitado a imprimirlos, pero si nuestro programa
+pretendiera hacer algo útil, tendríamos que trasladar esta información al modelo
+de objetos de Java, Por ejemplo, podríamos hacer esto:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Lista</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">   </span><span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">       </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">       </span><span class="n">String</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">);</span>
+<span class="w">       </span><span class="c1">// Posiblemente titularidad debería ser un enum.</span>
+<span class="w">       </span><span class="n">centros</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">));</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -795,19 +792,19 @@ muchos casos que se incluyan valores de variables en las propias sentencias
 anterior</span></a>.). Por este motivo los conectores incluyen un
 mecanismo para parametrizar sentencias; y, en el caso de <abbr title="Java DataBase Connectivity">JDBC</abbr>, se hace uso de
 <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/PreparedStatement.html">PreparedStatement</a>:</p>
-<div class="highlight-java notranslate" id="ej-insert-par"><div class="highlight"><pre><span></span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
-<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">},</span>
-<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">}</span>
-<span class="p">};</span>
+<div class="highlight-java notranslate" id="ej-insert-par"><div class="highlight"><pre><span></span><span class="n">Centro</span><span class="o">[]</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">),</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11007533</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Arroyo Hondo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">),</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">)</span>
+<span class="p">}</span>
 
 <span class="k">try</span><span class="p">(</span>
 <span class="hll"><span class="w">   </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="s">&quot;INSERT INTO Centro (id, nombre, titulacion) VALUES (?, ?, ?)&quot;</span><span class="p">)</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span><span class="w">        </span><span class="c1">// id</span>
-</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// nombre</span>
-</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// titulación</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">());</span>
+</span><span class="hll"><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">());</span>
 </span><span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -823,9 +820,9 @@ estudiantes. En esos casos, es probable que al insertarlos queramos conocer qué
 identificador se definió. Para ello podemos hacer lo siguiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TimeDateFormatter</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TimeDateFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">);</span>
 <span class="c1">// centro es un centro que ya tenemos definido.</span>
-<span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="n">registros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[][]</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Perico de los Palotes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;12/06/1995&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">},</span>
-<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;Mariquilla de la O&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;07/09/1999&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">}</span>
+<span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Perico de los Palotes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;12/06/1995&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">),</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Mariquilla de la O&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;07/09/1999&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span>
 <span class="p">};</span>
 
 <span class="k">try</span><span class="p">(</span>
@@ -834,11 +831,11 @@ identificador se definió. Para ello podemos hacer lo siguiente:</p>
 <span class="hll"><span class="w">      </span><span class="n">Statement</span><span class="p">.</span><span class="na">RETURN_GENERATED_KEYS</span>
 </span><span class="w">   </span><span class="p">)</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">registros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setDate</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">registro</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">));</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Profesor</span><span class="w"> </span><span class="n">profesor</span><span class="p">:</span><span class="w"> </span><span class="n">profesores</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">profesor</span><span class="p">.</span><span class="na">getNombre</span><span class="p">());</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setDate</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">profesor</span><span class="p">.</span><span class="na">getNacimiento</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">profesor</span><span class="p">.</span><span class="na">getNacimiento</span><span class="p">()));</span>
 <span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
-<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setNull</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">INTEGER</span><span class="p">);</span><span class="w">  </span><span class="c1">// Lo debe generar automáticamente el SGBD</span>
 <span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
 <span class="hll"><span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">getGeneratedKeys</span><span class="p">())</span><span class="w">  </span><span class="p">{</span>
 </span><span class="hll"><span class="w">           </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;&#39;%s&#39; se registró con ID=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">registro</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
@@ -854,7 +851,7 @@ repitiendo la ejecución de la misma sentencia con distintos valores.
 Necesitaremos <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">más adelante</span></a> darle al menos una vuelta más.</p>
 </div>
 <p>Obsérvese que al definir los valores de los parámetros de una consulta,
-necesitamos cambiar de método según sea el tipo del campos. Sin embargo,
+necesitamos cambiar de método según sea el tipo del campo. Sin embargo,
 <abbr title="Java DataBase Connectivity">JDBC</abbr> permite usar un método genérico (<code class="docutils literal notranslate"><span class="pre">setObject</span></code>) que se encargará de
 inferir el tipo <abbr title="Structured Query Language">SQL</abbr> correcto a partir del tipo de <em>Java</em>. La razón por la que
 en el ejemplo se añade un tercer parámetro se debe a que el valor puede ser nulo

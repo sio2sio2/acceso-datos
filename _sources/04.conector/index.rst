@@ -34,28 +34,30 @@ Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
    a. Mayor control sobre las operaciones, al definirse manualmente, lo que
       permite ajustar más la solución al problema concreto o utilizar
       características avanzadas de |SQL|.
-   #. Al haber menos abstracción, suele ser una estrategia de mayor rendimiento.
+   #. Al haber menos abstracción, suele ser una estrategia de mayor rendimiento,
+      siempre, claro está, que el programador sea hábil. Si no lo es, puede
+      resultar todo lo contrario.
    #. Es una solución más fácilmente depurable.
-   #. Las sentencias |SQL| son independientes del lenguaje de programación en que
-      se escriba la aplicación, pese a lo cual habrá que traducir el código al
-      nuevo lenguaje.
-   #. Son más sencillos de usar que un |ORM|.
+   #. Son más sencillos de aprender que un |ORM|, aunque luego sea más laborioso
+      escribir con ellos la aplicación.
    #. Los conectores suelen formar parte de las librerías básicas del lenguaje,
       por lo que no necesitaremos usar una librería de terceros (la librería
       |ORM|) ni tendremos que reescribir el código si decidimos cambiar a un
       |ORM| distinto.
 
 **Ventajas** de las herramientas |ORM|
-   a. Al proveer un mecanismo para traducir el modelo relacional al modelo de
-      datos del lenguaje de programación (modelo de objetos), son herramientas
-      más productivas.
+   a. Evitan al programador que tenga que codificar la traducción entre el
+      modelo tradicional y el modelo de datos del lenguaje de programación,
+      por lo que son herramientas más productivas.
    #. El programador trata los datos directamente como objetos, lo que hace el
       código más sencillo y manipulable.
    #. Generalmente, cambiar de |SGBD| es trivial, puesto que la herramienta
       nos abstrae de sus particularidades. Su uso, por tanto, nos independiza
       de cuál sea el |SGBD| que gestione los datos frente a los conectores que
       usan sentencias |SQL|, generalmente dependientes de cuál es el |SGBD|. En
-      contrapartida, puede resultar muy trabajoso cambiar de |ORM|.
+      contrapartida, puede resultar muy trabajoso cambiar de |ORM|\ [#]_. Con 
+      conectores, en cambio, hay que usar sentecias |SQL| y estas dependen del
+      |SGBD| por lo que un cambio en éste obligará a repasar el código.
 
 En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
 :ref:`unidad siguiente <orm>`.
@@ -134,6 +136,12 @@ El cual en |SQL| se define así:
    :glob:
 
    [0-9]*
+
+.. rubric:: Notas al pie
+
+.. [#] En *Java*, sin embargo, disponemos de una especificación oficial
+   propuesta para las herramientas |ORM| llamada :ref:`JPA <orm>`, por lo que es
+   trivial cambiar de herramienta |ORM| entre todas las que la soportan.
 
 .. |POO| replace:: :abbr:`POO (Programación Orientada a Objetos)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`

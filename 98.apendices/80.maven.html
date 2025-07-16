@@ -399,6 +399,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">4.3. Compilación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">4.4. Pruebas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">4.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arquetipos">4.6. Arquetipos</a></li>
 </ul>
             </nav>
         </div>
@@ -562,6 +563,168 @@ archivos adicionales. Para crearlo:</p>
 <p>Para la generación del paquete, <a class="reference internal" href="#maven"><span class="std std-ref">Maven</span></a> usa el plugin <a class="reference external" href="https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin">maven-jar-plugin</a>,
 que no incluye dependencias. Para más información sobre ello y cómo incluirlas
 consulte este <a class="reference external" href="https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/">gist sobre generación de paquetes</a>.</p>
+</section>
+<section id="arquetipos">
+<h2><span class="section-number">4.6. </span>Arquetipos<a class="headerlink" href="#arquetipos" title="Link to this heading">#</a></h2>
+<p>Al crear un nuevo proyecto, <em>Maven</em> define su estructura inicial tomando como
+referencia lo que se llama un arquetipo (o ninguno). Como es probable que para
+resolver las tareas del módulo partamos siempre de una misma base, nos ahorrará
+mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.</p>
+<p>Lo primero es crear un arquetipo en un directorio:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>archetype:generate<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-DgroupId<span class="o">=</span>edu.acceso.arquetipo<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-DartifactId<span class="o">=</span>acceso_datos
+<span class="go">   -DarchetypeArtifactId=maven-archetype-archetype \  # Arquetipo base</span>
+<span class="go">   -DarchetypeVersion=1.5 \         # Versión del arquetipo base</span>
+<span class="go">   -Dversion=1.0 \                  # Versión de este nuevo arquetipo.</span>
+<span class="go">   -DinteractiveMode=false</span>
+</pre></div>
+</div>
+<p>Esto definirá la estructura básica del arquetipo en el directorio
+<code class="file docutils literal notranslate"><span class="pre">acceso_datos</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>+-- pom.xml   (pom.xml del propio arquetipo)
+|
++-- src/
+     +-- main/resources/
+     |               +-- archetype-resources/
+     |                                    +-- pom.xml  (pom.xml del proyecto)
+     |                                    +-- src/ ...
+     |               +-- META-INF/maven/
+     |                               +-- archetype-metadata.xml
+     +-- pom.xml
+     +-- test/ ...
+</pre></div>
+</div>
+<p>Como no nos interesan las pruebas podemos eliminar <code class="file docutils literal notranslate"><span class="pre">src/test/</span></code> y debemos
+centrarmos en:</p>
+<ol class="arabic simple">
+<li><p>El <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> del propio arquetipo.</p></li>
+<li><p>El contenido de <code class="file docutils literal notranslate"><span class="pre">src/main/resources/archetype-resources/</span></code> que contiene
+los archivos que contendrá nuestro proyecto.</p></li>
+<li><p>El archivo <code class="file docutils literal notranslate"><span class="pre">src/main/resources/META-INF/maven/archetype-metadata.xml</span></code>
+que contiene la configuración para generar el nuevo proyecto.</p></li>
+</ol>
+<p>En consecuencia, todos los archivos que queramos que acaben en nuestro proyecto
+deberán incluirse dentro de la segunda ubicación; y en el tercer archivo
+deberemos definir la configuración:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">archetype-metadata.xml</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="toggle highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;archetype-descriptor</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;acceso-datos&quot;</span>
+<span class="w">  </span><span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0&quot;</span>
+<span class="w">  </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w">  </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0 http://maven.apache.org/xsd/archetype-descriptor-1.1.0.xsd&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">&lt;fileSets&gt;</span>
+<span class="w">     </span><span class="nt">&lt;fileSet</span><span class="w"> </span><span class="na">filtered=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">packaged=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;directory&gt;&lt;/directory&gt;</span>
+<span class="w">        </span><span class="nt">&lt;includes&gt;</span>
+<span class="w">           </span><span class="nt">&lt;include&gt;</span>README.md<span class="nt">&lt;/include&gt;</span>
+<span class="w">           </span><span class="nt">&lt;include&gt;</span>LICENSE<span class="nt">&lt;/include&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/includes&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/fileSet&gt;</span>
+<span class="w">     </span><span class="nt">&lt;fileSet</span><span class="w"> </span><span class="na">filtered=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">packaged=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;directory&gt;</span>.vscode<span class="nt">&lt;/directory&gt;</span>
+<span class="w">        </span><span class="nt">&lt;includes&gt;</span>
+<span class="w">           </span><span class="nt">&lt;include&gt;</span>**/*.json<span class="nt">&lt;/include&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/includes&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/fileSet&gt;</span>
+<span class="w">     </span><span class="nt">&lt;fileSet</span><span class="w"> </span><span class="na">filtered=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">packaged=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;directory&gt;</span>src/main/java<span class="nt">&lt;/directory&gt;</span>
+<span class="w">        </span><span class="nt">&lt;includes&gt;</span>
+<span class="w">           </span><span class="nt">&lt;include&gt;</span>**/*.java<span class="nt">&lt;/include&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/includes&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/fileSet&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/fileSets&gt;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">&lt;requiredProperties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;requiredProperty</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;groupId&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;requiredProperty</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;artifactId&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;requiredProperty</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;version&quot;</span><span class="nt">&gt;</span>
+<span class="w">       </span><span class="nt">&lt;defaultValue&gt;</span>1.0.0<span class="nt">&lt;/defaultValue&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/requiredProperty&gt;</span>
+<span class="w">    </span><span class="nt">&lt;requiredProperty</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;dollar&quot;</span><span class="nt">&gt;</span>
+<span class="w">       </span><span class="nt">&lt;defaultValue&gt;</span>$<span class="nt">&lt;/defaultValue&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/requiredProperty&gt;</span>
+<span class="w">    </span><span class="nt">&lt;requiredProperty</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;hash&quot;</span><span class="nt">&gt;</span>
+<span class="w">       </span><span class="nt">&lt;defaultValue&gt;</span>#<span class="nt">&lt;/defaultValue&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/requiredProperty&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/requiredProperties&gt;</span>
+<span class="nt">&lt;/archetype-descriptor&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>En la configuración tenemos dos partes fundamentales:</p>
+<ol class="loweralpha simple">
+<li><p>Por un lado declaramos los archivos que queremos que se incluyan en el
+proyecto. En la configuración hay tres bloques de archivos. La indicación
+<em>filtered</em> significa que queremos que el <em>plugin</em> analice el archivo en busca
+de propiedades para que las sustituya por su valor; y <em>packaged</em> que queremos
+que se añada la declaración de paquete: <code class="code docutils literal notranslate"><span class="pre">package</span>
+<span class="pre">edu.acceso.paquete...;</span></code> al comienzo del archivo.</p></li>
+<li><p>Por otro, definimos cuáles son las propiedades y los valores por defecto que
+tienen. Por ejemplo, la variable <em>artifactId</em> podrá referirse en los archivos
+como <code class="code docutils literal notranslate"><span class="pre">${artifactId}</span></code> y, en ese caso, se sustituirá por el valor
+asignado.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Hay archivos como <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code> que el plugin no incluirá en
+el proyecto aunque lo creemos.</p>
+</div>
+<p>Pues bien, una vez creado el arquetipo deberíamos retocar su contenido para
+ajustarlo a nuestras necesidades.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Se incluye <a class="reference download internal" download="" href="../_downloads/5505f5393e169ec4ed87cbdcc17b540c/arquetipo.zip"><code class="xref download docutils literal notranslate"><span class="pre">un</span> <span class="pre">arquetipo</span> <span class="pre">preparado</span></code></a>
+que puede descargar, modificar a su gusto e instalar.</p>
+</div>
+<p>Una vez que tengamos preparado el arquetipo, debemos acceder a su directorio e
+instalarlo:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>acceso_datos/
+<span class="gp">$ </span>mvn<span class="w"> </span>clean<span class="w"> </span>install
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Con <code class="docutils literal notranslate"><span class="pre">clean</span></code> nos aseguramos de que cualquier compilación anterior del
+arquetipo no interfiera.</p>
+</div>
+<p>Instalado, podemos comprobar que realmente lo está y registrarlo para que el
+<abbr title="Integrated Development Environment">IDE</abbr> nos permita seleccionarlo:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ls<span class="w"> </span>~/.m2/repository/edu/acceso/arquetipo/acceso_datos/<span class="w">  </span><span class="c1"># Si instalado, existirá.</span>
+<span class="gp">$ </span>mvn<span class="w"> </span>archetype:crawl<span class="w">                                     </span><span class="c1"># Lo registramos.</span>
+<span class="gp">$ </span>cat<span class="w"> </span>~/.m2/repository/archetype-catalog.xml<span class="w">              </span><span class="c1"># Comprobamos el registro.</span>
+</pre></div>
+</div>
+<p>En caso de que quisiéramos eliminarlo podríamo eliminar a mano:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rm<span class="w"> </span>-rf<span class="w"> </span>~/.m2/repository/edu/acceso/arquetipo/acceso_datos/
+<span class="gp">$ </span>mvn<span class="w"> </span>archetype:crawl
+</pre></div>
+</div>
+<p>En principio, podríamos probar a generar un nuevo proyecto sin llegar a usar el
+<abbr title="Integrated Development Environment">IDE</abbr>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>archetype:generate<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DarchetypeGroupId<span class="o">=</span>edu.acceso.arquetipo<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DarchetypeArtifactId<span class="o">=</span>acceso_datos<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DarchetypeVersion<span class="o">=</span><span class="m">1</span>.0<span class="w"> </span><span class="se">\ </span><span class="w">         </span><span class="c1"># Versión de arquetipo (en su pom.xml)</span>
+<span class="go">    -DgroupId=edu.acceso.test_test \</span>
+<span class="go">    -DartifactId=test_test \</span>
+<span class="go">    -DinteractiveMode=false</span>
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Téngase presente que hay dos números de versión: la versión del
+propio arquetipo que es la que se indica aquí y que se define en el archivo
+<code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> del propio arquetipo (el que se encuentra en el directorio
+raíz, <code class="file docutils literal notranslate"><span class="pre">acceso_datos</span></code> en nuestro ejemplo) y la versión de la aplicación
+que pretendemos desarrollar, que se puede proporcionar mediante
+<code class="code docutils literal notranslate"><span class="pre">-Dversion=</span></code>, pero que no hemos fijado y hemos preferido indicar en el
+archivo <cite>archetype-metadata.xml</cite> a través de la propiedad correspondiente.</p>
+</div>
+<p>También podremos crear el proyecto a través del <abbr title="Integrated Development Environment">IDE</abbr> siempre que nos hayamos
+asegurado de que el arquetipo se registró.</p>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id4" role="doc-footnote">
@@ -629,6 +792,7 @@ versión igual o superior. Lo contrario, sin embargo, no sucede.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion">4.3. Compilación</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas">4.4. Pruebas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#empaquetado">4.5. Empaquetado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arquetipos">4.6. Arquetipos</a></li>
 </ul>
   </nav></div>
 

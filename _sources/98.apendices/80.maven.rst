@@ -171,6 +171,134 @@ que no incluye dependencias. Para más información sobre ello y cómo incluirla
 consulte este `gist sobre generación de paquetes
 <https://gist.github.com/sio2sio2/efb81004024fd8329e2aef047f324c9c/>`_.
 
+Arquetipos
+==========
+Al crear un nuevo proyecto, *Maven* define su estructura inicial tomando como
+referencia lo que se llama un arquetipo (o ninguno). Como es probable que para
+resolver las tareas del módulo partamos siempre de una misma base, nos ahorrará
+mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.
+
+Lo primero es crear un arquetipo en un directorio:
+
+.. code-block:: console
+
+   $ mvn archetype:generate \
+      -DgroupId=edu.acceso.arquetipo \
+      -DartifactId=acceso_datos
+      -DarchetypeArtifactId=maven-archetype-archetype \  # Arquetipo base
+      -DarchetypeVersion=1.5 \         # Versión del arquetipo base
+      -Dversion=1.0 \                  # Versión de este nuevo arquetipo.
+      -DinteractiveMode=false
+
+Esto definirá la estructura básica del arquetipo en el directorio
+:file:`acceso_datos`:
+
+.. code-block:: none
+
+   +-- pom.xml   (pom.xml del propio arquetipo)
+   |
+   +-- src/
+        +-- main/resources/
+        |               +-- archetype-resources/
+        |                                    +-- pom.xml  (pom.xml del proyecto)
+        |                                    +-- src/ ...
+        |               +-- META-INF/maven/
+        |                               +-- archetype-metadata.xml
+        +-- pom.xml
+        +-- test/ ...
+
+Como no nos interesan las pruebas podemos eliminar :file:`src/test/` y debemos
+centrarmos en:
+
+#. El :file:`pom.xml` del propio arquetipo.
+#. El contenido de :file:`src/main/resources/archetype-resources/` que contiene
+   los archivos que contendrá nuestro proyecto.
+#. El archivo :file:`src/main/resources/META-INF/maven/archetype-metadata.xml`
+   que contiene la configuración para generar el nuevo proyecto.
+
+En consecuencia, todos los archivos que queramos que acaben en nuestro proyecto
+deberán incluirse dentro de la segunda ubicación; y en el tercer archivo
+deberemos definir la configuración:
+
+.. literalinclude:: files/archetype-metadata.xml
+   :language: xml
+   :class: toggle
+   :caption: archetype-metadata.xml
+
+En la configuración tenemos dos partes fundamentales:
+
+a. Por un lado declaramos los archivos que queremos que se incluyan en el
+   proyecto. En la configuración hay tres bloques de archivos. La indicación
+   *filtered* significa que queremos que el *plugin* analice el archivo en busca
+   de propiedades para que las sustituya por su valor; y *packaged* que queremos
+   que se añada la declaración de paquete: :code:`package
+   edu.acceso.paquete...;` al comienzo del archivo.
+
+#. Por otro, definimos cuáles son las propiedades y los valores por defecto que
+   tienen. Por ejemplo, la variable *artifactId* podrá referirse en los archivos
+   como :code:`${artifactId}` y, en ese caso, se sustituirá por el valor
+   asignado.
+
+.. warning:: Hay archivos como :file:`.gitignore` que el plugin no incluirá en
+   el proyecto aunque lo creemos.
+
+Pues bien, una vez creado el arquetipo deberíamos retocar su contenido para
+ajustarlo a nuestras necesidades. 
+
+.. note:: Se incluye :download:`un arquetipo preparado <files/arquetipo.zip>`
+   que puede descargar, modificar a su gusto e instalar.
+
+Una vez que tengamos preparado el arquetipo, debemos acceder a su directorio e
+instalarlo:
+
+.. code-block:: console
+
+   $ cd acceso_datos/
+   $ mvn clean install
+
+.. tip:: Con ``clean`` nos aseguramos de que cualquier compilación anterior del
+   arquetipo no interfiera.
+
+Instalado, podemos comprobar que realmente lo está y registrarlo para que el
+|IDE| nos permita seleccionarlo:
+
+.. code-block:: console
+
+   $ ls ~/.m2/repository/edu/acceso/arquetipo/acceso_datos/  # Si instalado, existirá.
+   $ mvn archetype:crawl                                     # Lo registramos.
+   $ cat ~/.m2/repository/archetype-catalog.xml              # Comprobamos el registro.
+
+En caso de que quisiéramos eliminarlo podríamo eliminar a mano:
+
+.. code-block:: console
+
+   $ rm -rf ~/.m2/repository/edu/acceso/arquetipo/acceso_datos/
+   $ mvn archetype:crawl
+
+En principio, podríamos probar a generar un nuevo proyecto sin llegar a usar el
+|IDE|:
+
+.. code-block:: console
+
+   $ mvn archetype:generate \
+       -DarchetypeGroupId=edu.acceso.arquetipo \
+       -DarchetypeArtifactId=acceso_datos \
+       -DarchetypeVersion=1.0 \          # Versión de arquetipo (en su pom.xml)
+       -DgroupId=edu.acceso.test_test \
+       -DartifactId=test_test \
+       -DinteractiveMode=false
+
+.. caution:: Téngase presente que hay dos números de versión: la versión del
+   propio arquetipo que es la que se indica aquí y que se define en el archivo
+   :file:`pom.xml` del propio arquetipo (el que se encuentra en el directorio
+   raíz, :file:`acceso_datos` en nuestro ejemplo) y la versión de la aplicación
+   que pretendemos desarrollar, que se puede proporcionar mediante
+   :code:`-Dversion=`, pero que no hemos fijado y hemos preferido indicar en el
+   archivo `archetype-metadata.xml` a través de la propiedad correspondiente.
+
+También podremos crear el proyecto a través del |IDE| siempre que nos hayamos
+asegurado de que el arquetipo se registró.
+
 .. rubric:: Notas al pie
 
 .. [#] El *bytecode* es retrocompatible, es decir, el *bytecode* generado para

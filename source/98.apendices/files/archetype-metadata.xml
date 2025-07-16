@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor name="acceso-datos"
+  xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0 http://maven.apache.org/xsd/archetype-descriptor-1.1.0.xsd">
+  
+  <fileSets>
+     <fileSet filtered="true" packaged="false">
+        <directory></directory>
+        <includes>
+           <include>README.md</include>
+           <include>LICENSE</include>
+        </includes>
+     </fileSet>
+     <fileSet filtered="true" packaged="false">
+        <directory>.vscode</directory>
+        <includes>
+           <include>**/*.json</include>
+        </includes>
+     </fileSet>
+     <fileSet filtered="true" packaged="true">
+        <directory>src/main/java</directory>
+        <includes>
+           <include>**/*.java</include>
+        </includes>
+     </fileSet>
+  </fileSets>
+  
+  <requiredProperties>
+    <requiredProperty key="groupId" />
+    <requiredProperty key="artifactId" />
+    <requiredProperty key="version">
+       <defaultValue>1.0.0</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="dollar">
+       <defaultValue>$</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="hash">
+       <defaultValue>#</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+</archetype-descriptor>

@@ -768,19 +768,24 @@ de objetos de Java, Por ejemplo, podríamos hacer esto:</p>
 <p>Obsérvese que tiene que ser el programador el que traduzca el modelo
 relacional al modelo de objetos, tal como adelantamos en la introducción.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
-<p>El valor de un campo puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. Cuando se recupera una cadena
-(<code class="docutils literal notranslate"><span class="pre">.getString</span></code>) esto no es un problema, porque <code class="docutils literal notranslate"><span class="pre">String</span></code> puede ser
-<code class="docutils literal notranslate"><span class="pre">null</span></code>. En cambio, <code class="docutils literal notranslate"><span class="pre">getInt</span></code> es incapaz de devolver <code class="docutils literal notranslate"><span class="pre">null</span></code>, aunque el
-campo no tenga valor, y se verá obligado a devolver <strong>0</strong>. Esto no será un
-problema cuando <strong>0</strong> no sea un valor válido (como en el ejemplo, ya que a
-los identificadores no se les suele asignar valor <strong>0</strong>), pero, cuando sea un
-valor válido, debe existir una forma de distinguir el <strong>0</strong> del valor nulo:</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Los métodos <code class="docutils literal notranslate"><span class="pre">.getInt</span></code>, <code class="docutils literal notranslate"><span class="pre">.getLong</span></code>, etc. devuelven tipos
+primitivos (<code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">long</span></code>, etc.) por lo que cuando en la base de datos el
+valor del campo es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, con incapaces de devolver <code class="docutils literal notranslate"><span class="pre">null</span></code> y devuelven
+el valor predeterminado del primitivo (p.ej.  ejemplo, <strong>0</strong> en caso de
+<code class="docutils literal notranslate"><span class="pre">int</span></code> o <code class="docutils literal notranslate"><span class="pre">long</span></code>). Si necesitamos diferenciar el valor predeterminado del
+valor nulo, hay dos estrategias. Una consiste en seguir usando estos métodos
+y preguntar luego si el valor era realmente <code class="docutils literal notranslate"><span class="pre">NULL</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Suponiendo que se permita que el campo &quot;edad&quot; sea nulo.</span>
-<span class="n">Integer</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;edad&quot;</span><span class="p">);</span>
-<span class="hll"><span class="k">if</span><span class="p">(</span><span class="n">edad</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">wasNull</span><span class="p">())</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;edad&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// si es nulo, edad valdrá 0.</span>
+<span class="hll"><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">wasNull</span><span class="p">())</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 </span></pre></div>
+</div>
+<p>La segunda estrategia es usar <code class="docutils literal notranslate"><span class="pre">.getObject</span></code> especificando la clase en la que
+se quiere convertir el dato:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getObject</span><span class="p">(</span><span class="s">&quot;edad&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
 </div>
 </div>
 </section>

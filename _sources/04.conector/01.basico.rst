@@ -220,20 +220,28 @@ de objetos de Java, Por ejemplo, podríamos hacer esto:
 .. important:: Obsérvese que tiene que ser el programador el que traduzca el modelo
    relacional al modelo de objetos, tal como adelantamos en la introducción.
 
-.. tip:: El valor de un campo puede ser ``NULL``. Cuando se recupera una cadena
-   (``.getString``) esto no es un problema, porque ``String`` puede ser
-   ``null``. En cambio, ``getInt`` es incapaz de devolver ``null``, aunque el
-   campo no tenga valor, y se verá obligado a devolver **0**. Esto no será un
-   problema cuando **0** no sea un valor válido (como en el ejemplo, ya que a
-   los identificadores no se les suele asignar valor **0**), pero, cuando sea un
-   valor válido, debe existir una forma de distinguir el **0** del valor nulo:
+.. caution:: Los métodos ``.getInt``, ``.getLong``, etc. devuelven tipos
+   primitivos (``int``, ``long``, etc.) por lo que cuando en la base de datos el
+   valor del campo es ``NULL``, con incapaces de devolver ``null`` y devuelven
+   el valor predeterminado del primitivo (p.ej.  ejemplo, **0** en caso de
+   ``int`` o ``long``). Si necesitamos diferenciar el valor predeterminado del
+   valor nulo, hay dos estrategias. Una consiste en seguir usando estos métodos
+   y preguntar luego si el valor era realmente ``NULL``:
 
    .. code-block:: java
       :emphasize-lines: 3
 
       // Suponiendo que se permita que el campo "edad" sea nulo.
-      Integer edad = rs.getInt("edad");
-      if(edad == 0 && rs.wasNull()) edad = null;
+      Integer edad = rs.getInt("edad");  // si es nulo, edad valdrá 0.
+      if(rs.wasNull()) edad = null;
+
+   La segunda estrategia es usar ``.getObject`` especificando la clase en la que
+   se quiere convertir el dato:
+
+   .. code-block:: java
+
+      Integer edad = rs.getObject("edad", Integer.class);
+
 
 .. _conn-preparedstatement:
 

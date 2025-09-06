@@ -102,23 +102,8 @@ Y si varios:
 
 Metamodel
 =========
-Para la habilitar la creación del *metamodelo*, debemos añadir como dependencia
-`hibernate-processor
-<https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor>`_:
-
-.. code-block:: xml
-
-   <dependency>
-       <groupId>org.hibernate.orm</groupId>
-       <artifactId>hibernate-processor</artifactId>
-       <version>7.0.0.Beta4</version>
-       <scope>provided</scope>
-   </dependency>
-
-Obsérvese su ámbito, ya que necesitamos la librería para el desarrollo, no para
-la ejecución de la aplicación.
-
-Además, debemos añadir una sección `<build>` a :file:`pom.xml`:
+Para la habilitar la creación del *metamodelo*, debemos añadir a
+la sección `<build>` de :file:`pom.xml`\ [#]_:
 
 .. code-block:: xml
 
@@ -129,12 +114,12 @@ Además, debemos añadir una sección `<build>` a :file:`pom.xml`:
               <artifactId>maven-compiler-plugin</artifactId>
               <version>3.14.0</version>
               <configuration>
-                  <release>21</release> <!-- Versión de JDK -->
+                  <release>${maven.compiler.release}</release>
                   <annotationProcessorPaths>
                       <path>
                           <groupId>org.hibernate.orm</groupId>
-                          <artifactId>hibernate-processor</artifactId>
-                          <version>7.0.0.Beta4</version>
+                          <artifactId>hibernate-jpamodelgen</artifactId>
+                          <version>${hibernate.version}</version>
                       </path>
                   </annotationProcessorPaths>
               </configuration>
@@ -442,7 +427,35 @@ También es posible **borrar**:
 
    em.createQuery(delete).executeUpdate();
 
+.. rubric:: Notas al pie
+
+.. [#] Si utilizáramos otros |ORM| tendríamos que cambiar la referencia al |ORM|
+       dentro de ``<annotationProcessorPaths>``. Para **EclipseLink**:
+
+       .. code-block:: xml
+
+          <annotationProcessorPaths>
+              <path>
+                  <groupId>org.eclipse.persistence</groupId>
+                  <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+                  <version>${eclipselink.version}</version>
+              </path>
+          </annotationProcessorPaths>
+         
+       Y para **OpenJPA**:
+
+       .. code-block:: xml
+
+          <annotationProcessorPaths>
+              <path>
+                  <groupId>org.apache.openjpa</groupId>
+                  <artifactId>openjpa</artifactId>
+                  <version>${openjpa.version}</version>
+              </path>
+          </annotationProcessorPaths>
+
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 
 .. |CriteriaBuilder| replace:: :hibernate-api:`CriteriaBuilder <query/criteria/HibernateCriteriaBuilder>`

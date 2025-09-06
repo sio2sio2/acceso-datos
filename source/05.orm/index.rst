@@ -19,8 +19,9 @@ llamada |JPA| para el uso de |ORM|, de manera que, si usamos |ORM|\ s
 compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El
 |ORM| más utilizado en Java es Hibernate_ y es compatible, por lo que esta
 unidad explicará cómo usar esta especificación usando como implementación
-Hibernate_. Los ejemplos los basaremos en :ref:`nuestro caso sobre centros y
-profesores <ej-centros-alumnos>`.
+Hibernate_, pero podríamos usar cualquier otro |ORM| siempre que nos
+aseguráramos que es compatible con |JPA|\ [#]_. Los ejemplos los basaremos en
+:ref:`nuestro caso sobre centros y profesores <ej-centros-alumnos>`.
 
 .. todo:: Investigar el enfoque de MyBatis_ (quizás para la unidad anterior).
 
@@ -35,6 +36,10 @@ profesores <ej-centros-alumnos>`.
 .. seealso:: Dado que usaremos Hibernate_ como implementación de |JPA|, puede consultar
    también su `pequeña guía oficial
    <https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html>`_.
+
+.. rubric:: Notas al pie
+
+.. [#] Por ejemplo, `EclipseLink <https://eclipse.dev/eclipselink/>`_ o `OpenJPA <https://openjpa.apache.org/>`_.
 
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 

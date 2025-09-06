@@ -23,34 +23,10 @@ del |ORM| siguiendo la especificación |JPA|:
    }
 
 Tuvimos que introducirlas tan temprano porque |JPA| nos obliga a explicitar la
-transacción siempre que se realioza alguna operación que implica cambios en la
-base de datos. Ciertamente la sintaxis es algo farragosa, por lo que podríamos
-definir algunos métodos en :ref:`JpaEMUtils <orm-conn>` que simplificaran su
-creación:
-
-
-.. literalinclude:: files/JpaEMUtils.java
-   :language: java
-   :start-after: // Transacciones
-   :end-before: // Fin transacciones
-   :dedent:
-
-
-La existencia de los tres métodos responde a las mismas causas por las que
-hicimos varias versiones de ``.getEntityManagerFactory``. Si manejamos una
-sola fábrica y ya la creamos antes, que será lo habitual, sólo necesitaremos
-pasar la acción:
-
-.. code-block:: java
-
-   JpaEMUtils.transaction(em -> {
-      Centro castillo = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
-      em.persist(castillo);
-   });
-
-Este método simplifica las operaciones en la base de datos, pero a costa de que
-los objetos creados dentro de la expresión lambda, no son visibles fuera de
-ella.
+transacción siempre que se realiza alguna operación que implica cambios en la
+base de datos. Ciertamente la sintaxis es algo farragosa, por lo que :ref:`más
+adelante introduciremos algunos métodos <orm-pattern>` que simplificarán su
+creación.
 
 Hay otros métodos que están asociados al objeto
 :jakarta-persistence:`EntityManager`:

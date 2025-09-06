@@ -1,0 +1,102 @@
+.. _orm-pattern:
+
+Estrategias de diseño
+=====================
+Cuando analizamos :ref:`conectores <conn>`, ya expusimos que uno de los patrones
+de diseño más socorridos es el patrón |DAO|. Al usar un |ORM| podríamos seguir
+esa misma estrategia y definir una interfaz |CRUD| para crear clases |DAO| para
+todas las entidades del modelo. En este caso, la única salvedad es que las
+implementaciones de los métodos de la interfaz no se basarían en |JDBC| sino en
+|JPA|. Ahora bien, muy comúnmente y a menos que nuestra intención sea
+reaprovechar una interfaz antigua implementada con |JDBC|, obrar de esta manera
+es un poco redundante, ya que el propio |JPA| tiene una orientación semejante a
+|DAO|.
+
+Lo que sí es muy conveniente es intentar liberar al resto del código de las
+particularidades del acceso, así que conviene encerrarlas en una clase auxiliar.
+Podríamos proponer esta:
+
+.. literalinclude:: files/JpaBackend.java
+   :class: toggle
+   :caption: JpaBackend.java
+   :language: java
+   :start-at: public class
+
+Esta clase implementa un `patrón Singleton`_ ampliado que posibilita la creación
+de una única fábrica por entidad de persistencia. Cada una de estas fábricas se
+asocia a un índice a partir del **1** para que podamos recuperarlas
+posteriormente cuando nos sean necesarias:
+
+.. code-block:: java
+
+   public static main(String[] args) throws Exception {}
+      // Propiedades configuradas en tiempo de ejecución.
+      Map<String, String> props = new HashMap<>();
+      props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
+      props.put("hibernate.show_sql", "true");
+
+      int idx = JpaBackend.createEntityManagerFactory("MiUnidadP", props);
+
+      // ...
+
+      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory(idx)) {
+         operaciones(idx);  // Aquí se crean y usan objetos EntityManager
+      }
+   }
+
+   private static void operaciones(int idx) {
+      // ¡Ojo! No hay que cerrarlo.
+      EntityManagerFactory emf = JpaEmFactory.getInstance(idx); // Devuelve el mismo objeto.
+
+      try(em EntityFactory = emf.createEntityManager()) {
+         EntityTransaction tr = em.getTransaction();
+         try {
+            tr.begin();
+            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+            em.persist(centro);
+            tr.commit();
+         }
+         catch(Exception e) {
+            if(tr != null && tr.isActive()) tr.rollback();
+            throw new RuntimeException("Error al almacenar el centro", err);
+         }
+      }
+   }
+
+.. tip:: Se ha permitido también que en caso de que sólo se haya creado una
+   fábrica, ni siquiera sea necesario facilitar el índice:
+
+   .. code-block:: java
+
+      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory()) {
+         operaciones();
+      }
+
+Obtener la fábrica, sin embargo, nos obligaría a crear objetos
+:jakarta-persistence:`EntityManager` y a gestionar correctamente las
+transacciones con lo que no abstraería el código de las particularidades del
+almacenamiento. Por ese motivo la clase incluye algunos métodos para manejar
+automáticamente las transacciones:
+
+.. code-block:: java
+
+   // Usamos la fábrica 1 para hacer persistente un centro.
+   // También podríamos obviar el índice, si sólo hubiera una fábrica
+   JpaBackend.transaction(1, em -> {
+      Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+      em.persist(centro);
+   });
+
+
+   // Este método es capaz de devolver lo que devuelve la función del argumento.
+   // Como en el caso anterior, se puede obviar el índice 1.
+   Centro otro = JpaBackend.transactionR(1, em -> em.get(Centro.class, 11004866L));
+
+
+.. |DAO| replace:: :abbr:`DAO (Data Access Object)`
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+
+.. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton

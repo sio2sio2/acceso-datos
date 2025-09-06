@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -417,12 +417,19 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 </ol>
 <section id="depedencias">
 <h2><span class="section-number">5.1.1. </span>Depedencias<a class="headerlink" href="#depedencias" title="Link to this heading">#</a></h2>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
+<span class="w">    </span><span class="nt">&lt;hibernate.version&gt;</span>7.1.0.Final<span class="nt">&lt;/hibernate.version&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+
+<span class="cm">&lt;!-- ... --&gt;</span>
+
+<span class="nt">&lt;dependencies&gt;</span>
 <span class="w">      </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
 <span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.49.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.50.3.0<span class="nt">&lt;/version&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- JPA --&gt;</span>
@@ -436,14 +443,14 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">          </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- Soporte en Hibernate para SQLite --&gt;</span>
 <span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-community-dialects<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">          </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- Opcional para anotaciones de comprobación --&gt;</span>
@@ -457,7 +464,14 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.validator<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-validator<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">         </span><span class="nt">&lt;version&gt;</span>9.0.0.CR1<span class="nt">&lt;/version&gt;</span>
+<span class="w">         </span><span class="nt">&lt;version&gt;</span>9.0.1.Final<span class="nt">&lt;/version&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">     </span><span class="cm">&lt;!-- Opcional para Expression Language (necesario para Hibernate Validator) --&gt;</span>
+<span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.glassfish<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>jakarta.el<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>4.0.2<span class="nt">&lt;/version&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
@@ -471,9 +485,10 @@ es <a class="reference external" href="https://mvnrepository.com/artifact/org.xe
 <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a> no soporta de serie <a class="reference external" href="https://sqlite.org">SQLite</a>, por lo que se debe añadir
 uan librería más (<cite>hibernate-community-dialects</cite>).</p></li>
 <li><p>En principio, basta con lo anterior, pero si se quiere llevar a cabo
-comprobaciones sobre los valores de los datos, serán necesaria la
-especificación sita en <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a> y su implementación en
-<a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.</p></li>
+comprobaciones sobre los valores de los datos (p.ej. las <a class="reference internal" href="04.mapeo.html#orm-mapping-check"><span class="std std-ref">referidas más
+adelante</span></a>), serán necesaria la especificación sita en
+<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a>, su implementación en <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a> y
+<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.el/jakarta.el-api">jakarta.el-api</a>, que es necesaria para dicha implementación.</p></li>
 </ul>
 </section>
 <section id="configuracion-de-la-persistencia">
@@ -518,7 +533,8 @@ especificación sita en <a class="reference external" href="https://mvnrepositor
 <p>En este archivo:</p>
 <ul>
 <li><p>Debemos recordar el nombre que le damos a la unidad de persistencia, porque
-la usaremos luego; y hay propiedades que</p></li>
+la usaremos luego; y hay propiedades cuyos valores dependen del <abbr title="Object-Relational Mapping">ORM</abbr> y el
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> utilizados.</p></li>
 <li><p>El proveedor indica cuál es la implementación <abbr title="Java Persistence API">JPA</abbr> que usaremos. Algunos
 muy usandos son:</p>
 <div class="pst-scrollable-table-container"><table class="url-sql table">

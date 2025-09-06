@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.3. Conexión &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.5. Estrategias de diseño &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -54,11 +54,11 @@
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/03.conexion';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/09.dao';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.4. Mapeo" href="04.mapeo.html" />
-    <link rel="prev" title="5.2. Operativa básica" href="02.basico.html" />
+    <link rel="next" title="5.6. Operaciones CRUD" href="10.crud.html" />
+    <link rel="prev" title="5.4. Transacciones" href="08.transaction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -300,7 +300,7 @@
       
       
       
-      <li><a href="../_sources/05.orm/03.conexion.rst" target="_blank"
+      <li><a href="../_sources/05.orm/09.dao.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -382,7 +382,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Conexión</h1>
+    <h1>Estrategias de diseño</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -396,46 +396,76 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="conexion">
-<span id="orm-conn"></span><h1><span class="section-number">5.3. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h1>
-<p>En el apartado dedicado a <a class="reference internal" href="02.basico.html#orm-bas"><span class="std std-ref">operaciones básicas</span></a> ya adelantamos
-que la creación del objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a> es muy
-costosa, puesto que implica el establecimiento y validación de la conexión. Por
-consiguiente, conviene asegurarnos de que su creación sólo se realiza una vez
-para lo cual nos valdremos del <a class="reference external" href="https://es.wikipedia.org/wiki/Singleton">patrón Singleton</a> modificado para crear una
-<a class="reference download internal" download="" href="../_downloads/e013c943649caa843b16297a28a9002c/JpaEMUtils.java"><code class="xref download docutils literal notranslate"><span class="pre">clase</span> <span class="pre">con</span> <span class="pre">utilidades</span></code></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">JpaEMUtils</span><span class="w"> </span><span class="p">{</span>
+  <section id="estrategias-de-diseno">
+<span id="orm-pattern"></span><h1><span class="section-number">5.5. </span>Estrategias de diseño<a class="headerlink" href="#estrategias-de-diseno" title="Link to this heading">#</a></h1>
+<p>Cuando analizamos <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">conectores</span></a>, ya expusimos que uno de los patrones
+de diseño más socorridos es el patrón <abbr title="Data Access Object">DAO</abbr>. Al usar un <abbr title="Object-Relational Mapping">ORM</abbr> podríamos seguir
+esa misma estrategia y definir una interfaz <abbr title="Create, Read, Update, Delete">CRUD</abbr> para crear clases <abbr title="Data Access Object">DAO</abbr> para
+todas las entidades del modelo. En este caso, la única salvedad es que las
+implementaciones de los métodos de la interfaz no se basarían en <abbr title="Java DataBase Connectivity">JDBC</abbr> sino en
+<abbr title="Java Persistence API">JPA</abbr>. Ahora bien, muy comúnmente y a menos que nuestra intención sea
+reaprovechar una interfaz antigua implementada con <abbr title="Java DataBase Connectivity">JDBC</abbr>, obrar de esta manera
+es un poco redundante, ya que el propio <abbr title="Java Persistence API">JPA</abbr> tiene una orientación semejante a
+<abbr title="Data Access Object">DAO</abbr>.</p>
+<p>Lo que sí es muy conveniente es intentar liberar al resto del código de las
+particularidades del acceso, así que conviene encerrarlas en una clase auxiliar.
+Podríamos proponer esta:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">JpaBackend.java</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">JpaBackend</span><span class="w"> </span><span class="p">{</span>
 
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">JpaEMUtils</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">super</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">JpaBackend</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">super</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Genera siempre el mismo EntityManagerFactory a partir del nombre de la unidad de persistencia</span>
+<span class="cm">     * Genera un {@link EntityManagerFactory} a partir del nombre de la unidad de persistencia</span>
 <span class="cm">     * y un mapa que modifica sus propiedades.</span>
 <span class="cm">     * @param persistenceUnit El nombre de la unidad de persistencia.</span>
 <span class="cm">     * @param props El mapa que define las propiedades definidas en tiempo de ejecución.</span>
-<span class="cm">     * @return El objeto resultante.</span>
+<span class="cm">     * @return Un índice que representa la instancia creada.</span>
+<span class="cm">     * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.</span>
+<span class="cm">     * @throws IllegalStateException Si ya existe una instancia con esos parámetros.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">getEntityManagerFactory</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">createEntityManagerFactory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;El nombre de la unidad de persistencia no puede ser nulo&quot;</span><span class="p">);</span><span class="w"> </span>
+
 <span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">hashCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
+
 <span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
-<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">hashCode</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Ya existe una EntityManagerFactory con esos parámetros&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">        </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
+<span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">hashCode</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
+<span class="w">        </span><span class="n">keys</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Genera siempre el mismo EntityManagerFactory a partir del nombre de la unidad de persistencia.</span>
-<span class="cm">     * Se sobreentiende que no se modifica o añade ninguna propiedad.ñ</span>
+<span class="cm">     * Genera un {@link EntityManagerFactory} a partir del nombre de la unidad de persistencia</span>
+<span class="cm">     * Se sobreentiende que no se modifica o añade ninguna propiedad.</span>
 <span class="cm">     * @param persistenceUnit El nombre de la unidad de persistencia.</span>
-<span class="cm">     * @return El objeto resultante.</span>
+<span class="cm">     * @return Un índice que representa la instancia creada.</span>
+<span class="cm">     * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.</span>
+<span class="cm">     * @throws IllegalStateException Si ya existe una instancia con esos parámetros.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">getEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">createEntityManagerFactory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">createEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">size</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;Índice fuera de rango&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">hashCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
+<span class="w">            </span><span class="n">keys</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada no está disponible&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -449,9 +479,12 @@ para lo cual nos valdremos del <a class="reference external" href="https://es.wi
 <span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
 <span class="w">                </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">iterator</span><span class="p">().</span><span class="na">next</span><span class="p">();</span>
 <span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">reset</span><span class="p">();</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada no está disponible&quot;</span><span class="p">);</span>
+<span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No hay disponible ninguna instancia con parámetros&quot;</span><span class="p">);</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No hay disponible ninguna instancia&quot;</span><span class="p">);</span>
 <span class="w">            </span><span class="k">default</span><span class="p">:</span>
 <span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Invocación ambigua: hay varios candidatos&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
@@ -462,17 +495,19 @@ para lo cual nos valdremos del <a class="reference external" href="https://es.wi
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">reset</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+<span class="w">        </span><span class="n">keys</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="c1">// Transacciones.</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">transactionR</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="n">getEntityManagerFactory</span><span class="p">(</span><span class="n">index</span><span class="p">):</span><span class="n">getEntityManagerFactory</span><span class="p">();</span>
 <span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">                </span><span class="n">action</span><span class="p">.</span><span class="na">accept</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
+<span class="w">                </span><span class="n">T</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
 <span class="w">                </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">tx</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
@@ -481,44 +516,47 @@ para lo cual nos valdremos del <a class="reference external" href="https://es.wi
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">transaction</span><span class="p">(</span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">transactionR</span><span class="p">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">transactionR</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">transactionR</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">action</span><span class="p">.</span><span class="na">accept</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">transaction</span><span class="p">(</span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">        </span><span class="n">transaction</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="c1">// Fin transacciones.</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>La clase:</p>
-<ul class="simple">
-<li><p>Implementa un <a class="reference external" href="https://es.wikipedia.org/wiki/Singleton">patrón Singleton</a>, de modo que para la misma configuración
-de conexión, siempre se devuelve la misma fábrica.</p></li>
-<li><p>En caso de que sólo se haya creado una fábrica, es posible recuperarla sin
-necesidad de facilitar la configuración.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Los métodos dedicados a las transacciones <a class="reference internal" href="08.transaction.html#orm-transaction"><span class="std std-ref">los trararemos más
-adelante</span></a>.</p>
 </div>
-<p>De este modo:</p>
-<div class="highlight-java notranslate" id="orm-uso-sf"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<p>Esta clase implementa un <a class="reference external" href="https://es.wikipedia.org/wiki/Singleton">patrón Singleton</a> ampliado que posibilita la creación
+de una única fábrica por entidad de persistencia. Cada una de estas fábricas se
+asocia a un índice a partir del <strong>1</strong> para que podamos recuperarlas
+posteriormente cuando nos sean necesarias:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">   </span><span class="c1">// Propiedades configuradas en tiempo de ejecución.</span>
 <span class="w">   </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="w">   </span><span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:centro.db&quot;</span><span class="p">);</span>
 <span class="w">   </span><span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">);</span>
 
-<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaEmFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">operaciones</span><span class="p">();</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaBackend</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// ...</span>
+
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaBackend</span><span class="p">.</span><span class="na">getEntityManagerFactory</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">operaciones</span><span class="p">(</span><span class="n">idx</span><span class="p">);</span><span class="w">  </span><span class="c1">// Aquí se crean y usan objetos EntityManager</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 
-<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="nf">operaciones</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">operaciones</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// ¡Ojo! No hay que cerrarlo.</span>
-<span class="w">   </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaEmFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w"> </span><span class="c1">// Devuelve el mismo objeto.</span>
+<span class="w">   </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaEmFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">idx</span><span class="p">);</span><span class="w"> </span><span class="c1">// Devuelve el mismo objeto.</span>
 
 <span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">em</span><span class="w"> </span><span class="n">EntityFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
@@ -536,6 +574,34 @@ adelante</span></a>.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Se ha permitido también que en caso de que sólo se haya creado una
+fábrica, ni siquiera sea necesario facilitar el índice:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaBackend</span><span class="p">.</span><span class="na">getEntityManagerFactory</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">operaciones</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Obtener la fábrica, sin embargo, nos obligaría a crear objetos
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a> y a gestionar correctamente las
+transacciones con lo que no abstraería el código de las particularidades del
+almacenamiento. Por ese motivo la clase incluye algunos métodos para manejar
+automáticamente las transacciones:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Usamos la fábrica 1 para hacer persistente un centro.</span>
+<span class="c1">// También podríamos obviar el índice, si sólo hubiera una fábrica</span>
+<span class="n">JpaBackend</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
+<span class="w">   </span><span class="n">em</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="p">});</span>
+
+
+<span class="c1">// Este método es capaz de devolver lo que devuelve la función del argumento.</span>
+<span class="c1">// Como en el caso anterior, se puede obviar el índice 1.</span>
+<span class="n">Centro</span><span class="w"> </span><span class="n">otro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaBackend</span><span class="p">.</span><span class="na">transactionR</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">));</span>
+</pre></div>
+</div>
 </section>
 
 
@@ -550,20 +616,20 @@ adelante</span></a>.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="02.basico.html"
+       href="08.transaction.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.2. </span>Operativa básica</p>
+        <p class="prev-next-title"><span class="section-number">5.4. </span>Transacciones</p>
       </div>
     </a>
     <a class="right-next"
-       href="04.mapeo.html"
+       href="10.crud.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.4. </span>Mapeo</p>
+        <p class="prev-next-title"><span class="section-number">5.6. </span>Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

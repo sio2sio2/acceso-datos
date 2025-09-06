@@ -57,7 +57,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/02.basico';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.3. Conexión" href="03.conexion.html" />
+    <link rel="next" title="5.3. Mapeo" href="04.mapeo.html" />
     <link rel="prev" title="5.1. Configuración" href="01.conf.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -501,7 +501,7 @@ añadir una anotación extra:</p>
 anotación comentada en el código de más arriba.</p></li>
 <li><p>Si el identificador puede ser definido por el usuario y, si no lo hace, el
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> se encarga de adjudicar uno (<code class="docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">AS</span> <span class="pre">DEFAULT</span> <span class="pre">BY</span> <span class="pre">IDENTITY</span></code>),
-no hay manera de expresarlo con <a class="reference external" href="https://www.hibernate.org">Hibernate</a>.</p></li>
+no hay manera de expresarlo con <abbr title="Java Persistent API">JPA</abbr>.</p></li>
 </ul>
 </li>
 <li><p>Los atributos que son campos se notan con <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> y pueden añadirse
@@ -578,7 +578,7 @@ de suerte que cada transacción debería usar uno nuevo.</p></li>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Más adelante sugerimos <a class="reference internal" href="03.conexion.html#orm-conn"><span class="std std-ref">cómo crear una fábrica que asegure su
+<p>Más adelante sugerimos <a class="reference internal" href="09.dao.html#orm-pattern"><span class="std std-ref">cómo crear una fábrica que asegure su
 unicidad</span></a>.</p>
 </aside>
 </aside>
@@ -606,11 +606,11 @@ unicidad</span></a>.</p>
       </div>
     </a>
     <a class="right-next"
-       href="03.conexion.html"
+       href="04.mapeo.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.3. </span>Conexión</p>
+        <p class="prev-next-title"><span class="section-number">5.3. </span>Mapeo</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

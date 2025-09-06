@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.4. Mapeo &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.3. Mapeo &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -57,8 +57,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/04.mapeo';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.5. Transacciones" href="08.transaction.html" />
-    <link rel="prev" title="5.3. Conexión" href="03.conexion.html" />
+    <link rel="next" title="5.4. Transacciones" href="08.transaction.html" />
+    <link rel="prev" title="5.2. Operativa básica" href="02.basico.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -394,9 +394,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.4.1. Anotaciones básicas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.4.2. Otras anotaciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.3. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.3.1. Anotaciones básicas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.3.2. Otras anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.3.3. Relaciones</a></li>
 </ul>
             </nav>
         </div>
@@ -409,7 +409,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="mapeo">
-<span id="orm-mapping"></span><h1><span class="section-number">5.4. </span>Mapeo<a class="headerlink" href="#mapeo" title="Link to this heading">#</a></h1>
+<span id="orm-mapping"></span><h1><span class="section-number">5.3. </span>Mapeo<a class="headerlink" href="#mapeo" title="Link to this heading">#</a></h1>
 <p>El <em class="dfn">mapeo</em> consiste en definir cómo se hará la traducción entre las clases
 del modelo de objetos (de <em>Java</em>, en este caso) y las entidades del modelo
 relacional. En esta traducción las clases se corresponden con las tablas, las
@@ -423,7 +423,7 @@ Fundamentalmente sirven para:</p>
 <li><p>Definir relaciones entre tablas.</p></li>
 </ul>
 <section id="anotaciones-basicas">
-<h2><span class="section-number">5.4.1. </span>Anotaciones básicas<a class="headerlink" href="#anotaciones-basicas" title="Link to this heading">#</a></h2>
+<span id="orm-mapping-bas"></span><h2><span class="section-number">5.3.1. </span>Anotaciones básicas<a class="headerlink" href="#anotaciones-basicas" title="Link to this heading">#</a></h2>
 <p>Ya introdujimos las anotaciones más básicas al presentar el <a class="reference internal" href="02.basico.html#orm-bas-map"><span class="std std-ref">ejemplo de
 anotación de la clase Centro</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
@@ -677,7 +677,7 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 </dl>
 </section>
 <section id="otras-anotaciones">
-<h2><span class="section-number">5.4.2. </span>Otras anotaciones<a class="headerlink" href="#otras-anotaciones" title="Link to this heading">#</a></h2>
+<span id="orm-mapping-check"></span><h2><span class="section-number">5.3.2. </span>Otras anotaciones<a class="headerlink" href="#otras-anotaciones" title="Link to this heading">#</a></h2>
 <p>Existen otras anotaciones relacionadas con la validación de valores (el
 equivalente al <code class="docutils literal notranslate"><span class="pre">CHECK</span></code> de <abbr title="Structured Query Language">SQL</abbr>), que requieren importar la librería
 <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">validation-api</a>. Son variadas. Por ejemplo:</p>
@@ -700,7 +700,7 @@ equivalente al <code class="docutils literal notranslate"><span class="pre">CHEC
 </div>
 </section>
 <section id="relaciones">
-<h2><span class="section-number">5.4.3. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.3.3. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
 <p>Las relaciones entre las entidades también se significan mediante anotaciones.
 Hay tres tipos de relaciones binarias en el modelo relacional:</p>
 <dl>
@@ -831,7 +831,7 @@ introduce un <strong>problema de sincronización</strong> entre los extremos de 
 relación, ya que un extremo puede que informe de una cosa distinta a la
 que informa el otro. En el caso anterior, el <em>estudiante</em> informa de que
 no está matriculado, mientras la lista de estudiantes en el centro
-informa de que sí lo está. En casos de discrepancia, <a class="reference external" href="https://www.hibernate.org">Hibernate</a> hará
+informa de que sí lo está. En casos de discrepancia, <abbr title="Java Persisten API">JPA</abbr> hará
 prevalecer la información del extremo de la relación que realmente
 existe en la base de datos, esto es, la información que ofrece
 <em>estudiante</em>.</p>
@@ -841,7 +841,7 @@ existe en la base de datos, esto es, la información que ofrece
 </dd>
 <dt><strong>Relación 1:1</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code></dt><dd><p>Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
 ninguno) registro de la otra tabla. En <abbr title="Structured Query Language">SQL</abbr> se resuelve colocando el campo
-en cualquiera de las dos tablas. En <a class="reference external" href="https://www.hibernate.org">Hibernate</a> para significar este tipo
+en cualquiera de las dos tablas. En <abbr title="Java Persisten API">JPA</abbr> para significar este tipo
 relaciones se usa la notación <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code> y, como en el caso anterior,
 podemos reflejarla de modo <strong>unidireccional</strong> o <strong>bidireccional</strong>.</p>
 <p>Para ilustrarlo, supongamos que añadimos un campo <code class="docutils literal notranslate"><span class="pre">direccion</span></code> a la clase
@@ -876,7 +876,7 @@ relación, si ampliáramos la base de datos para que incluyera profesores y los
 quisiéramos relacionar con estudiantes, ya que los estudiantes tienen varios
 profesores; y cada profesor imparte sus enseñanzas a varios estudiantes. Por
 tanto, la relación entre las tablas <em>Profesor</em> y <em>Estudiante</em> es una relación
-<strong>N:M</strong>. Para implementar en <a class="reference external" href="https://www.hibernate.org">Hibernate</a> estas relaciones, han de distinguirse
+<strong>N:M</strong>. Para implementar en <abbr title="Java Persisten API">JPA</abbr> estas relaciones, han de distinguirse
 dos casos:</p>
 <ol class="loweralpha">
 <li><p>La relación no tiene atributos propios: <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
@@ -942,12 +942,12 @@ clase.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="03.conexion.html"
+       href="02.basico.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.3. </span>Conexión</p>
+        <p class="prev-next-title"><span class="section-number">5.2. </span>Operativa básica</p>
       </div>
     </a>
     <a class="right-next"
@@ -955,7 +955,7 @@ clase.</p>
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.5. </span>Transacciones</p>
+        <p class="prev-next-title"><span class="section-number">5.4. </span>Transacciones</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -975,9 +975,9 @@ clase.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.4.1. Anotaciones básicas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.4.2. Otras anotaciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.4.3. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones-basicas">5.3.1. Anotaciones básicas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#otras-anotaciones">5.3.2. Otras anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.3.3. Relaciones</a></li>
 </ul>
   </nav></div>
 

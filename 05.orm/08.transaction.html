@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.5. Transacciones &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.4. Transacciones &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -57,8 +57,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/08.transaction';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="5.6. Operaciones CRUD" href="10.crud.html" />
-    <link rel="prev" title="5.4. Mapeo" href="04.mapeo.html" />
+    <link rel="next" title="5.5. Estrategias de diseño" href="09.dao.html" />
+    <link rel="prev" title="5.3. Mapeo" href="04.mapeo.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -397,7 +397,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="transacciones">
-<span id="orm-transaction"></span><h1><span class="section-number">5.5. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h1>
+<span id="orm-transaction"></span><h1><span class="section-number">5.4. </span>Transacciones<a class="headerlink" href="#transacciones" title="Link to this heading">#</a></h1>
 <p>Ya se mostró como realizar transacciones en el ejemplo que ilustraba el uso básico
 del <abbr title="Object-Relational Mapping">ORM</abbr> siguiendo la especificación <abbr title="Java Persistence API">JPA</abbr>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">em</span><span class="w"> </span><span class="n">EntityFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -416,48 +416,10 @@ del <abbr title="Object-Relational Mapping">ORM</abbr> siguiendo la especificaci
 </pre></div>
 </div>
 <p>Tuvimos que introducirlas tan temprano porque <abbr title="Java Persistence API">JPA</abbr> nos obliga a explicitar la
-transacción siempre que se realioza alguna operación que implica cambios en la
-base de datos. Ciertamente la sintaxis es algo farragosa, por lo que podríamos
-definir algunos métodos en <a class="reference internal" href="03.conexion.html#orm-conn"><span class="std std-ref">JpaEMUtils</span></a> que simplificaran su
-creación:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
-<span class="w">    </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">            </span><span class="n">action</span><span class="p">.</span><span class="na">accept</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
-<span class="w">            </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">tx</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="n">tx</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Fallo en la transacción&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">transaction</span><span class="p">(</span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">transaction</span><span class="p">(</span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>La existencia de los tres métodos responde a las mismas causas por las que
-hicimos varias versiones de <code class="docutils literal notranslate"><span class="pre">.getEntityManagerFactory</span></code>. Si manejamos una
-sola fábrica y ya la creamos antes, que será lo habitual, sólo necesitaremos
-pasar la acción:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">JpaEMUtils</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">em</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
-<span class="w">   </span><span class="n">em</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
-</div>
-<p>Este método simplifica las operaciones en la base de datos, pero a costa de que
-los objetos creados dentro de la expresión lambda, no son visibles fuera de
-ella.</p>
+transacción siempre que se realiza alguna operación que implica cambios en la
+base de datos. Ciertamente la sintaxis es algo farragosa, por lo que <a class="reference internal" href="09.dao.html#orm-pattern"><span class="std std-ref">más
+adelante introduciremos algunos métodos</span></a> que simplificarán su
+creación.</p>
 <p>Hay otros métodos que están asociados al objeto
 <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>:</p>
 <dl class="simple">
@@ -490,15 +452,15 @@ los cambios que haya sufrido, se aplicará al hacer un <em>commit</em> (o un
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.4. </span>Mapeo</p>
+        <p class="prev-next-title"><span class="section-number">5.3. </span>Mapeo</p>
       </div>
     </a>
     <a class="right-next"
-       href="10.crud.html"
+       href="09.dao.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.6. </span>Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></p>
+        <p class="prev-next-title"><span class="section-number">5.5. </span>Estrategias de diseño</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

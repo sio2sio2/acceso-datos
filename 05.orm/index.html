@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -413,9 +413,10 @@ llamada <abbr title="Java Persistent API">JPA</abbr> para el uso de <abbr title=
 compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El
 <abbr title="Object-Relational Mapping">ORM</abbr> más utilizado en Java es <a class="reference external" href="https://hibernate.org/">Hibernate</a> y es compatible, por lo que esta
 unidad explicará cómo usar esta especificación usando como implementación
-<a class="reference external" href="https://hibernate.org/">Hibernate</a>. Los ejemplos los basaremos en <a class="reference internal" href="../04.conector/index.html#ej-centros-alumnos"><span class="std std-ref">nuestro caso sobre centros y
-profesores</span></a>.</p>
-<div class="admonition-todo admonition" id="id1">
+<a class="reference external" href="https://hibernate.org/">Hibernate</a>, pero podríamos usar cualquier otro <abbr title="Object-Relational Mapping">ORM</abbr> siempre que nos
+aseguráramos que es compatible con <abbr title="Java Persistent API">JPA</abbr><a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Los ejemplos los basaremos en
+<a class="reference internal" href="../04.conector/index.html#ej-centros-alumnos"><span class="std std-ref">nuestro caso sobre centros y profesores</span></a>.</p>
+<div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Por hacer</p>
 <p>Investigar el enfoque de <a class="reference external" href="https://mybatis.org/mybatis-3/es/">MyBatis</a> (quizás para la unidad anterior).</p>
 </div>
@@ -424,9 +425,9 @@ profesores</span></a>.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l1"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a></li>
 <li class="toctree-l1"><a class="reference internal" href="15.extra.html">5.7. Otros aspectos</a></li>
 </ul>
@@ -436,6 +437,13 @@ profesores</span></a>.</p>
 <p>Dado que usaremos <a class="reference external" href="https://hibernate.org/">Hibernate</a> como implementación de <abbr title="Java Persistent API">JPA</abbr>, puede consultar
 también su <a class="reference external" href="https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html">pequeña guía oficial</a>.</p>
 </div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Por ejemplo, <a class="reference external" href="https://eclipse.dev/eclipselink/">EclipseLink</a> o <a class="reference external" href="https://openjpa.apache.org/">OpenJPA</a>.</p>
+</aside>
+</aside>
 </section>
 
 

@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -394,19 +394,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patron-dao">5.7.1. Patrón <abbr title="Data Access Object">DAO</abbr></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.2. Excepciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.3. Mapeo avanzado</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.3.1. Cascada de operaciones</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.3.2. Mapeo de colecciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.1. Excepciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.2. Mapeo avanzado</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.2.1. Cascada de operaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.2.2. Mapeo de colecciones</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.4. Concurrencia</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.4.1. Bloqueo optimista</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.4.2. Bloqueo pesimista</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.3. Concurrencia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.3.1. Bloqueo optimista</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.3.2. Bloqueo pesimista</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.5. Optimización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.4. Optimización</a></li>
 </ul>
             </nav>
         </div>
@@ -420,16 +419,8 @@ document.write(`
                   
   <section id="otros-aspectos">
 <span id="orm-extra"></span><h1><span class="section-number">5.7. </span>Otros aspectos<a class="headerlink" href="#otros-aspectos" title="Link to this heading">#</a></h1>
-<section id="patron-dao">
-<span id="orm-dao"></span><h2><span class="section-number">5.7.1. </span>Patrón <abbr title="Data Access Object">DAO</abbr><a class="headerlink" href="#patron-dao" title="Link to this heading">#</a></h2>
-<p>El patrón visto en la unidad sobre conectores para abstraer de la persistencia a
-la lógica de negocio, sigue siendo perfectamente válido. De este modo, podríamos
-tomar la <a class="reference internal" href="../04.conector/15.dao.html#clase-crud"><span class="std std-ref">interfaz Crud definida entonces</span></a> e implementar
-clases <abbr title="Data Access Object">DAO</abbr> a partir de ella. Esas implementaciones en vez de basarse en <abbr title="Java DataBase Connectivity">JDBC</abbr>
-se basarían en <abbr title="Java Persistence API">JPA</abbr>.</p>
-</section>
 <section id="excepciones">
-<span id="orm-exp"></span><h2><span class="section-number">5.7.2. </span>Excepciones<a class="headerlink" href="#excepciones" title="Link to this heading">#</a></h2>
+<span id="orm-exp"></span><h2><span class="section-number">5.7.1. </span>Excepciones<a class="headerlink" href="#excepciones" title="Link to this heading">#</a></h2>
 <p><abbr title="Java Persistence API">JPA</abbr> define su propio conjunto de excepciones derivadas todas de
 <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/PersistenceException">PersistenceException</a>, que a su vez deriva
 de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/RuntimeException.html">RuntimeException</a>. Hay que tener en cuenta
@@ -470,11 +461,11 @@ esté asociado a la sesión activa.</p>
 </dl>
 </section>
 <section id="mapeo-avanzado">
-<span id="orm-adv-mapping"></span><h2><span class="section-number">5.7.3. </span>Mapeo avanzado<a class="headerlink" href="#mapeo-avanzado" title="Link to this heading">#</a></h2>
+<span id="orm-adv-mapping"></span><h2><span class="section-number">5.7.2. </span>Mapeo avanzado<a class="headerlink" href="#mapeo-avanzado" title="Link to this heading">#</a></h2>
 <p>Incluimos bajo este epígrafe otros aspectos más específicos que se reflejan al
 anotar las clases.</p>
 <section id="cascada-de-operaciones">
-<h3><span class="section-number">5.7.3.1. </span>Cascada de operaciones<a class="headerlink" href="#cascada-de-operaciones" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.7.2.1. </span>Cascada de operaciones<a class="headerlink" href="#cascada-de-operaciones" title="Link to this heading">#</a></h3>
 <p>Cuando dos entidades se relaciones entre sí, los cambios en uno de los extremos
 pueden afectar al otro.</p>
 <p class="rubric"><abbr title="Structured Query Language">SQL</abbr></p>
@@ -578,7 +569,7 @@ relaciones bidireccionales:</p>
 </div>
 </section>
 <section id="mapeo-de-colecciones">
-<h3><span class="section-number">5.7.3.2. </span>Mapeo de colecciones<a class="headerlink" href="#mapeo-de-colecciones" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.7.2.2. </span>Mapeo de colecciones<a class="headerlink" href="#mapeo-de-colecciones" title="Link to this heading">#</a></h3>
 <p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;ElementCollection</span></code> permite mapear colecciones de tipos básicos
 (como <code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Integer</span></code> o <code class="docutils literal notranslate"><span class="pre">LocalDate</span></code>) sin que haya necesidad de  crear
 una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
@@ -610,7 +601,7 @@ cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
 </section>
 </section>
 <section id="concurrencia">
-<span id="orm-concurrencia"></span><h2><span class="section-number">5.7.4. </span>Concurrencia<a class="headerlink" href="#concurrencia" title="Link to this heading">#</a></h2>
+<span id="orm-concurrencia"></span><h2><span class="section-number">5.7.3. </span>Concurrencia<a class="headerlink" href="#concurrencia" title="Link to this heading">#</a></h2>
 <p><abbr title="Java Persistence API">JPA</abbr> permite también controlar el acceso concurrente a la base de datos.
 Nótese que, cuando hay dos o más accesos a la base de datos, uno de ellos puede
 obtener datos y el otro, alterarlos después de aquel acceso. La consecuencia esa
@@ -618,7 +609,7 @@ que los datos obtenidos en esa primera sesión no serán exactamente iguales a l
 que hay en la base de datos y eso puede dar lugar a situaciones de
 inconsistencia. Para paliar estos problemas, hay dos estrategias de <strong>bloqueo</strong>.</p>
 <section id="bloqueo-optimista">
-<span id="orm-bloq-opt"></span><h3><span class="section-number">5.7.4.1. </span>Bloqueo optimista<a class="headerlink" href="#bloqueo-optimista" title="Link to this heading">#</a></h3>
+<span id="orm-bloq-opt"></span><h3><span class="section-number">5.7.3.1. </span>Bloqueo optimista<a class="headerlink" href="#bloqueo-optimista" title="Link to this heading">#</a></h3>
 <p>Este bloqueo se basa en el uso de un atributo anotado con <code class="docutils literal notranslate"><span class="pre">&#64;Version</span></code> que
 signifique la versión del objeto, de modo que cada vez que se cambian sus
 valores, el <abbr title="Object-Relational Mapping">ORM</abbr> se encarga de aumentar su versión. No tenemos que
@@ -647,7 +638,7 @@ o actualizar, y, en caso contrario, lanza una excepción
 no son frecuentes.</p>
 </section>
 <section id="bloqueo-pesimista">
-<span id="orm-bloq-pes"></span><h3><span class="section-number">5.7.4.2. </span>Bloqueo pesimista<a class="headerlink" href="#bloqueo-pesimista" title="Link to this heading">#</a></h3>
+<span id="orm-bloq-pes"></span><h3><span class="section-number">5.7.3.2. </span>Bloqueo pesimista<a class="headerlink" href="#bloqueo-pesimista" title="Link to this heading">#</a></h3>
 <p>Este bloqueo es más adecuado cuando las colisiones son probables. Hay tres tipos
 de bloqueo:</p>
 <dl class="simple">
@@ -706,7 +697,7 @@ pueden bloquer registros individuales.</p>
 </section>
 </section>
 <section id="optimizacion">
-<span id="orm-optimo"></span><h2><span class="section-number">5.7.5. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h2>
+<span id="orm-optimo"></span><h2><span class="section-number">5.7.4. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h2>
 <p>Así tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
 indicamos que <em>fetch</em> permitía forzar una carga inmediata de las entidades
 relacionadas. Ahora bien, ¿cuál es el comportamiento de <abbr title="Java Persistence API">JPA</abbr> ante las
@@ -783,19 +774,18 @@ fuerzan siempre la carga inmediata.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patron-dao">5.7.1. Patrón <abbr title="Data Access Object">DAO</abbr></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.2. Excepciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.3. Mapeo avanzado</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.3.1. Cascada de operaciones</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.3.2. Mapeo de colecciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones">5.7.1. Excepciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-avanzado">5.7.2. Mapeo avanzado</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cascada-de-operaciones">5.7.2.1. Cascada de operaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mapeo-de-colecciones">5.7.2.2. Mapeo de colecciones</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.4. Concurrencia</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.4.1. Bloqueo optimista</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.4.2. Bloqueo pesimista</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concurrencia">5.7.3. Concurrencia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-optimista">5.7.3.1. Bloqueo optimista</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bloqueo-pesimista">5.7.3.2. Bloqueo pesimista</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.5. Optimización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizacion">5.7.4. Optimización</a></li>
 </ul>
   </nav></div>
 

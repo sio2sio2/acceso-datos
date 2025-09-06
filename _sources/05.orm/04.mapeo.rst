@@ -15,6 +15,8 @@ Fundamentalmente sirven para:
 - Establecer restricciones sobre los valores.
 - Definir relaciones entre tablas.
 
+.. _orm-mapping-bas:
+
 Anotaciones básicas
 ===================
 Ya introdujimos las anotaciones más básicas al presentar el :ref:`ejemplo de
@@ -240,6 +242,8 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
    Y el conversor se aplicará automáticamente a todos los atributos de tipo
    ``Titularidad`` sin  necesidad de anotar los atributos individualmente.
 
+.. _orm-mapping-check:
+
 Otras anotaciones
 =================
 Existen otras anotaciones relacionadas con la validación de valores (el
@@ -335,7 +339,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
          relación, ya que un extremo puede que informe de una cosa distinta a la
          que informa el otro. En el caso anterior, el *estudiante* informa de que
          no está matriculado, mientras la lista de estudiantes en el centro
-         informa de que sí lo está. En casos de discrepancia, Hibernate_ hará
+         informa de que sí lo está. En casos de discrepancia, |JPA| hará
          prevalecer la información del extremo de la relación que realmente
          existe en la base de datos, esto es, la información que ofrece
          *estudiante*.
@@ -343,7 +347,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 **Relación 1:1**: ``@OneToOne``
    Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
    ninguno) registro de la otra tabla. En |SQL| se resuelve colocando el campo
-   en cualquiera de las dos tablas. En Hibernate_ para significar este tipo
+   en cualquiera de las dos tablas. En |JPA| para significar este tipo
    relaciones se usa la notación ``@OneToOne`` y, como en el caso anterior,
    podemos reflejarla de modo **unidireccional** o **bidireccional**.
 
@@ -384,7 +388,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    quisiéramos relacionar con estudiantes, ya que los estudiantes tienen varios
    profesores; y cada profesor imparte sus enseñanzas a varios estudiantes. Por
    tanto, la relación entre las tablas *Profesor* y *Estudiante* es una relación
-   **N:M**. Para implementar en Hibernate_ estas relaciones, han de distinguirse
+   **N:M**. Para implementar en |JPA| estas relaciones, han de distinguirse
    dos casos:
 
    a. La relación no tiene atributos propios: ``@ManyToMany``.

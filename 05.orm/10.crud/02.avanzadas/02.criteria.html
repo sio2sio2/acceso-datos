@@ -202,9 +202,9 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../01.conf.html">5.1. Configuración</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../02.basico.html">5.2. Operativa básica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../03.conexion.html">5.3. Conexión</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../04.mapeo.html">5.4. Mapeo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../08.transaction.html">5.5. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../04.mapeo.html">5.3. Mapeo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../08.transaction.html">5.4. Transacciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../09.dao.html">5.5. Estrategias de diseño</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../02.avanzadas.html">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -496,19 +496,8 @@ recomendable generar el <em>Metamodel</em>, que nos permite escribir:</p>
 </section>
 <section id="metamodel">
 <span id="orm-jra-metamodel"></span><h2><span class="section-number">5.6.2.2.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
-<p>Para la habilitar la creación del <em>metamodelo</em>, debemos añadir como dependencia
-<a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor">hibernate-processor</a>:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>hibernate-processor<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
-<span class="w">    </span><span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
-</div>
-<p>Obsérvese su ámbito, ya que necesitamos la librería para el desarrollo, no para
-la ejecución de la aplicación.</p>
-<p>Además, debemos añadir una sección <cite>&lt;build&gt;</cite> a <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>:</p>
+<p>Para la habilitar la creación del <em>metamodelo</em>, debemos añadir a
+la sección <cite>&lt;build&gt;</cite> de <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
 <span class="w">   </span><span class="nt">&lt;plugins&gt;</span>
 <span class="w">       </span><span class="nt">&lt;plugin&gt;</span>
@@ -516,12 +505,12 @@ la ejecución de la aplicación.</p>
 <span class="w">           </span><span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">           </span><span class="nt">&lt;version&gt;</span>3.14.0<span class="nt">&lt;/version&gt;</span>
 <span class="w">           </span><span class="nt">&lt;configuration&gt;</span>
-<span class="w">               </span><span class="nt">&lt;release&gt;</span>21<span class="nt">&lt;/release&gt;</span><span class="w"> </span><span class="cm">&lt;!-- Versión de JDK --&gt;</span>
+<span class="w">               </span><span class="nt">&lt;release&gt;</span>${maven.compiler.release}<span class="nt">&lt;/release&gt;</span>
 <span class="w">               </span><span class="nt">&lt;annotationProcessorPaths&gt;</span>
 <span class="w">                   </span><span class="nt">&lt;path&gt;</span>
 <span class="w">                       </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">                       </span><span class="nt">&lt;artifactId&gt;</span>hibernate-processor<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">                       </span><span class="nt">&lt;version&gt;</span>7.0.0.Beta4<span class="nt">&lt;/version&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;artifactId&gt;</span>hibernate-jpamodelgen<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
 <span class="w">                   </span><span class="nt">&lt;/path&gt;</span>
 <span class="w">               </span><span class="nt">&lt;/annotationProcessorPaths&gt;</span>
 <span class="w">           </span><span class="nt">&lt;/configuration&gt;</span>
@@ -774,6 +763,33 @@ desmatricularía a todos los estudiantes cuyo nombre empieza por «J»:</p>
 <span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">delete</span><span class="p">).</span><span class="na">executeUpdate</span><span class="p">();</span>
 </pre></div>
 </div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Si utilizáramos otros <abbr title="Object-Relational Mapping">ORM</abbr> tendríamos que cambiar la referencia al <abbr title="Object-Relational Mapping">ORM</abbr>
+dentro de <code class="docutils literal notranslate"><span class="pre">&lt;annotationProcessorPaths&gt;</span></code>. Para <strong>EclipseLink</strong>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;annotationProcessorPaths&gt;</span>
+<span class="w">    </span><span class="nt">&lt;path&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>org.eclipse.persistence.jpa.modelgen.processor<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${eclipselink.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/path&gt;</span>
+<span class="nt">&lt;/annotationProcessorPaths&gt;</span>
+</pre></div>
+</div>
+<p>Y para <strong>OpenJPA</strong>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;annotationProcessorPaths&gt;</span>
+<span class="w">    </span><span class="nt">&lt;path&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.apache.openjpa<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>openjpa<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${openjpa.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/path&gt;</span>
+<span class="nt">&lt;/annotationProcessorPaths&gt;</span>
+</pre></div>
+</div>
+</aside>
+</aside>
 </section>
 </section>
 

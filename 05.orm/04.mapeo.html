@@ -422,6 +422,12 @@ Fundamentalmente sirven para:</p>
 <li><p>Establecer restricciones sobre los valores.</p></li>
 <li><p>Definir relaciones entre tablas.</p></li>
 </ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>Bajo este epígrafe se verá cómo definir el mapeo mediante
+anotaciones. Hay otra estrategia que consiste en un utilizar archivos <abbr title="eXtensible Markup Language">XML</abbr>
+aparte. Se tratará más adelante en <a class="reference internal" href="15.extra.html#xml-orm-mapping"><span class="std std-ref">mapeo mediante configuración</span></a>.</p>
+</div>
 <section id="anotaciones-basicas">
 <span id="orm-mapping-bas"></span><h2><span class="section-number">5.3.1. </span>Anotaciones básicas<a class="headerlink" href="#anotaciones-basicas" title="Link to this heading">#</a></h2>
 <p>Ya introdujimos las anotaciones más básicas al presentar el <a class="reference internal" href="02.basico.html#orm-bas-map"><span class="std std-ref">ejemplo de
@@ -685,6 +691,7 @@ equivalente al <code class="docutils literal notranslate"><span class="pre">CHEC
 <span class="n">private</span> <span class="nb">int</span> <span class="n">cantidad</span>
 
 <span class="nd">@Positive</span>
+<span class="nd">@NotNull</span>
 <span class="n">private</span> <span class="n">BigDecimal</span> <span class="n">precio</span><span class="p">;</span>
 
 <span class="nd">@Min</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="mi">18</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;La entrada está vetada a menores de edad&quot;</span><span class="p">)</span>
@@ -697,6 +704,20 @@ equivalente al <code class="docutils literal notranslate"><span class="pre">CHEC
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>&quot;<em>message</em>&quot; permite personalizar el mensaje de error.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><code class="docutils literal notranslate"><span class="pre">&#64;NotNull</span></code> impide que el valor sea nulo a nivel de aplicación,
+mientras que el atributo <code class="docutils literal notranslate"><span class="pre">nullable</span></code> de <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> define la restrucción en
+la definición del esquema (a nivel de base de datos).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Aunque hemos relacionado estas restricciones con el <code class="docutils literal notranslate"><span class="pre">CHECK</span></code> de
+<abbr title="Structured Query Language">SQL</abbr>, la validación que nos ofrece <abbr title="Java Persisten API">JPA</abbr> no se basa en usarlo (o sea, en
+incluir en la definición de las tablas las cláusulas <code class="docutils literal notranslate"><span class="pre">CHECK</span></code>
+apropiadas), sino en que la propia aplicación de Java haga las comprobaciones
+antes de aceptar el valor del atributo.</p>
 </div>
 </section>
 <section id="relaciones">

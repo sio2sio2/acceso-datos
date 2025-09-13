@@ -414,9 +414,19 @@ Podríamos proponer esta:</p>
 <div class="code-block-caption"><span class="caption-text">JpaBackend.java</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">JpaBackend</span><span class="w"> </span><span class="p">{</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Lista de claves hash que representan las instancias creadas.</span>
+<span class="cm">     * Se utiliza una lista para mantener el orden de creación y permitir la recuperación por índice.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Mapa que asocia las claves hash con las instancias de EntityManagerFactory.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor privado para evitar instanciación.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">JpaBackend</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">super</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -455,6 +465,12 @@ Podríamos proponer esta:</p>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">createEntityManagerFactory</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Devuelve un objeto EntityManagerFactory generado anteriormente.</span>
+<span class="cm">     * @param index El índice de la instancia a recuperar.</span>
+<span class="cm">     * @return La instancia de EntityManagerFactory correspondiente al índice.</span>
+<span class="cm">     * @throws IllegalArgumentException Si el índice está fuera de rango.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">size</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;Índice fuera de rango&quot;</span><span class="p">);</span>
 
@@ -471,6 +487,7 @@ Podríamos proponer esta:</p>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Devuelve un objeto EntityManagerFactory generado anteriormente. Sólo funciona si se generó uno.</span>
 <span class="cm">     * @return El objeto resultante.</span>
+<span class="cm">     * @throws IllegalStateException Si no hay ninguna instancia o si hay varias.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
@@ -499,6 +516,13 @@ Podríamos proponer esta:</p>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="c1">// Transacciones.</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Ejecuta una acción dentro de una transacción, devolviendo un resultado.</span>
+<span class="cm">     * @param &lt;T&gt; El tipo de resultado de la acción.</span>
+<span class="cm">     * @param index El índice de la instancia a utilizar.</span>
+<span class="cm">     * @param action La acción a ejecutar.</span>
+<span class="cm">     * @return El resultado de la acción.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">transactionR</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="n">getEntityManagerFactory</span><span class="p">(</span><span class="n">index</span><span class="p">):</span><span class="n">getEntityManagerFactory</span><span class="p">();</span>
 <span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -516,10 +540,21 @@ Podríamos proponer esta:</p>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Versión sin índice de {@link #transactionR(Integer, Function)} para cuando sólo hay una instancia.</span>
+<span class="cm">     * @param &lt;T&gt; El tipo de resultado de la acción.</span>
+<span class="cm">     * @param action La acción a ejecutar.</span>
+<span class="cm">     * @return El resultado de la acción.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">transactionR</span><span class="p">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">transactionR</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Ejecuta una acción dentro de una transacción, sin devolver resultado.</span>
+<span class="cm">     * @param index El índice de la instancia a utilizar.</span>
+<span class="cm">     * @param action La acción a ejecutar.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">transactionR</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="n">action</span><span class="p">.</span><span class="na">accept</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
@@ -527,6 +562,10 @@ Podríamos proponer esta:</p>
 <span class="w">        </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Versión sin índice de {@link #transaction(Integer, Consumer)} para cuando sólo hay una instancia.</span>
+<span class="cm">     * @param action La acción a ejecutar.</span>
+<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">transaction</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>

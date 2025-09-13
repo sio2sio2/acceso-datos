@@ -15,6 +15,12 @@ Fundamentalmente sirven para:
 - Establecer restricciones sobre los valores.
 - Definir relaciones entre tablas.
 
+.. seealso:: Bajo este epígrafe se verá cómo definir el mapeo mediante
+   anotaciones. Hay otra estrategia que consiste en un utilizar archivos |XML|
+   aparte. Se tratará más adelante en :ref:`mapeo mediante configuración
+   <xml-orm-mapping>`.
+
+
 .. _orm-mapping-bas:
 
 Anotaciones básicas
@@ -257,6 +263,7 @@ equivalente al ``CHECK`` de |SQL|), que requieren importar la librería
    private int cantidad
 
    @Positive
+   @NotNull
    private BigDecimal precio;
 
    @Min(value = 18, message = "La entrada está vetada a menores de edad")
@@ -266,6 +273,16 @@ equivalente al ``CHECK`` de |SQL|), que requieren importar la librería
    private String nif;
 
 .. note:: \"*message*\" permite personalizar el mensaje de error.
+
+.. note:: ``@NotNull`` impide que el valor sea nulo a nivel de aplicación,
+   mientras que el atributo ``nullable`` de ``@Column`` define la restrucción en
+   la definición del esquema (a nivel de base de datos).
+
+.. note:: Aunque hemos relacionado estas restricciones con el ``CHECK`` de
+   |SQL|, la validación que nos ofrece |JPA| no se basa en usarlo (o sea, en
+   incluir en la definición de las tablas las cláusulas ``CHECK``
+   apropiadas), sino en que la propia aplicación de Java haga las comprobaciones
+   antes de aceptar el valor del atributo.
 
 Relaciones
 ==========
@@ -442,4 +459,5 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 .. |JPA| replace:: :abbr:`JPA (Java Persisten API)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. _Hibernate: https://www.hibernate.org

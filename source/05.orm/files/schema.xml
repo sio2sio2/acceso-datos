@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.2"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm 
+        http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd">
+
+    <entity class="edu.acceso.ejemplo.modelo.Centro" access="FIELD">
+        <table name="Centro"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="nombre">
+               <!-- El atributo name permite que la columna en la BD se llame
+                    de distinta forma -->
+                <column name="nombre" nullable="false" length="255" />
+            </basic>
+            <basic name="titularidad">
+                <!-- El Enum se almacenará como un número -->
+                <enumerated>ORDINAL</enumerated>
+            </basic>
+            <!--
+            <one-to-many name="estudiantes" target-entity="educ.acceso.ejemplo.modelo.Estudiante" mapped-by="centro">
+               <cascade>
+                  <cascade-type>ALL</cascade-type>
+               <cascade>
+            </one-to-many>
+            -->
+        </attributes>
+    </entity>
+
+    <entity class="edu.acceso.ejemplo.modelo.Estudiante" access="FIELD">
+        <table name="Estudiante"/>
+        <attributes>
+            <id name="id">
+                <!-- o SEQUENCE si queremos que se genere automáticamente -->
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="nombre">
+                <column nullable="false" length="255"/>
+            </basic>
+            <basic name="nacimiento" />
+            <!-- Optional permite valores nulos para el atributo (datos en la aplicación) -->
+            <many-to-one name="centro" target-entity="edu.acceso.ejemplo.modelo.Centro" fetch="EAGER" optional="false">
+                <!-- nullable permite valores nulos en el esquema -->
+                <join-column nullable="false"/>
+            </many-to-one>
+        </attributes>
+    </entity>
+</entity-mappings>

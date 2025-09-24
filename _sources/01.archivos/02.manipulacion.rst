@@ -66,7 +66,7 @@ por:
    Path archivo = Path.of(System.getProperty("user.home"), ".bashrc");
    InputStream st = Files.newInputStream(archivo); // Si no puede abrirse, genera un error.
 
-ya que genera un objeto ``InputStream``, que es lo mismo que se obtiene al
+ya que genera un objeto |InputStream|, que es lo mismo que se obtiene al
 extraer contenido de una |URL| mediante este código:
 
 .. code-block:: java
@@ -83,7 +83,7 @@ y que también coincide con el tipo de ``System.in``:
 En consecuencia, a partir de este punto podemos tratar estas tres entradas
 diferentes de un mismo modo (p.e. usando la clase :java-util:`Scanner
 <Scanner>`). Si el archivo lo vamos a manejar por líneas lo más adecuado es
-hacer lo siguiente:
+hacer uso de |InputStreamReader| y |BufferedReader|:
 
 .. code-block:: java
 
@@ -93,7 +93,7 @@ hacer lo siguiente:
 .. note:: En las siguientes unidades, para el tratamiento de archivos en
    distintos formatos de intercambio de información conocidos intentaremos
    utilizar un método que nos permita convertir la entrada en un objeto
-   `InputStream`, aunque pueda existir algún otro menos verborreico que permita
+   |InputStream|, aunque pueda existir algún otro menos verborreico que permita
    utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
    entrada no es un archivo sino el teclado o una |URL| externa, sabremos cómo
    tratarlo.
@@ -111,6 +111,9 @@ hacer lo siguiente:
 
       Charset.defaultCharset() == StandardCharsets.UTF_8; // true 
       InputStreamReader sr =  new InputStreamReader(st); // UTF-8
+
+   Ahora bien, tenga presente que la codificación del recurso, tanto si se
+   trata de un archivo local o remoto, puede no coincidir con la del sistema.
 
 Al objeto resultado podemos tratarlo como prefiramos:
 
@@ -180,7 +183,8 @@ Escritura
 ---------
 En este tipo de archivos, obviamente, tenemos que escribir texto, o sea,
 cadenas, pero no directamente caracteres, sino bytes. Por lo demás, basta con
-utilizar otro método de :java-nio:`Files <Files>` para abrir un flujo de salida:
+utilizar otro método de :java-nio:`Files <Files>` para abrir un flujo de
+salida (|OutputStream|):
 
 .. code-block:: java
 
@@ -210,7 +214,7 @@ Por otro lado, para transformar la cadena en *bytes* es necesario especificar
 la codificación usada (:java-lang:`StandardCharsets.UTF-8 <StandardCharsets>`),
 aunque si no se indica se sobreentiende la predeterminada de la |JVM| (muy
 probablemente UTF-8, que es lo habitual en los sistemas modernos). Una
-alternativa, es utilizar un escritor de flujo:
+alternativa, es utilizar un escritor de flujo (|OutputStreamWriter|):
 
 .. code-block:: java
 
@@ -297,6 +301,11 @@ Para ilustrar cómo se serializan objetos definamos una clase muy simple:
            Persona otra = (Persona) o;
            return edad == otra.edad && nombre.equals(otra.nombre);
        }
+
+       @Override
+       public int hashCode() {
+          return Objects.hash(nombre, edad);
+       }
    }
 
 Escritura
@@ -354,3 +363,9 @@ Para recuperar un objeto serializado, hay que hacer el proceso inverso. Para ilu
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |JVM| replace:: :abbr:`JVM (Java Virtual Machine)`
+
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+.. |InputStreamReader| replace:: :java-io:`InputStreamReader <InputStreamReader>`
+.. |BufferedReader| replace:: :java-io:`BufferedReader <BufferedReader>`
+.. |OutputStream| replace:: :java-io:`OutputStream <InputStream>`
+.. |OutputStreamWriter| replace:: :java-io:`OutputStreamWriter <OutputStreamWriter>`

@@ -475,7 +475,7 @@ por:</p>
 <span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span><span class="w"> </span><span class="c1">// Si no puede abrirse, genera un error.</span>
 </pre></div>
 </div>
-<p>ya que genera un objeto <code class="docutils literal notranslate"><span class="pre">InputStream</span></code>, que es lo mismo que se obtiene al
+<p>ya que genera un objeto <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>, que es lo mismo que se obtiene al
 extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> mediante este código:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">URL</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="s">&quot;https://etc...&quot;</span><span class="p">).</span><span class="na">toURL</span><span class="p">();</span>
 <span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="na">openStream</span><span class="p">();</span>
@@ -487,7 +487,7 @@ extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> media
 </div>
 <p>En consecuencia, a partir de este punto podemos tratar estas tres entradas
 diferentes de un mismo modo (p.e. usando la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Scanner.html">Scanner</a>). Si el archivo lo vamos a manejar por líneas lo más adecuado es
-hacer lo siguiente:</p>
+hacer uso de <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStreamReader.html">InputStreamReader</a> y <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/BufferedReader.html">BufferedReader</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
 <span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
 </pre></div>
@@ -497,7 +497,7 @@ hacer lo siguiente:</p>
 <p>En las siguientes unidades, para el tratamiento de archivos en
 distintos formatos de intercambio de información conocidos intentaremos
 utilizar un método que nos permita convertir la entrada en un objeto
-<cite>InputStream</cite>, aunque pueda existir algún otro menos verborreico que permita
+<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>, aunque pueda existir algún otro menos verborreico que permita
 utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
 entrada no es un archivo sino el teclado o una <abbr title="Uniform Resource Locator">URL</abbr> externa, sabremos cómo
 tratarlo.</p>
@@ -516,6 +516,8 @@ volveremos a indicarlo:</p>
 <span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span><span class="w"> </span><span class="c1">// UTF-8</span>
 </pre></div>
 </div>
+<p>Ahora bien, tenga presente que la codificación del recurso, tanto si se
+trata de un archivo local o remoto, puede no coincidir con la del sistema.</p>
 </div>
 <p>Al objeto resultado podemos tratarlo como prefiramos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">;</span>
@@ -572,7 +574,8 @@ al que se pueden aplicar <a class="reference internal" href="../98.apendices/01.
 <span id="iotext-w"></span><h3><span class="section-number">1.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
 <p>En este tipo de archivos, obviamente, tenemos que escribir texto, o sea,
 cadenas, pero no directamente caracteres, sino bytes. Por lo demás, basta con
-utilizar otro método de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">Files</a> para abrir un flujo de salida:</p>
+utilizar otro método de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Files.html">Files</a> para abrir un flujo de
+salida (<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">OutputStream</a>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
@@ -598,7 +601,7 @@ opciones que modifiquen este comportamiento (véase
 la codificación usada (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/StandardCharsets.html">StandardCharsets.UTF-8</a>),
 aunque si no se indica se sobreentiende la predeterminada de la <abbr title="Java Virtual Machine">JVM</abbr> (muy
 probablemente UTF-8, que es lo habitual en los sistemas modernos). Una
-alternativa, es utilizar un escritor de flujo:</p>
+alternativa, es utilizar un escritor de flujo (<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/OutputStreamWriter.html">OutputStreamWriter</a>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Este es el texto del archivo&quot;</span><span class="p">;</span>
 
 <span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;caca.txt&quot;</span><span class="p">);</span>
@@ -672,6 +675,11 @@ de datos.</p></li>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">Persona</span><span class="w"> </span><span class="n">otra</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Persona</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">edad</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">otra</span><span class="p">.</span><span class="na">edad</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">nombre</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">otra</span><span class="p">.</span><span class="na">nombre</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">hashCode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">edad</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>

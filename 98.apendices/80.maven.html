@@ -221,7 +221,7 @@
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../99.ejercicios/index.html">Ejercicios</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/01.achivos.html">1. Archivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/01.archivos.html">1. Archivos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/02.formatos.html">2. Formatos de información</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/03.xml.html">3. Formato <abbr title="eXtensible Markup Language">XML</abbr></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../99.ejercicios/04.conectores.html">4. <abbr title="Java DataBase Connectivity">JDBC</abbr></a></li>
@@ -587,8 +587,13 @@ mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.</p>
 +-- src/
      +-- main/resources/
      |               +-- archetype-resources/
-     |                                    +-- pom.xml  (pom.xml del proyecto)
-     |                                    +-- src/ ...
+     |               |                    +-- pom.xml  (pom.xml del proyecto)
+     |               |                    +-- src/
+     |               |                         +-- main/
+     |               |                               + java/ # ¡Atención!
+     |               |                               |   +-- Main.java
+     |               |                               + resource&amp;/
+     |               |
      |               +-- META-INF/maven/
      |                               +-- archetype-metadata.xml
      +-- pom.xml
@@ -600,7 +605,9 @@ centrarmos en:</p>
 <ol class="arabic simple">
 <li><p>El <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> del propio arquetipo.</p></li>
 <li><p>El contenido de <code class="file docutils literal notranslate"><span class="pre">src/main/resources/archetype-resources/</span></code> que contiene
-los archivos que contendrá nuestro proyecto.</p></li>
+los archivos que contendrá nuestro proyecto. Obsérvese que bajo
+<code class="file docutils literal notranslate"><span class="pre">src/main/java</span></code> aparecen directamente los archivos <code class="file docutils literal notranslate"><span class="pre">*.java</span></code>, ya
+que ahora mismo no se conoce cuál será el <code class="docutils literal notranslate"><span class="pre">groupId</span></code> del proyecto.</p></li>
 <li><p>El archivo <code class="file docutils literal notranslate"><span class="pre">src/main/resources/META-INF/maven/archetype-metadata.xml</span></code>
 que contiene la configuración para generar el nuevo proyecto.</p></li>
 </ol>
@@ -660,8 +667,9 @@ deberemos definir la configuración:</p>
 proyecto. En la configuración hay tres bloques de archivos. La indicación
 <em>filtered</em> significa que queremos que el <em>plugin</em> analice el archivo en busca
 de propiedades para que las sustituya por su valor; y <em>packaged</em> que queremos
-que se añada la declaración de paquete: <code class="code docutils literal notranslate"><span class="pre">package</span>
-<span class="pre">edu.acceso.paquete...;</span></code> al comienzo del archivo.</p></li>
+que los archivos marcados así se organicen en la estructura de paquete. De
+ahí que todo lo que incluyamos en <code class="file docutils literal notranslate"><span class="pre">src/main/java</span></code> tenga el atributo a
+<code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></li>
 <li><p>Por otro, definimos cuáles son las propiedades y los valores por defecto que
 tienen. Por ejemplo, la variable <em>artifactId</em> podrá referirse en los archivos
 como <code class="code docutils literal notranslate"><span class="pre">${artifactId}</span></code> y, en ese caso, se sustituirá por el valor

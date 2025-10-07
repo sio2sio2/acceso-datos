@@ -1,0 +1,534 @@
+.. _cliargs:
+
+Análisis de la línea de órdenes
+*******************************
+Cualquier aplicación necesita para ejecutarse que se le suministren unos datos
+de entrada. Para el suministro pueden usarse varias vías:
+
+#. Incluirlos dentro del código de la propia aplicación. Este mecanismo se
+   utiliza para proporcionar los datos predeterminados y es absolutamente
+   inconveniente para cualquier otro tipo de dato.
+
+#. Añadir argumentos en la línea de órdenes que, aunque resulte algo paradójico,
+   es un mecanismo que suele utilizarse aunque la aplicación sea de interfaz
+   gráfica.
+
+#. Utilizar archivos de configuración en distintos formatos (|JSON|, |YAML|,
+   |XML|, INI, etc.). Para configuraciones simples pueden utilizarse archivos de
+   definición de propiedades:
+
+   .. code-block:: properties
+
+      app.version=1.1
+      app.ui=cli
+      # etc...
+
+   que tienen soporte nativo en Java utilizando :java-util:`Properties
+   <Properties>`.
+
+#. Proporcionarlos de forma interactiva el usuario a través de la interfaz que
+   utilice el programa (|CLI|, |GUI|)
+
+En este apéndice nos centraremos en cómo obtener información de la línea de
+órdenes y, ligeramente, cómo complementarlo con archivos de definición de
+propiedades. En cualquier caso, utilizar otros formatos es trivial si se cabe
+cómo leer estos, que es algo que se aprende en las primeras unidades del curso.
+
+La obtención de datos a través de interfaces interactivas de usuario es estudio
+propio del módulo de "Desarrollo de Interfaces".
+
+Principios
+==========
+*Java*, como cualquier otro lenguaje de programación, almacena los argumentos
+pasados al programa en un array de cadenas (``String[]``), de ahí que el método
+estático que arranca la aplicación sea:
+
+.. code-block:: java
+
+   public static void main(String[] args) {
+       // Código ...
+   }
+
+.. caution:: En *Java*, los elementos de este array incluyen (en orden)
+   exclusivamente los argumentos del programa, por lo que el primer elemento (el
+   elemento 0) también es argumento y no el nombre con el que se invocó el
+   programa, como ocurre en otros lenguajes com o *Python*.
+
+Sin embargo, basar la introducción de parámetros de entrada en la posición y
+obtenerlos de este array es un engorro para el usuario que ejecuta la
+aplicación, por lo que lo más juicioso es habilitar que la línea de órdenes
+cumpla con el `estándar POSIX <:linux:ordenar>`. Para ello, hay distintas
+librerías: nosotros estudiaremos picocli_.
+
+Otro aspecto a tener en cuenta es la necesidad de acceso a esos datos desde
+cualquier lugar de la aplicación, porque sus valores pueden condicionar
+cualquier aspecto de la ejecución. Obsérvese, sin embargo, que los argumentos
+(``args``) están disponibles en el método de entrada y que fácilmente podríamos
+hacerlos accesible a todo el código de la clase en la que se encuentra el
+método, o incluso de toda la aplicación:
+
+.. code-block:: java
+
+   public class Main {
+
+      // Suponiendo que no usemos ninguna librería seguirá siendo String[]
+      public static String[] args;
+
+      public static void main(String[] args) {
+          Main.args = args;
+
+          // Código.
+      }
+   }
+
+Pero esto es ser un poco chapucero. Lo analizaremos mejor. En definitiva,
+nuestros principios son:
+
++ Hacer accesible los datos en todo el código de la aplicación.
++ Utilizar el estándar POSIX para la introducción de argumentos y opciones. Por
+  ejemplo:
+
+  .. code-block:: bash
+
+     java -jar app.jar -vvvvv --ui=cli -s -r --prefix=pre archivo.txt
+
+  donde hay:
+
+  * Una opción (``-r``) sin parámetro que puede o no aparecer. Pongamos que su
+    versión larga es ``--recursive``.
+  * Una opción (``-s``) sin parámetro también. Pongamos que su
+    versión larga es ``--silent``. Está relacionada con ``-v`` ya que ambas son
+    excluyentes.
+  * Una opción (``--pre``) que permite un argumento de tipo cadena. Tiene la
+    versión corta ``-p``.
+  * Una opción (``--ui``) que permite también un argumento, pero en este caso es
+    un argumento con valores restringidos. Ya veremos cómo tratarlo.
+  * Una opción (``-v``) sin parámetro, pero que admite su repetición y nos
+    interesa saber cuántas veces se ha repetido. Es el típico parámetro para
+    aumentar la verbosidad de la aplicación. Admite la opción larga ``--verbose``.
+  * Un argumento posicional.
+
+  Además, existen las opciones típicas ``-h``/``--help`` para pedir ayuda y
+  ``-V/--version`` para mostrar la versión deel programa.
+
+Objeto ``config``
+=================
+El objetivo es tener un objeto ``config`` cuyos atributos sean los valores de
+entrada y que sea accesible en todo el código. Para ello, lo más limpio es
+utilizar el :ref:`patrón Singleton <singleton-pattern>`. Por tanto, la clase
+debería tener un aspecto así:
+
+.. code-block:: java
+   :caption: Config.java (propuesta previa)
+   :class: toggle
+   :name: config-pre
+
+   /**
+    * Clase con un única instancia que almacena los parámetros de configuración.
+    */
+   public class Config {
+
+      // Instancia única
+      private static Config instance;
+
+      private static final Path DEFAULT_PATH = Path.of(System.getProperty("user.home"));
+
+      // Datos
+      private boolean silent;
+      private boolean[] verbosity;
+      private boolean recursive;
+      private String prefix;
+      private Ui ui;
+      private Path input;
+
+      private Config() {
+        super();
+      }
+
+      /**
+       * Crea la instancia única a partir de los argumentos de la línea de órdenes.
+       * @return El objeto de configuración recientemente creado.
+       */
+      public static Config create(String[] args) {
+          if(instance != null) throw new IllegalStateException("Ya se creó un objeto de configuración");
+
+          instance = Config();
+
+          // Código para poblar el objeto...
+
+          return instance;
+      }
+      
+      /**
+       * Permite recuperar desde cualquier lugar del código la configuración.
+       * @return El objeto de configuración
+       */
+      public static Config getInstance() {
+          if(instance == null) throw new IllegalStateException("No se ha creado aún un objeto de configuración");
+          return instance;
+      }
+
+      // ... Getters ...
+      // pero no silent y verbositym porque añadimos este:
+
+      public Level getLogLevel() {
+         if(silent) return Level.ERROR;
+
+         int verbose = verbosity == null ? 0 : verbosity.length;
+         return switch(verbose) {
+            case 0 -> Level.WARN;
+            case 1 -> Level.INFO;
+            case 2 -> Level.DEBUG;
+            default -> Level.TRACE;
+         };
+      }
+   }
+
+Esta, pues, debería ser la clase con la que construyéramos el objeto. Su
+implementación final dependerá de qué cuál sea la librería que utilicemos para
+analizar la línea de órdenes.
+
+Picocli
+=======
+Para tratar los argumentos de la línea de órdenes o, lo que es lo mismo, para
+poblar nuestro objeto ``Config`` con los proporcionados al ejecutar el programa
+usaremos la librería picocli_ (con también `repositorio en mvnrepository.com
+<https://mvnrepository.com/artifact/info.picocli/picocli>`_).
+
+Básico
+------
+Para ello tomaremos como base la :ref:`clase Config propuesta <config-pre>` y
+añadiremos las anotaciones precisas para que picocli_ haga su magia. Por ahora
+no haremos la implementación completa y dejaremos aún cosas en el aire.
+
+.. code-block:: java
+   :caption: Config.java (con picocli)
+   :class: toggle
+   :name: config-picocli
+
+   @Command(name = "java -jar miapp.jar", mixinStandardHelpOptions = true,
+            version = "1.0.0", description = "Mi aplicación molona")
+   public class Config {
+
+      private static Config instance;
+
+      private static final Path DEFAULT_PATH = Path.of(System.getProperty("user.home"));
+
+      @Option(names = {"-s", "--silent"}, 
+              description = "Modo silencioso, sólo muestra errores. Incompatible con -v")
+      private boolean silent;
+
+      @Option(names = {"-v", "--verbose"},
+              description = "Verbosidad de los mensajes de información. Puede repetirse para aumentarla")
+      private boolean[] verbosity;
+
+      @Option(names = {"-r", "--recursive"}, description = "Habilita la recursividad en la búsqueda")
+      private boolean recursive;
+
+      @Option(names = {"-p", "--prefix"}, description = "Prefijo para búsqueda")
+      private String prefix;
+
+      @Option(names = {"-i", "--ui"}, description = "Interfaz de usuario", converter = Uiconverter.class)
+      private Ui ui;
+
+      @Parameters(paramLabel = "DIRECTORIO", arity = "0..1", description = "Directorio de búsqueda")
+      private Optional<Path> input;
+
+      private Config() {
+        super();
+      }
+
+      /**
+       * Crea la instancia única a partir de los argumentos de la línea de órdenes.
+       * @return El objeto de configuración recientemente creado.
+       */
+      public static Config create(String[] args) {
+         if(instance != null) throw new IllegalStateException("Ya se creó un objeto de configuración");
+
+         instance = Config();
+         CommandLine cmd = new CommandLine(instance);
+
+         try {
+            cmd.parseArgs(args);
+
+            if (cmd.isUsageHelpRequested()) {
+                cmd.usage(System.out);
+                System.exit(0);
+            }
+
+            if (cmd.isVersionHelpRequested()) {
+                cmd.printVersionHelp(System.out);
+                System.exit(0);
+            }
+
+            // Validaciones y reasignaciones de valor adicionales
+            instance.validate();
+            
+         } catch (CommandLine.ParameterException e) {
+            logger.error("Error en parámetros: {}", e.getMessage());
+            cmd.usage(System.err);
+            System.exit(2);
+         }
+
+         return instance;
+      }
+      
+      /**
+       * Permite recuperar desde cualquier lugar del código la configuración.
+       * @return El objeto de configuración
+       */
+      public static Config getInstance() {
+          if(instance == null) throw new IllegalStateException("No se ha creado aún un objeto de configuración");
+          return instance;
+      }
+
+      /**
+       * Comprueba los valores suministrados.
+       */
+      private validate() {
+         if(silent && verbosity != null && verbosity.length > 0) {
+            throw new CommandLine.ParameterException(new CommandLine(this), "Las opciones -s y -v son incompatibles");
+         }
+
+         // Más comprobaciones si fueran necesarias...
+      }
+
+      // ... Getters ...
+      // pero no silent y verbosity, porque añadimos este:
+
+      public Level getLogLevel() {
+         if(silent) return Level.ERROR;
+
+         int verbose = verbosity == null ? 0 : verbosity.length;
+         return switch(verbose) {
+            case 0 -> Level.WARN;
+            case 1 -> Level.INFO;
+            case 2 -> Level.DEBUG;
+            default -> Level.TRACE;
+         };
+      }
+   }
+
+Analicemos las adiciones que hemos hecho al código:
+
+* La anotación ``@Command`` informa de que trataremos la clase con picocli_ y
+  proporciona información que se usa cuando se requiere ayuda o la versión.
+  Además, ``mixinStandardHelpOptions`` añade de forma automática las opciones
+  ``-h``/``--help`` y ``-V``/``--version`` sin que necesitemos expresamente
+  definirlas.
+
+  Podría ser que la información quisiéramos obtenerla de algún lado (por
+  ejemplo, el archivo ``pom.xml`` en un proyecto :ref:`Maven`). En ese caso, no
+  podemos añadir atributos a la anotación, ya que estos tienen que ser
+  constantes no calculadas y debería obrar de otro modo que :ref:`trataremos más
+  adelante <picocli-command-plus>`.
+
+* Los cuatro primeros atributos no tienen demasiada historia: se marcan con la
+  anotación ``@Option`` y se indica qué nombres de opción se usarán y cuál es su
+  descripción (para la ayuda). Las opciones que son booleanas no requieren
+  argumento, mientras que las que no lo son sí lo necesitan y se deberá hacer
+  una transformación al tipo del atributo. En el ejemplo, ``prefix`` es una
+  cadena, así que en realidad, ni siquiera hay una transformación. Si alguna
+  hubiera sido de tipo ``int`` sí habría intentado hacerse automáticamente una
+  conversión y, en caso de fallo, se generaría un error.
+
+* El quinto atributo, ``ui`` tiene la particularidad de que almacena qué
+  interfaz se usará por lo que tiene un tipo particular: la interfaz ``Ui`` que
+  deberemos haber definido en nuestro programa. Obviamente, picocli_ es incapaz
+  de saber cómo obtener la interfaz apropiada a partir de la cadena que se ha
+  suministrado como atributo a la opción correspondiente. Por ese motivo, es
+  necesario **crear un conversor**. En nuestro código, falta aún implementar ese
+  conversor,
+
+* Por último, queda indicar los argumentos posicionales, lo cual se hace través
+  de la anotación ``@Parameters``.  Como queremos que se pueda (o no) incluir
+  una ruta, hemos decidido hacer el argumento de tipo :java-util:`Optional
+  <Optional>`, aunque podríamos haber respetado nuestro diseño original y
+  haberlo definido como :java-nio:`Path <Path>` a secas. Tal y como lo hemos
+  hecho, lo lógico es que el *getter* fuera así:
+
+  .. code-block:: java
+
+     public Path getInput() {
+        return input.orElse(Config.DEFAULT_PATH);
+     }
+
+  Los argumentos posicionales también pueden ser varios en cuyo caso, podríamos
+  haber definido el tipo como ``Path[]`` o ``List<Path>``, o incluso si hubiera
+  dos argumentos posicionales, uno el origen y otro el destino, podríamos haber
+  separado en dos:
+
+  .. code-block:: java
+
+      @Parameters(paramLabel = "ORIGEN", description = "Archivo de origen")
+      private Path origin;
+
+      @Parameters(paramLabel = "DESTINO", description = "Archivo de destino")
+      private Path target;
+
+* En el método estático ``.create`` está definido cómo usar picocli_ para
+  procesar los argumentos:
+
+  .. code-block:: java
+  
+     instance = Config();
+     CommandLine cmd = new CommandLine(instance);
+
+     try {
+        cmd.parseArgs(args);
+
+        // Código adicional
+
+      } catch (CommandLine.ParameterException e) {
+         System.err.printf("Error en parámetros: {}.\n", e.getMessage())
+         cmd.usage(System.err);  // Muestra la ayuda.
+         System.exit(2);
+      }
+
+* En el código adicional podemos:
+
+  - Mostrar la ayuda en caso de que se usara la opción correspondiente.
+  - Mostrar la versión en caso de que se usara la opción correspondiente.
+  - Hacer validaciones adicionales, que nosotros hemos incluido en el método
+    ``.validate``.
+
+.. _picocli-converter:
+
+Conversores
+-----------
+Los conversores, simplemente, indican cómo obtener el tipo deseado a partir del
+valor que se introdujo en la línea de órdenes:
+
+.. code-block:: java
+
+   // La clase la incluímos dentro de Config
+   private static class UiConverter implements CommandLine.ITypeConverter<Ui> {
+      @Override
+      public Ui convert(String value) throws Exception {
+         // Supongamos que hemos implementado el patrón Factory
+         // para escoger qué interfaz se usa.
+         return UiFactory.get(value);
+      }
+   }
+
+.. _picocli-command-plus:
+
+Información de ayuda
+--------------------
+Ya hemos visto que tanto la información que se muestra en la ayuda como la que
+se muestra con la versión se introducen como atributos de la anotación
+``@Command``. El problema es que en muchos casos está información ya se
+encuentra referida en otra parte del proyecto (en caso de :ref:`Maven` en el
+:file:`pom.xml`) y copiarla aquí supone duplicarla y preocuparse mantenerla
+sincronizada.
+
+Por ese motivo, existe una alternativa que consiste en:
+
+a. Crear un archivo dentro de :file:`src/main/resources` que copie los valores
+   que hemos definido en el :file:`pom.xml`. Por ejemplo:
+
+   .. code-block:: properties
+
+      # src/main/resources/app.properties
+      app.name=${project.name}
+      app.version=${project.version}
+      app.description=${project.description}
+
+
+#. Añadir en :file:`pom.xml` un sección que habilite la sustitución de las
+   variables incluidas en el archivo anterior por sus valores:
+
+   .. code-block:: xml
+
+      <build>
+         <plugins>
+            <!-- Los plugins que se usen -->
+         </plugins>
+
+         <resources>
+            <resource>
+               <directory>src/main/resources</directory>
+               <includes>
+                  <include>**/*.properties</include>
+               </includes>
+               <filtering>true</filtering>
+            </resource>
+         </resources>
+
+#. Definir un método privado en :ref:`Config <config-picocli>` que cargue en el
+   código de Java las propiedades almacenadas en el archivo:
+
+   .. code-block:: java
+
+      private static Properties load(String resources) {
+         Properties properties = new Properties();
+
+         try(
+             InputStream st = getClass().getResourceAsStream(resource);
+             InputStreamReader sr = new InputStreamReader(st, StandardCharsets.UTF_8);
+         ) {
+             if(st != null) properties.load(sr);
+         } catch (IOException e) {
+             logger.warn("No se pudo leer la información de versión.", e);
+         }
+
+         return properties;
+      }
+
+#. Usar la anotación ``@Command`` sin atributos y en ``.create`` modificar la
+   forma en que se construye ``CommandLine``:
+
+   .. code-block:: java
+
+      instance = new Config();
+      // Suponemos que ya hemos definido DEFAULT_PROPERTIES = "/app.properties"
+      Properties properties = properties.load(DEFAULT_PROPERTIES);
+
+      CommandSpec spec = CommandSpec.forAnnotatedObject(instance)
+         .name("java -jar miapp.jar")
+         .mixinStandardHelpOptions(true)
+         .versionProvider(new VersionProvider(properties));
+         
+      spec.usageMessage().description(properties.getProperty("app.description", "Sin descripción "));
+
+#. Creamos la clase ``VersionProvider`` para que el mensaje sobre la versión
+   incluya la información que nos interesa:
+
+   .. code-block:: java
+
+      // Hemos supuesto que hemos definido esta clase dentro de Config
+      private static class VersionProvider implements CommandLine.IVersionProvider {
+
+          private final Properties properties;
+
+          public VersionProvider(Properties properties) {
+              this.properties = properties;
+          }
+
+          @Override
+          public String[] getVersion() throws Exception {
+              String appName = properties.getProperty("app.name", "Sin nombre");
+              String appVersion = properties.getProperty("app.version", "???");
+              String appDescription = properties.getProperty("app.description", "Si descripción");
+
+              Version runtimeVersion = Runtime.version();
+              String osName = System.getProperty("os.name");
+              String osVersion = System.getProperty("os.version");
+              String osArch = System.getProperty("os.arch");
+
+              return new String[] {
+                  String.format("%s v%s [JRE v%s. %s v%s (%s)]:", appName,
+                                appersion, runtimeVersion,
+                                osName, osVersion, osArch),
+                  "   " + appDescription,
+              };
+          }
+      }
+
+.. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |CLI| replace:: :abbr:`CLI (Command Line Interface)`
+.. |GUI| replace:: :abbr:`GUI (Graphical User Interface)`
+
+.. _picocli: https://picocli.info/

@@ -16,18 +16,22 @@ arrays y los valores son directamente traducibles a un tipo primitivo de |JSON|
 Para empezar necesitaremos la librería `jackson-databind
 <https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind>`_.
 
+.. _json-jackson-basico:
+
+Operativa básica
+================
+
 .. _json-jackson-read:
 
 Lectura
-=======
-
+-------
 El código es muy similar al practicado con `GSON`:
 
 .. code-block:: java
    :emphasize-lines: 2, 8
 
    Path ruta = Path.of(System.getProperty("user.home"), "grupos.json");
-   ObjectMapper mapper = new ObjectMapper();
+   ObjectMapper mapper = new JsonMapper();
 
    try  (
        InputStream st = Files.newInputStream(ruta);
@@ -53,7 +57,7 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
 .. _json-jackson-write:
 
 Escritura
-=========
+---------
 Por su parte la escritura a un |JSON| desde un modelo de objetos tampoco tiene
 excesivas diferencias respecto a lo que encontraríamos en `GSON`:
 
@@ -100,6 +104,89 @@ Al escribir, es indiferente si usamos arrays o listas.
    .. code-block:: java
 
       String contenido = mapper.writeValueAsString(grupos);
+
+.. _json-jackson-conf:
+
+Configuración del mapeo
+=======================
+Bajo el epígrafe anterior hemos hecho una traducción muy sencilla en la que no
+hemos definido ninguna característica particular para la lectura o la escritura
+del |JSON| ni hemos necesitado afinar la traducción de los atributos del objeto:
+se llaman igual en Java y en |JSON|, no hemos necesitado evitar ninguno, todos
+son traducibles directamente a algún tipo existente en el formato |JSON|.
+
+Lo habitual en cambio es que necesitemos configurar el mapeo y eso es lo que
+veremos ahora.
+
+Creación del mapper
+-------------------
+Cuando queremos configurar las características del mapeo, no debemos crear el
+*mapper* directamente como hicimos anteriormente:
+
+.. code-block:: java
+
+   ObjectMapper mapper = new JsonMapper();  // Inmutable, no se puede configurar.
+
+ya que a partir de la versión 3 de *Jackson* `los objetos de mapeos son
+inmutables
+<https://cowtowncoder.medium.com/jackson-3-0-immutability-w-builders-d9c532860d88>`_
+y no pueden configurarse después de haberse creado.
+
+El proceso completo de creación de un mapeo tiene tres fases:
+
+1. Creación de un *Factory* (|JsonFactory|), en
+   la que podemos ajustar características de serialización
+   (|JsonWriteFeature|) y deserialización
+   (|JsonReadFeature|) propias del formato.
+2. Creación de un *Builder* (|JsonMapper.Builder|), en la que podremos añadir como más adelante
+   veremos módulos, características generales de serialización (|SerializationFeature|) y
+   deserialización (|DeserializationFeature|), y complementar la
+   definición las clases del modelo con la técnica del *MixIn*.
+3. Creación del *Mapper* propiamente (|JsonMapper|).
+
+Ilustrémoslo:
+
+.. code-block:: java
+
+   JsonFactory factory = JsonFactory.builder()
+        .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)  // Características particulares de de/serialización
+        .build();
+
+   // JsonMapper.Builder o MapperBuilder<?, ?>, que es la clase padre.
+   MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+        .enable(SerializationFeature.INDENT_OUTPUT)  // Características generales de de/serialización
+        .addModule(module)      // Supongamos que hemos definido ese modulo. Ya se tratará más adelante
+        .addMixIn(Grupo.class, GrupoMixin.class);   // Mezclamos (ya veremos la utilidad)
+
+    // JsonMapper o ObjectMapper, que es la clase padre.
+    ObjectMapper mapper = builder.build();
+
+.. note:: |MapperBuilder| y |ObjectMapper| son clases padre que se comparten con
+   otros formatos como |YAML| o |XML|. Si nuestra intención es soportar varios
+   formatos, es probable que nos convenga definir ``builder`` y ``mapper`` como
+   de estas clases respectivamente en vez de las clases más concretas
+   |JsonMapper.Builder| y |JsonMapper|.
+
+Estás tres etapas pueden simplificarse si necesitamos menos configuración. Ya hemos
+visto que pueden reducirse a una, si no necesitamos configuración adicional en
+absoluto:
+
+.. code-block:: java
+
+   ObjectMapper mapper = new JsonMapper();
+
+O a dos, si no necesitamos añadir características particulares de serialización
+de deserialización:
+
+.. code-block:: java
+   :emphasize-lines: 1
+
+   MapperBuilder<?, ?> builder = JsonMapper.builder() // No hemos definido factory.
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .addModule(module)
+        .addMixIn(Grupo.class, GrupoMixin.class);
+
+   ObjectMapper mapper = builder.build();
 
 .. _json-jackson-annotations:
 
@@ -175,7 +262,7 @@ exclusivamente los atributos que necesitan anotación:
 
    public abstract class GrupoMixin {
 
-      @JsonProperty("etapa_educativo")
+      @JsonProperty("etapa_educativa")
       private String etapa;
    }
 
@@ -185,152 +272,118 @@ con la clase abstracta anotada:
 .. code-block:: java
    :emphasize-lines: 2
 
-   ObjectMapper mapper = new ObjectMapper();
-   mapper.addMixIn(Grupo.class, GrupoMixin.class);
+   MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+        .addMixIn(Grupo.class, GrupoMixin.class);
 
 .. note:: Al :ref:`serializar en formato XML <xml-jackson>` con esta librería,
    las anotaciones se vuelven imprescindibles, porque es la única forma de
    indicar, entre otras cosas, si un atributo de la clase será un elemento o un
    atributo |XML|.
 
+Existen otras anotaciones interesante que introduciremos más adelante.
+
 .. _json-jackson-no-primitivos:
 
-Tipos no primitivos
-===================
-En el ejemplo anterior todos los tipos de los objetos de Java tienen
-correspondencia con un tipo primitivo de |JSON|, ya que las cadenas son cadenas,
-los números, números, y los arrays o ``ArrayList`` los traduce directamente
-Jackson como secuencias. Incluso si usamos los valores de una enumeración para
-codificarla en el |JSON|\ [#]_, la librería será capaz de traducir sin
-instrucciones por nuestra parte.
+Traducción de tipos no primitivos
+=================================
+En el ejemplo anterior todos los atributos de los objetos de *Java* tienen una
+correspondencia con un tipo primitivo de |JSON|: cadenas, números, secuencias
+(ya sean ``Array`` o :java-util:`ArrayList <ArrayList>`), por lo que no hemos
+tenido que preocuparnos en definir cómo debe ser la serialización.
 
-Fechas
-======
-Pero supongamos ahora que no es así y que de los alumnos se registra la fecha de
-nacimiento:
+Traducciones predefinidas
+-------------------------
+Tampoco es necesario definir una traducción específica en otros casos en que no
+hay correspondencia, pero *Jackson* nos provee una predeterminada:
 
-.. literalinclude:: files/grupos-nacimiento.json
-   :class: toggle
-   :emphasize-lines: 13,17,32,36
+**Enumeraciones** (:java-lang:`Enum`),
+  si se usan las constantes de enumeración, esto es, si la enumeración es
 
-y, por supuesto, se modifica la clase ``Alumno`` para que contenga un atributo
-`nacimiento`  de tipo |Date| (véase :ref:`la versión incluida
-en las explicaciones sobre GSON <json-alumno-nacimiento>`).
+  .. code-block:: java
+
+     public enum Enumeracion {
+       UNO,
+       DOS;
+     }
+
+  y se pretenden usar las cadenas *UNO* y *DOS* en el |JSON|.
 
 .. _json-jackson-date:
-
-.. rubric:: Date
-
-La clase |Date| del paquete `java.util` tiene soporte nativo en la librería,
-pero su traducción es un número entero que representa el `tiempo UNIX
-<https://es.wikipedia.org/wiki/Tiempo_Unix>`_). Si esta representación no nos
-gusta y preferimos otra (p.e. '`yyyy-MM-dd`'), entonces tendremos que indicarlo
-y podemos usar dos estrategias:
-
-* Especificar el formato de fechas en el objeto mapeador:
-
-  .. code-block:: java
-
-     mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-
-* Usar la anotación `@JsonFormat
-  <https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest/com/fasterxml/jackson/annotation/JsonFormat.html>`_
-  que da soporte a fechas:
-
-  .. code-block:: java
-
-     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
-     private Date nacimiento
-
-  .. note:: En este segundo caso, necesitamos importar el paquete aparte
-     `jackson-annotations
-     <https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations>`_.
-
-  .. warning:: Al usar esta anotación puede haber desajustes al serializar las fechas
-     como consecuencia de la zona horaria, por lo que habría que especificarla
-     en la propia anotación:
-
-     .. code-block:: java
-
-        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Europe/Madrid")
-        private Date nacimiento
-
-     o al definir el objeto de mapeo:
-
-     .. code-block:: java
-
-        mapper.setTimeZone(TimeZone.getDefault());
-
-  .. caution:: En las anotaciones deben usarse literales y constantes, por lo
-     que no puede usarse el método para obtener el huso horario del sistema.
-
-.. todo:: Comprobar si es preciso incorporar:
-
-   .. code-block:: java
-
-      mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
 .. _json-jackson-localdate:
 
-.. rubric:: LocalDate
+**Fechas**
+  Tanto si se usa el antiguo :java-util:`Date <Date>` como el moderno
+  :java-time:`LocalDate`, no es necesario definir ningúna traducción si se
+  pretenden trasladar a cadenas según el `estándar ISO-8601
+  <https://es.wikipedia.org/wiki/ISO_8601>`_, es decir, si se escriben en el
+  |JSON| de la forma ``yyyy-MM-dd``\ [#]_.
 
-Las clases más modernas incluidas en el paquete `java.time` no tienen soporte
-nativo en a librería y necesitan que se importe  el módulo
-`jackson-datatype-jsr310
-<https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310>`_.
-Hecho esto, la representación de estas clases se hará según la `ISO 8601
-<https://es.wikipedia.org/wiki/ISO_8601>`_ (que para una fecha |LocalDate| es
-'`yyyy-MM-dd`'). Si se quieren otras representaciones, entonces habrá que
-informar a la librería y las estrategias cambia un poco respecto a |Date|:
-
-* La anotación se hace exactamente igual que con |Date|:
+  Si la forma de la cadena es otra (p.ej. ``dd/MM/yyyy``) aún es posible de
+  manera sencilla indicárselo a la librería mediante una anotación:
 
   .. code-block:: java
 
-     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
-     private LocalDate nacimiento
-  
-* En cambio, no hay un soporte directo equivalente al que proporcionaba
-  el módulo ``setDateFormat`` y es un poco más complicado hacer algo semejante:
+     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+     private LocalDate fechaNacimiento;
 
   .. code-block:: java
 
-     DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "Europe/Madrid")
+     private Date fechaNacimiento;
 
-     SimpleModule module = new SimpleModule();  
-     module.addSerializer(LocalDate.class, new LocalDateSerializer(pattern))
-     module.addDeserializer(LocalDate.class, new LocalDateDeserializer(pattern));
+  Este último método, no obstante, sólo sirve para especificar la traducción de
+  un atributo en concreto. Si se quiere una configuración que afecte a todos los
+  atributos que contengan fechas, entonces el modo de obrar difiere entre uno y
+  otro tipo:
 
-     // Se supone ya creado el mapper.
-     mapper.registerModule(module);
+  :java-util:`Date <Date>`
+     Podemos especificar el formato de fecha al crear el *Builder*:
 
-.. todo:: Comprobar que no aporta nada a este respecto usar JavaTimeModule en
-   vez de SimpleModule.
+     .. code-block:: java
+        :emphasize-lines: 2,3
 
+        MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+           .defaultDateFormat(new SimpleDateFormat("dd/MM/yyyy"))
+           .defaultTimeZone(TimeZone.getTimeZone("Europe/Madrid"));  // o TimeZone.getDefault()
+
+     Como se ve también es conveniente especificar la zona horaria.
+
+  :java-time:`LocalDate <LocalDate>`
+     La configuración difiere porque hay que hacerla definiendo un módulo:
+
+     .. code-block:: java
+        :emphasize-lines: 8
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        SimpleModule module = new SimpleModule();  
+        module.addSerializer(LocalDate.class, new LocalDateSerializer(pattern))
+        module.addDeserializer(LocalDate.class, new LocalDateDeserializer(pattern));
+
+         MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+            .addModule(module);
+     
 Traductor específico
-====================
+--------------------
 La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
-de cualquier tipo que se nos pueda ocurrir, Basta con añadir, en principio, la
-librería `jackson-core
-<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core>`_)
-para poder hacer cualquier definición. Ilustrémoslo con la serialización y
-deserialización artesanal de una tipo |Date|, aunque ya esté resuelto dentro de
-la propia librería. Sin embargo, nos sirve para ilustrarlo\ [#]_:
+de cualquier tipo que se nos pueda ocurrir.  Ilustrémoslo con la serialización y
+deserialización artesanal de una tipo |LocalDate|, aunque ya esté resuelto
+en la propia librería. Sin embargo, nos sirve para ilustrarlo:
 
 .. code-block:: java
    :emphasize-lines: 3, 11, 21
 
    public class Traductor {
        
-       public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+       public static DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-       public static class DateSerializer extends JsonSerializer<Date> {
+       public static class DateSerializer extends JsonSerializer<LocalDate> {
 
            @Override
-           public void serialize(Date value, JsonGenerator gen, SerializerProvider sp) 
+           public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider sp) 
                throws IOException, JsonProcessingException {
                    if(value == null) gen.writeNull();
-                   else gen.writeString(df.format(value));     // Date --> String
+                   else gen.writeString(df.format(value));     // LocalDate --> String
            }
        }
 
@@ -340,7 +393,7 @@ la propia librería. Sin embargo, nos sirve para ilustrarlo\ [#]_:
            public Date deserialize(JsonParser parser, DeserializationContext context)
                throws IOException, JsonProcessingException {
                    try {
-                      return df.parse(parser.getText());  // String --> Date
+                      return LocalDate.parse(parser.getText(), df);  // String --> LocalDate
                    }
                    catch(ParseException err) {
                       throw new RuntimeException(err);
@@ -361,24 +414,26 @@ Y ya sólo quedaría indicar el campo en que se va a usar este traductor:
    @JsonDeserialize(using=Traductor.DateDeserializer.class)
    private Date nacimiento;
 
-Y en caso de que hubiera varios atributos `Date` en las clases implicadas y
-todas se quieran traducir igual, podríamos ahorrarnos la anotación individual en
-cada uno de los atributos y hacer lo siguiente:
+Y en caso de que hubiera varios atributos :java-time:`LocalDate <LocalDate>` en
+las clases implicadas y todas se quieran traducir igual, podríamos ahorrarnos la
+anotación individual en cada uno de los atributos y hacer lo siguiente:
 
 .. code-block:: java
 
-   ObjectMapper mapper = new ObjectMapper();
    SimpleModule module = new SimpleModule();
 
    module.addSerializer(java.util.Date.class, new Traductor.DateSerializer());
    module.addDeserializer(java.util.Date.class, new Traductor.DateDeserializer());
-   mapper.registerModule(module);
+   
+   
+  MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+   .addModule(module);
 
 .. tip:: Obsérvese que el segundo mecanismo para :ref:`convertir fechas
    LocalDate <json-jackson-localdate>` es equivalente a este que indicamos
-   ahora. Simplemente, la librería adicional `jackson-datatype-jsr310`_ ya define
-   clases serializadoras y deserializadoras para los tipos incluidos en
-   `java.time` y nos limitamos a usarlas en vez de definirlas nosotros.
+   ahora. Simplemente ya están definidas las clases serializadoras y
+   deserializadoras para los tipos incluidos en `java.time` y nos limitamos a
+   usarlas en vez de definirlas nosotros.
 
 .. rubric:: Notas al pie
 
@@ -386,31 +441,30 @@ cada uno de los atributos y hacer lo siguiente:
    cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
    cosa que expondremos en :ref:`json-jackson-no-primitivos`.
 
-.. [#] Es decir, que si se tiene:
-
-       .. code-block:: java
-
-          public enum Enumeracion {
-            UNO,
-            DOS;
-          }
-
-       se usan las cadenas *UNO* y *DOS* en el |JSON|. En caso contrario,
-       habría que hacer un traductor como se expone bajo este epígrafe.
-
-.. [#] ``SimpleDateFormat`` no es *thread-safe* por lo que habría que mejorar
-   algo el código en caso de utilizarse hilos. Por ejemplo:
+.. [#] En realidad, si en vez de una cadena, el |JSON| presenta un número,
+   entonces la librería entenderá que el tiempo se ha definido e `tiempo
+   UNIX <https://es.wikipedia.org/wiki/Tiempo_Unix>`_. La escritura siempre será
+   en forma de cadena, a menos que se use :jackson-databind:`DateTimeFeature
+   <cfg/DateTimeFeature>` para cambiar el comportamiento:
 
    .. code-block:: java
+      :emphasize-lines: 2
 
-      private static final ThreadLocal<SimpleDateFormat> df = 
-         ThreadLocal.<SimpleDateFormat>withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
-
-   y ``df.parse`` y ``df.format`` se transforman en ``df.get().parse`` y
-   ``df.get().format``.
+      MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
+         .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |Date| replace:: :java-util:`Date <Date>`
 .. |LocalDate| replace:: :java-time:`LocalDate <LocalDate>`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
 
+.. |JsonMapper| replace:: :jackson-databind:`JsonMapper <json/JsonMapper>`
+.. |JsonFactory| replace:: :jackson-core:`JsonFactory <json/JsonFactory>`
+.. |JsonMapper.Builder| replace:: :jackson-databind:`JsonMapper.Builder <json/JsonMapper.Builder>`
+.. |JsonReadFeature| replace:: :jackson-core:`JsonReadFeature <json/JsonReadFeature>`
+.. |JsonWriteFeature| replace:: :jackson-core:`JsonWriteFeature <json/JsonWriteFeature>`
+.. |SerializationFeature| replace:: :jackson-databind:`SerializationFeature`
+.. |DeserializationFeature| replace:: :jackson-databind:`DeserializationFeature`
+.. |MapperBuilder| replace:: :jackson-databind:`MapperBuilder <cfg/MapperBuilder>`
+.. |ObjectMapper| replace:: :jackson-databind:`ObjectMapper`

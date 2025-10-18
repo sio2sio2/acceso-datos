@@ -401,10 +401,15 @@ document.write(`
 <span id="id1"></span><h1><span class="section-number">2.3. </span><abbr title="YAML Ain't Markup Language">YAML</abbr><a class="headerlink" href="#yaml" title="Link to this heading">#</a></h1>
 <p><abbr title="YAML Ain't Markup Language">YAML</abbr> es un superconjunto de <abbr title="JavaScript Object Notation">JSON</abbr> (véase una <a class="reference external" href="https://sio2sio2.github.io/LM/01.intro/02a.serial.html#yaml" title="(en Lenguajes de Marcas)"><span class="xref std std-ref">explicación detallada del
 formato aquí</span></a>), por lo que si usamos el <a class="reference external" href="https://github.com/FasterXML/jackson">proyecto Jackson</a> nos es válido absolutamente todo
-<a class="reference internal" href="02.json/02.jackson.html#json-jackson"><span class="std std-ref">lo indicado para json</span></a>. Simplemente, tendremos que cargar
+<a class="reference internal" href="02.json/02.jackson.html#json-jackson"><span class="std std-ref">lo indicado para JSON</span></a>. Simplemente, tendremos que cargar
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml">la librería adecuada</a>
 y modificar la forma en que definimos el mapeador:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">YAMLFactory</span><span class="p">());</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">YamlFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">YamlFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">YamlMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">);</span>
+
+<span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </pre></div>
 </div>
 </section>

@@ -24,9 +24,8 @@ y esta otra ``Profesor``:
    :class: toggle
    :caption: Profesor.java
 
-.. caution:: Se ha definido el departamento como una cadena por simplificar el
-   código. En puridad, el departamento debería ser un Enum y, en ese caso,
-   habría que hacer :ref:`un traductor <json-jackson-no-primitivos>`.
+.. caution:: Para no complicar en exceso el código se han puesto todos los
+   atributos como :java-lang:`String`.
 
 .. _xml-jackson-write:
 
@@ -78,20 +77,20 @@ respecto a |JSON|:
 + En |XML| el orden de los nodos elemento importa y podría ser que nos
   interesara predefinirlo.
 
-Teniendo presente esto, podemos alterar las clases anteriores del siguiente
-modo:
+Teniendo presente esto, escribamos clases abstractas complementarias que
+incluyan las anotaciones y que luego mezclaremos:
 
-.. literalinclude:: files/Claustro-xml.java
+.. literalinclude:: files/ClaustroMixin.java
    :language: java
    :class: toggle
-   :caption: Claustro.java
-   :emphasize-lines: 1,4,7,8
+   :caption: ClaustroMixin.java
+   :emphasize-lines: 1,3,6,7
 
-.. literalinclude:: files/Profesor-xml.java
+.. literalinclude:: files/ProfesorMixin.java
    :language: java
    :class: toggle
-   :caption: Profesor.java
-   :emphasize-lines: 3
+   :caption: ProfesorMixin.java
+   :emphasize-lines: 2, 5, 8
 
 Hemos utilizados anotaciones sobre las clases para:
 
@@ -145,18 +144,24 @@ igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
        }
    );
    
-   ObjectMapper mapper = new XmlMapper()
-       .configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true)
-       .enable(SerializationFeature.INDENT_OUTPUT);   // Salida "bonita".
+   XmlFactory factory = XmLFactory.builder()
+      .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
+      .enable(XmlWriteFeature.WRITE_XML_1_1)
+      .build();
+
+   MapperBuilder<?, ?> builder = XmlFactory.builder(factory)
+      .enable(SerializationFeature.INDENT_OUTPUT)
+      .addMixIn(Claustro.class, ClaustroMixin.class)
+      .addMixIn(Profesor.class, ProfesorMixin.class);
+
+   ObjectMapper mapper = builder.build();
 
    try (
        OutputStream st = Files.newOutputStream(archivo);
        OutputStreamWriter sw = new OutputStreamWriter(st);
-   )
-   {
+   ) {
        mapper.writeValue(sw, claustro);
-   }
-   catch(IOException err) {
+   } catch(IOException err) {
        err.printStackTrace();
    }
    
@@ -168,8 +173,7 @@ También podríamos haber generado una cadena con la salida:
    try {
        String contenido = mapper.writeValueAsString(claustro);
        System.out.println(contenido);
-   }
-   catch(IOException err) {
+   } catch(IOException err) {
        err.printStackTrace();
    }
 
@@ -189,10 +193,14 @@ Habiendo definido las clases con anotaciones como en el apartado anterior, la
 lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson-read>`:
 
 .. code-block:: java
-   :emphasize-lines: 2
 
    Path archivo = Path.of(System.getProperty("user.home"), "claustro.xml");
-   ObjectMapper mapper = new XmlMapper();
+   
+   MapperBuilder<?, ?> builder = XmlFactory.builder()
+      .addMixIn(Claustro.class, ClaustroMixin.class)
+      .addMixIn(Profesor.class, ProfesorMixin.class);
+
+   ObjectMapper mapper = builder.build();
 
    try (
       InputStream st = Files.newInputStream(ruta);
@@ -200,8 +208,7 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
    ) {
       Claustro claustro = mapper.readValue(sr, Claustro.class);
       System.out.println(claustro);
-   }
-   catch(IOException err) {
+   } catch(IOException err) {
       err.printStackTrace();
    }
 

@@ -655,6 +655,7 @@ con la clase abstracta anotada:</p>
 <span class="hll"><span class="w">     </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Grupo</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </span></pre></div>
 </div>
+<p>Existen otras anotaciones interesante que introduciremos más adelante.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Al <a class="reference internal" href="../../03.xml/02.jackson.html#xml-jackson"><span class="std std-ref">serializar en formato XML</span></a> con esta librería,
@@ -662,7 +663,6 @@ las anotaciones se vuelven imprescindibles, porque es la única forma de
 indicar, entre otras cosas, si un atributo de la clase será un elemento o un
 atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p>
 </div>
-<p>Existen otras anotaciones interesante que introduciremos más adelante.</p>
 </section>
 </section>
 <section id="traduccion-de-tipos-no-primitivos">
@@ -676,14 +676,15 @@ tenido que preocuparnos en definir cómo debe ser la serialización.</p>
 <p>Tampoco es necesario definir una traducción específica en otros casos en que no
 hay correspondencia, pero <em>Jackson</em> nos provee una predeterminada:</p>
 <dl>
-<dt><strong>Enumeraciones</strong> (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Enum.html">Enum</a>),</dt><dd><p>si se usan las constantes de enumeración, esto es, si la enumeración es</p>
+<dt><strong>Enumeraciones</strong> (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Enum.html">Enum</a>),</dt><dd><p>Si se pretende que la traducción a  <abbr title="JavaScript Object Notation">JSON</abbr> sean las constantes de enumeración
+convertidas a cadenas. Por ejemplo, en este caso:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Enumeracion</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">UNO</span><span class="p">,</span>
 <span class="w">  </span><span class="n">DOS</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>y se pretenden usar las cadenas <em>UNO</em> y <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>.</p>
+<p>los valores se verán como las cadenas <em>UNO</em> o <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>.</p>
 </dd>
 </dl>
 <span id="json-jackson-date"></span><dl id="json-jackson-localdate">

@@ -275,12 +275,12 @@ con la clase abstracta anotada:
    MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
         .addMixIn(Grupo.class, GrupoMixin.class);
 
+Existen otras anotaciones interesante que introduciremos más adelante.
+
 .. note:: Al :ref:`serializar en formato XML <xml-jackson>` con esta librería,
    las anotaciones se vuelven imprescindibles, porque es la única forma de
    indicar, entre otras cosas, si un atributo de la clase será un elemento o un
    atributo |XML|.
-
-Existen otras anotaciones interesante que introduciremos más adelante.
 
 .. _json-jackson-no-primitivos:
 
@@ -297,7 +297,8 @@ Tampoco es necesario definir una traducción específica en otros casos en que n
 hay correspondencia, pero *Jackson* nos provee una predeterminada:
 
 **Enumeraciones** (:java-lang:`Enum`),
-  si se usan las constantes de enumeración, esto es, si la enumeración es
+  Si se pretende que la traducción a  |JSON| sean las constantes de enumeración
+  convertidas a cadenas. Por ejemplo, en este caso:
 
   .. code-block:: java
 
@@ -306,7 +307,7 @@ hay correspondencia, pero *Jackson* nos provee una predeterminada:
        DOS;
      }
 
-  y se pretenden usar las cadenas *UNO* y *DOS* en el |JSON|.
+  los valores se verán como las cadenas *UNO* o *DOS* en el |JSON|.
 
 .. _json-jackson-date:
 .. _json-jackson-localdate:

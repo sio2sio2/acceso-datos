@@ -371,6 +371,11 @@ de cualquier tipo que se nos pueda ocurrir.  Ilustrémoslo con la serialización
 deserialización artesanal de una tipo |LocalDate|, aunque ya esté resuelto
 en la propia librería. Sin embargo, nos sirve para ilustrarlo:
 
+.. caution:: Lo que exponemos ahora **ya está resuelto** en *Jackson* (como acabamos de ver)
+   por lo que no tiene mucho sentido perder el tiempo en reimplementarlo.
+   Sin embargo, es didácticamente pertienente porque nos sirve para ilustrar
+   cómo definir serializadores y deserializadores.
+
 .. code-block:: java
    :emphasize-lines: 3, 11, 21
 
@@ -430,11 +435,10 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
   MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
    .addModule(module);
 
-.. tip:: Obsérvese que el segundo mecanismo para :ref:`convertir fechas
-   LocalDate <json-jackson-localdate>` es equivalente a este que indicamos
-   ahora. Simplemente ya están definidas las clases serializadoras y
-   deserializadoras para los tipos incluidos en `java.time` y nos limitamos a
-   usarlas en vez de definirlas nosotros.
+.. tip:: Obsérvese que el mecanismo específico para definir el :ref:`formato de
+   las fechas LocalDate <json-jackson-localdate>` es equivalente a este que
+   indicamos ahora. Simplemente las clases serializadoras y deserializadoras
+   ya están definidas y nos limitamos a usarlas en vez de definirlas nosotros.
 
 .. rubric:: Notas al pie
 
@@ -443,7 +447,7 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
    cosa que expondremos en :ref:`json-jackson-no-primitivos`.
 
 .. [#] En realidad, si en vez de una cadena, el |JSON| presenta un número,
-   entonces la librería entenderá que el tiempo se ha definido e `tiempo
+   entonces la librería entenderá que el tiempo se ha definido en `tiempo
    UNIX <https://es.wikipedia.org/wiki/Tiempo_Unix>`_. La escritura siempre será
    en forma de cadena, a menos que se use :jackson-databind:`DateTimeFeature
    <cfg/DateTimeFeature>` para cambiar el comportamiento:
@@ -453,6 +457,9 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
 
       MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
          .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+   De hecho, la traducción a tiempo *UNIX* era el comportamiento predeterminado
+   en *Jackson 2*.
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |Date| replace:: :java-util:`Date <Date>`

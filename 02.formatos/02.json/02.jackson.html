@@ -737,6 +737,13 @@ otro tipo:</p>
 de cualquier tipo que se nos pueda ocurrir.  Ilustrémoslo con la serialización y
 deserialización artesanal de una tipo <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, aunque ya esté resuelto
 en la propia librería. Sin embargo, nos sirve para ilustrarlo:</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Lo que exponemos ahora <strong>ya está resuelto</strong> en <em>Jackson</em> (como acabamos de ver)
+por lo que no tiene mucho sentido perder el tiempo en reimplementarlo.
+Sin embargo, es didácticamente pertienente porque nos sirve para ilustrar
+cómo definir serializadores y deserializadores.</p>
+</div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 
 <span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;yyyy-MM-dd&quot;</span><span class="p">);</span>
@@ -791,11 +798,10 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
-<p>Obsérvese que el segundo mecanismo para <a class="reference internal" href="#json-jackson-localdate"><span class="std std-ref">convertir fechas
-LocalDate</span></a> es equivalente a este que indicamos
-ahora. Simplemente ya están definidas las clases serializadoras y
-deserializadoras para los tipos incluidos en <cite>java.time</cite> y nos limitamos a
-usarlas en vez de definirlas nosotros.</p>
+<p>Obsérvese que el mecanismo específico para definir el <a class="reference internal" href="#json-jackson-localdate"><span class="std std-ref">formato de
+las fechas LocalDate</span></a> es equivalente a este que
+indicamos ahora. Simplemente las clases serializadoras y deserializadoras
+ya están definidas y nos limitamos a usarlas en vez de definirlas nosotros.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
@@ -808,13 +814,15 @@ cosa que expondremos en <a class="reference internal" href="#json-jackson-no-pri
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p>En realidad, si en vez de una cadena, el <abbr title="JavaScript Object Notation">JSON</abbr> presenta un número,
-entonces la librería entenderá que el tiempo se ha definido e <a class="reference external" href="https://es.wikipedia.org/wiki/Tiempo_Unix">tiempo
+entonces la librería entenderá que el tiempo se ha definido en <a class="reference external" href="https://es.wikipedia.org/wiki/Tiempo_Unix">tiempo
 UNIX</a>. La escritura siempre será
 en forma de cadena, a menos que se use <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/cfg/DateTimeFeature.html">DateTimeFeature</a> para cambiar el comportamiento:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
 <span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">DateTimeFeature</span><span class="p">.</span><span class="na">WRITE_DATES_AS_TIMESTAMPS</span><span class="p">);</span>
 </span></pre></div>
 </div>
+<p>De hecho, la traducción a tiempo <em>UNIX</em> era el comportamiento predeterminado
+en <em>Jackson 2</em>.</p>
 </aside>
 </aside>
 </section>

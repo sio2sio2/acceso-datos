@@ -138,10 +138,10 @@ El proceso completo de creación de un mapeo tiene tres fases:
    la que podemos ajustar características de serialización
    (|JsonWriteFeature|) y deserialización
    (|JsonReadFeature|) propias del formato.
-2. Creación de un *Builder* (|JsonMapper.Builder|), en la que podremos añadir como más adelante
-   veremos módulos, características generales de serialización (|SerializationFeature|) y
-   deserialización (|DeserializationFeature|), y complementar la
-   definición las clases del modelo con la técnica del *MixIn*.
+2. Creación de un *Builder* (|JsonMapper.Builder|), en la que podremos añadir
+   módulos (los veremos más adelante), características generales de serialización
+   (|SerializationFeature|) y deserialización (|DeserializationFeature|), y
+   complementar la definición las clases del modelo con la técnica del *MixIn*.
 3. Creación del *Mapper* propiamente (|JsonMapper|).
 
 Ilustrémoslo:
@@ -152,13 +152,13 @@ Ilustrémoslo:
         .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)  // Características particulares de de/serialización
         .build();
 
-   // JsonMapper.Builder o MapperBuilder<?, ?>, que es la clase padre.
+   // MapperBuilder<?, ?> o JsonMapper.Builder, que es la clase padre.
    MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
         .enable(SerializationFeature.INDENT_OUTPUT)  // Características generales de de/serialización
         .addModule(module)      // Supongamos que hemos definido ese modulo. Ya se tratará más adelante
         .addMixIn(Grupo.class, GrupoMixin.class);   // Mezclamos (ya veremos la utilidad)
 
-    // JsonMapper o ObjectMapper, que es la clase padre.
+    // ObjectMapper o JsonMapper, que es la clase padre.
     ObjectMapper mapper = builder.build();
 
 .. note:: |MapperBuilder| y |ObjectMapper| son clases padre que se comparten con
@@ -176,7 +176,7 @@ absoluto:
    ObjectMapper mapper = new JsonMapper();
 
 O a dos, si no necesitamos añadir características particulares de serialización
-de deserialización:
+o deserialización:
 
 .. code-block:: java
    :emphasize-lines: 1

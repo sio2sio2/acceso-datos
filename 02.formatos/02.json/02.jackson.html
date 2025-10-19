@@ -537,10 +537,10 @@ y no pueden configurarse después de haberse creado.</p>
 la que podemos ajustar características de serialización
 (<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonWriteFeature.html">JsonWriteFeature</a>) y deserialización
 (<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonReadFeature.html">JsonReadFeature</a>) propias del formato.</p></li>
-<li><p>Creación de un <em>Builder</em> (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.Builder.html">JsonMapper.Builder</a>), en la que podremos añadir como más adelante
-veremos módulos, características generales de serialización (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/SerializationFeature.html">SerializationFeature</a>) y
-deserialización (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/DeserializationFeature.html">DeserializationFeature</a>), y complementar la
-definición las clases del modelo con la técnica del <em>MixIn</em>.</p></li>
+<li><p>Creación de un <em>Builder</em> (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.Builder.html">JsonMapper.Builder</a>), en la que podremos añadir
+módulos (los veremos más adelante), características generales de serialización
+(<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/SerializationFeature.html">SerializationFeature</a>) y deserialización (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/DeserializationFeature.html">DeserializationFeature</a>), y
+complementar la definición las clases del modelo con la técnica del <em>MixIn</em>.</p></li>
 <li><p>Creación del <em>Mapper</em> propiamente (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.html">JsonMapper</a>).</p></li>
 </ol>
 <p>Ilustrémoslo:</p>
@@ -548,13 +548,13 @@ definición las clases del modelo con la técnica del <em>MixIn</em>.</p></li>
 <span class="w">     </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">JsonReadFeature</span><span class="p">.</span><span class="na">ALLOW_JAVA_COMMENTS</span><span class="p">)</span><span class="w">  </span><span class="c1">// Características particulares de de/serialización</span>
 <span class="w">     </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="c1">// JsonMapper.Builder o MapperBuilder&lt;?, ?&gt;, que es la clase padre.</span>
+<span class="c1">// MapperBuilder&lt;?, ?&gt; o JsonMapper.Builder, que es la clase padre.</span>
 <span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
 <span class="w">     </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">INDENT_OUTPUT</span><span class="p">)</span><span class="w">  </span><span class="c1">// Características generales de de/serialización</span>
 <span class="w">     </span><span class="p">.</span><span class="na">addModule</span><span class="p">(</span><span class="n">module</span><span class="p">)</span><span class="w">      </span><span class="c1">// Supongamos que hemos definido ese modulo. Ya se tratará más adelante</span>
 <span class="w">     </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Grupo</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">   </span><span class="c1">// Mezclamos (ya veremos la utilidad)</span>
 
-<span class="w"> </span><span class="c1">// JsonMapper o ObjectMapper, que es la clase padre.</span>
+<span class="w"> </span><span class="c1">// ObjectMapper o JsonMapper, que es la clase padre.</span>
 <span class="w"> </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -573,7 +573,7 @@ absoluto:</p>
 </pre></div>
 </div>
 <p>O a dos, si no necesitamos añadir características particulares de serialización
-de deserialización:</p>
+o deserialización:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span><span class="w"> </span><span class="c1">// No hemos definido factory.</span>
 </span><span class="w">     </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">INDENT_OUTPUT</span><span class="p">)</span>
 <span class="w">     </span><span class="p">.</span><span class="na">addModule</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>

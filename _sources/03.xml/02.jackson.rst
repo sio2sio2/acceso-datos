@@ -24,7 +24,7 @@ y esta otra ``Profesor``:
    :class: toggle
    :caption: Profesor.java
 
-.. caution:: Para no complicar en exceso el código se han puesto todos los
+.. note:: Para no complicar en exceso el código se han puesto todos los
    atributos como :java-lang:`String`.
 
 .. _xml-jackson-write:
@@ -128,6 +128,44 @@ Hemos utilizados anotaciones sobre las clases para:
 
    Por supuesto, la anotación también es válida cuando se genera el formato
    |JSON|, pero no suele tener importancia.
+
+.. note:: En este ejemplo tenemos una clase explícita (``Claustro``) que sirve
+   como envoltorio a una lista de profesores. Obśervese que es en este
+   envoltorio donde controlamos qué etiquetas se utilizan para los elementos de
+   la lista. En otro caso distinto en que
+   tuviéramos solamente una lista (o array) y quisiéramos generar un |XML|,
+   deberíamos ser conscientes de que en la traducción no podríamos controlar el
+   elemento padre ni los nombres de las etiquetas de los elementos de la lista.
+   Es decir, si tuviéramos una lista de objetos ``Profesor`` al generar un |XML|
+   obtendríamos lo siguiente:
+
+   .. code-block:: xml
+
+      <Profesor>
+         <Profesor>
+            <!-- Contenido del primer profesor... -->
+         </Profesor>
+
+         <!-- Más profesores -->
+      </Profesor>
+
+   Si nuestra intención fuera controlar los nombres de esas etiquetas al
+   traducir a XML, entonces tendríamos que crear una clase adicional que hiciera
+   de envoltorio, aunque en nuestro modelo de datos no exista:
+
+   .. code-block:: java
+
+      @JsonRootName(value = "claustro")
+      public class ProfesorWrapper {
+
+         @JacksonXmlElementWrapper(useWrapping = false)
+         @JacksonnXmlProperty(localName = "profesor")
+         private Profesor[] profesores;
+      }
+
+   Por supuesto, antes de escribir el |XML| deberíamos crear un objeto de este
+   clase envoltorio y asignar al atributo ``profesores`` la lista de profesores
+   existente.
 
 Por último queda generar la salida en el programa principal, que es básicamente
 igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:

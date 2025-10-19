@@ -539,8 +539,8 @@ existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code 
 </pre></div>
 </div>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
 <p>Para no complicar en exceso el código se han puesto todos los
 atributos como <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a>.</p>
 </div>
@@ -652,6 +652,42 @@ atributos de una clase, podríamos usar <code class="docutils literal notranslat
 </div>
 <p>Por supuesto, la anotación también es válida cuando se genera el formato
 <abbr title="JavaScript Object Notation">JSON</abbr>, pero no suele tener importancia.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En este ejemplo tenemos una clase explícita (<code class="docutils literal notranslate"><span class="pre">Claustro</span></code>) que sirve
+como envoltorio a una lista de profesores. Obśervese que es en este
+envoltorio donde controlamos qué etiquetas se utilizan para los elementos de
+la lista. En otro caso distinto en que
+tuviéramos solamente una lista (o array) y quisiéramos generar un <abbr title="eXtensible Markup Language">XML</abbr>,
+deberíamos ser conscientes de que en la traducción no podríamos controlar el
+elemento padre ni los nombres de las etiquetas de los elementos de la lista.
+Es decir, si tuviéramos una lista de objetos <code class="docutils literal notranslate"><span class="pre">Profesor</span></code> al generar un <abbr title="eXtensible Markup Language">XML</abbr>
+obtendríamos lo siguiente:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;Profesor&gt;</span>
+<span class="w">   </span><span class="nt">&lt;Profesor&gt;</span>
+<span class="w">      </span><span class="cm">&lt;!-- Contenido del primer profesor... --&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/Profesor&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Más profesores --&gt;</span>
+<span class="nt">&lt;/Profesor&gt;</span>
+</pre></div>
+</div>
+<p>Si nuestra intención fuera controlar los nombres de esas etiquetas al
+traducir a XML, entonces tendríamos que crear una clase adicional que hiciera
+de envoltorio, aunque en nuestro modelo de datos no exista:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonRootName</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;claustro&quot;</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ProfesorWrapper</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">   </span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">useWrapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">   </span><span class="nd">@JacksonnXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesor&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">profesores</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Por supuesto, antes de escribir el <abbr title="eXtensible Markup Language">XML</abbr> deberíamos crear un objeto de este
+clase envoltorio y asignar al atributo <code class="docutils literal notranslate"><span class="pre">profesores</span></code> la lista de profesores
+existente.</p>
 </div>
 <p>Por último queda generar la salida en el programa principal, que es básicamente
 igual que <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-write"><span class="std std-ref">la escritura en el caso de JSON</span></a>:</p>

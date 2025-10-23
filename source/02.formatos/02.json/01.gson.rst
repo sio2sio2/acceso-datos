@@ -11,6 +11,11 @@ por *Google* y nos permite dos estrategias para leer y escribir |JSON|:
 .. note:: Podemos descargar la librería de su `página en mvnrepository.com
    <https://mvnrepository.com/artifact/com.google.code.gson/gson>`_.
 
+.. warning:: La exposición se ha hecho considerando que la clase ``Alumno`` tiene
+   un atributo ``edad`` y no un atributo ``fechaNacimiento`` de tipo
+   :java-time:`LocalDate <LocalDate>`. El texto bajo este epígrafe necesita un
+   repaso.
+
 .. _gson-auto:
 
 Conversión automática
@@ -25,14 +30,17 @@ recoge el |JSON|:
 
 .. literalinclude:: files/Tutor.java
    :class: toggle
+   :name: class-tutor
    :caption: Tutor.java
 
 .. literalinclude:: files/Alumno.java
    :class: toggle
+   :name: class-alumno
    :caption: Alumno.java
 
 .. literalinclude:: files/Grupo.java
    :class: toggle
+   :name: class-grupo
    :caption: Grupo.java
 
 No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que

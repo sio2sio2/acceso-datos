@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 public class Alumno implements Serializable {
     private String nombre;
-    private int edad;
+    private LocalDate fechaNacimiento;
 
     public Alumno() {}
 
@@ -16,15 +16,19 @@ public class Alumno implements Serializable {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+       this.nombre = nombre;
     }
+
+   public LocalDate getFechaNacimiento() {
+       return fechaNacimiento
+   }
 
     public int getEdad() {
-        return edad;
+       return Perido.between(fechaNacimiento, LocalDate.now()).getYears();
     }
 
-    public void setEdad(int edad) {
-        this.edad = edad;
+    public void setFechaNacimiento(LocalDate nacimiento) {
+        this.fechaNacimiento = nacimiento;
     }
 
     @Override

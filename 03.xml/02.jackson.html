@@ -395,8 +395,14 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.1. Escritura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.2. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparativos">3.2.1. Preparativos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">3.2.1.1. Anotaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#envoltorio">3.2.1.2. Envoltorio</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductores">3.2.1.3. Traductores</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.3. Lectura</a></li>
 </ul>
             </nav>
         </div>
@@ -414,311 +420,446 @@ document.write(`
 objetos de <em>Java</em>, estrategia que ya seguimos con <abbr title="JavaScript Object Notation">JSON</abbr> y con <abbr title="YAML Ain't Markup Language">YAML</abbr> y que,
 como en el caso de estos otros dos formatos, también puede llevarse a cabo con
 <em>Jackson</em>, para lo cual necesitaremos <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/">jackson-dataformat-xml</a>.</p>
-<p>En este caso, usaremos también como ejemplo ilustrativo <a class="reference internal" href="index.html#xml"><span class="std std-ref">el XML sobre un
-claustro de profesores</span></a>. En principio, podemos modelar las dos entidades
-existentes (<cite>claustro</cite> y <cite>profesor</cite>) con esta clase <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>:</p>
+<p>Para ilustrar el uso de la librería tomaremos con ejemplo una versión <abbr title="eXtensible Markup Language">XML</abbr> del
+<a class="reference internal" href="../02.formatos/02.json.html#json"><span class="std std-ref">archivo JSON que usamos en la unidad anterior</span></a>:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Claustro.java</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Claustro</span><span class="w"> </span><span class="p">{</span>
+<div class="code-block-caption"><span class="caption-text">centro.xml</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="toggle highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;centro&gt;</span>
+<span class="w">    </span><span class="nt">&lt;grupo</span><span class="w"> </span><span class="na">nivel=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">etapa=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">grupo=</span><span class="s">&quot;D&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;tutor&gt;</span>
+<span class="w">            </span><span class="nt">&lt;nombre&gt;</span>Federico<span class="w"> </span>Arias<span class="w"> </span>Torres<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;especialidad&gt;</span>Inglés<span class="nt">&lt;/especialidad&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/tutor&gt;</span>
+<span class="w">        </span><span class="nt">&lt;miembros&gt;</span>
+<span class="w">            </span><span class="nt">&lt;alumno</span><span class="w"> </span><span class="na">nacimiento=</span><span class="s">&quot;15/05/2010&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;nombre&gt;</span>Matías<span class="w"> </span>Sánchez<span class="w"> </span>Aguado<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/alumno&gt;</span>
+<span class="w">            </span><span class="nt">&lt;alumno</span><span class="w"> </span><span class="na">nacimiento=</span><span class="s">&quot;25/03/2010&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;nombre&gt;</span>María<span class="w"> </span>Bonet<span class="w"> </span>Periáñez<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/alumno&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/miembros&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/grupo&gt;</span>
+<span class="w">    </span><span class="nt">&lt;grupo</span><span class="w"> </span><span class="na">nivel=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">etapa=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">grupo=</span><span class="s">&quot;A&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;tutor&gt;</span>
+<span class="w">            </span><span class="nt">&lt;nombre&gt;</span>Gertrudis<span class="w"> </span>Avellaneda<span class="w"> </span>Pérez<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;especialidad&gt;</span>Francés<span class="nt">&lt;/especialidad&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/tutor&gt;</span>
+<span class="w">        </span><span class="nt">&lt;miembros&gt;</span>
+<span class="w">            </span><span class="nt">&lt;alumno</span><span class="w"> </span><span class="na">nacimiento=</span><span class="s">&quot;02/10/2008&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;nombre&gt;</span>Marcela<span class="w"> </span>Venegas<span class="w"> </span>Pancorbo<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/alumno&gt;</span>
+<span class="w">            </span><span class="nt">&lt;alumno</span><span class="w"> </span><span class="na">nacimiento=</span><span class="s">&quot;11/01/2009&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;nombre&gt;</span>Feliciano<span class="w"> </span>Martín<span class="w"> </span>Suárez<span class="nt">&lt;/nombre&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/alumno&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/miembros&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/grupo&gt;</span>
+<span class="nt">&lt;/centro&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Obsérvese que directamente hemos traducido <code class="docutils literal notranslate"><span class="pre">Etapa</span></code> con el ordinal,
+en vez de con las constantes de enumeración.</p>
+</div>
+<p>Nuestra intención es usar el modelo de datos que ya presentamos en la unidad
+anterior:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Claustro</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Grupo</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Claustro</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">setCentro</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setPlantilla</span><span class="p">(</span><span class="n">plantilla</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Grupo</span><span class="p">(</span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">,</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">,</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">setNivel</span><span class="p">(</span><span class="n">nivel</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setEtapa</span><span class="p">(</span><span class="n">etapa</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setGrupo</span><span class="p">(</span><span class="n">grupo</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setTutor</span><span class="p">(</span><span class="n">tutor</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setMiembros</span><span class="p">(</span><span class="n">miembros</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getCentro</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="nf">getNivel</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCentro</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNivel</span><span class="p">(</span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">nivel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="nf">getPlantilla</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getEtapa</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setPlantilla</span><span class="p">(</span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">plantilla</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setEtapa</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">etapa</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">etapa</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="nf">getGrupo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setGrupo</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">grupo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="nf">getTutor</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setTutor</span><span class="p">(</span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">tutor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="nf">getMiembros</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setMiembros</span><span class="p">(</span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">miembros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">nombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%dº%s-%c&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nivel</span><span class="p">,</span><span class="w"> </span><span class="n">etapa</span><span class="p">,</span><span class="w"> </span><span class="n">grupo</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s -- %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">plantilla</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s (%s): %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">(),</span><span class="w"> </span><span class="n">tutor</span><span class="p">,</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">miembros</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<p>y esta otra <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Profesor.java</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Profesor</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Tutor</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">especialidad</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Profesor</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Tutor</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Profesor</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">setId</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setApelativo</span><span class="p">(</span><span class="n">apelativo</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Tutor</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">especialidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setApellidos</span><span class="p">(</span><span class="n">apellidos</span><span class="p">);</span>
-<span class="w">        </span><span class="n">setDepartamento</span><span class="p">(</span><span class="n">departamento</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setEspecialidad</span><span class="p">(</span><span class="n">especialidad</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setId</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getSustituye</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setSustituye</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">sustituye</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getCasillero</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCasillero</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">casillero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getApelativo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setApelativo</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">apelativo</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">apelativo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">apelativo</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getEspecialidad</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">especialidad</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setEspecialidad</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">especialidad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">especialidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">especialidad</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Alumno</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Alumno</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">edad</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setEdad</span><span class="p">(</span><span class="n">edad</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getNombre</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getApellidos</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="nf">getFechaNacimiento</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">fechaNacimiento</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getEdad</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">Perido</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">fechaNacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">()).</span><span class="na">getYears</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setApellidos</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">apellidos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">apellidos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">apellidos</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setFechaNacimiento</span><span class="p">(</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">fechaNacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getDepartamento</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setDepartamento</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">departamento</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">this</span><span class="p">.</span><span class="na">departamento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">departamento</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
+<span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s, %s [%s] (%s)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">apellidos</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">departamento</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s: %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">edad</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Para no complicar en exceso el código se han puesto todos los
-atributos como <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a>.</p>
-</div>
-<section id="escritura">
-<span id="xml-jackson-write"></span><h2><span class="section-number">3.2.1. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
-<p>Antes de comenzar a exponerla repasemos algunas diferencias significativas
-respecto a <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
+<p>a los que habría que añadir <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#etapa-enum"><span class="std std-ref">el enum Etapa</span></a>.</p>
+<section id="preparativos">
+<h2><span class="section-number">3.2.1. </span>Preparativos<a class="headerlink" href="#preparativos" title="Link to this heading">#</a></h2>
+<p>Para lograr traducir entre el modelo de datos y <abbr title="eXtensible Markup Language">XML</abbr> necesitamos hacer varias
+consideraciones:</p>
+<ol class="arabic">
+<li><p>Al margen de lo anterior, las anotaciones suelen ser necesarias en <abbr title="eXtensible Markup Language">XML</abbr>
+porque en este formato la información se proporciona mediante nodos
+elementos, pero también i mediante nodos atributo. En cambio, en el modelo de
+objetos sólo existen los atributos del objeto. Por tanto, debe existir un
+modo de indicar cuándo quiere mapearse un atributo de objeto a elemento y
+cuando a atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
+<li><p>En <abbr title="eXtensible Markup Language">XML</abbr> el orden de los nodos elemento importa. Por eso es importante saber
+especificar en qué orden queremos que se escriban los atributos si estos
+generan nodos elemento. Se verá más adelante.</p></li>
+<li><p><abbr title="eXtensible Markup Language">XML</abbr> introduce otra dificultad: en <abbr title="JavaScript Object Notation">JSON</abbr> una secuencia o es el elemento
+raíz o el valor de un campo. En cambio, en <abbr title="eXtensible Markup Language">XML</abbr> la casuística es distinta,
+porque no existen las secuencias por se, lo que existen son los nodos
+elemento que contiene varios nodos elementos del mismo tipo. De este modo nos
+podemos encontrar con:</p>
 <ul>
-<li><p>En <abbr title="eXtensible Markup Language">XML</abbr> la información se proporciona mediante nodos elementos, pero también
-mediante nodos atributo. En cambio, en el modelo de objetos sólo existen los
-atributos del objeto. Por tanto, debe existir un modo de indicar cuándo quiere
-mapearse un atributo de objeto a elemento y cuando a atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
-<li><p>La conversión de una campo que fuera una secuencia <abbr title="JavaScript Object Notation">JSON</abbr> al modelo de objetos
-era evidente: un atributo del objeto que sea una lista o un array. En cambio,
-en <abbr title="eXtensible Markup Language">XML</abbr> esto no es tan claro y el ejemplo lo ilustra. Los profesores del
-claustro son conceptualmente una secuencia, pero no están contenidos dentro
-todos ellos dentro de un elemento hijo de <cite>claustro</cite>, sino que son todos hijos
-inmediatos de <cite>claustro</cite>. Dicho de otra forma, no nos encontramos con esto:</p>
-<div class="no-copybutton highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;claustro</span><span class="w"> </span><span class="na">centro=</span><span class="s">&quot;...&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;profesores&gt;</span>
-<span class="w">       </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p1&quot;</span><span class="nt">&gt;</span>
-<span class="w">          </span><span class="cm">&lt;!-- contenido del primer profesor --&gt;</span>
-<span class="w">       </span><span class="nt">&lt;/profesor&gt;</span>
-<span class="w">       </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p2&quot;</span><span class="nt">&gt;</span>
-<span class="w">          </span><span class="cm">&lt;!-- contenido del segundo profesor --&gt;</span>
-<span class="w">       </span><span class="nt">&lt;/profesor&gt;</span>
-<span class="w">    </span><span class="nt">&lt;/profesores&gt;</span>
-<span class="nt">&lt;/claustro&gt;</span>
-</pre></div>
-</div>
-<p>sino con esto otro:</p>
-<div class="no-copybutton highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;claustro</span><span class="w"> </span><span class="na">centro=</span><span class="s">&quot;...&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p1&quot;</span><span class="nt">&gt;</span>
-<span class="w">       </span><span class="cm">&lt;!-- contenido del primer profesor --&gt;</span>
+<li><p>Elementos raíz sin interés que sólo existen porque necesitan contener a la
+secuencia de elementos, como es el caso que nos ocupa. Obsérvese que en
+esta version <abbr title="eXtensible Markup Language">XML</abbr> hemos tenido que crear un elemento raíz <code class="docutils literal notranslate"><span class="pre">&lt;centro&gt;</span></code>, que
+no existía en la versión <abbr title="JavaScript Object Notation">JSON</abbr>.</p></li>
+<li><p>La secuencia puede estar mezclada con otro elementos. Por ejemplo:</p>
+<div class="no-copybutton highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;centro</span><span class="w"> </span><span class="na">nombre=</span><span class="s">&quot;IES Zopón&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;director&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Datos del director --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/director&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Datos del primer profesor --&gt;</span>
 <span class="w">    </span><span class="nt">&lt;/profesor&gt;</span>
-<span class="w">    </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;p2&quot;</span><span class="nt">&gt;</span>
-<span class="w">       </span><span class="cm">&lt;!-- contenido del segundo profesor --&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;profesor</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Datos del segundo profesor --&gt;</span>
 <span class="w">    </span><span class="nt">&lt;/profesor&gt;</span>
-<span class="nt">&lt;/claustro&gt;</span>
+
+<span class="w">    </span><span class="cm">&lt;!-- Más profesores --&gt;</span>
+<span class="nt">&lt;/centro&gt;</span>
 </pre></div>
 </div>
 </li>
-<li><p>En <abbr title="eXtensible Markup Language">XML</abbr> el orden de los nodos elemento importa y podría ser que nos
-interesara predefinirlo.</p></li>
 </ul>
-<p>Teniendo presente esto, escribamos clases abstractas complementarias que
-incluyan las anotaciones y que luego mezclaremos:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">ClaustroMixin.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="nd">@JsonRootName</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;claustro&quot;</span><span class="p">)</span>
-</span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ClaustroMixin</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">centro</span><span class="p">;</span>
-
-<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">useWrapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-</span><span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesor&quot;</span><span class="p">)</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
+<blockquote>
+<div><p>Obsérvese que la secuencia de profesores está contenida directamente dentro
+de <em>centro</em>, a diferencia de lo que ocurriría en <abbr title="JavaScript Object Notation">JSON</abbr>, y además, <em>centro</em>
+contiene otros dos nodos (<em>director</em> y <em>nombre</em>).</p>
+<div class="no-copybutton highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IES Zopón&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;director&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;profesores&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="c1">// profesor1</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="c1">// profesor2</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">ProfesorMixin.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ProfesorMixin</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+</div></blockquote>
+</li>
+</ol>
+<section id="anotaciones">
+<h3><span class="section-number">3.2.1.1. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h3>
+<p>Las particularidades de <abbr title="eXtensible Markup Language">XML</abbr> obligan a anotar las clases del modelo. Empecemos
+por <code class="docutils literal notranslate"><span class="pre">Alumno</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">AlumnoMixin</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Sólo tiene efecto en JSON.</span>
+<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;nacimiento&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span class="w">    </span><span class="nd">@JsonFormat</span><span class="p">(</span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonFormat</span><span class="p">.</span><span class="na">Shape</span><span class="p">.</span><span class="na">STRING</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
 
-<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">sustituye</span><span class="p">;</span>
-
-<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">casillero</span><span class="p">;</span>
+<span class="w">    </span><span class="nd">@JsonIgnore</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getEdad</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>En este caso debemos cambiar el nombre, pero no puede hacerse a través de la
+anotación <code class="docutils literal notranslate"><span class="pre">&#64;JsonProperty</span></code> (que sobra totalmente), sino de
+<code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>. De hecho, se ha mantenido la anotación
+<code class="docutils literal notranslate"><span class="pre">&#64;JsonProperty</span></code> en previsión de que se quisiera también traducir a <abbr title="JavaScript Object Notation">JSON</abbr>, si
+no es el caso, se puede eliminar por completo. La información, además, se
+muestra en forma de nodo atributo, por lo es necesario especificarlo usando
+también <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>. Por otro lado, la anotación <code class="docutils literal notranslate"><span class="pre">&#64;JsonFormat</span></code> no
+es ninguna novedad: ya la necesitamos en <abbr title="JavaScript Object Notation">JSON</abbr> para definir cómo escibir la
+fecha como cadena.</p>
+<p>Pasemos a <code class="docutils literal notranslate"><span class="pre">Grupo</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="nd">@JsonRootName</span><span class="p">(</span><span class="s">&quot;grupo&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="nd">@JsonPropertyOrder</span><span class="p">({</span><span class="s">&quot;nivel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;etapa&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;grupo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;tutor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;miembros&quot;</span><span class="p">})</span>
+</span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GrupoMixin</span><span class="w"> </span><span class="p">{</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">isAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;miembros&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">useWrapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="hll"><span class="w">    </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;alumno&quot;</span><span class="p">)</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
 </div>
-<p>Hemos utilizados anotaciones sobre las clases para:</p>
+<p>Aquí tenemos varias novedades:</p>
+<ul>
+<li><p>Nos vemos obligados a usar <code class="docutils literal notranslate"><span class="pre">&#64;JsonRootName</span></code> para que la etiqueta sea
+<code class="docutils literal notranslate"><span class="pre">&lt;grupo&gt;</span></code> y no <code class="docutils literal notranslate"><span class="pre">&lt;Grupo&gt;</span></code>.</p></li>
+<li><p>Como en <abbr title="eXtensible Markup Language">XML</abbr> es importante (al menos para los nodos elementos el orden), nos
+vemos obligados a definirlo con <code class="docutils literal notranslate"><span class="pre">&#64;JsonPropertyOrder</span></code>.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Es probable que para <code class="docutils literal notranslate"><span class="pre">Tutor</span></code> necesitemos crear una clase
+<code class="docutils literal notranslate"><span class="pre">TutorMixin</span></code> sólo para asegurarnos de que <code class="docutils literal notranslate"><span class="pre">&lt;nombre&gt;</span></code> aparezca antes que
+<code class="docutils literal notranslate"><span class="pre">&lt;especialidad&gt;</span></code>.</p>
+</div>
+</li>
+<li><p>Hay tres atributos que son nodos atributo, así que debemos declararlo.</p></li>
+<li><p>El elemento <code class="docutils literal notranslate"><span class="pre">miembros</span></code> contiene elementos <code class="docutils literal notranslate"><span class="pre">&lt;alumno&gt;</span></code>. Sin anotación, la
+traducción sería así:</p>
+<div class="no-copybutton highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;miembros&gt;</span>
+<span class="w">   </span><span class="nt">&lt;miembros</span><span class="w"> </span><span class="na">nacimiento=</span><span class="s">&quot;01/01/2001&quot;</span><span class="nt">&gt;</span>
+<span class="w">       </span><span class="cm">&lt;!-- Información sobre el primer alumno --&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/miembros&gt;</span>
+
+<span class="w">   </span><span class="cm">&lt;!-- Resto de alumnos --&gt;</span>
+<span class="nt">&lt;/miembros&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlElementWrapper</span></code> influye sobre el elemento contenedor de la
+secuencia. En principio, la traducción es la predeterminada, pero al haber
+usado <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code> la hemos alterado, así que es necesaria para
+que <em>miembros</em> siga siendo <em>miembros</em>. Lo que sí podríamos habernos ahorrado
+es especificar <code class="docutils literal notranslate"><span class="pre">useWrapping</span></code> ya que por defecto está a <code class="docutils literal notranslate"><span class="pre">true</span></code> y significa
+que el elemento contenedor está presente. Podría no existir si hubiéramos
+decidido incluir en el <abbr title="eXtensible Markup Language">XML</abbr> la secuencia de alumnos directamente dentro de
+<code class="docutils literal notranslate"><span class="pre">&lt;centro&gt;</span></code> en cuyo caso deberíamos haberlo puesto a <code class="docutils literal notranslate"><span class="pre">false</span></code>. Por otro
+lado, tenemos que cambiar el nombre de los elementos de <code class="docutils literal notranslate"><span class="pre">miembros</span></code> a
+<code class="docutils literal notranslate"><span class="pre">alumno</span></code>, por lo que necesitamos usar <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>.</p>
+</li>
+</ul>
+</section>
+<section id="envoltorio">
+<h3><span class="section-number">3.2.1.2. </span>Envoltorio<a class="headerlink" href="#envoltorio" title="Link to this heading">#</a></h3>
+<p>Otra gran diferencia respecto a la traducción a <abbr title="JavaScript Object Notation">JSON</abbr> es que en <abbr title="eXtensible Markup Language">XML</abbr> nos hemos
+visto obligados a crear un elemento contenedor de la secuencia llamado
+<code class="docutils literal notranslate"><span class="pre">&lt;centro&gt;</span></code>. No contiene más información que la propia secuencia, por lo que en
+el modelo de datos no se traduce en una nueva clase. En <em>Java</em>, simplemente,
+existirá un dato de tipo <code class="docutils literal notranslate"><span class="pre">Grupo[]</span></code> o <code class="docutils literal notranslate"><span class="pre">List&lt;Grupo&gt;</span></code>.</p>
+<p>Por eso, para poder hacer la traducción a <abbr title="eXtensible Markup Language">XML</abbr> necesitamos añadir una clase
+envoltorio auxiliar:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="nd">@JsonRootName</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">)</span>
+</span><span class="kd">private</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GrupoWrapper</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">useWrapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span class="hll"><span class="w">   </span><span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;grupo&quot;</span><span class="p">)</span>
+</span><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Las particularidades de este código son las siguientes:</p>
 <ul class="simple">
-<li><p>Que la etiqueta raíz sea <cite>claustro</cite> y no <cite>Claustro</cite>.</p></li>
-<li><p>Que los atributos <cite>centro</cite> e <cite>id</cite> se transcriban como atributos <abbr title="eXtensible Markup Language">XML</abbr>, no como
-un nodos elemento.</p></li>
-<li><p>Que la etiqueta sea <cite>profesor</cite> y no <cite>plantilla</cite>.</p></li>
-<li><p>Que la lista de profesores este directamente incluida dentro de <cite>claustro</cite> y
-no dentro de un hijo de <cite>claustro</cite> (repásese la segunda diferencia
-significativa que se acaba de enumerar).</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En realidad, cuando no se prescinde del envoltorio, el elemento en
-que se incluyen todos los componentes de la secuencia tiene el mismo nombre
-que los propios componentes (<code class="docutils literal notranslate"><span class="pre">profesor</span></code> en este caso). Si quisiéramos
-cambiarlos, podríamos haber escrito:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesores&quot;</span><span class="p">)</span>
-<span class="nd">@JacksonXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesor&quot;</span><span class="p">)</span>
-<span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">plantilla</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</li>
+<li><p>Necesitamos definir una clase auxiliar que represente al envoltorio
+<code class="docutils literal notranslate"><span class="pre">&lt;centro&gt;</span></code>. Para ello hemos creado una clase <code class="docutils literal notranslate"><span class="pre">GrupoWrapper</span></code>.</p></li>
+<li><p>En este caso, cada elemento <code class="docutils literal notranslate"><span class="pre">&lt;grupo&gt;</span></code> sí está directamente
+incluido en <code class="docutils literal notranslate"><span class="pre">&lt;centro&gt;</span></code> por lo que sí es necesaria la anotación
+<code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlElementWrapper</span></code> con <code class="docutils literal notranslate"><span class="pre">useWrapping</span></code> a <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+<li><p>El nombre del elemento es <code class="docutils literal notranslate"><span class="pre">&lt;grupo&gt;</span></code>, no <code class="docutils literal notranslate"><span class="pre">&lt;grupos&gt;</span></code>, así que es necesaria
+también la anotación <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>.</p></li>
 </ul>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
-<p>Si quisiéramos modificar el orden en que se vuelcan en el <abbr title="eXtensible Markup Language">XML</abbr> los
-atributos de una clase, podríamos usar <code class="docutils literal notranslate"><span class="pre">&#64;JsonPropertyOrder</span></code>:</p>
-<div class="no-copybutton highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonPropertyOrder</span><span class="p">({</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;apelativo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;departamento&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;apellidos&quot;</span><span class="p">})</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Profesor</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// ...</span>
+</section>
+<section id="traductores">
+<h3><span class="section-number">3.2.1.3. </span>Traductores<a class="headerlink" href="#traductores" title="Link to this heading">#</a></h3>
+<p>En principio, como en el caso de <abbr title="JavaScript Object Notation">JSON</abbr> necesitamos el traductor para <code class="docutils literal notranslate"><span class="pre">Etapa</span></code>.
+Debería ser idéntico y usarse igual, pero hay una pequeña diferencia:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Deserializer</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ValueDeserializer</span><span class="o">&lt;</span><span class="n">Etapa</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">JsonParser</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">DeserializationContext</span><span class="w"> </span><span class="n">ctxt</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">JacksonException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">etapa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="na">getString</span><span class="p">());</span><span class="w">  </span><span class="c1">// No, p.getIntValue();</span>
+</span><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Etapa</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="n">etapa</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">NumberFormatException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//logger.error(&quot;No se ha podido convertir {} a número&quot;,</span>
+<span class="w">            </span><span class="c1">//p.getString());</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">catch</span><span class="p">(</span><span class="n">ArrayIndexOutOfBoundsException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//logger.error(&quot;No existe la etapa {}&quot;, p.getString());</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Por supuesto, la anotación también es válida cuando se genera el formato
-<abbr title="JavaScript Object Notation">JSON</abbr>, pero no suele tener importancia.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Si no hemos definido una gramática <abbr title="Xml Schema Definition">XSD</abbr> para el <abbr title="eXtensible Markup Language">XML</abbr>, todo son
+cadenas, así que no podemos usar <code class="docutils literal notranslate"><span class="pre">.getIntValue()</span></code>. Lo cierto es que esta
+versión también funciona para traducir el <abbr title="JavaScript Object Notation">JSON</abbr>, así que podríamos haberla
+implementado directamente.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En este ejemplo tenemos una clase explícita (<code class="docutils literal notranslate"><span class="pre">Claustro</span></code>) que sirve
-como envoltorio a una lista de profesores. Obśervese que es en este
-envoltorio donde controlamos qué etiquetas se utilizan para los elementos de
-la lista. En otro caso distinto en que
-tuviéramos solamente una lista (o array) y quisiéramos generar un <abbr title="eXtensible Markup Language">XML</abbr>,
-deberíamos ser conscientes de que en la traducción no podríamos controlar el
-elemento padre ni los nombres de las etiquetas de los elementos de la lista.
-Es decir, si tuviéramos una lista de objetos <code class="docutils literal notranslate"><span class="pre">Profesor</span></code> al generar un <abbr title="eXtensible Markup Language">XML</abbr>
-obtendríamos lo siguiente:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;Profesor&gt;</span>
-<span class="w">   </span><span class="nt">&lt;Profesor&gt;</span>
-<span class="w">      </span><span class="cm">&lt;!-- Contenido del primer profesor... --&gt;</span>
-<span class="w">   </span><span class="nt">&lt;/Profesor&gt;</span>
-
-<span class="w">   </span><span class="cm">&lt;!-- Más profesores --&gt;</span>
-<span class="nt">&lt;/Profesor&gt;</span>
-</pre></div>
-</div>
-<p>Si nuestra intención fuera controlar los nombres de esas etiquetas al
-traducir a XML, entonces tendríamos que crear una clase adicional que hiciera
-de envoltorio, aunque en nuestro modelo de datos no exista:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonRootName</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;claustro&quot;</span><span class="p">)</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ProfesorWrapper</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">   </span><span class="nd">@JacksonXmlElementWrapper</span><span class="p">(</span><span class="n">useWrapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-<span class="w">   </span><span class="nd">@JacksonnXmlProperty</span><span class="p">(</span><span class="n">localName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;profesor&quot;</span><span class="p">)</span>
-<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">profesores</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Por supuesto, antes de escribir el <abbr title="eXtensible Markup Language">XML</abbr> deberíamos crear un objeto de este
-clase envoltorio y asignar al atributo <code class="docutils literal notranslate"><span class="pre">profesores</span></code> la lista de profesores
-existente.</p>
-</div>
-<p>Por último queda generar la salida en el programa principal, que es básicamente
+</section>
+</section>
+<section id="escritura">
+<span id="xml-jackson-write"></span><h2><span class="section-number">3.2.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
+<p>Generar la salida en el programa principal es básicamente
 igual que <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-write"><span class="std std-ref">la escritura en el caso de JSON</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
 
-<span class="n">Claustro</span><span class="w"> </span><span class="n">claustro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Claustro</span><span class="p">(</span>
-<span class="w">    </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="p">(</span><span class="s">&quot;p1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Paco&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Francisco&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Calderón Márquez&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">),</span>
-<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="p">(</span><span class="s">&quot;p2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Loli&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Dolores&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Fuertes de Barriga&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Francés&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">);</span>
+<span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Etapa</span><span class="p">.</span><span class="na">ESO</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">New</span><span class="w"> </span><span class="nf">Tutor</span><span class="p">(</span><span class="s">&quot;Florencio Vázquez Méndez&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Inglés&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;María Isabel Menézdez Roldán&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)),</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Francisco Macías Bermejo&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">))</span>
+<span class="w">   </span><span class="p">}),</span>
+<span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">Etapa</span><span class="p">.</span><span class="na">ESO</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;C&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">New</span><span class="w"> </span><span class="nf">Tutor</span><span class="p">(</span><span class="s">&quot;Petra Laynez Beltrán&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Francés&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Clara Ribera Paterna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">)),</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Tania Macías Cordero&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span>
+<span class="w">   </span><span class="p">})</span>
+<span class="p">};</span>
 
 <span class="n">XmlFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmLFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 <span class="w">   </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">XmlWriteFeature</span><span class="p">.</span><span class="na">WRITE_XML_DECLARATION</span><span class="p">)</span>
-<span class="w">   </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">XmlWriteFeature</span><span class="p">.</span><span class="na">WRITE_XML_1_1</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmlFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
+<span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmlMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">INDENT_OUTPUT</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Claustro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">ClaustroMixin</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Profesor</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">ProfesorMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 
 <span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">    </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">);</span>
-<span class="w">    </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValue</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span><span class="w"> </span><span class="n">claustro</span><span class="p">);</span>
-<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">archivo</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">claustro</span><span class="p">);</span><span class="w">  </span><span class="c1">// Puede generar JacksonException</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">JacksonException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
@@ -727,7 +868,7 @@ igual que <a class="reference internal" href="../02.formatos/02.json/02.jackson.
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValueAsString</span><span class="p">(</span><span class="n">claustro</span><span class="p">);</span>
 <span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">contenido</span><span class="p">);</span>
-<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">JacksonException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
@@ -742,7 +883,7 @@ afirmarse en la lectura, que se verá a continuación.</p>
 que con JSON</span></a>.</p>
 </section>
 <section id="lectura">
-<span id="xml-jackson-read"></span><h2><span class="section-number">3.2.2. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
+<span id="xml-jackson-read"></span><h2><span class="section-number">3.2.3. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>Habiendo definido las clases con anotaciones como en el apartado anterior, la
 lectura del formato es <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-read"><span class="std std-ref">prácticamente la misma que para JSON</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
@@ -753,13 +894,10 @@ lectura del formato es <a class="reference internal" href="../02.formatos/02.jso
 
 <span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">   </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Claustro</span><span class="w"> </span><span class="n">claustro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">Claustro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">Claustro</span><span class="w"> </span><span class="n">claustro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">Claustro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">claustro</span><span class="p">);</span>
-<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">JacksonIOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
@@ -812,8 +950,14 @@ lectura del formato es <a class="reference internal" href="../02.formatos/02.jso
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.1. Escritura</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.2. Lectura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparativos">3.2.1. Preparativos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">3.2.1.1. Anotaciones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#envoltorio">3.2.1.2. Envoltorio</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductores">3.2.1.3. Traductores</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">3.2.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">3.2.3. Lectura</a></li>
 </ul>
   </nav></div>
 

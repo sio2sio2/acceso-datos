@@ -8,198 +8,298 @@ como en el caso de estos otros dos formatos, también puede llevarse a cabo con
 *Jackson*, para lo cual necesitaremos `jackson-dataformat-xml
 <https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/>`_.
 
-En este caso, usaremos también como ejemplo ilustrativo :ref:`el XML sobre un
-claustro de profesores <xml>`. En principio, podemos modelar las dos entidades
-existentes (`claustro` y `profesor`) con esta clase ``Claustro``:
+Para ilustrar el uso de la librería tomaremos con ejemplo una versión |XML| del
+:ref:`archivo JSON que usamos en la unidad anterior <json>`:
 
-.. literalinclude:: files/Claustro.java
+.. literalinclude:: files/centro.xml
+   :language: xml
+   :class: toggle
+   :caption: centro.xml
+
+.. note:: Obsérvese que directamente hemos traducido ``Etapa`` con el ordinal,
+   en vez de con las constantes de enumeración.
+
+Nuestra intención es usar el modelo de datos que ya presentamos en la unidad
+anterior:
+
+.. literalinclude:: /02.formatos/02.json/files/Grupo-etapa.java
    :language: java
    :class: toggle
-   :caption: Claustro.java
+   :caption: Grupo.java
 
-y esta otra ``Profesor``:
-
-.. literalinclude:: files/Profesor.java
+.. literalinclude:: /02.formatos/02.json/files/Tutor.java
    :language: java
    :class: toggle
-   :caption: Profesor.java
+   :caption: Tutor.java
 
-.. note:: Para no complicar en exceso el código se han puesto todos los
-   atributos como :java-lang:`String`.
+.. literalinclude:: /02.formatos/02.json/files/Alumno.java
+   :language: java
+   :class: toggle
+   :caption: Alumno.java
+
+a los que habría que añadir :ref:`el enum Etapa <Etapa-enum>`.
+
+Preparativos
+============
+Para lograr traducir entre el modelo de datos y |XML| necesitamos hacer varias
+consideraciones:
+
+#. Al margen de lo anterior, las anotaciones suelen ser necesarias en |XML|
+   porque en este formato la información se proporciona mediante nodos
+   elementos, pero también i mediante nodos atributo. En cambio, en el modelo de
+   objetos sólo existen los atributos del objeto. Por tanto, debe existir un
+   modo de indicar cuándo quiere mapearse un atributo de objeto a elemento y
+   cuando a atributo |XML|.
+
+#. En |XML| el orden de los nodos elemento importa. Por eso es importante saber
+   especificar en qué orden queremos que se escriban los atributos si estos
+   generan nodos elemento. Se verá más adelante.
+
+#. |XML| introduce otra dificultad: en |JSON| una secuencia o es el elemento
+   raíz o el valor de un campo. En cambio, en |XML| la casuística es distinta,
+   porque no existen las secuencias por se, lo que existen son los nodos
+   elemento que contiene varios nodos elementos del mismo tipo. De este modo nos
+   podemos encontrar con:
+
+   + Elementos raíz sin interés que sólo existen porque necesitan contener a la
+     secuencia de elementos, como es el caso que nos ocupa. Obsérvese que en
+     esta version |XML| hemos tenido que crear un elemento raíz ``<centro>``, que
+     no existía en la versión |JSON|.
+
+   + La secuencia puede estar mezclada con otro elementos. Por ejemplo:
+
+     .. code-block:: xml
+        :class: no-copybutton
+
+
+        <centro nombre="IES Zopón">
+            <director>
+                <!-- Datos del director -->
+            </director>
+
+            <profesor id="1">
+                <!-- Datos del primer profesor -->
+            </profesor>
+
+            <profesor id="2">
+                <!-- Datos del segundo profesor -->
+            </profesor>
+
+            <!-- Más profesores -->
+        </centro>
+
+    Obsérvese que la secuencia de profesores está contenida directamente dentro
+    de *centro*, a diferencia de lo que ocurriría en |JSON|, y además, *centro*
+    contiene otros dos nodos (*director* y *nombre*).
+
+    .. code-block:: json
+       :class: no-copybutton
+
+       {
+          "nombre": "IES Zopón",
+          "director": { /* ... */ },
+          "profesores": [
+             {
+                // profesor1
+             },
+             {
+                // profesor2
+             }
+          }
+       }
+
+.. **
+
+Anotaciones
+-----------
+Las particularidades de |XML| obligan a anotar las clases del modelo. Empecemos
+por ``Alumno``:
+
+.. code-block:: java
+   :emphasize-lines: 3
+
+   private static abstract class AlumnoMixin {
+       @JsonProperty("nacimiento") // Sólo tiene efecto en JSON.
+       @JacksonXmlProperty(localName = "nacimiento", isAttribute = true)
+       @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+       private LocalDate fechaNacimiento;
+
+       @JsonIgnore
+       public abstract int getEdad();
+   }
+
+En este caso debemos cambiar el nombre, pero no puede hacerse a través de la
+anotación ``@JsonProperty`` (que sobra totalmente), sino de
+``@JacksonXmlProperty``. De hecho, se ha mantenido la anotación
+``@JsonProperty`` en previsión de que se quisiera también traducir a |JSON|, si
+no es el caso, se puede eliminar por completo. La información, además, se
+muestra en forma de nodo atributo, por lo es necesario especificarlo usando
+también ``@JacksonXmlProperty``. Por otro lado, la anotación ``@JsonFormat`` no
+es ninguna novedad: ya la necesitamos en |JSON| para definir cómo escibir la
+fecha como cadena.
+
+Pasemos a ``Grupo``:
+
+.. code-block:: java
+   :emphasize-lines: 1, 2, 5, 8, 11, 15
+
+   @JsonRootName("grupo")
+   @JsonPropertyOrder({"nivel", "etapa", "grupo", "tutor", "miembros"})
+   private static abstract class GrupoMixin {
+
+       @JacksonXmlProperty(isAttribute = true)
+       private short nivel;
+
+       @JacksonXmlProperty(isAttribute = true)
+       private Etapa etapa;
+
+       @JacksonXmlProperty(isAttribute = true)
+       private char grupo;
+
+       @JacksonXmlElementWrapper(localName = "miembros", useWrapping = true)
+       @JacksonXmlProperty(localName = "alumno")
+       private Alumno[] miembros;
+   }
+
+Aquí tenemos varias novedades:
+
++ Nos vemos obligados a usar ``@JsonRootName`` para que la etiqueta sea
+  ``<grupo>`` y no ``<Grupo>``.
+
++ Como en |XML| es importante (al menos para los nodos elementos el orden), nos
+  vemos obligados a definirlo con ``@JsonPropertyOrder``.
+
+  .. caution:: Es probable que para ``Tutor`` necesitemos crear una clase
+     ``TutorMixin`` sólo para asegurarnos de que ``<nombre>`` aparezca antes que
+     ``<especialidad>``.
+
++ Hay tres atributos que son nodos atributo, así que debemos declararlo.
+
++ El elemento ``miembros`` contiene elementos ``<alumno>``. Sin anotación, la
+  traducción sería así:
+
+  .. code-block:: xml
+     :class: no-copybutton
+
+     <miembros>
+        <miembros nacimiento="01/01/2001">
+            <!-- Información sobre el primer alumno -->
+        </miembros>
+
+        <!-- Resto de alumnos -->
+     </miembros>
+
+  ``@JacksonXmlElementWrapper`` influye sobre el elemento contenedor de la
+  secuencia. En principio, la traducción es la predeterminada, pero al haber
+  usado ``@JacksonXmlProperty`` la hemos alterado, así que es necesaria para
+  que *miembros* siga siendo *miembros*. Lo que sí podríamos habernos ahorrado
+  es especificar ``useWrapping`` ya que por defecto está a ``true`` y significa
+  que el elemento contenedor está presente. Podría no existir si hubiéramos
+  decidido incluir en el |XML| la secuencia de alumnos directamente dentro de
+  ``<centro>`` en cuyo caso deberíamos haberlo puesto a ``false``. Por otro
+  lado, tenemos que cambiar el nombre de los elementos de ``miembros`` a
+  ``alumno``, por lo que necesitamos usar ``@JacksonXmlProperty``.
+
+Envoltorio
+----------
+Otra gran diferencia respecto a la traducción a |JSON| es que en |XML| nos hemos
+visto obligados a crear un elemento contenedor de la secuencia llamado
+``<centro>``. No contiene más información que la propia secuencia, por lo que en
+el modelo de datos no se traduce en una nueva clase. En *Java*, simplemente,
+existirá un dato de tipo ``Grupo[]`` o ``List<Grupo>``.
+
+Por eso, para poder hacer la traducción a |XML| necesitamos añadir una clase
+envoltorio auxiliar:
+
+.. code-block:: java
+   :emphasize-lines: 1, 3, 4
+
+   @JsonRootName("centro")
+   private class GrupoWrapper {
+      @JacksonXmlElementWrapper(useWrapping = false)
+      @JacksonXmlProperty(localName = "grupo")
+      private Grupo[] grupos;
+   }
+
+Las particularidades de este código son las siguientes:
+
++ Necesitamos definir una clase auxiliar que represente al envoltorio
+  ``<centro>``. Para ello hemos creado una clase ``GrupoWrapper``.
+
++ En este caso, cada elemento ``<grupo>`` sí está directamente
+  incluido en ``<centro>`` por lo que sí es necesaria la anotación
+  ``@JacksonXmlElementWrapper`` con ``useWrapping`` a ``false``.
+
++ El nombre del elemento es ``<grupo>``, no ``<grupos>``, así que es necesaria
+  también la anotación ``@JacksonXmlProperty``.
+
+Traductores
+-----------
+En principio, como en el caso de |JSON| necesitamos el traductor para ``Etapa``.
+Debería ser idéntico y usarse igual, pero hay una pequeña diferencia:
+
+.. code-block:: java
+   :emphasize-lines: 5
+
+   public static class Deserializer extends ValueDeserializer<Etapa> {
+       @Override
+       public Etapa deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+           try {
+               int etapa = Integer.parseInt(p.getString());  // No, p.getIntValue();
+               return Etapa.indexOf(etapa);
+           }
+           catch(NumberFormatException e) {
+               //logger.error("No se ha podido convertir {} a número",
+               //p.getString());
+           }
+           catch(ArrayIndexOutOfBoundsException e) {
+               //logger.error("No existe la etapa {}", p.getString());
+           }
+           return null;
+       }
+   }
+
+.. caution:: Si no hemos definido una gramática |XSD| para el |XML|, todo son
+   cadenas, así que no podemos usar ``.getIntValue()``. Lo cierto es que esta
+   versión también funciona para traducir el |JSON|, así que podríamos haberla
+   implementado directamente.
 
 .. _xml-jackson-write:
 
 Escritura
 =========
-Antes de comenzar a exponerla repasemos algunas diferencias significativas
-respecto a |JSON|:
-
-+ En |XML| la información se proporciona mediante nodos elementos, pero también
-  mediante nodos atributo. En cambio, en el modelo de objetos sólo existen los
-  atributos del objeto. Por tanto, debe existir un modo de indicar cuándo quiere
-  mapearse un atributo de objeto a elemento y cuando a atributo |XML|.
-
-+ La conversión de una campo que fuera una secuencia |JSON| al modelo de objetos
-  era evidente: un atributo del objeto que sea una lista o un array. En cambio,
-  en |XML| esto no es tan claro y el ejemplo lo ilustra. Los profesores del
-  claustro son conceptualmente una secuencia, pero no están contenidos dentro
-  todos ellos dentro de un elemento hijo de `claustro`, sino que son todos hijos
-  inmediatos de `claustro`. Dicho de otra forma, no nos encontramos con esto:
-
-  .. code-block:: xml
-     :class: no-copybutton
-
-     <claustro centro="...">
-         <profesores>
-            <profesor id="p1">
-               <!-- contenido del primer profesor -->
-            </profesor>
-            <profesor id="p2">
-               <!-- contenido del segundo profesor -->
-            </profesor>
-         </profesores>
-     </claustro>
-
-  sino con esto otro:
-
-  .. code-block:: xml
-     :class: no-copybutton
-
-     <claustro centro="...">
-         <profesor id="p1">
-            <!-- contenido del primer profesor -->
-         </profesor>
-         <profesor id="p2">
-            <!-- contenido del segundo profesor -->
-         </profesor>
-     </claustro>
-
-+ En |XML| el orden de los nodos elemento importa y podría ser que nos
-  interesara predefinirlo.
-
-Teniendo presente esto, escribamos clases abstractas complementarias que
-incluyan las anotaciones y que luego mezclaremos:
-
-.. literalinclude:: files/ClaustroMixin.java
-   :language: java
-   :class: toggle
-   :caption: ClaustroMixin.java
-   :emphasize-lines: 1,3,6,7
-
-.. literalinclude:: files/ProfesorMixin.java
-   :language: java
-   :class: toggle
-   :caption: ProfesorMixin.java
-   :emphasize-lines: 2, 5, 8
-
-Hemos utilizados anotaciones sobre las clases para:
-
-.. rst-class:: simple
-
-- Que la etiqueta raíz sea `claustro` y no `Claustro`.
-- Que los atributos `centro` e `id` se transcriban como atributos |XML|, no como
-  un nodos elemento.
-- Que la etiqueta sea `profesor` y no `plantilla`.
-- Que la lista de profesores este directamente incluida dentro de `claustro` y
-  no dentro de un hijo de `claustro` (repásese la segunda diferencia
-  significativa que se acaba de enumerar).
-
-  .. note:: En realidad, cuando no se prescinde del envoltorio, el elemento en
-     que se incluyen todos los componentes de la secuencia tiene el mismo nombre
-     que los propios componentes (``profesor`` en este caso). Si quisiéramos
-     cambiarlos, podríamos haber escrito:
-
-     .. code-block:: java
-
-        @JacksonXmlElementWrapper(localName = "profesores")
-        @JacksonXmlProperty(localName = "profesor")
-        private Profesor[] plantilla;
-
-.. tip:: Si quisiéramos modificar el orden en que se vuelcan en el |XML| los
-   atributos de una clase, podríamos usar ``@JsonPropertyOrder``:
-
-   .. code-block:: java
-      :class: no-copybutton
-      
-      @JsonPropertyOrder({"nombre", "apelativo", "departamento", "apellidos"})
-      public class Profesor {
-         // ...
-      }
-
-   Por supuesto, la anotación también es válida cuando se genera el formato
-   |JSON|, pero no suele tener importancia.
-
-.. note:: En este ejemplo tenemos una clase explícita (``Claustro``) que sirve
-   como envoltorio a una lista de profesores. Obśervese que es en este
-   envoltorio donde controlamos qué etiquetas se utilizan para los elementos de
-   la lista. En otro caso distinto en que
-   tuviéramos solamente una lista (o array) y quisiéramos generar un |XML|,
-   deberíamos ser conscientes de que en la traducción no podríamos controlar el
-   elemento padre ni los nombres de las etiquetas de los elementos de la lista.
-   Es decir, si tuviéramos una lista de objetos ``Profesor`` al generar un |XML|
-   obtendríamos lo siguiente:
-
-   .. code-block:: xml
-
-      <Profesor>
-         <Profesor>
-            <!-- Contenido del primer profesor... -->
-         </Profesor>
-
-         <!-- Más profesores -->
-      </Profesor>
-
-   Si nuestra intención fuera controlar los nombres de esas etiquetas al
-   traducir a XML, entonces tendríamos que crear una clase adicional que hiciera
-   de envoltorio, aunque en nuestro modelo de datos no exista:
-
-   .. code-block:: java
-
-      @JsonRootName(value = "claustro")
-      public class ProfesorWrapper {
-
-         @JacksonXmlElementWrapper(useWrapping = false)
-         @JacksonnXmlProperty(localName = "profesor")
-         private Profesor[] profesores;
-      }
-
-   Por supuesto, antes de escribir el |XML| deberíamos crear un objeto de este
-   clase envoltorio y asignar al atributo ``profesores`` la lista de profesores
-   existente.
-
-Por último queda generar la salida en el programa principal, que es básicamente
+Generar la salida en el programa principal es básicamente
 igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
 
 .. code-block:: java
 
    Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "claustro.xml");
 
-   Claustro claustro = new Claustro(
-       "IES Castillo de Luna",
-       new Profesor[] {
-           new Profesor("p1", "Paco", "Francisco", "Calderón Márquez", "Inglés"),
-           new Profesor("p2", "Loli", "Dolores", "Fuertes de Barriga", "Francés")
-       }
-   );
+   Grupo[] grupos = new Grupo[] {
+      new Grupo(1, Etapa.ESO, 'A', New Tutor("Florencio Vázquez Méndez", "Inglés"), {
+         new Alumno("María Isabel Menézdez Roldán", LocalDate.of(2010, 12, 3)),
+         new Alumno("Francisco Macías Bermejo", LocalDate.of(2011, 1, 16))
+      }),
+      new Grupo(2, Etapa.ESO, 'C', New Tutor("Petra Laynez Beltrán", "Francés"), {
+         new Alumno("Clara Ribera Paterna", LocalDate.of(2009, 12, 12)),
+         new Alumno("Tania Macías Cordero", LocalDate.of(2010, 3, 5))
+      })
+   };
    
    XmlFactory factory = XmLFactory.builder()
       .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
-      .enable(XmlWriteFeature.WRITE_XML_1_1)
       .build();
 
-   MapperBuilder<?, ?> builder = XmlFactory.builder(factory)
+   MapperBuilder<?, ?> builder = XmlMapper.builder(factory)
       .enable(SerializationFeature.INDENT_OUTPUT)
       .addMixIn(Claustro.class, ClaustroMixin.class)
       .addMixIn(Profesor.class, ProfesorMixin.class);
 
    ObjectMapper mapper = builder.build();
 
-   try (
-       OutputStream st = Files.newOutputStream(archivo);
-       OutputStreamWriter sw = new OutputStreamWriter(st);
-   ) {
-       mapper.writeValue(sw, claustro);
-   } catch(IOException err) {
+   try (OutputStream st = Files.newOutputStream(archivo)) {
+       mapper.writeValue(st, claustro);  // Puede generar JacksonException
+   } catch(JacksonException | IOException err) {
        err.printStackTrace();
    }
    
@@ -211,7 +311,7 @@ También podríamos haber generado una cadena con la salida:
    try {
        String contenido = mapper.writeValueAsString(claustro);
        System.out.println(contenido);
-   } catch(IOException err) {
+   } catch(JacksonException err) {
        err.printStackTrace();
    }
 
@@ -240,16 +340,14 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
 
    ObjectMapper mapper = builder.build();
 
-   try (
-      InputStream st = Files.newInputStream(ruta);
-      InputStreamReader sr = new InputStreamReader(st);
-   ) {
-      Claustro claustro = mapper.readValue(sr, Claustro.class);
+   try (InputStream st = Files.newInputStream(ruta)) {
+      Claustro claustro = mapper.readValue(st, Claustro.class);
       System.out.println(claustro);
-   } catch(IOException err) {
+   } catch(JacksonIOException | IOException err) {
       err.printStackTrace();
    }
 
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
+.. |XSD| replace:: :abbr:`XSD (Xml Schema Definition)`

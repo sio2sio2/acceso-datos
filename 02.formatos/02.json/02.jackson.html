@@ -427,24 +427,20 @@ document.write(`
 <a class="reference internal" href="../../03.xml/index.html#xml"><span class="std std-ref">XML</span></a> es la proporcionada por el <a class="reference external" href="https://github.com/FasterXML/jackson">proyecto Jackson</a>.</p>
 <p>Como <a class="reference internal" href="01.gson.html#json-gson"><span class="std std-ref">GSON</span></a>, nos permite hacer una conversión automática entre
 el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para lo cual podemos definir las clases para
-<cite>Tutor</cite>, <cite>Alumno</cite> y <cite>Grupo</cite> exactamente de <a class="reference internal" href="01.gson.html#gson-auto"><span class="std std-ref">la misma forma</span></a>.
-Como en aquel caso, empezaremos por no complicar las cosas: las secuencias son
-arrays y los valores son directamente traducibles a un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>
-(es decir, representaremos la edad y no la fecha de nacimiento).</p>
-<p>Para empezar necesitaremos la librería <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind">jackson-databind</a>.</p>
+<a class="reference internal" href="01.gson.html#class-tutor"><span class="std std-ref">Tutor</span></a>, <a class="reference internal" href="01.gson.html#class-alumno"><span class="std std-ref">Alumno</span></a> y <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a> exactamente de
+<a class="reference internal" href="01.gson.html#gson-auto"><span class="std std-ref">la misma forma</span></a>. En este caso, la librería que necesitamos es
+<a class="reference external" href="https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind">jackson-databind</a>.</p>
 <section id="operativa-basica">
 <span id="json-jackson-basico"></span><h2><span class="section-number">2.2.2.1. </span>Operativa básica<a class="headerlink" href="#operativa-basica" title="Link to this heading">#</a></h2>
+<p>Empecemos por ver cómo leer o escribir <a class="reference internal" href="../02.json.html#grupos-json"><span class="std std-ref">el archivo JSON de referencia</span></a>.</p>
 <section id="lectura">
 <span id="json-jackson-read"></span><h3><span class="section-number">2.2.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
 <p>El código es muy similar al practicado con <cite>GSON</cite>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
 <span class="hll"><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">();</span>
 </span>
-<span class="k">try</span><span class="w">  </span><span class="p">(</span>
-<span class="w">    </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">    </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
-<span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">    </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="k">try</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">    </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </span><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">grupos</span><span class="p">).</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -459,8 +455,11 @@ arrays y los valores son directamente traducibles a un tipo primitivo de <abbr t
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Que los miembros de cada grupo sean un array o una lista es
-absolutamente indiferente: la traducción se hará de igual forma.</p>
+<p>Cuando los atributos de clases incluidas en la traducción
+son secuencias, es indiferente que sea listas o array: la traducción
+se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
+<code class="docutils literal notranslate"><span class="pre">miembros</span></code> de <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a>, que lo hemos definido como un
+<em>array</em>, pero podría perfectamente ser una lista.</p>
 </div>
 </section>
 <section id="escritura">
@@ -468,9 +467,6 @@ absolutamente indiferente: la traducción se hará de igual forma.</p>
 <p>Por su parte la escritura a un <abbr title="JavaScript Object Notation">JSON</abbr> desde un modelo de objetos tampoco tiene
 excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">();</span>
-<span class="w">    </span><span class="c1">// mapper.enable(SerializationFeature.INDENT_OUTPUT);  // Salida &quot;bonita&quot;</span>
 
 <span class="w">    </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span>
@@ -478,23 +474,29 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 <span class="w">            </span><span class="s">&quot;ESO&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="sc">&#39;B&#39;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Tutor</span><span class="p">(</span><span class="s">&quot;Pepe M.J.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Matemáticas&quot;</span><span class="p">),</span>
-<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Pablito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Juanito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">)}</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">               </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Pablito&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)),</span>
+<span class="w">               </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Juanito&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">),</span>
 <span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="p">(</span>
 <span class="w">            </span><span class="p">(</span><span class="kt">short</span><span class="p">)</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
 <span class="w">            </span><span class="s">&quot;ESO&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="sc">&#39;C&#39;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Tutor</span><span class="p">(</span><span class="s">&quot;Pedro J.M.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Lengua&quot;</span><span class="p">),</span>
-<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Lola&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Manolito&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">)}</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">               </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Lola&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">)),</span>
+<span class="w">               </span><span class="k">new</span><span class="w"> </span><span class="n">Alumno</span><span class="p">(</span><span class="s">&quot;Manolito&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">)</span>
 <span class="w">    </span><span class="p">};</span>
 
-<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">        </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="w">        </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
-<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValue</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span><span class="w"> </span><span class="n">grupos</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
+<span class="hll"><span class="w">    </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">();</span>
+</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newOutputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">        </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">grupos</span><span class="p">);</span>
+</span><span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
@@ -536,7 +538,7 @@ y no pueden configurarse después de haberse creado.</p>
 <li><p>Creación de un <em>Factory</em> (<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonFactory.html">JsonFactory</a>), en
 la que podemos ajustar características de serialización
 (<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonWriteFeature.html">JsonWriteFeature</a>) y deserialización
-(<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonReadFeature.html">JsonReadFeature</a>) propias del formato.</p></li>
+(<a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/json/JsonReadFeature.html">JsonReadFeature</a>) propias del formato (<abbr title="JavaScript Object Notation">JSON</abbr> en este caso).</p></li>
 <li><p>Creación de un <em>Builder</em> (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.Builder.html">JsonMapper.Builder</a>), en la que podremos añadir
 módulos (los veremos más adelante), características generales de serialización
 (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/SerializationFeature.html">SerializationFeature</a>) y deserialización (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/DeserializationFeature.html">DeserializationFeature</a>), y
@@ -587,15 +589,12 @@ o deserialización:</p>
 <span id="json-jackson-annotations"></span><h3><span class="section-number">2.2.2.2.2. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h3>
 <p>Hemos visto muy por encima cómo trasladar objetos a <abbr title="JavaScript Object Notation">JSON</abbr> y viceversa. La regla
 es que cada atributo del objeto se traduce en una propiedad <abbr title="JavaScript Object Notation">JSON</abbr> con el mismo
-nombre y que conserva el mismo valor<a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Centrémonos en <code class="docutils literal notranslate"><span class="pre">Grupo</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+nombre y que conserva el mismo valor<a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Centrémonos en <a class="reference internal" href="01.gson.html#class-alumno"><span class="std std-ref">Alumno</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// Atributos</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
 
 <span class="w">    </span><span class="c1">// Resto de la implementación</span>
 <span class="p">}</span>
@@ -603,56 +602,57 @@ nombre y que conserva el mismo valor<a class="footnote-reference brackets" href=
 </div>
 <p>La serialización de un objeto <code class="docutils literal notranslate"><span class="pre">Grupo</span></code> será esta:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">   </span><span class="nt">&quot;nivel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;etapa&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ESO&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;grupo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;tutor&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Serialización de un tutor</span>
-<span class="w">   </span><span class="p">},</span>
-<span class="w">   </span><span class="nt">&quot;miembros&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="c1">// Serialización de los alumnos</span>
-<span class="w">   </span><span class="p">]</span>
+<span class="w">   </span><span class="nt">&quot;nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Matías Sánchez Aguado&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;fechaNacimiento&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2010-05-15&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Ahora bien, ¿cómo puede personalizarse la serialización para cambiar el nombre
 de un atributo o no serializarlo? La librería para ello utiliza <a class="reference external" href="https://www.geeksforgeeks.org/java/annotations-in-java/">anotaciones</a> que permiten indicar
 todos estos particulares:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// Atributos</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 
-<span class="hll"><span class="w">    </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;etapa_educativa&quot;</span><span class="p">)</span>
-</span><span class="hll"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
-</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Tutor</span><span class="w"> </span><span class="n">tutor</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Alumno</span><span class="o">[]</span><span class="w"> </span><span class="n">miembros</span><span class="p">;</span>
+<span class="hll"><span class="w">    </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">)</span>
+</span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
 
-<span class="w">    </span><span class="c1">// Resto de la implementación</span>
+<span class="w">    </span><span class="c1">// ...</span>
+
+<span class="hll"><span class="w">    </span><span class="nd">@JsonIgnore</span>
+</span><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getEdad</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="k">return</span><span class="w"> </span><span class="n">Period</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">fechaNacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">()).</span><span class="na">getYears</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>De esta forma logramos que en el <abbr title="JavaScript Object Notation">JSON</abbr> la propiedad no sea  <code class="docutils literal notranslate"><span class="pre">etapa</span></code>, sino
-<code class="docutils literal notranslate"><span class="pre">etapa_educativa</span></code>. Si nuestra intención fuera que algún atributo no pasará al
-archivo, tendríamos que anotarlo con <code class="docutils literal notranslate"><span class="pre">&#64;JsonIgnore</span></code>. El problema de anotar
-directamente la clase es que quizás no nos resulte elegante o directamente no
-podamos, porque no dependa de nosotros la definición. Para poder añadir
-anotaciones sin modificar la clase original, <em>Jackson</em> proporciona un mecanismo:
-la mezcla. Para ello podríamos definir aparte otra clase distinta que contenga
-exclusivamente los atributos que necesitan anotación:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GrupoMixin</span><span class="w"> </span><span class="p">{</span>
+<p>De esta forma logramos que en el <abbr title="JavaScript Object Notation">JSON</abbr> la propiedad no sea
+<code class="docutils literal notranslate"><span class="pre">fechaNacimiento</span></code>, sino <code class="docutils literal notranslate"><span class="pre">nacimiento</span></code>. Además, el método que nos devuelve la
+edad tiene forma de <em>getter</em> por lo que <em>Jackson</em> lo entenderá como tal y
+escribirá en el <abbr title="JavaScript Object Notation">JSON</abbr> la propiedad <em>edad</em>, sin que esta exista realmente en el
+modelo de datos. Por eso añadimos la anotación <code class="docutils literal notranslate"><span class="pre">&#64;JsonIgnore</span></code>.</p>
+<p>El problema de anotar directamente la clase es que quizás no nos resulte
+elegante o directamente no podamos, porque no dependa de nosotros la definición.
+Para poder añadir anotaciones sin modificar la clase original, <em>Jackson</em>
+proporciona un mecanismo: la mezcla. Para ello podríamos definir aparte otra
+clase distinta que contenga exclusivamente los atributos que necesitan
+anotación:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">AlumnoMixin</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">   </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;etapa_educativa&quot;</span><span class="p">)</span>
-<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
+<span class="w">   </span><span class="nd">@JsonProperty</span><span class="p">(</span><span class="s">&quot;nacimiento&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
+
+<span class="w">   </span><span class="nd">@JsonIgnore</span>
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getEdad</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Luego, al definir el mapeo. se declara que deseamos mezclar la clase original
 con la clase abstracta anotada:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
-<span class="hll"><span class="w">     </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Grupo</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="w">     </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Alumno</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">AlumnoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </span></pre></div>
 </div>
 <p>Existen otras anotaciones interesante que introduciremos más adelante.</p>
@@ -669,8 +669,8 @@ atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p>
 <span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.2.3. </span>Traducción de tipos no primitivos<a class="headerlink" href="#traduccion-de-tipos-no-primitivos" title="Link to this heading">#</a></h2>
 <p>En el ejemplo anterior todos los atributos de los objetos de <em>Java</em> tienen una
 correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>: cadenas, números, secuencias
-(ya sean <code class="docutils literal notranslate"><span class="pre">Array</span></code> o <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">ArrayList</a>), por lo que no hemos
-tenido que preocuparnos en definir cómo debe ser la serialización.</p>
+(ya sean <code class="docutils literal notranslate"><span class="pre">Array</span></code> o <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">ArrayList</a>) excepto uno del que no
+nos hemos preocupado, por lo que no hemos defino cómo debe ser su serialización.</p>
 <section id="traducciones-predefinidas">
 <h3><span class="section-number">2.2.2.3.1. </span>Traducciones predefinidas<a class="headerlink" href="#traducciones-predefinidas" title="Link to this heading">#</a></h3>
 <p>Tampoco es necesario definir una traducción específica en otros casos en que no
@@ -678,24 +678,52 @@ hay correspondencia, pero <em>Jackson</em> nos provee una predeterminada:</p>
 <dl>
 <dt><strong>Enumeraciones</strong> (<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Enum.html">Enum</a>),</dt><dd><p>Si se pretende que la traducción a  <abbr title="JavaScript Object Notation">JSON</abbr> sean las constantes de enumeración
 convertidas a cadenas. Por ejemplo, en este caso:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Enumeracion</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">UNO</span><span class="p">,</span>
-<span class="w">  </span><span class="n">DOS</span><span class="p">;</span>
+<div class="highlight-java notranslate" id="etapa-enum"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">INFANTIL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">PRIMARIA</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ESO</span><span class="p">,</span>
+<span class="w">  </span><span class="n">BACHILLERATO</span><span class="p">,</span>
+<span class="w">  </span><span class="n">FP</span><span class="p">,</span>
+<span class="w">  </span><span class="n">UNIVERSIDAD</span><span class="p">;</span>
+
+<span class="w">  </span><span class="cm">/**</span>
+<span class="cm">   * Devuelve en enum a partir de su ordinal</span>
+<span class="cm">   */</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="nf">indexOf</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="k">return</span><span class="w"> </span><span class="n">Etapa</span><span class="p">.</span><span class="na">values</span><span class="p">()</span><span class="o">[</span><span class="n">ordinal</span><span class="o">]</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>los valores se verán como las cadenas <em>UNO</em> o <em>DOS</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>.</p>
+<p>los valores se verán como las cadenas <em>INFANTIL</em>, <em>PRIMARIA</em>, <em>ESO</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>.
+De hecho, podríamos definir el atributo <code class="docutils literal notranslate"><span class="pre">etapa</span></code> de <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a> como
+de tipo <code class="docutils literal notranslate"><span class="pre">Etapa</span></code> y todo seguiría funcionado perfectamente.</p>
 </dd>
 </dl>
 <span id="json-jackson-date"></span><dl id="json-jackson-localdate">
 <dt><strong>Fechas</strong></dt><dd><p>Tanto si se usa el antiguo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> como el moderno
 <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, no es necesario definir ningúna traducción si se
 pretenden trasladar a cadenas según el <a class="reference external" href="https://es.wikipedia.org/wiki/ISO_8601">estándar ISO-8601</a>, es decir, si se escriben en el
-<abbr title="JavaScript Object Notation">JSON</abbr> de la forma <code class="docutils literal notranslate"><span class="pre">yyyy-MM-dd</span></code><a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<abbr title="JavaScript Object Notation">JSON</abbr> de la forma <code class="docutils literal notranslate"><span class="pre">yyyy-MM-dd</span></code><a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#id7" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 <p>Si la forma de la cadena es otra (p.ej. <code class="docutils literal notranslate"><span class="pre">dd/MM/yyyy</span></code>) aún es posible de
-manera sencilla indicárselo a la librería mediante una anotación:</p>
+manera sencilla indicárselo a la librería mediante una anotación. Imaginemos
+que en vez de almacenar la edad, almacenamos la fecha de nacimiento del
+alumno:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonFormat</span><span class="p">(</span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonFormat</span><span class="p">.</span><span class="na">Shape</span><span class="p">.</span><span class="na">STRING</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
+
+<span class="cm">/* ... */</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * &quot;Atributo&quot; calculado a partir de la fecha de nacimiento.</span>
+<span class="cm"> * Como le hemos dado la forma de un getter, Jackson lo tomará como</span>
+<span class="cm"> * tal y al escribir el alumno incluirá la propiedad &quot;edad&quot;. Por eso,</span>
+<span class="cm"> * especificamos que lo salte.</span>
+<span class="cm"> */</span>
+<span class="nd">@JsonIgnore</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getEdad</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">Period</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">fechaNacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">()).</span><span class="na">getYears</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@JsonFormat</span><span class="p">(</span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonFormat</span><span class="p">.</span><span class="na">Shape</span><span class="p">.</span><span class="na">STRING</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">timezone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Europe/Madrid&quot;</span><span class="p">)</span>
@@ -734,15 +762,16 @@ otro tipo:</p>
 <section id="traductor-especifico">
 <h3><span class="section-number">2.2.2.3.2. </span>Traductor específico<a class="headerlink" href="#traductor-especifico" title="Link to this heading">#</a></h3>
 <p>La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
-de cualquier tipo que se nos pueda ocurrir.  Ilustrémoslo con la serialización y
+de cualquier tipo que se nos pueda ocurrir. Ilustrémoslo con la serialización y
 deserialización artesanal de una tipo <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, aunque ya esté resuelto
 en la propia librería. Sin embargo, nos sirve para ilustrarlo:</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
-<p>Lo que exponemos ahora <strong>ya está resuelto</strong> en <em>Jackson</em> (como acabamos de ver)
-por lo que no tiene mucho sentido perder el tiempo en reimplementarlo.
-Sin embargo, es didácticamente pertienente porque nos sirve para ilustrar
-cómo definir serializadores y deserializadores.</p>
+<p>Lo que exponemos ahora <strong>ya está resuelto</strong> en <em>Jackson</em> con
+<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ext/javatime/ser/LocalDateSerializer.html">LocalDateSerializer</a> y <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ext/javatime/deser/LocalDateDeserializer.html">LocalDateDeserializer</a> (como acabamos de ver) por lo
+que no tiene mucho sentido perder el tiempo en reimplementarlo.  Sin embargo,
+es didácticamente pertinente porque nos sirve para ilustrar cómo definir
+serializadores y deserializadores.</p>
 </div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Traductor</span><span class="w"> </span><span class="p">{</span>
 
@@ -800,19 +829,27 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:</p>
 <p class="admonition-title">Truco</p>
 <p>Obsérvese que el mecanismo específico para definir el <a class="reference internal" href="#json-jackson-localdate"><span class="std std-ref">formato de
 las fechas LocalDate</span></a> es equivalente a este que
-indicamos ahora. Simplemente las clases serializadoras y deserializadoras
-ya están definidas y nos limitamos a usarlas en vez de definirlas nosotros.</p>
+indicamos ahora. Simplemente las clases serializadora (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ext/javatime/ser/LocalDateSerializer.html">LocalDateSerializer</a>)
+y deserializadora (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ext/javatime/deser/LocalDateDeserializer.html">LocalDateDeserializer</a>) ya están definidas y nos
+limitamos a usarlas en vez de definirlas nosotros.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Siempre que el tipo, claro está, sea un primitivo de <abbr title="JavaScript Object Notation">JSON</abbr> (p. ej. una
 cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
 cosa que expondremos en <a class="reference internal" href="#json-jackson-no-primitivos"><span class="std std-ref">Traducción de tipos no primitivos</span></a>.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>De hecho, es de este tipo la única excepción que incluimos en nuestro
+ejemplo: hay un dato de tipo <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, pero como su
+representación a cadena fue la estándar no nos preocupamos de su
+serialización.</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
 <p>En realidad, si en vez de una cadena, el <abbr title="JavaScript Object Notation">JSON</abbr> presenta un número,
 entonces la librería entenderá que el tiempo se ha definido en <a class="reference external" href="https://es.wikipedia.org/wiki/Tiempo_Unix">tiempo
 UNIX</a>. La escritura siempre será

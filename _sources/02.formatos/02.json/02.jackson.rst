@@ -8,18 +8,17 @@ Otra librería muy utilizada y que tiene la ventaja de que también soporta
 
 Como :ref:`GSON <json-gson>`, nos permite hacer una conversión automática entre
 el modelo de objetos y |JSON| para lo cual podemos definir las clases para
-`Tutor`, `Alumno` y `Grupo` exactamente de :ref:`la misma forma <gson-auto>`.
-Como en aquel caso, empezaremos por no complicar las cosas: las secuencias son
-arrays y los valores son directamente traducibles a un tipo primitivo de |JSON|
-(es decir, representaremos la edad y no la fecha de nacimiento).
-
-Para empezar necesitaremos la librería `jackson-databind
-<https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind>`_.
+:ref:`Tutor <class-tutor>`, |Alumno| y :ref:`Grupo <class-grupo>` exactamente de
+:ref:`la misma forma <gson-auto>`. En este caso, la librería que necesitamos es
+`jackson-databind
+<https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind>`_.
 
 .. _json-jackson-basico:
 
 Operativa básica
 ================
+Empecemos por ver cómo leer o escribir :ref:`el archivo JSON de referencia
+<grupos.json>`.
 
 .. _json-jackson-read:
 
@@ -28,16 +27,13 @@ Lectura
 El código es muy similar al practicado con `GSON`:
 
 .. code-block:: java
-   :emphasize-lines: 2, 8
+   :emphasize-lines: 2, 5
 
    Path ruta = Path.of(System.getProperty("user.home"), "grupos.json");
    ObjectMapper mapper = new JsonMapper();
 
-   try  (
-       InputStream st = Files.newInputStream(ruta);
-       InputStreamReader sr = new InputStreamReader(st);
-   ) {
-       Grupo[] grupos = mapper.readValue(sr, Grupo[].class);
+   try(InputStream st = Files.newInputStream(ruta)) {
+       Grupo[] grupos = mapper.readValue(st, Grupo[].class);
        Arrays.stream(grupos).forEach(System.out::println);
    }
    catch(IOException err) {
@@ -51,8 +47,11 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
    TypeReference<List<Grupo>> GrupoLista =  new TypeReference<>(){};
    List<Grupo> grupos = mapper.readValue(sr, GrupoLista);
 
-.. note:: Que los miembros de cada grupo sean un array o una lista es
-   absolutamente indiferente: la traducción se hará de igual forma.
+.. note:: Cuando los atributos de clases incluidas en la traducción
+   son secuencias, es indiferente que sea listas o array: la traducción
+   se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
+   ``miembros`` de :ref:`Grupo <class-grupo>`, que lo hemos definido como un
+   *array*, pero podría perfectamente ser una lista.
 
 .. _json-jackson-write:
 
@@ -62,11 +61,9 @@ Por su parte la escritura a un |JSON| desde un modelo de objetos tampoco tiene
 excesivas diferencias respecto a lo que encontraríamos en `GSON`:
 
 .. code-block:: java
+   :emphasize-lines: 27, 30
 
    public static void main(String[] args) {
-       Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "grupos.json");
-       ObjectMapper mapper = new ObjectMapper();
-       // mapper.enable(SerializationFeature.INDENT_OUTPUT);  // Salida "bonita"
 
        Grupo[] grupos = {
            new Grupo(
@@ -74,22 +71,28 @@ excesivas diferencias respecto a lo que encontraríamos en `GSON`:
                "ESO",
                'B',
                new Tutor("Pepe M.J.", "Matemáticas"),
-               new Alumno[] {new Alumno("Pablito", 12), new Alumno("Juanito", 13)}
+               new Alumno[] {
+                  new Alumno("Pablito", LocalDate.of(2008, 10, 2)),
+                  new Alumno("Juanito", LocalDate.of(2010, 3, 25))
+               }
            ),
            new Grupo(
                (short) 2,
                "ESO",
                'C',
                new Tutor("Pedro J.M.", "Lengua"),
-               new Alumno[] {new Alumno("Lola", 13), new Alumno("Manolito", 13)}
+               new Alumno[] {
+                  new Alumno("Lola", LocalDate.of(2009, 1, 11)),
+                  new Alumno("Manolito", LocalDate.of(2010, 5, 15))
+               }
            )
        };
 
-       try (
-           OutputStream st = Files.newOutputStream(ruta);
-           OutputStreamWriter sw = new OutputStreamWriter(st);
-       ) {
-           mapper.writeValue(sw, grupos);
+       Path ruta = Path.of(System.getProperty("java.io.tmpdir"), "grupos.json");
+       ObjectMapper mapper = new JsonMapper();
+
+       try (OutputStream st = Files.newOutputStream(ruta)) {
+           mapper.writeValue(st, grupos);
        }
        catch (IOException err) {
            err.printStackTrace();
@@ -137,7 +140,7 @@ El proceso completo de creación de un mapeo tiene tres fases:
 1. Creación de un *Factory* (|JsonFactory|), en
    la que podemos ajustar características de serialización
    (|JsonWriteFeature|) y deserialización
-   (|JsonReadFeature|) propias del formato.
+   (|JsonReadFeature|) propias del formato (|JSON| en este caso).
 2. Creación de un *Builder* (|JsonMapper.Builder|), en la que podremos añadir
    módulos (los veremos más adelante), características generales de serialización
    (|SerializationFeature|) y deserialización (|DeserializationFeature|), y
@@ -194,18 +197,15 @@ Anotaciones
 -----------
 Hemos visto muy por encima cómo trasladar objetos a |JSON| y viceversa. La regla
 es que cada atributo del objeto se traduce en una propiedad |JSON| con el mismo
-nombre y que conserva el mismo valor\ [#]_. Centrémonos en ``Grupo``:
+nombre y que conserva el mismo valor\ [#]_. Centrémonos en |Alumno|:
 
 .. code-block:: java
 
-   public class Grupo implements Serializable {
+   public class Alumno implements Serializable {
 
        // Atributos
-       private short nivel;
-       private String etapa;
-       private char grupo;
-       private Tutor tutor;
-       private Alumno[] miembros;
+       private String nombre;
+       private LocalDate fechaNacimiento;
 
        // Resto de la implementación
    }
@@ -215,15 +215,8 @@ La serialización de un objeto ``Grupo`` será esta:
 .. code-block:: json
 
    {
-      "nivel": 1,
-      "etapa": "ESO",
-      "grupo": "C",
-      "tutor": { 
-         // Serialización de un tutor
-      },
-      "miembros": [
-         // Serialización de los alumnos
-      ]
+      "nombre": "Matías Sánchez Aguado",
+      "fechaNacimiento": "2010-05-15"
    }
 
 Ahora bien, ¿cómo puede personalizarse la serialización para cambiar el nombre
@@ -232,38 +225,47 @@ de un atributo o no serializarlo? La librería para ello utiliza `anotaciones
 todos estos particulares:
 
 .. code-block:: java
-   :emphasize-lines: 6-7
+   :emphasize-lines: 6, 11
 
-   public class Grupo implements Serializable {
+   public class Alumno implements Serializable {
 
        // Atributos
-       private short nivel;
+       private String nombre;
 
-       @JsonProperty("etapa_educativa")
-       private String etapa;
-       private char grupo;
-       private Tutor tutor;
-       private Alumno[] miembros;
+       @JsonProperty("nacimiento")
+       private LocalDate fechaNacimiento;
 
-       // Resto de la implementación
+       // ...
+
+       @JsonIgnore
+       public int getEdad() {
+          return Period.between(fechaNacimiento, LocalDate.now()).getYears();
+       }
       
    }
 
-De esta forma logramos que en el |JSON| la propiedad no sea  ``etapa``, sino
-``etapa_educativa``. Si nuestra intención fuera que algún atributo no pasará al
-archivo, tendríamos que anotarlo con ``@JsonIgnore``. El problema de anotar
-directamente la clase es que quizás no nos resulte elegante o directamente no
-podamos, porque no dependa de nosotros la definición. Para poder añadir
-anotaciones sin modificar la clase original, *Jackson* proporciona un mecanismo:
-la mezcla. Para ello podríamos definir aparte otra clase distinta que contenga
-exclusivamente los atributos que necesitan anotación:
+De esta forma logramos que en el |JSON| la propiedad no sea
+``fechaNacimiento``, sino ``nacimiento``. Además, el método que nos devuelve la
+edad tiene forma de *getter* por lo que *Jackson* lo entenderá como tal y
+escribirá en el |JSON| la propiedad *edad*, sin que esta exista realmente en el
+modelo de datos. Por eso añadimos la anotación ``@JsonIgnore``.
+
+El problema de anotar directamente la clase es que quizás no nos resulte
+elegante o directamente no podamos, porque no dependa de nosotros la definición.
+Para poder añadir anotaciones sin modificar la clase original, *Jackson*
+proporciona un mecanismo: la mezcla. Para ello podríamos definir aparte otra
+clase distinta que contenga exclusivamente los atributos que necesitan
+anotación:
 
 .. code-block:: java
 
-   public abstract class GrupoMixin {
+   public abstract class AlumnoMixin {
 
-      @JsonProperty("etapa_educativa")
-      private String etapa;
+      @JsonProperty("nacimiento")
+      private LocalDate nacimiento;
+
+      @JsonIgnore
+      public abstract int getEdad();
    }
 
 Luego, al definir el mapeo. se declara que deseamos mezclar la clase original
@@ -273,7 +275,7 @@ con la clase abstracta anotada:
    :emphasize-lines: 2
 
    MapperBuilder<?, ?> builder = JsonMapper.builder(factory)
-        .addMixIn(Grupo.class, GrupoMixin.class);
+        .addMixIn(Alumno.class, AlumnoMixin.class);
 
 Existen otras anotaciones interesante que introduciremos más adelante.
 
@@ -288,8 +290,8 @@ Traducción de tipos no primitivos
 =================================
 En el ejemplo anterior todos los atributos de los objetos de *Java* tienen una
 correspondencia con un tipo primitivo de |JSON|: cadenas, números, secuencias
-(ya sean ``Array`` o :java-util:`ArrayList <ArrayList>`), por lo que no hemos
-tenido que preocuparnos en definir cómo debe ser la serialización.
+(ya sean ``Array`` o :java-util:`ArrayList <ArrayList>`) excepto uno del que no
+nos hemos preocupado, por lo que no hemos defino cómo debe ser su serialización.
 
 Traducciones predefinidas
 -------------------------
@@ -301,13 +303,27 @@ hay correspondencia, pero *Jackson* nos provee una predeterminada:
   convertidas a cadenas. Por ejemplo, en este caso:
 
   .. code-block:: java
+     :name: Etapa-enum
 
-     public enum Enumeracion {
-       UNO,
-       DOS;
+     public enum Etapa {
+       INFANTIL,
+       PRIMARIA,
+       ESO,
+       BACHILLERATO,
+       FP,
+       UNIVERSIDAD;
+
+       /**
+        * Devuelve en enum a partir de su ordinal
+        */
+       public static Etapa indexOf(int ordinal) {
+          return Etapa.values()[ordinal];
+       }
      }
 
-  los valores se verán como las cadenas *UNO* o *DOS* en el |JSON|.
+  los valores se verán como las cadenas *INFANTIL*, *PRIMARIA*, *ESO* en el |JSON|.
+  De hecho, podríamos definir el atributo ``etapa`` de :ref:`Grupo <class-grupo>` como
+  de tipo ``Etapa`` y todo seguiría funcionado perfectamente.
 
 .. _json-jackson-date:
 .. _json-jackson-localdate:
@@ -317,15 +333,30 @@ hay correspondencia, pero *Jackson* nos provee una predeterminada:
   :java-time:`LocalDate`, no es necesario definir ningúna traducción si se
   pretenden trasladar a cadenas según el `estándar ISO-8601
   <https://es.wikipedia.org/wiki/ISO_8601>`_, es decir, si se escriben en el
-  |JSON| de la forma ``yyyy-MM-dd``\ [#]_.
+  |JSON| de la forma ``yyyy-MM-dd``\ [#]_\ [#]_.
 
   Si la forma de la cadena es otra (p.ej. ``dd/MM/yyyy``) aún es posible de
-  manera sencilla indicárselo a la librería mediante una anotación:
+  manera sencilla indicárselo a la librería mediante una anotación. Imaginemos
+  que en vez de almacenar la edad, almacenamos la fecha de nacimiento del
+  alumno:
 
   .. code-block:: java
 
      @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
      private LocalDate fechaNacimiento;
+
+     /* ... */
+
+     /**
+      * "Atributo" calculado a partir de la fecha de nacimiento.
+      * Como le hemos dado la forma de un getter, Jackson lo tomará como
+      * tal y al escribir el alumno incluirá la propiedad "edad". Por eso,
+      * especificamos que lo salte.
+      */
+     @JsonIgnore
+     public int getEdad() {
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears();
+     }
 
   .. code-block:: java
 
@@ -367,14 +398,15 @@ hay correspondencia, pero *Jackson* nos provee una predeterminada:
 Traductor específico
 --------------------
 La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
-de cualquier tipo que se nos pueda ocurrir.  Ilustrémoslo con la serialización y
+de cualquier tipo que se nos pueda ocurrir. Ilustrémoslo con la serialización y
 deserialización artesanal de una tipo |LocalDate|, aunque ya esté resuelto
 en la propia librería. Sin embargo, nos sirve para ilustrarlo:
 
-.. caution:: Lo que exponemos ahora **ya está resuelto** en *Jackson* (como acabamos de ver)
-   por lo que no tiene mucho sentido perder el tiempo en reimplementarlo.
-   Sin embargo, es didácticamente pertienente porque nos sirve para ilustrar
-   cómo definir serializadores y deserializadores.
+.. caution:: Lo que exponemos ahora **ya está resuelto** en *Jackson* con
+   |LocalDateSerializer| y |LocalDateDeserializer| (como acabamos de ver) por lo
+   que no tiene mucho sentido perder el tiempo en reimplementarlo.  Sin embargo,
+   es didácticamente pertinente porque nos sirve para ilustrar cómo definir
+   serializadores y deserializadores.
 
 .. code-block:: java
    :emphasize-lines: 3, 11, 21
@@ -437,14 +469,20 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
 
 .. tip:: Obsérvese que el mecanismo específico para definir el :ref:`formato de
    las fechas LocalDate <json-jackson-localdate>` es equivalente a este que
-   indicamos ahora. Simplemente las clases serializadoras y deserializadoras
-   ya están definidas y nos limitamos a usarlas en vez de definirlas nosotros.
+   indicamos ahora. Simplemente las clases serializadora (|LocalDateSerializer|)
+   y deserializadora (|LocalDateDeserializer|) ya están definidas y nos
+   limitamos a usarlas en vez de definirlas nosotros.
 
 .. rubric:: Notas al pie
 
 .. [#] Siempre que el tipo, claro está, sea un primitivo de |JSON| (p. ej. una
    cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
    cosa que expondremos en :ref:`json-jackson-no-primitivos`.
+
+.. [#] De hecho, es de este tipo la única excepción que incluimos en nuestro
+   ejemplo: hay un dato de tipo :java-time:`LocalDate <LocalDate>`, pero como su
+   representación a cadena fue la estándar no nos preocupamos de su
+   serialización.
 
 .. [#] En realidad, si en vez de una cadena, el |JSON| presenta un número,
    entonces la librería entenderá que el tiempo se ha definido en `tiempo
@@ -476,3 +514,7 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
 .. |DeserializationFeature| replace:: :jackson-databind:`DeserializationFeature`
 .. |MapperBuilder| replace:: :jackson-databind:`MapperBuilder <cfg/MapperBuilder>`
 .. |ObjectMapper| replace:: :jackson-databind:`ObjectMapper`
+.. |Alumno| replace:: :ref:`Alumno <class-alumno>`
+.. |LocalDateSerializer| replace:: :jackson-databind:`LocalDateSerializer <ext/javatime/ser/LocalDateSerializer>`
+.. |LocalDateDeserializer| replace:: :jackson-databind:`LocalDateDeserializer <ext/javatime/deser/LocalDateDeserializer>`
+

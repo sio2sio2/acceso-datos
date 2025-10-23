@@ -425,6 +425,13 @@ por <em>Google</em> y nos permite dos estrategias para leer y escribir <abbr tit
 <p class="admonition-title">Nota</p>
 <p>Podemos descargar la librería de su <a class="reference external" href="https://mvnrepository.com/artifact/com.google.code.gson/gson">página en mvnrepository.com</a>.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>La exposición se ha hecho considerando que la clase <code class="docutils literal notranslate"><span class="pre">Alumno</span></code> tiene
+un atributo <code class="docutils literal notranslate"><span class="pre">edad</span></code> y no un atributo <code class="docutils literal notranslate"><span class="pre">fechaNacimiento</span></code> de tipo
+<a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>. El texto bajo este epígrafe necesita un
+repaso.</p>
+</div>
 <section id="conversion-automatica">
 <span id="gson-auto"></span><h2><span class="section-number">2.2.1.1. </span>Conversión automática<a class="headerlink" href="#conversion-automatica" title="Link to this heading">#</a></h2>
 <p>Para ello necesitamos que las clases con las que vamos a convertir los objetos
@@ -432,8 +439,8 @@ codificados en <abbr title="JavaScript Object Notation">JSON</abbr> sigan el est
 <p>Es obvio que en el ejemplo anterior tenemos tres objetos (<cite>Grupo</cite>, <cite>Alumno</cite> y
 <cite>Tutor</cite>) así que definámoslos, de modo que sus atributos se ajusten a lo que
 recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="class-tutor">
+<div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#class-tutor" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">Tutor</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
@@ -471,13 +478,13 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="class-alumno">
+<div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#class-alumno" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
 
 <span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">Alumno</span> <span class="n">implements</span> <span class="n">Serializable</span> <span class="p">{</span>
     <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
-    <span class="n">private</span> <span class="nb">int</span> <span class="n">edad</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">LocalDate</span> <span class="n">fechaNacimiento</span><span class="p">;</span>
 
     <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
 
@@ -491,15 +498,19 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
     <span class="p">}</span>
 
     <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+       <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
     <span class="p">}</span>
+
+   <span class="n">public</span> <span class="n">LocalDate</span> <span class="n">getFechaNacimiento</span><span class="p">()</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="n">fechaNacimiento</span>
+   <span class="p">}</span>
 
     <span class="n">public</span> <span class="nb">int</span> <span class="n">getEdad</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">edad</span><span class="p">;</span>
+       <span class="k">return</span> <span class="n">Perido</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">fechaNacimiento</span><span class="p">,</span> <span class="n">LocalDate</span><span class="o">.</span><span class="n">now</span><span class="p">())</span><span class="o">.</span><span class="n">getYears</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="n">public</span> <span class="n">void</span> <span class="n">setEdad</span><span class="p">(</span><span class="nb">int</span> <span class="n">edad</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">this</span><span class="o">.</span><span class="n">edad</span> <span class="o">=</span> <span class="n">edad</span><span class="p">;</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setFechaNacimiento</span><span class="p">(</span><span class="n">LocalDate</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">fechaNacimiento</span> <span class="o">=</span> <span class="n">nacimiento</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="nd">@Override</span>
@@ -510,8 +521,8 @@ recoge el <abbr title="JavaScript Object Notation">JSON</abbr>:</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="class-grupo">
+<div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#class-grupo" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
 
@@ -763,8 +774,8 @@ hace esta traducción, prescindimos de la ayuda de <code class="docutils literal
 </div>
 <p>Para lograr la traducción entre una cadena con formato <cite>yyyy-MM-dd</cite> y el tipo
 <cite>Date</cite> necesitamos definir así al alumno:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<span id="json-alumno-nacimiento"></span><div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<span id="json-alumno-nacimiento"></span><div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.text.ParseException</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
@@ -837,8 +848,8 @@ manualmente en la aplicación alumnos de esta forma:</p>
 <p>Y ahora hay que definir esa clase que define cómo es la traducción. Lo más
 limpio, por si se quiere soportar fácilmente diferentes formatos para la fecha
 es crear una clase abstracta:</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">AbstractDateTypeAdapter.java</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">AbstractDateTypeAdapter.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.text.DateFormat</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Date</span><span class="p">;</span>
@@ -870,8 +881,8 @@ es crear una clase abstracta:</p>
 </div>
 </div>
 <p>Y una clase que concretamente define cuál es el formato de fecha:</p>
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">YyyyyMMddDateTypeAdapter.java</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">YyyyyMMddDateTypeAdapter.java</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.text.DateFormat</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
 

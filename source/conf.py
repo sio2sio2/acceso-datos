@@ -48,6 +48,7 @@ extlinks = {
     'java-io': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/%s.html', 'java.io.%s'),
     'java-nio': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/%s.html', 'java.nio.file.%s'),
     'java-lang': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/%s.html', '%s'),
+    'java-jaxp': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/%s.html', '%s'),
     'java-function': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/function/%s.html', 'java.util.function.%s'),
     'java-stream': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/%s.html', 'java.util.stream.%s'),
     'java-sql': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/%s.html', 'java.sql.%s'),

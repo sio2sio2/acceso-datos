@@ -253,6 +253,59 @@ podemos hacer construcciones como esta:
       [#]_ y crear código condicional que implemente la solución dependiendo
       cuál sea.
 
+.. _file-arc-pro:
+
+Archivos del proyecto
+---------------------
+Es común que, cuando desarrollamos una aplicación, tengamos que hacer referencia
+a archivos que hemos incluido dentro de ella. Un error de principiante es hacer
+lo siguiente:
+
+.. code-block:: java
+
+   // No haga esto jamás.
+   Path path = Path.of(System.getProperty("user.dir"), "imagen.jpg");
+
+Durante el desarrollo, si colocamos el archivo de imagen en el directorio de
+proyecto, la aplicación posiblemente encontrará el archivo, porque el |IDE|
+suele fijar el *directorio de proyecto* (que es lo que significa realmente
+``user.dir``) como *directorio de trabajo*. Sin embargo, al empaquetarla en
+un archivo |JAR|, no lo hará porque el archivo se encontrará dentro del paquete
+y el directorio de trabajo será el directorio desde el que el usuario ejecuta la
+aplicación.
+
+La forma correcta de acceder a archivos para su lectura incluidos en la
+aplicación es:
+
+.. code-block:: java
+
+   // Obsérvese la ruta absoluta.
+   InputStream st = getClass().getResourceAsStream("/imagen.jpg");
+
+que abre el archivo como un |InputStream| para su lectura y entiende que el
+archivo está en la raíz del *classpath*. Ya veremos más adelante :ref:`cómo
+utilizar estos flujos <iotext-r>`.
+
+.. note:: Hemos supuesto que la línea está dentro de un método de instancia. Si
+   fuera estático, tendríamos que utilizar directamente la clase:
+
+   .. code-block:: java
+
+      InputStream st = Main.class.getResourceAsStream("/imagen.jpg");
+
+Cuando la ruta es relativa, en vez de absoluta, se entiende que es referida
+al directorio del *classpath* donde se encuentra la clase que se utiliza para
+invocar el método.
+
+.. caution:: En los proyectos de *Java* suele existir un directorio
+   :file:`resources` para almacenar archivos con datos. El contenido de este
+   directorio acaba en la aplicación en la raíz del *classpath*. Por tanto, el
+   archivo de imagen que hemos puesto de ejemplo, podríamos hacerlo incluido en
+   este subdirectorio del proyecto. Ahora bien, con :ref:`Maven` la copia a
+   *classpath* no es automática y hay que declararla en :file:`pom.xml`. Vea un
+   ejemplo de :ref:`cómo añadir archivos con propiedades <add-resources>` en uno
+   de los apéndices.
+
 .. _file.files:
 
 Gestión
@@ -397,3 +450,7 @@ contenido, pero los dejamos para el siguiente epígrafe.
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |MIME| replace:: :abbr:`MIME (Multipurpose Internet Mail Extensions)`
 .. |URI| replace:: :abbr:`URI (Uniform Resource Identifier)`
+.. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
+.. |JAR| replace:: :abbr:`JAR (Java ARchive)`
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+

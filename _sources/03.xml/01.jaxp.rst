@@ -14,12 +14,11 @@ Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
 
 .. code-block:: java
 
-   Path ruta = Path.of(System.getProperty("user.home"), "claustro.xml");
    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
    // La siguiente línea puede provocar un ParseConfigurationException
    DocumentBuilder builder = factory.newDocumentBuilder();
 
-   try (InputStream st = Files.newInputStream(ruta)) {
+   try (InputStream st = getClass().getResourceAsStream("/claustro.xml")) {
       // La línea posterior también puede generar una excepción.
       Document xml = builder.parse(st);
       // Accedemos a la información del documento a través de su DOM.
@@ -39,14 +38,11 @@ Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
    <jaxp-dtd>`.
 
 Una vez tenemos disponible el objeto `Document` ya podremos acceder a los nodos
-del documento. En principio, los nodos se modelan mediante la clase `Node
-<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html>`_ sobre la que
-construyen subsclases que modelan los distintos tipos de nodos (`Element
-<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html>`_, `Text
-<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Text.html>`_, `Attr
-<https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html>`_, etc.). Cada
-uno de estos tipos de nodos está asociado a un número entero al que se da 
-nombre mediante un atributo estático de `Node`_. Por ejemplo:
+del documento. En principio, los nodos se modelan mediante la clase |Node| sobre
+la que construyen subsclases que modelan los distintos tipos de nodos
+(|Element|, |Text|, |Attr|, etc.). Cada uno de estos tipos de nodos está
+asociado a un número entero al que se da nombre mediante un atributo estático de
+|Node|. Por ejemplo:
 
 .. code-block:: java
 
@@ -73,7 +69,7 @@ hacer diversas pesquisas:
 
 ``getNodeValue()``
    devuelve el valor del nodo. Dependiendo del tipo de nodo, así será su valor
-   (al comienzo de la explicación sobre Node_ hay una tabla que indica qué valor
+   (al comienzo de la explicación sobre |Node| hay una tabla que indica qué valor
    devuelve cada tipo).
 
 ``getTextContent()``
@@ -89,8 +85,8 @@ hacer diversas pesquisas:
 
    .. code-block:: java
 
-      // apelativo es una variable que contiene el elemento apelativo comentado
-      apelativo.getTextContent() == apelativo.firstChild().getNodeValue();
+      // apelativo es una variable que contiene el elemento apelativo antedicho
+      apelativo.getTextContent().equals(apelativo.firstChild().getNodeValue());
 
 ``getFirstChild()`` o ``getLastChild()``
    Devuelve el primero o el último **nodo** hijo de aquel. Se ha remarcado nodo,
@@ -101,13 +97,11 @@ hacer diversas pesquisas:
    devuelve el nodo padre o el hermano previo o el hermano siguiente.
 
 ``getChildNodes()``
-   devuelve un objeto `NodeList
-   <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html>`_  con
-   los nodos hijos. A pesar de su naturaleza no implementa la interfaz
-   :java-lang:`Iterable <Iterable>` y sólo presenta un método (``getLength()``)
-   que devuelve la cantidad de hijos y un método ``item(int index)`` que
-   devuelve el i-ésimo nodo de la lista. Por tanto, si se quiere quiere recorrer
-   la colección, habrá que usar un `for` clásico:
+   devuelve un objeto |NodeList| con los nodos hijos. A pesar de su naturaleza
+   no implementa la interfaz :java-lang:`Iterable <Iterable>` y sólo presenta un
+   método (``getLength()``) que devuelve la cantidad de hijos y un método
+   ``item(int index)`` que devuelve el i-ésimo nodo de la lista. Por tanto, si
+   se quiere quiere recorrer la colección, habrá que usar un `for` clásico:
 
    .. code-block:: java
 
@@ -124,7 +118,7 @@ hacer diversas pesquisas:
       }
 
   .. tip:: Pese a que, a priori, sólo podemos utilizar el `for` tradicional
-     para recorrer NodeList_, podemos buscarnos las vueltas para convertirlo
+     para recorrer |NodeList|, podemos buscarnos las vueltas para convertirlo
      en un flujo y poder usar con él técnicas de :ref:`Java funcional <funcional>`:
 
      .. code-block:: Java
@@ -133,12 +127,11 @@ hacer diversas pesquisas:
         Stream<Node> streamNode = IntStream.range(0, hijos.getLength()).mapToObj(hijos::item);
 
 ``getAttributes()``
-   devuelve los atributos del elemento en forma de `NamedNodeMap
-   <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html>`_
-   que como NodeList_ tampoco implemente la interfaz :java-lang:`Iterable
-   <Iterable>`. Además de ``item(int index)`` y ``getLength()``, dispone también
-   de ``getNamedItem(String name)`` que permite obtener el nodo atributo a
-   partir de su nombre:
+   devuelve los atributos del elemento en forma de |NamedNodeMap| que como
+   |NodeList| tampoco implemente la interfaz :java-lang:`Iterable <Iterable>`.
+   Además de ``item(int index)`` y ``getLength()``, dispone también de
+   ``getNamedItem(String name)`` que permite obtener el nodo atributo a partir
+   de su nombre:
 
    .. code-block:: java
 
@@ -151,12 +144,12 @@ hacer diversas pesquisas:
       }
 
 Por otra parte, los tipos de nodos tiene también sus métodos específicos. Por
-ejemplo, Element_:
+ejemplo, |Element|:
 
 ``getElementsByTagName(String name)``
    devuelve los elementos descendientes cuyo nombre de etiqueta es el
    suministrado en el argumento. El método también existe para los nodo
-   `Document <https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html>`_:
+   |Document|:
 
    .. code-block:: java
 
@@ -172,7 +165,7 @@ ejemplo, Element_:
       Element p17 = xml.getElementById("p17"); // null, porque no estamos usando el DTD
 
 ``getAttributeNode(String name)`` o ``getAttribute(String name)``
-   devuelve el atributo (Attr_) o el valor del atributo cuyo nombre se
+   devuelve el atributo (|Attr|) o el valor del atributo cuyo nombre se
    proporciona en el argumento.
 
 .. _jaxp-dtd:
@@ -303,7 +296,7 @@ crearlo *ex novo*:
 
 Escritura a archivo
 -------------------
-Partamos de que ya tenemos un Document_ construido como queremos que quede
+Partamos de que ya tenemos un |Document| construido como queremos que quede
 (véase el apartado anterior) y queremos ahora generar el |XML| correspondiente:
 
 .. code-block:: java
@@ -385,7 +378,7 @@ si nuestra intención es usarla una sola vez:
 
 .. [#] En realidad el método tiene sentido para otros nodos que no sean
    elementos. Véase la tabla que resume sus significados en la explicación del
-   método que ofrece la documentación original de Node_.
+   método que ofrece la documentación original de |Node|.
 
 .. |JAXP| replace:: :abbr:`JAXP (Java API for XML Processing)`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
@@ -393,3 +386,11 @@ si nuestra intención es usarla una sola vez:
 .. |DTD| replace:: :abbr:`DTD (Document Type Definition)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+
+.. |Node| replace:: :java-jaxp:`Node`
+.. |Element| replace:: :java-jaxp:`Element`
+.. |Attr| replace:: :java-jaxp:`Attr`
+.. |Text| replace:: :java-jaxp:`Text`
+.. |NodeList| replace:: :java-jaxp:`NodeList`
+.. |NamedNodeMap| replace:: :java-jaxp:`NamedNodeMap`
+.. |Document| replace:: :java-jaxp:`Document`

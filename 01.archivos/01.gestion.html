@@ -396,7 +396,10 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-de-entorno">1.1.1. Variables de entorno</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#archivos-del-proyecto">1.1.2.1. Archivos del proyecto</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion">1.1.3. Gestión</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta">1.1.3.1. Consulta</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulacion">1.1.3.2. Manipulación</a></li>
@@ -630,6 +633,54 @@ cual debemos:</p>
 cuál sea.</p></li>
 </ol>
 </div>
+<section id="archivos-del-proyecto">
+<span id="file-arc-pro"></span><h3><span class="section-number">1.1.2.1. </span>Archivos del proyecto<a class="headerlink" href="#archivos-del-proyecto" title="Link to this heading">#</a></h3>
+<p>Es común que, cuando desarrollamos una aplicación, tengamos que hacer referencia
+a archivos que hemos incluido dentro de ella. Un error de principiante es hacer
+lo siguiente:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// No haga esto jamás.</span>
+<span class="n">Path</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.dir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;imagen.jpg&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Durante el desarrollo, si colocamos el archivo de imagen en el directorio de
+proyecto, la aplicación posiblemente encontrará el archivo, porque el <abbr title="Integrated Development Environment">IDE</abbr>
+suele fijar el <em>directorio de proyecto</em> (que es lo que significa realmente
+<code class="docutils literal notranslate"><span class="pre">user.dir</span></code>) como <em>directorio de trabajo</em>. Sin embargo, al empaquetarla en
+un archivo <abbr title="Java ARchive">JAR</abbr>, no lo hará porque el archivo se encontrará dentro del paquete
+y el directorio de trabajo será el directorio desde el que el usuario ejecuta la
+aplicación.</p>
+<p>La forma correcta de acceder a archivos para su lectura incluidos en la
+aplicación es:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Obsérvese la ruta absoluta.</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="s">&quot;/imagen.jpg&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>que abre el archivo como un <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a> para su lectura y entiende que el
+archivo está en la raíz del <em>classpath</em>. Ya veremos más adelante <a class="reference internal" href="02.manipulacion.html#iotext-r"><span class="std std-ref">cómo
+utilizar estos flujos</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Hemos supuesto que la línea está dentro de un método de instancia. Si
+fuera estático, tendríamos que utilizar directamente la clase:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Main</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="s">&quot;/imagen.jpg&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<p>Cuando la ruta es relativa, en vez de absoluta, se entiende que es referida
+al directorio del <em>classpath</em> donde se encuentra la clase que se utiliza para
+invocar el método.</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>En los proyectos de <em>Java</em> suele existir un directorio
+<code class="file docutils literal notranslate"><span class="pre">resources</span></code> para almacenar archivos con datos. El contenido de este
+directorio acaba en la aplicación en la raíz del <em>classpath</em>. Por tanto, el
+archivo de imagen que hemos puesto de ejemplo, podríamos hacerlo incluido en
+este subdirectorio del proyecto. Ahora bien, con <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> la copia a
+<em>classpath</em> no es automática y hay que declararla en <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>. Vea un
+ejemplo de <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cómo añadir archivos con propiedades</span></a> en uno
+de los apéndices.</p>
+</div>
+</section>
 </section>
 <section id="gestion">
 <span id="file-files"></span><h2><span class="section-number">1.1.3. </span>Gestión<a class="headerlink" href="#gestion" title="Link to this heading">#</a></h2>
@@ -805,7 +856,10 @@ sistema operativo.</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-de-entorno">1.1.1. Variables de entorno</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas">1.1.2. Rutas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#archivos-del-proyecto">1.1.2.1. Archivos del proyecto</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion">1.1.3. Gestión</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta">1.1.3.1. Consulta</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulacion">1.1.3.2. Manipulación</a></li>

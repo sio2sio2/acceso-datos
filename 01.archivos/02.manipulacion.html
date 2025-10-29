@@ -486,6 +486,22 @@ extraer contenido de una <abbr title="Uniform Resource Locator">URL</abbr> media
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">;</span>
 </pre></div>
 </div>
+<p>Un caso particular son los archivos que se incluyen dentro de la aplicación,
+que pueden leerse con:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">rutaRelativa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/ruta/relativa/a/resources/archivo.txt&quot;</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="n">rutaRelativa</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Se está suponiendo que el código está dentro de un método de
+instancia y, por tanto, se dispone del objeto <code class="docutils literal notranslate"><span class="pre">this</span></code>. Si el método es
+estático, entonces debe utilizarse directamente la clase:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// El método está, por ejemplo, en la clase &#39;Main&#39;.</span>
+<span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Main</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="n">rutaRelativa</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
 <p>En consecuencia, a partir de este punto podemos tratar estas tres entradas
 diferentes de un mismo modo (p.e. usando la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Scanner.html">Scanner</a>). Si el archivo lo vamos a manejar por líneas lo más adecuado es
 hacer uso de <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStreamReader.html">InputStreamReader</a> y <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/BufferedReader.html">BufferedReader</a>:</p>

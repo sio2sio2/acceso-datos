@@ -80,6 +80,25 @@ y que también coincide con el tipo de ``System.in``:
 
    InputStream st = System.in;
 
+Un caso particular son los archivos que se incluyen dentro de la aplicación,
+que pueden leerse con:
+
+.. code-block:: java
+
+   String rutaRelativa = "/ruta/relativa/a/resources/archivo.txt"
+   InputStream st = getClass().getResourceAsStream(rutaRelativa);
+
+.. caution:: Se está suponiendo que el código está dentro de un método de
+   instancia y, por tanto, se dispone del objeto ``this``. Si el método es
+   estático, entonces debe utilizarse directamente la clase:
+
+   .. code-block:: java
+
+      // El método está, por ejemplo, en la clase 'Main'. 
+      InputStream st = Main.class.getResourceAsStream(rutaRelativa);
+
+.. 
+
 En consecuencia, a partir de este punto podemos tratar estas tres entradas
 diferentes de un mismo modo (p.e. usando la clase :java-util:`Scanner
 <Scanner>`). Si el archivo lo vamos a manejar por líneas lo más adecuado es

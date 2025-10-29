@@ -420,12 +420,11 @@ soporte alguno.</p>
 <section id="lectura">
 <span id="jaxp-read"></span><h2><span class="section-number">3.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>Comencemos por conocer cómo abrir un documento <abbr title="eXtensible Markup Language">XML</abbr> y acceder a sus nodos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;claustro.xml&quot;</span><span class="p">);</span>
-<span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DocumentBuilderFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DocumentBuilderFactory</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span>
 <span class="c1">// La siguiente línea puede provocar un ParseConfigurationException</span>
 <span class="n">DocumentBuilder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="na">newDocumentBuilder</span><span class="p">();</span>
 
-<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="s">&quot;/claustro.xml&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// La línea posterior también puede generar una excepción.</span>
 <span class="w">   </span><span class="n">Document</span><span class="w"> </span><span class="n">xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">st</span><span class="p">);</span>
 <span class="w">   </span><span class="c1">// Accedemos a la información del documento a través de su DOM.</span>
@@ -445,10 +444,11 @@ validez. Sin embargo, si hay una declaración de tipo de documento:</p>
 Evite incluir esta cláusula hasta que <a class="reference internal" href="#jaxp-dtd"><span class="std std-ref">estudiemos la validación</span></a>.</p>
 </div>
 <p>Una vez tenemos disponible el objeto <cite>Document</cite> ya podremos acceder a los nodos
-del documento. En principio, los nodos se modelan mediante la clase <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> sobre la que
-construyen subsclases que modelan los distintos tipos de nodos (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html">Element</a>, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Text.html">Text</a>, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>, etc.). Cada
-uno de estos tipos de nodos está asociado a un número entero al que se da
-nombre mediante un atributo estático de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a>. Por ejemplo:</p>
+del documento. En principio, los nodos se modelan mediante la clase <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Node.html">Node</a> sobre
+la que construyen subsclases que modelan los distintos tipos de nodos
+(<a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Element.html">Element</a>, <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Text.html">Text</a>, <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Attr.html">Attr</a>, etc.). Cada uno de estos tipos de nodos está
+asociado a un número entero al que se da nombre mediante un atributo estático de
+<a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Node.html">Node</a>. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Element</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getDocumentElement</span><span class="p">();</span><span class="w">  </span><span class="c1">// Obtiene el nodo raíz.</span>
 <span class="n">root</span><span class="p">.</span><span class="na">getNodeType</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">ELEMENT_NODE</span><span class="w">   </span><span class="c1">// true.</span>
 </pre></div>
@@ -467,7 +467,7 @@ hacer diversas pesquisas:</p>
 <dt><code class="docutils literal notranslate"><span class="pre">getNodeName()</span></code></dt><dd><p>devuelve el nombre del nodo (si es un elemento, el nombre de la etiqueta).</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getNodeValue()</span></code></dt><dd><p>devuelve el valor del nodo. Dependiendo del tipo de nodo, así será su valor
-(al comienzo de la explicación sobre <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a> hay una tabla que indica qué valor
+(al comienzo de la explicación sobre <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Node.html">Node</a> hay una tabla que indica qué valor
 devuelve cada tipo).</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getTextContent()</span></code></dt><dd><p>devuelve el valor de texto del elemento<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, que es la concatenación de los nodos de
@@ -477,8 +477,8 @@ nodo así:</p>
 </pre></div>
 </div>
 <p>resulta que:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// apelativo es una variable que contiene el elemento apelativo comentado</span>
-<span class="n">apelativo</span><span class="p">.</span><span class="na">getTextContent</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">apelativo</span><span class="p">.</span><span class="na">firstChild</span><span class="p">().</span><span class="na">getNodeValue</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// apelativo es una variable que contiene el elemento apelativo antedicho</span>
+<span class="n">apelativo</span><span class="p">.</span><span class="na">getTextContent</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">apelativo</span><span class="p">.</span><span class="na">firstChild</span><span class="p">().</span><span class="na">getNodeValue</span><span class="p">());</span>
 </pre></div>
 </div>
 </dd>
@@ -489,12 +489,11 @@ cuidado con los documentos indentados)</p>
 <dt><code class="docutils literal notranslate"><span class="pre">getParentNode()</span></code> o <code class="docutils literal notranslate"><span class="pre">getPreviousSibling()</span></code> o <code class="docutils literal notranslate"><span class="pre">getFollowingSibling()</span></code></dt><dd><p>devuelve el nodo padre o el hermano previo o el hermano siguiente.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">getChildNodes()</span></code></dt><dd><blockquote>
-<div><p>devuelve un objeto <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>  con
-los nodos hijos. A pesar de su naturaleza no implementa la interfaz
-<a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable</a> y sólo presenta un método (<code class="docutils literal notranslate"><span class="pre">getLength()</span></code>)
-que devuelve la cantidad de hijos y un método <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> que
-devuelve el i-ésimo nodo de la lista. Por tanto, si se quiere quiere recorrer
-la colección, habrá que usar un <cite>for</cite> clásico:</p>
+<div><p>devuelve un objeto <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/NodeList.html">NodeList</a> con los nodos hijos. A pesar de su naturaleza
+no implementa la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable</a> y sólo presenta un
+método (<code class="docutils literal notranslate"><span class="pre">getLength()</span></code>) que devuelve la cantidad de hijos y un método
+<code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> que devuelve el i-ésimo nodo de la lista. Por tanto, si
+se quiere quiere recorrer la colección, habrá que usar un <cite>for</cite> clásico:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">hijos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">getChildNodes</span><span class="p">();</span>
 <span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="n">hijos</span><span class="p">.</span><span class="na">getLength</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">Node</span><span class="w"> </span><span class="n">nodo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hijos</span><span class="p">.</span><span class="na">item</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
@@ -512,7 +511,7 @@ la colección, habrá que usar un <cite>for</cite> clásico:</p>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>Pese a que, a priori, sólo podemos utilizar el <cite>for</cite> tradicional
-para recorrer <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a>, podemos buscarnos las vueltas para convertirlo
+para recorrer <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/NodeList.html">NodeList</a>, podemos buscarnos las vueltas para convertirlo
 en un flujo y poder usar con él técnicas de <a class="reference internal" href="../98.apendices/01.funcional.html#funcional"><span class="std std-ref">Java funcional</span></a>:</p>
 <div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">hijos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="na">getChildNodes</span><span class="p">();</span>
 <span class="n">Stream</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span><span class="w"> </span><span class="n">streamNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IntStream</span><span class="p">.</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">hijos</span><span class="p">.</span><span class="na">getLength</span><span class="p">()).</span><span class="na">mapToObj</span><span class="p">(</span><span class="n">hijos</span><span class="p">::</span><span class="n">item</span><span class="p">);</span>
@@ -520,10 +519,11 @@ en un flujo y poder usar con él técnicas de <a class="reference internal" href
 </div>
 </div>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">getAttributes()</span></code></dt><dd><p>devuelve los atributos del elemento en forma de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a>
-que como <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/NodeList.html">NodeList</a> tampoco implemente la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable</a>. Además de <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> y <code class="docutils literal notranslate"><span class="pre">getLength()</span></code>, dispone también
-de <code class="docutils literal notranslate"><span class="pre">getNamedItem(String</span> <span class="pre">name)</span></code> que permite obtener el nodo atributo a
-partir de su nombre:</p>
+<dt><code class="docutils literal notranslate"><span class="pre">getAttributes()</span></code></dt><dd><p>devuelve los atributos del elemento en forma de <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a> que como
+<a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/NodeList.html">NodeList</a> tampoco implemente la interfaz <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Iterable.html">Iterable</a>.
+Además de <code class="docutils literal notranslate"><span class="pre">item(int</span> <span class="pre">index)</span></code> y <code class="docutils literal notranslate"><span class="pre">getLength()</span></code>, dispone también de
+<code class="docutils literal notranslate"><span class="pre">getNamedItem(String</span> <span class="pre">name)</span></code> que permite obtener el nodo atributo a partir
+de su nombre:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;profesores&quot;</span><span class="p">);</span>
 <span class="n">Element</span><span class="w"> </span><span class="n">p4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Element</span><span class="p">)</span><span class="w"> </span><span class="n">profesores</span><span class="p">.</span><span class="na">item</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="n">NamedNodeMap</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p4</span><span class="p">.</span><span class="na">getAttributes</span><span class="p">();</span>
@@ -536,11 +536,11 @@ partir de su nombre:</p>
 </dd>
 </dl>
 <p>Por otra parte, los tipos de nodos tiene también sus métodos específicos. Por
-ejemplo, <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Element.html">Element</a>:</p>
+ejemplo, <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Element.html">Element</a>:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">getElementsByTagName(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve los elementos descendientes cuyo nombre de etiqueta es el
 suministrado en el argumento. El método también existe para los nodo
-<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html">Document</a>:</p>
+<a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Document.html">Document</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">NodeList</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xml</span><span class="p">.</span><span class="na">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;profesores&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -552,7 +552,7 @@ identificador, por lo que es necesario que el documento se haya validado.</p>
 </pre></div>
 </div>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">getAttributeNode(String</span> <span class="pre">name)</span></code> o <code class="docutils literal notranslate"><span class="pre">getAttribute(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve el atributo (<a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Attr.html">Attr</a>) o el valor del atributo cuyo nombre se
+<dt><code class="docutils literal notranslate"><span class="pre">getAttributeNode(String</span> <span class="pre">name)</span></code> o <code class="docutils literal notranslate"><span class="pre">getAttribute(String</span> <span class="pre">name)</span></code></dt><dd><p>devuelve el atributo (<a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Attr.html">Attr</a>) o el valor del atributo cuyo nombre se
 proporciona en el argumento.</p>
 </dd>
 </dl>
@@ -671,7 +671,7 @@ crearlo <em>ex novo</em>:</p>
 </section>
 <section id="escritura-a-archivo">
 <h3><span class="section-number">3.1.2.2. </span>Escritura a archivo<a class="headerlink" href="#escritura-a-archivo" title="Link to this heading">#</a></h3>
-<p>Partamos de que ya tenemos un <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html">Document</a> construido como queremos que quede
+<p>Partamos de que ya tenemos un <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Document.html">Document</a> construido como queremos que quede
 (véase el apartado anterior) y queremos ahora generar el <abbr title="eXtensible Markup Language">XML</abbr> correspondiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DOMSource</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DOMSource</span><span class="p">(</span><span class="n">xml</span><span class="p">);</span>
 
@@ -746,7 +746,7 @@ si nuestra intención es usarla una sola vez:</p>
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>En realidad el método tiene sentido para otros nodos que no sean
 elementos. Véase la tabla que resume sus significados en la explicación del
-método que ofrece la documentación original de <a class="reference external" href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html">Node</a>.</p>
+método que ofrece la documentación original de <a class="extlink-java-jaxp reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.xml/org/w3c/dom/Node.html">Node</a>.</p>
 </aside>
 </aside>
 </section>

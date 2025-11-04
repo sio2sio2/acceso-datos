@@ -227,11 +227,11 @@ original.
 
 .. admonition:: Advertencia
 
-   El código incluye una variable ``ruta``, que es un objeto ``Path`` que
+   El código incluye una variable ``ruta``, que es un objeto |Path| que
    contiene la ruta del archivo |XML| en consonancia con :ref:`el ejemplo
    ilustrativo que escribimos sobre lectura <jaxp-read>`.
 
-   Si en cambio, ``ruta`` fuera una objeto ``URI`` podríamos obtener la cadena
+   Si en cambio, ``ruta`` fuera una objeto :java-net:`URI <URI>` podríamos obtener la cadena
    con la ruta del |DTD| de este otro modo:
 
    .. code-block:: java
@@ -365,13 +365,13 @@ si nuestra intención es usarla una sola vez:
 
 .. code-block:: java
 
-   Element profesor = (Element) xPath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); 
+   Element profesor = (Element) xPath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); // Mejor que NODESET, porque sabemos que es único
    System.out.println(profesor.getTagName());  // profesor
    
    String apelativo = (String) xPath.evaluate("//profesor[@id='p81']/apelativo", xml, XPathConstants.STRING); 
    System.out.println(apelativo);  // Verónica
 
-   int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.STRING)).intValue();
+   int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.NUMBER)).intValue();
    System.out.println(cantidad);
 
 .. rubric:: Notas al pie
@@ -394,3 +394,4 @@ si nuestra intención es usarla una sola vez:
 .. |NodeList| replace:: :java-jaxp:`NodeList`
 .. |NamedNodeMap| replace:: :java-jaxp:`NamedNodeMap`
 .. |Document| replace:: :java-jaxp:`Document`
+.. |Path| replace:: :java-nio:`Path`

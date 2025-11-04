@@ -44,6 +44,7 @@ html_theme_options = {
 
 extlinks = {
       'java-util': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/%s.html', 'java.util.%s'),
+      'java-net': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/net/%s.html', 'java.net.%s'),
     'java-text': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/text/%s.html', 'java.text.%s'),
     'java-io': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/%s.html', 'java.io.%s'),
     'java-nio': ('https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/%s.html', 'java.nio.file.%s'),

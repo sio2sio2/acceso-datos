@@ -121,29 +121,35 @@ sirva en cualquier aplicación:
    :language: java
    :class: toggle
    :caption: Clase Factory
-   :start-at: public class
+   :start-at: public class Factory
 
 La principal diferencia (además de ser mucho más complicado que el anterior) es
-que esta clase sí se instancia con el constructor ``Factory(String packageName,
-Class<I> interfaceClass)`` para indicar en qué paquete se encuentran las clases
-que implementan la interfaz y cuál es esta. En el ejemplo de nuestros
-traductores:
+que esta clase sí se instancia con el constructor ``Factory(Class<I>, String)``
+para indicar cuál es la interfaz implementada y en qué paquete se encuentran las
+clases que la implementan.  En el ejemplo de nuestros traductores:
 
 .. code-block:: java
 
-   Factory<Traductor> trFactory = new Factory<>("edu.acceso.ejemplo.traductor", Traductor.class);
+   Factory<Traductor> factory = new Factory<>(Traductor.class, "edu.acceso.ejemplo.traductor");
+
+Ahora bien, si se coloca la interfaz en el mismo paquete que las clases, se
+puede omitir el segundo argumento:
+
+.. code-block:: java
+
+   Factory<Traductor> factory = new Factory<>(Traductor.class);
 
 La creación de este objeto *Factory* provoca que gracias a la reflexión se
 analice el paquete y se localicen las clases que implementan la interfaz
 (``Traductor`` en este caso). El objetivo es relacionar estas clases con su
 nombre y, en su caso, con los nombres alternativos contenidos en el atributo
-``aliases``. Por ejemplo:
+``alias``. Por ejemplo:
 
 .. code-block:: java
 
    public class TYaml implements Traductor {
       // También podría ser String si sólo hay una alternativa
-      private static final String[] = {"yml", "yaml"};
+      private static final String[] alias = {"yml", "yaml"};
 
       // Implementación de la traducción para YAML...
    }
@@ -157,11 +163,34 @@ traducción, nos bastaría con hacer:
 
    String formato = "yml"; // Por ejemplo.
 
-   Factory<Traductor> trFactory = new Factory<>("edu.acceso.ejemplo.traductor", Traductor.class);
-   Traductor traductor = trFactory.getObject(formato);
+   // Suponemos que Traductor y TYaml están en el mismo paquete.
+   Factory<Traductor> factory = new Factory<>(Traductor.class);
+   Class<? extends Traductor> traductorClass = factory.get(formato);
 
-La clase tiene, además, dos métodos adicionales que sirven básicamente para
-brindar información:
+Y ya tendríamos disponible la clase que implementa |YAML| para instanciarla
+cuando nos sea necesario. También existe la posibilidad de pedir directamente la
+instancia:
+
+.. code-block:: java
+
+   Traductor traductor = factory.getInstance(formato);
+
+.. caution:: Este método sólo funcionará si el constructor de las clases no
+   tiene argumentos y, además, la construcción no tiene dependencias cruzadas
+   en el programa. Por ejemplo, si utilizamos :ref:`una clase para gestionar la
+   configuración de usuario <cliargs>` es probable que echemos mano de esta
+   clase ``Factory``. Si el constructor del traductor hace
+   uso a su vez de la configuración entonces tendremos una dependencia circular:
+   para construir el objeto de configuración necesitamos un objeto traductor,
+   pero para construir un objeto traductor necesitamos la configuración.
+
+   Por lo general es más seguro obtener la clase del traductor e instanciar
+   nosotros luego. Justamente en el caso anterior, podríamos obtener la clase
+   del traductor para definir el atributo del objeto ``Config`` y en el *getter*
+   de ese atributo, hacer la instanciación.
+
+La clase tiene, además, otros dos métodos adicionales que sirven básicamente
+para brindar información:
 
 ``getClasses()``
    que devuelve un mapa en que las claves son las cadenas y los valores las
@@ -171,15 +200,4 @@ brindar información:
    que devuelve un mapa en que cada clave es una clase y los valores un array
    con todos los nombres con los que está relacionada.
 
-.. warning:: El ćodigo tiene una limitación: el constructor de las clases no
-   puede tener argumentos. En caso de que debiera tenerlos, no obstante, es
-   fácil soslayar la limitación: bastaría con incluir en la interfaz un método
-   inicializador. Por ejemplo:
-
-   .. code-block:: java
-
-      public interface Foobar {
-
-         public void initialize( /* Los argumentos que sea */ );
-         // Resto de métodos que definen la interfaz.
-      }
+.. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`

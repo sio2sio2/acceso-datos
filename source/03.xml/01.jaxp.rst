@@ -183,40 +183,55 @@ En primer lugar, si queremos que la validación se lleve a cabo debemos añadir:
    factory.setValidating(true);
 
 Otro aspecto importante es el de la manipulación de la validación, que se lleva
-cabo definiendo un \"*resolutor de entidades*\".
+a cabo definiendo un *resolutor de entidades*.
 
 .. code-block:: java
-   :emphasize-lines: 1,13,14,27
+   :emphasize-lines: 1,3,4,9,10,15,16
 
-   builder.setEntityResolver(new EntityResolver2() {
-       @Override
-       public InputSource getExternalSubset(String name, String baseURI) {
-           return null;
-       }
+    builder.setEntityResolver(new EntityResolver2() {
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI)
+                throws SAXException, IOException {
+            return null;
+        }
 
-       @Override
-       public InputSource resolveEntity(String publicID, String systemID) throws SAXException, IOException {
-           return resolveEntity(null, publicID, null, systemID);
-       }
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            return resolveEntity(null, publicId, null, systemId);
+        }
 
-       @Override
-       public InputSource resolveEntity(String name, String publicID, String baseURI, String systemID)
-           throws SAXException, IOException {
-               if(systemID == null) return null;
+        @Override
+        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
+                throws SAXException, IOException {
 
-               try {
-                   if(!new URI(systemID).isAbsolute()) {
-                       // Se supone que "ruta" ya se definió como Path.
-                       systemID = ruta.getParent().resolve(systemID).toString();
-                   }
-               }
-               catch(URISyntaxException err) {
-                   return null;
-               }
+            if (systemId == null) return null;
 
-               return new InputSource(systemID);
-       }       
-   });
+            try {
+                systemId = resolvePath(baseURI, systemId);
+            } catch(URISyntaxException e) {
+                return null;
+            }
+            
+            return new InputSource(systemId);
+        }
+
+        private String resolvePath(String base, String path) throws URISyntaxException {
+            if(new URI(path).isAbsolute()) return path;
+            if(base == null) throw new IllegalArgumentException("No puede calcularse una ruta relativa si la base es nula.");
+
+            if(base.contains("!")) {
+                // Nos quedamos con la parte del path dentro del jar
+                Path basePath = Path.of(base.substring(base.indexOf("!") + 1));
+                // Resolvemos el path relativo y devolvemos el recurso.
+                 URL resource = getClass().getResource(basePath.resolveSibling(path).toString());
+                return resource != null ? resource.toString() : null;
+            }
+
+            return new URI(base).resolve(path).toString();
+        }
+
+    });
 
 Debemos fijarnos en el último método. Cuando devuelve `null`, es como, si no
 hubiéramos definido nada, y el procesador obrará como lo hace habitualmente para
@@ -227,25 +242,27 @@ original.
 
 .. admonition:: Advertencia
 
-   El código incluye una variable ``ruta``, que es un objeto |Path| que
-   contiene la ruta del archivo |XML| en consonancia con :ref:`el ejemplo
-   ilustrativo que escribimos sobre lectura <jaxp-read>`.
-
-   Si en cambio, ``ruta`` fuera una objeto :java-net:`URI <URI>` podríamos obtener la cadena
-   con la ruta del |DTD| de este otro modo:
-
-   .. code-block:: java
-
-      systemID = ruta.resolve(systemID).toString();
+   Este código da por hecho que se conoce la ruta del |XML| (``baseURI``). Esto,
+   sin embargo, puede ser cierto o no. Todo este procesamiento lo desencadena
+   :code:`builder.parse()`, el cual permite proporcionar los datos de distinto
+   modo. Puede pasarse un |String| o un |File| en cuyo caso
+   sí se sabrá ``baseURI``. En cambio, si se pasa un |InputStream| (que es
+   *precisamente la forma en la que hemos ilustrado el uso*) no hay modo de
+   conocer su valor y, en consencuencia, será ``null``. Eso sí, en este último
+   caso, se admite un segundo argumento con una cadena que defina ``baseURI``.
 
 ¿Qué hace exactamente el código que hemos propuesto? En principio, si
-no hay definido ninguno, no hace nada. En cambio, si hay definido uno,
-comprueba si el |DTD| se proporcionó con ruta absoluta (lo cual incluye una
-|URL| completa). Si fue así, respeta el valor y la validación se hará con el
-valor expresado en el archivo. En cambio, si la ruta era relativa, hay un
-problema: la librería entiende la ruta relativa no respecto al |XML| (que sería
-lo esperable), sino respecto al directorio de trabajo. Lo que hace nuestro
-código en este caso, es hacerla relativa respecto al |XML|.
+no hay definido ningun |DTD|, no hace nada. En cambio, si hay definido uno,
+comprueba si el |DTD| se proporciona con ruta absoluta. Si es así, respeta el
+valor y la validación se hará con el valor expresado en el archivo. En cambio,
+si la ruta es relativa, hace una distinción:
+
+* Si ``baseURI`` contiene el carácter ``!`` se ha pasado como |XML| un
+  :ref:`archivo de recursos <file-arc-pro>` y en consecuencia el |DTD| también
+  lo será y hay que buscarlo dentro del paquete |JAR|.
+
+* Si no es así, se resuelve de forma normal la ruta relativa usando como base el
+  |XML| (``baseURI``).
 
 .. tip:: El argumento del constructor de `InputSource` también puede ser un
    :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
@@ -386,6 +403,7 @@ si nuestra intención es usarla una sola vez:
 .. |DTD| replace:: :abbr:`DTD (Document Type Definition)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+.. |JAR| replace:: :abbr:`JAR (Java ARchive)`
 
 .. |Node| replace:: :java-jaxp:`Node`
 .. |Element| replace:: :java-jaxp:`Element`
@@ -395,3 +413,6 @@ si nuestra intención es usarla una sola vez:
 .. |NamedNodeMap| replace:: :java-jaxp:`NamedNodeMap`
 .. |Document| replace:: :java-jaxp:`Document`
 .. |Path| replace:: :java-nio:`Path`
+.. |String| replace:: :java-io:`String <String>`
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+.. |File| replace:: :java-io:`File <File>`

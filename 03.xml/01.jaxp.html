@@ -565,36 +565,51 @@ ninguna comprobación en caso de que la declaración exista, pero el <abbr title
 </pre></div>
 </div>
 <p>Otro aspecto importante es el de la manipulación de la validación, que se lleva
-cabo definiendo un &quot;<em>resolutor de entidades</em>&quot;.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">builder</span><span class="p">.</span><span class="na">setEntityResolver</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">EntityResolver2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">getExternalSubset</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
+a cabo definiendo un <em>resolutor de entidades</em>.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">setEntityResolver</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">EntityResolver2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">     </span><span class="nd">@Override</span>
+<span class="hll"><span class="w">     </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">getExternalSubset</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">)</span>
+</span><span class="hll"><span class="w">             </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">     </span><span class="p">}</span>
 
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemID</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resolveEntity</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">systemID</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">     </span><span class="nd">@Override</span>
+<span class="hll"><span class="w">     </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">publicId</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemId</span><span class="p">)</span>
+</span><span class="hll"><span class="w">             </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">resolveEntity</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">publicId</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">systemId</span><span class="p">);</span>
+<span class="w">     </span><span class="p">}</span>
 
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="hll"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">publicID</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemID</span><span class="p">)</span>
-</span><span class="hll"><span class="w">        </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-</span><span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">systemID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">     </span><span class="nd">@Override</span>
+<span class="hll"><span class="w">     </span><span class="kd">public</span><span class="w"> </span><span class="n">InputSource</span><span class="w"> </span><span class="nf">resolveEntity</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">publicId</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">baseURI</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">systemId</span><span class="p">)</span>
+</span><span class="hll"><span class="w">             </span><span class="kd">throws</span><span class="w"> </span><span class="n">SAXException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+</span>
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">systemId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 
-<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="n">systemID</span><span class="p">).</span><span class="na">isAbsolute</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="c1">// Se supone que &quot;ruta&quot; ya se definió como Path.</span>
-<span class="w">                    </span><span class="n">systemID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ruta</span><span class="p">.</span><span class="na">getParent</span><span class="p">().</span><span class="na">resolve</span><span class="p">(</span><span class="n">systemID</span><span class="p">).</span><span class="na">toString</span><span class="p">();</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">URISyntaxException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="n">systemId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resolvePath</span><span class="p">(</span><span class="n">baseURI</span><span class="p">,</span><span class="w"> </span><span class="n">systemId</span><span class="p">);</span>
+<span class="w">         </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">URISyntaxException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">         </span><span class="p">}</span>
 
-<span class="hll"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputSource</span><span class="p">(</span><span class="n">systemID</span><span class="p">);</span>
-</span><span class="w">    </span><span class="p">}</span>
-<span class="p">});</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputSource</span><span class="p">(</span><span class="n">systemId</span><span class="p">);</span>
+<span class="w">     </span><span class="p">}</span>
+
+<span class="w">     </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">resolvePath</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">URISyntaxException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="na">isAbsolute</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">path</span><span class="p">;</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;No puede calcularse una ruta relativa si la base es nula.&quot;</span><span class="p">);</span>
+
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="n">base</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;!&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="c1">// Nos quedamos con la parte del path dentro del jar</span>
+<span class="w">             </span><span class="n">Path</span><span class="w"> </span><span class="n">basePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">base</span><span class="p">.</span><span class="na">substring</span><span class="p">(</span><span class="n">base</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="s">&quot;!&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span>
+<span class="w">             </span><span class="c1">// Resolvemos el path relativo y devolvemos el recurso.</span>
+<span class="w">              </span><span class="n">URL</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getResource</span><span class="p">(</span><span class="n">basePath</span><span class="p">.</span><span class="na">resolveSibling</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="na">toString</span><span class="p">());</span>
+<span class="w">             </span><span class="k">return</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">resource</span><span class="p">.</span><span class="na">toString</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">         </span><span class="p">}</span>
+
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="n">base</span><span class="p">).</span><span class="na">resolve</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="na">toString</span><span class="p">();</span>
+<span class="w">     </span><span class="p">}</span>
+
+<span class="w"> </span><span class="p">});</span>
 </pre></div>
 </div>
 <p>Debemos fijarnos en el último método. Cuando devuelve <cite>null</cite>, es como, si no
@@ -605,23 +620,27 @@ llevar a cabo la validación. En cambio, si devolvemos un <code class="code docu
 original.</p>
 <div class="admonition-advertencia admonition">
 <p class="admonition-title">Advertencia</p>
-<p>El código incluye una variable <code class="docutils literal notranslate"><span class="pre">ruta</span></code>, que es un objeto <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">java.nio.file.Path</a> que
-contiene la ruta del archivo <abbr title="eXtensible Markup Language">XML</abbr> en consonancia con <a class="reference internal" href="#jaxp-read"><span class="std std-ref">el ejemplo
-ilustrativo que escribimos sobre lectura</span></a>.</p>
-<p>Si en cambio, <code class="docutils literal notranslate"><span class="pre">ruta</span></code> fuera una objeto <a class="extlink-java-net reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/net/URI.html">URI</a> podríamos obtener la cadena
-con la ruta del <abbr title="Document Type Definition">DTD</abbr> de este otro modo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">systemID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ruta</span><span class="p">.</span><span class="na">resolve</span><span class="p">(</span><span class="n">systemID</span><span class="p">).</span><span class="na">toString</span><span class="p">();</span>
-</pre></div>
-</div>
+<p>Este código da por hecho que se conoce la ruta del <abbr title="eXtensible Markup Language">XML</abbr> (<code class="docutils literal notranslate"><span class="pre">baseURI</span></code>). Esto,
+sin embargo, puede ser cierto o no. Todo este procesamiento lo desencadena
+<code class="code docutils literal notranslate"><span class="pre">builder.parse()</span></code>, el cual permite proporcionar los datos de distinto
+modo. Puede pasarse un <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/String.html">String</a> o un <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/File.html">File</a> en cuyo caso
+sí se sabrá <code class="docutils literal notranslate"><span class="pre">baseURI</span></code>. En cambio, si se pasa un <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a> (que es
+<em>precisamente la forma en la que hemos ilustrado el uso</em>) no hay modo de
+conocer su valor y, en consencuencia, será <code class="docutils literal notranslate"><span class="pre">null</span></code>. Eso sí, en este último
+caso, se admite un segundo argumento con una cadena que defina <code class="docutils literal notranslate"><span class="pre">baseURI</span></code>.</p>
 </div>
 <p>¿Qué hace exactamente el código que hemos propuesto? En principio, si
-no hay definido ninguno, no hace nada. En cambio, si hay definido uno,
-comprueba si el <abbr title="Document Type Definition">DTD</abbr> se proporcionó con ruta absoluta (lo cual incluye una
-<abbr title="Uniform Resource Locator">URL</abbr> completa). Si fue así, respeta el valor y la validación se hará con el
-valor expresado en el archivo. En cambio, si la ruta era relativa, hay un
-problema: la librería entiende la ruta relativa no respecto al <abbr title="eXtensible Markup Language">XML</abbr> (que sería
-lo esperable), sino respecto al directorio de trabajo. Lo que hace nuestro
-código en este caso, es hacerla relativa respecto al <abbr title="eXtensible Markup Language">XML</abbr>.</p>
+no hay definido ningun <abbr title="Document Type Definition">DTD</abbr>, no hace nada. En cambio, si hay definido uno,
+comprueba si el <abbr title="Document Type Definition">DTD</abbr> se proporciona con ruta absoluta. Si es así, respeta el
+valor y la validación se hará con el valor expresado en el archivo. En cambio,
+si la ruta es relativa, hace una distinción:</p>
+<ul class="simple">
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">baseURI</span></code> contiene el carácter <code class="docutils literal notranslate"><span class="pre">!</span></code> se ha pasado como <abbr title="eXtensible Markup Language">XML</abbr> un
+<a class="reference internal" href="../01.archivos/01.gestion.html#file-arc-pro"><span class="std std-ref">archivo de recursos</span></a> y en consecuencia el <abbr title="Document Type Definition">DTD</abbr> también
+lo será y hay que buscarlo dentro del paquete <abbr title="Java ARchive">JAR</abbr>.</p></li>
+<li><p>Si no es así, se resuelve de forma normal la ruta relativa usando como base el
+<abbr title="eXtensible Markup Language">XML</abbr> (<code class="docutils literal notranslate"><span class="pre">baseURI</span></code>).</p></li>
+</ul>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El argumento del constructor de <cite>InputSource</cite> también puede ser un

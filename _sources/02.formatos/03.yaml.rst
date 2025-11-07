@@ -13,11 +13,16 @@ y modificar la forma en que definimos el mapeador:
 .. code-block:: java
 
    YAMLFactory factory = YAMLFactory.builder()
+      // Podemos habilitar o deshabilitar características del formato.
       .build();
 
-   MapperBuilder<?, ?> builder = YAMLMapper.builder(factory);
+   MapperBuilder<?, ?> builder = YAMLMapper.builder(factory)
+      // Podemos habilitar o deshabilitar características generales.
+      // Añadir módulos
+      // Hacer mixIn
+      ;
 
-   ObjectMapper mapper = builder.build();
+   ObjectMapper mapper = builder.build();  // Mapeador inmutable.
 
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`

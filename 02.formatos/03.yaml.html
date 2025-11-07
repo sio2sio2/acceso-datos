@@ -405,11 +405,16 @@ formato aquí</span></a>), por lo que si usamos el <a class="reference external"
 <a class="reference external" href="https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml">la librería adecuada</a>
 y modificar la forma en que definimos el mapeador:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">YAMLFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">YAMLFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="w">   </span><span class="c1">// Podemos habilitar o deshabilitar características del formato.</span>
 <span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">YAMLMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">);</span>
+<span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">YAMLMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
+<span class="w">   </span><span class="c1">// Podemos habilitar o deshabilitar características generales.</span>
+<span class="w">   </span><span class="c1">// Añadir módulos</span>
+<span class="w">   </span><span class="c1">// Hacer mixIn</span>
+<span class="w">   </span><span class="p">;</span>
 
-<span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span><span class="w">  </span><span class="c1">// Mapeador inmutable.</span>
 </pre></div>
 </div>
 </section>

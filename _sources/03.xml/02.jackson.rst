@@ -206,19 +206,39 @@ Otra gran diferencia respecto a la traducción a |JSON| es que en |XML| nos hemo
 visto obligados a crear un elemento contenedor de la secuencia llamado
 ``<centro>``. No contiene más información que la propia secuencia, por lo que en
 el modelo de datos no se traduce en una nueva clase. En *Java*, simplemente,
-existirá un dato de tipo ``Grupo[]`` o ``List<Grupo>``.
+existirá un dato de tipo ``Grupo[]`` o ``List<Grupo>``. Si intentáramos traducir
+directamente estos tipos de datos a |XML|, la librería no nos permitiría definir
+el nombre de la etiqueta para el envoltorio (queremos que sea ``<centro>``) ni
+tampoco qué etiqueta tendría cada uno de los elementos de la secuencia (utiliza
+el predeterminado ``<item>``) por lo que obtendríamos una salida semejante a
+esta:
 
-Por eso, para poder hacer la traducción a |XML| necesitamos añadir una clase
-envoltorio auxiliar:
+.. code-block:: xml
+
+   <List1> <!-- O alguna etiqueta semejante -->
+      <item nivel="1" etapa="2" grupo="D">
+         <!-- Elementos del grupo (nombrados correctamente) -->
+      </item>
+
+      <!-- Otro grupos con la etiqueta item -->
+   </List1>
+
+Para solucionar esto tenemos dos soluciones:
+
+.. rubric:: Clase envoltorio auxiliar
 
 .. code-block:: java
    :emphasize-lines: 1, 3, 4
 
    @JsonRootName("centro")
-   private class GrupoWrapper {
+   private class GruposWrapper {
       @JacksonXmlElementWrapper(useWrapping = false)
       @JacksonXmlProperty(localName = "grupo")
-      private Grupo[] grupos;
+      public Grupo[] grupos;
+
+      public GruposWrapper(Grupo[] grupos) {
+         this.grupos = grupos;
+      }
    }
 
 Las particularidades de este código son las siguientes:
@@ -232,6 +252,37 @@ Las particularidades de este código son las siguientes:
 
 + El nombre del elemento es ``<grupo>``, no ``<grupos>``, así que es necesaria
   también la anotación ``@JacksonXmlProperty``.
+
+Una vez definida la clase, basta con que sea una instancia de ella la que se
+escriba (o lea):
+
+.. code-block:: java
+
+   // Escritura
+   mapper.writeValue(new GruposWrapper(grupos));
+   // Lectura
+
+   Grupo[] grupos = mapper.readValue(st, GruposWrapper.class).grupos;
+
+.. rubric:: Mapa envoltorio
+
+Consiste en improvisar un mapa con una única clave que sea el nombre que
+queremos darle a los elementos de la secuencia:
+
+.. code-block:: java
+   :emphasize-lines: 1, 4
+
+   Map<String, Object> centro = Map.of("grupo", grupos);  // Se usará <grupo>, no <item>
+
+   ObjectWriter writer = mapper.writer()
+      .withRootName("centro");   // Indicamos que se use <centro>, no <Map1>
+
+
+   // Escritura
+   writer.writeValues(st, centro);
+
+   // Lectura (no tiene dificultad)
+   mapper.readValues(st, Grupo[].class);
 
 Traductores
 -----------
@@ -273,7 +324,7 @@ igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
 
 .. code-block:: java
 
-   Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "claustro.xml");
+   Path archivo = Path.of(System.getProperty("java.io.tmpdir"), "grupos.xml");
 
    Grupo[] grupos = new Grupo[] {
       new Grupo(1, Etapa.ESO, 'A', New Tutor("Florencio Vázquez Méndez", "Inglés"), {
@@ -292,13 +343,12 @@ igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
 
    MapperBuilder<?, ?> builder = XmlMapper.builder(factory)
       .enable(SerializationFeature.INDENT_OUTPUT)
-      .addMixIn(Claustro.class, ClaustroMixin.class)
-      .addMixIn(Profesor.class, ProfesorMixin.class);
+      .addMixIn(Grupo.class, GrupoMixin.class);
 
    ObjectMapper mapper = builder.build();
 
    try (OutputStream st = Files.newOutputStream(archivo)) {
-       mapper.writeValue(st, claustro);  // Puede generar JacksonException
+       mapper.writeValue(st, new GruposWrapper(grupos));  // Puede generar JacksonException
    } catch(JacksonException | IOException err) {
        err.printStackTrace();
    }
@@ -309,7 +359,7 @@ También podríamos haber generado una cadena con la salida:
 .. code-block:: java
 
    try {
-       String contenido = mapper.writeValueAsString(claustro);
+       String contenido = mapper.writeValueAsString(new GruposWrapper(grupos));
        System.out.println(contenido);
    } catch(JacksonException err) {
        err.printStackTrace();
@@ -332,17 +382,16 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
 
 .. code-block:: java
 
-   Path archivo = Path.of(System.getProperty("user.home"), "claustro.xml");
+   Path archivo = Path.of(System.getProperty("user.home"), "grupos.xml");
    
    MapperBuilder<?, ?> builder = XmlFactory.builder()
-      .addMixIn(Claustro.class, ClaustroMixin.class)
-      .addMixIn(Profesor.class, ProfesorMixin.class);
+      .addMixIn(Grupo.class, GrupoMixin.class)
 
    ObjectMapper mapper = builder.build();
 
    try (InputStream st = Files.newInputStream(ruta)) {
-      Claustro claustro = mapper.readValue(st, Claustro.class);
-      System.out.println(claustro);
+      Grupos[] grupos = mapper.readValue(st, GruposWrapper.class).grupos;
+      System.out.println(grupos);
    } catch(JacksonIOException | IOException err) {
       err.printStackTrace();
    }

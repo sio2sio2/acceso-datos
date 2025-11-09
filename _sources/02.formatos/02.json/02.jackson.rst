@@ -170,6 +170,21 @@ Ilustrémoslo:
    de estas clases respectivamente en vez de las clases más concretas
    |JsonMapper.Builder| y |JsonMapper|.
 
+.. tip:: El ejemplo ilustra cómo puede habilitarse con ``.enable()`` una
+   característica de serialización que por defecto esté desactiva. y obviamente
+   puede hacerse al contrario con ``.disable()``. También existe ``.configure()``
+   que añade un segundo argumento *booleano* para expresar si se quiere
+   habilitada o deshabilitada la característica:
+
+   .. code-block:: java
+
+      JsonFactory factory = JsonFactory.builder()
+           .configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+           .build();
+
+.. seealso:: El control de la serialización puede hacerse de un modo más exhaustivo
+   utilizando el :ref:`concepto de writer <jackson-writer>`. Lo introduciremos más adelante.
+
 Estás tres etapas pueden simplificarse si necesitamos menos configuración. Ya hemos
 visto que pueden reducirse a una, si no necesitamos configuración adicional en
 absoluto:
@@ -473,6 +488,117 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
    y deserializadora (|LocalDateDeserializer|) ya están definidas y nos
    limitamos a usarlas en vez de definirlas nosotros.
 
+.. _jackson-writer:
+
+Control de la serialización
+===========================
+
+.. rubric:: Características generales de serialización
+
+Ya hemos dicho que algunas características generales de la serialización
+independientes al formato de traducción puede configurarse antes de crear el
+mapeador. Hay, sin embargo, otro mecanismo más potente para definir la
+serialización hacia el formato: definir un |ObjectWriter|.
+
+.. code-block:: java
+   :emphasize-lines: 7
+
+   ObjectMapper mapper = JsonMapper.builder().build();  // Mapper inmutable.
+   ObjectWriter writer = mapper.writer()
+      .with(Serialization.INDENT_OUTPUT);
+
+   // Ahora usamos el writer (en vez del mapper) para escribir los datos
+
+   writer.writeValue(st, datos);
+
+.. _jackson-writer-wrapper:
+
+.. rubric:: Filtrado de atributos.
+
+Puede darse el caso de que no quiera almacenarse toda la información contenida
+en el modelo de datos. La solución general es crear |DTO|\ s, pero *Jackson*
+tiene algunas herramientas que nos permiten ahorrarnos la definición de estos
+objetos.
+
+En concreto, nos facilita dos herramientas: las **vistas**, que permiten hacer un
+filtrado estático basado en anotaciones, y los **filtros**, que permiten la
+definición de filtrados programáticos. Para ilustrarlas supongamos que tenemos
+más información referente a los alumnos:
+
+.. code-block:: java
+   :emphasize-lines: 4, 5
+
+   public class Alumno implements Serializable {
+      private String nombre;
+      private LocalDate fechaNacimiento;
+      private int telefono;
+      private String dni;
+
+      // Resto de la definición de la clase.
+   }
+
+Los datos de los alumnos no tienen la misma confidencialidad, así que nos podría
+interesar proporcionar más o menos información. Para ello se definen tres
+*vistas* de menor a mayor confidencialidad:
+
++ Views.Public
++ Views.Internal
++ Views.Admin
+
+Al anotar la clase podemos indicar a qué vista queremos que pertenezca el
+atributo:
+
+.. code-block:: java
+   :emphasize-lines: 2, 8, 11
+
+   public class Alumno implements Serializable {
+      @JsonView(Views.Public.class)
+      private String nombre;
+
+      // No pertenece a ninguna vista así que se muestra siempre.
+      private LocalDate fechaNacimiento;
+
+      @JsonView(Views.Internal.class)
+      private int telefono;
+
+      @JsonView(Views.Admin.class)
+      private String dni;
+   }
+
+Definida la *vista* de cada atributo, en el momento de serializar podemos
+indicar al objeto |ObjectWriter| qué vista debe escribir. En nuestro ejemplo:
+
++ Sin vista, sólo se serializará sólo ``fechaNacimiento``.
++ Con Views.Public se serializará ``fechaNacimiento`` y ``nombre``.
++ Con Views.Internal se añadirá a las anteriores el teléfono.
++ Con Views.Admin se serializarán todos los atributos.
+
+Para escribir con vistas, simplemente, debemos crear un *writer* y ajustar la
+vista:
+
+.. code-block:: java
+   :emphasize-lines: 2
+
+   ObjectWriter writer = mapper.writer()
+      .withWithView(Views.Public.class);
+
+   writer.writeValueAsString(grupos);
+
+El otro mecanismo para filtrar atributos es usar **filtros**:
+
+.. code-block:: java
+   :emphasize-lines: 1-3, 7
+
+   FilterProvider filters = new SimpleFilterProvider()
+      .addFilters("filtro",
+         SimpleBeanPropertyFilter.serializeAllExcept("telefono", "dni"));
+
+   // También existe .filterOutAllExcept
+
+   ObjectWriter writer = mapper.writer(filters);
+   writer.writeAsValueAsString(grupos);
+
+
 .. rubric:: Notas al pie
 
 .. [#] Siempre que el tipo, claro está, sea un primitivo de |JSON| (p. ej. una
@@ -504,6 +630,7 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
 .. |LocalDate| replace:: :java-time:`LocalDate <LocalDate>`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
+.. |DTO| replace:: :abbr:`DTO (Data Transfer Object)`
 
 .. |JsonMapper| replace:: :jackson-databind:`JsonMapper <json/JsonMapper>`
 .. |JsonFactory| replace:: :jackson-core:`JsonFactory <json/JsonFactory>`
@@ -517,4 +644,4 @@ anotación individual en cada uno de los atributos y hacer lo siguiente:
 .. |Alumno| replace:: :ref:`Alumno <class-alumno>`
 .. |LocalDateSerializer| replace:: :jackson-databind:`LocalDateSerializer <ext/javatime/ser/LocalDateSerializer>`
 .. |LocalDateDeserializer| replace:: :jackson-databind:`LocalDateDeserializer <ext/javatime/deser/LocalDateDeserializer>`
-
+.. |ObjectWriter| replace:: :jackson-databind:`ObjectWriter <ObjectWriter>`

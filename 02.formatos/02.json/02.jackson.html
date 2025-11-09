@@ -410,6 +410,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.3.2. Traductor específico</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.2.4. Control de la serialización</a></li>
 </ul>
             </nav>
         </div>
@@ -567,6 +568,24 @@ otros formatos como <abbr title="YAML Ain't Markup Language">YAML</abbr> o <abbr
 formatos, es probable que nos convenga definir <code class="docutils literal notranslate"><span class="pre">builder</span></code> y <code class="docutils literal notranslate"><span class="pre">mapper</span></code> como
 de estas clases respectivamente en vez de las clases más concretas
 <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.Builder.html">JsonMapper.Builder</a> y <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.html">JsonMapper</a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>El ejemplo ilustra cómo puede habilitarse con <code class="docutils literal notranslate"><span class="pre">.enable()</span></code> una
+característica de serialización que por defecto esté desactiva. y obviamente
+puede hacerse al contrario con <code class="docutils literal notranslate"><span class="pre">.disable()</span></code>. También existe <code class="docutils literal notranslate"><span class="pre">.configure()</span></code>
+que añade un segundo argumento <em>booleano</em> para expresar si se quiere
+habilitada o deshabilitada la característica:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">JsonFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="w">     </span><span class="p">.</span><span class="na">configure</span><span class="p">(</span><span class="n">JsonReadFeature</span><span class="p">.</span><span class="na">ALLOW_JAVA_COMMENTS</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El control de la serialización puede hacerse de un modo más exhaustivo
+utilizando el <a class="reference internal" href="#jackson-writer"><span class="std std-ref">concepto de writer</span></a>. Lo introduciremos más adelante.</p>
 </div>
 <p>Estás tres etapas pueden simplificarse si necesitamos menos configuración. Ya hemos
 visto que pueden reducirse a una, si no necesitamos configuración adicional en
@@ -833,6 +852,95 @@ indicamos ahora. Simplemente las clases serializadora (<a class="extlink-jackson
 y deserializadora (<a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ext/javatime/deser/LocalDateDeserializer.html">LocalDateDeserializer</a>) ya están definidas y nos
 limitamos a usarlas en vez de definirlas nosotros.</p>
 </div>
+</section>
+</section>
+<section id="control-de-la-serializacion">
+<span id="jackson-writer"></span><h2><span class="section-number">2.2.2.4. </span>Control de la serialización<a class="headerlink" href="#control-de-la-serializacion" title="Link to this heading">#</a></h2>
+<p class="rubric">Características generales de serialización</p>
+<p>Ya hemos dicho que algunas características generales de la serialización
+independientes al formato de traducción puede configurarse antes de crear el
+mapeador. Hay, sin embargo, otro mecanismo más potente para definir la
+serialización hacia el formato: definir un <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ObjectWriter.html">ObjectWriter</a>.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">();</span><span class="w">  </span><span class="c1">// Mapper inmutable.</span>
+<span class="n">ObjectWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">writer</span><span class="p">()</span>
+<span class="w">   </span><span class="p">.</span><span class="na">with</span><span class="p">(</span><span class="n">Serialization</span><span class="p">.</span><span class="na">INDENT_OUTPUT</span><span class="p">);</span>
+
+<span class="c1">// Ahora usamos el writer (en vez del mapper) para escribir los datos</span>
+
+<span class="hll"><span class="n">writer</span><span class="p">.</span><span class="na">writeValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">datos</span><span class="p">);</span>
+</span></pre></div>
+</div>
+<p class="rubric" id="jackson-writer-wrapper">Filtrado de atributos.</p>
+<p>Puede darse el caso de que no quiera almacenarse toda la información contenida
+en el modelo de datos. La solución general es crear <abbr title="Data Transfer Object">DTO</abbr>s, pero <em>Jackson</em>
+tiene algunas herramientas que nos permiten ahorrarnos la definición de estos
+objetos.</p>
+<p>En concreto, nos facilita dos herramientas: las <strong>vistas</strong>, que permiten hacer un
+filtrado estático basado en anotaciones, y los <strong>filtros</strong>, que permiten la
+definición de filtrados programáticos. Para ilustrarlas supongamos que tenemos
+más información referente a los alumnos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
+<span class="hll"><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">telefono</span><span class="p">;</span>
+</span><span class="hll"><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dni</span><span class="p">;</span>
+</span>
+<span class="w">   </span><span class="c1">// Resto de la definición de la clase.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Los datos de los alumnos no tienen la misma confidencialidad, así que nos podría
+interesar proporcionar más o menos información. Para ello se definen tres
+<em>vistas</em> de menor a mayor confidencialidad:</p>
+<ul class="simple">
+<li><p>Views.Public</p></li>
+<li><p>Views.Internal</p></li>
+<li><p>Views.Admin</p></li>
+</ul>
+<p>Al anotar la clase podemos indicar a qué vista queremos que pertenezca el
+atributo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="nd">@JsonView</span><span class="p">(</span><span class="n">Views</span><span class="p">.</span><span class="na">Public</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+</span><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
+
+<span class="w">   </span><span class="c1">// No pertenece a ninguna vista así que se muestra siempre.</span>
+<span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
+
+<span class="hll"><span class="w">   </span><span class="nd">@JsonView</span><span class="p">(</span><span class="n">Views</span><span class="p">.</span><span class="na">Internal</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+</span><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">telefono</span><span class="p">;</span>
+
+<span class="hll"><span class="w">   </span><span class="nd">@JsonView</span><span class="p">(</span><span class="n">Views</span><span class="p">.</span><span class="na">Admin</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+</span><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dni</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Definida la <em>vista</em> de cada atributo, en el momento de serializar podemos
+indicar al objeto <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ObjectWriter.html">ObjectWriter</a> qué vista debe escribir. En nuestro ejemplo:</p>
+<ul class="simple">
+<li><p>Sin vista, sólo se serializará sólo <code class="docutils literal notranslate"><span class="pre">fechaNacimiento</span></code>.</p></li>
+<li><p>Con Views.Public se serializará <code class="docutils literal notranslate"><span class="pre">fechaNacimiento</span></code> y <code class="docutils literal notranslate"><span class="pre">nombre</span></code>.</p></li>
+<li><p>Con Views.Internal se añadirá a las anteriores el teléfono.</p></li>
+<li><p>Con Views.Admin se serializarán todos los atributos.</p></li>
+</ul>
+<p>Para escribir con vistas, simplemente, debemos crear un <em>writer</em> y ajustar la
+vista:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">writer</span><span class="p">()</span>
+<span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">withWithView</span><span class="p">(</span><span class="n">Views</span><span class="p">.</span><span class="na">Public</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</span>
+<span class="n">writer</span><span class="p">.</span><span class="na">writeValueAsString</span><span class="p">(</span><span class="n">grupos</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>El otro mecanismo para filtrar atributos es usar <strong>filtros</strong>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">FilterProvider</span><span class="w"> </span><span class="n">filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleFilterProvider</span><span class="p">()</span>
+</span><span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">addFilters</span><span class="p">(</span><span class="s">&quot;filtro&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="w">      </span><span class="n">SimpleBeanPropertyFilter</span><span class="p">.</span><span class="na">serializeAllExcept</span><span class="p">(</span><span class="s">&quot;telefono&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dni&quot;</span><span class="p">));</span>
+</span>
+<span class="c1">// También existe .filterOutAllExcept</span>
+
+<span class="hll"><span class="n">ObjectWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">writer</span><span class="p">(</span><span class="n">filters</span><span class="p">);</span>
+</span><span class="n">writer</span><span class="p">.</span><span class="na">writeAsValueAsString</span><span class="p">(</span><span class="n">grupos</span><span class="p">);</span>
+</pre></div>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id5" role="doc-footnote">
@@ -862,7 +970,6 @@ en forma de cadena, a menos que se use <a class="extlink-jackson-databind refere
 en <em>Jackson 2</em>.</p>
 </aside>
 </aside>
-</section>
 </section>
 </section>
 
@@ -926,6 +1033,7 @@ en <em>Jackson 2</em>.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.3.2. Traductor específico</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.2.4. Control de la serialización</a></li>
 </ul>
   </nav></div>
 

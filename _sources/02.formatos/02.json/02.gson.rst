@@ -16,42 +16,17 @@ por *Google* y nos permite dos estrategias para leer y escribir |JSON|:
    :java-time:`LocalDate <LocalDate>`. El texto bajo este epígrafe necesita un
    repaso.
 
+para lo cual podemos definir las clases para
+
+:ref:`la misma forma <gson-auto>`. 
+
 .. _gson-auto:
 
 Conversión automática
 =====================
-Para ello necesitamos que las clases con las que vamos a convertir los objetos
-codificados en |JSON| sigan el estándar `JavaBean
-<https://es.wikipedia.org/wiki/JavaBean>`_.
-
-Es obvio que en el ejemplo anterior tenemos tres objetos (`Grupo`, `Alumno` y
-`Tutor`) así que definámoslos, de modo que sus atributos se ajusten a lo que
-recoge el |JSON|:
-
-.. literalinclude:: files/Tutor.java
-   :class: toggle
-   :name: class-tutor
-   :caption: Tutor.java
-
-.. literalinclude:: files/Alumno.java
-   :class: toggle
-   :name: class-alumno
-   :caption: Alumno.java
-
-.. literalinclude:: files/Grupo.java
-   :class: toggle
-   :name: class-grupo
-   :caption: Grupo.java
-
-No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
-se observan en el |JSON| y cumplen los requisitos para ser un *JavaBean*:
-
-.. rst-class:: simple
-
-* Disponen de un constructor sin argumentos.
-* Es serializable.
-* Sus atributos son privados.
-* Dispone de *getters* y *setters* con la convención de nombres apropiada.
+Tomemos como ejemplo ilustrativo las clases ya usadas al tratar
+:ref:`json-jackson`: :ref:`Tutor <class-tutor>`, |Alumno| y :ref:`Grupo
+<class-grupo>`.
 
 Lectura
 -------
@@ -259,11 +234,8 @@ Conversión manual
 
 .. Enlaces:
    https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
-
-   https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/package-summary.html
-   
    https://mkyong.com/java/how-do-convert-java-object-to-from-json-format-gson-api/
 
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
-
+.. |Alumno| replace:: :ref:`Alumno <class-alumno>`

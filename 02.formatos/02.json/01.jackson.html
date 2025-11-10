@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2.2.2. Jackson &#8212; documentación de Acceso a datos - rolling</title>
+    <title>2.2.1. Jackson &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -54,11 +54,11 @@
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '02.formatos/02.json/02.jackson';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '02.formatos/02.json/01.jackson';</script>
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
-    <link rel="next" title="2.3. YAML" href="../03.yaml.html" />
-    <link rel="prev" title="2.2.1. GSON" href="01.gson.html" />
+    <link rel="next" title="2.2.2. GSON" href="02.gson.html" />
+    <link rel="prev" title="2.2. JSON" href="../02.json.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -177,8 +177,8 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">2. Formatos de información</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../02.json.html">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01.gson.html">2.2.1. GSON</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">2.2.2. Jackson</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">2.2.1. Jackson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="02.gson.html">2.2.2. GSON</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
@@ -301,7 +301,7 @@
       
       
       
-      <li><a href="../../_sources/02.formatos/02.json/02.jackson.rst" target="_blank"
+      <li><a href="../../_sources/02.formatos/02.json/01.jackson.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -395,22 +395,22 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operativa-basica">2.2.2.1. Operativa básica</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1.1. Lectura</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.1.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operativa-basica">2.2.1.1. Operativa básica</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1.1. Lectura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.1.2. Escritura</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-mapeo">2.2.2.2. Configuración del mapeo</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-mapper">2.2.2.2.1. Creación del mapper</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.2.2.2. Anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-mapeo">2.2.1.2. Configuración del mapeo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-mapper">2.2.1.2.1. Creación del mapper</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.1.2.2. Anotaciones</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traduccion-de-tipos-no-primitivos">2.2.2.3. Traducción de tipos no primitivos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traducciones-predefinidas">2.2.2.3.1. Traducciones predefinidas</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.3.2. Traductor específico</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traduccion-de-tipos-no-primitivos">2.2.1.3. Traducción de tipos no primitivos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traducciones-predefinidas">2.2.1.3.1. Traducciones predefinidas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.1.3.2. Traductor específico</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.2.4. Control de la serialización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.1.4. Control de la serialización</a></li>
 </ul>
             </nav>
         </div>
@@ -423,20 +423,178 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="jackson">
-<span id="json-jackson"></span><h1><span class="section-number">2.2.2. </span>Jackson<a class="headerlink" href="#jackson" title="Link to this heading">#</a></h1>
-<p>Otra librería muy utilizada y que tiene la ventaja de que también soporta
-<a class="reference internal" href="../../03.xml/index.html#xml"><span class="std std-ref">XML</span></a> es la proporcionada por el <a class="reference external" href="https://github.com/FasterXML/jackson">proyecto Jackson</a>.</p>
-<p>Como <a class="reference internal" href="01.gson.html#json-gson"><span class="std std-ref">GSON</span></a>, nos permite hacer una conversión automática entre
-el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para lo cual podemos definir las clases para
-<a class="reference internal" href="01.gson.html#class-tutor"><span class="std std-ref">Tutor</span></a>, <a class="reference internal" href="01.gson.html#class-alumno"><span class="std std-ref">Alumno</span></a> y <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a> exactamente de
-<a class="reference internal" href="01.gson.html#gson-auto"><span class="std std-ref">la misma forma</span></a>. En este caso, la librería que necesitamos es
-<a class="reference external" href="https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind">jackson-databind</a>.</p>
+<span id="json-jackson"></span><h1><span class="section-number">2.2.1. </span>Jackson<a class="headerlink" href="#jackson" title="Link to this heading">#</a></h1>
+<p>Un potentísima librería, que tiene la ventaja de que también soporta <a class="reference internal" href="../../03.xml/index.html#xml"><span class="std std-ref">XML</span></a> es la proporcionada por el <a class="reference external" href="https://github.com/FasterXML/jackson">proyecto Jackson</a>, disponible en su <a class="reference external" href="https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind">repositorio de
+mvnrepository.com</a><a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Permite hacer una conversión automática entre el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr>.
+Para ilustrarlo, podemos definir las tres clases que modelas el <a class="reference internal" href="../02.json.html#grupos-json"><span class="std std-ref">archivo
+json propuesto</span></a>:</p>
+<div class="literal-block-wrapper docutils container" id="class-tutor">
+<div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#class-tutor" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">Tutor</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">especialidad</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">String</span> <span class="n">especialidad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+        <span class="n">setEspecialidad</span><span class="p">(</span><span class="n">especialidad</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getEspecialidad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">especialidad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setEspecialidad</span><span class="p">(</span><span class="n">String</span> <span class="n">especialidad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">especialidad</span> <span class="o">=</span> <span class="n">especialidad</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="class-alumno">
+<div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#class-alumno" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">Alumno</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">LocalDate</span> <span class="n">fechaNacimiento</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">,</span> <span class="nb">int</span> <span class="n">edad</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNombre</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
+        <span class="n">setEdad</span><span class="p">(</span><span class="n">edad</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getNombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNombre</span><span class="p">(</span><span class="n">String</span> <span class="n">nombre</span><span class="p">)</span> <span class="p">{</span>
+       <span class="n">this</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span><span class="p">;</span>
+    <span class="p">}</span>
+
+   <span class="n">public</span> <span class="n">LocalDate</span> <span class="n">getFechaNacimiento</span><span class="p">()</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="n">fechaNacimiento</span>
+   <span class="p">}</span>
+
+    <span class="n">public</span> <span class="nb">int</span> <span class="n">getEdad</span><span class="p">()</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="n">Perido</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">fechaNacimiento</span><span class="p">,</span> <span class="n">LocalDate</span><span class="o">.</span><span class="n">now</span><span class="p">())</span><span class="o">.</span><span class="n">getYears</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setFechaNacimiento</span><span class="p">(</span><span class="n">LocalDate</span> <span class="n">nacimiento</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">fechaNacimiento</span> <span class="o">=</span> <span class="n">nacimiento</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">edad</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="class-grupo">
+<div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#class-grupo" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">Grupo</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">short</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">etapa</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">char</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">Tutor</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Grupo</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="n">public</span> <span class="n">Grupo</span><span class="p">(</span><span class="n">short</span> <span class="n">nivel</span><span class="p">,</span> <span class="n">String</span> <span class="n">etapa</span><span class="p">,</span> <span class="n">char</span> <span class="n">grupo</span><span class="p">,</span> <span class="n">Tutor</span> <span class="n">tutor</span><span class="p">,</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">setNivel</span><span class="p">(</span><span class="n">nivel</span><span class="p">);</span>
+        <span class="n">setEtapa</span><span class="p">(</span><span class="n">etapa</span><span class="p">);</span>
+        <span class="n">setGrupo</span><span class="p">(</span><span class="n">grupo</span><span class="p">);</span>
+        <span class="n">setTutor</span><span class="p">(</span><span class="n">tutor</span><span class="p">);</span>
+        <span class="n">setMiembros</span><span class="p">(</span><span class="n">miembros</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">short</span> <span class="n">getNivel</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setNivel</span><span class="p">(</span><span class="n">short</span> <span class="n">nivel</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">nivel</span> <span class="o">=</span> <span class="n">nivel</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getEtapa</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">etapa</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setEtapa</span><span class="p">(</span><span class="n">String</span> <span class="n">etapa</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">etapa</span> <span class="o">=</span>  <span class="n">etapa</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">char</span> <span class="n">getGrupo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setGrupo</span><span class="p">(</span><span class="n">char</span> <span class="n">grupo</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">grupo</span> <span class="o">=</span> <span class="n">grupo</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">Tutor</span> <span class="n">getTutor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setTutor</span><span class="p">(</span><span class="n">Tutor</span> <span class="n">tutor</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">tutor</span> <span class="o">=</span> <span class="n">tutor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">Alumno</span><span class="p">[]</span> <span class="n">getMiembros</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">miembros</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setMiembros</span><span class="p">(</span><span class="n">Alumno</span><span class="p">[]</span> <span class="n">miembros</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">miembros</span> <span class="o">=</span> <span class="n">miembros</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">String</span> <span class="n">nombre</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">º</span><span class="si">%s</span><span class="s2">-</span><span class="si">%c</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nivel</span><span class="p">,</span> <span class="n">etapa</span><span class="p">,</span> <span class="n">grupo</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nombre</span><span class="p">(),</span> <span class="n">tutor</span><span class="p">,</span> <span class="n">Arrays</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="n">miembros</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
+se observan en el <abbr title="JavaScript Object Notation">JSON</abbr> y, además, cumplen los requisitos para ser un
+<em>JavaBean</em>, aunque no es indispensable:</p>
+<ul class="simple">
+<li><p>Disponen de un constructor sin argumentos.</p></li>
+<li><p>Sus atributos son privados.</p></li>
+<li><p>Dispone de <em>getters</em> y <em>setters</em> con la convención de nombres apropiada.</p></li>
+</ul>
 <section id="operativa-basica">
-<span id="json-jackson-basico"></span><h2><span class="section-number">2.2.2.1. </span>Operativa básica<a class="headerlink" href="#operativa-basica" title="Link to this heading">#</a></h2>
+<span id="json-jackson-basico"></span><h2><span class="section-number">2.2.1.1. </span>Operativa básica<a class="headerlink" href="#operativa-basica" title="Link to this heading">#</a></h2>
 <p>Empecemos por ver cómo leer o escribir <a class="reference internal" href="../02.json.html#grupos-json"><span class="std std-ref">el archivo JSON de referencia</span></a>.</p>
 <section id="lectura">
-<span id="json-jackson-read"></span><h3><span class="section-number">2.2.2.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
-<p>El código es muy similar al practicado con <cite>GSON</cite>:</p>
+<span id="json-jackson-read"></span><h3><span class="section-number">2.2.1.1.1. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h3>
+<p>Básicamente, necesitamos un <em>mapper</em> y volcar los datos en el almacenamiento que
+hayamos decidido:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">ruta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.json&quot;</span><span class="p">);</span>
 <span class="hll"><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">();</span>
 </span>
@@ -449,7 +607,10 @@ el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Si, en cambio, quisiéramos generar una lista de grupos y no un array:</p>
+<p>Obsérvese que necesitamos indicar en qué objeto de <em>Java</em> se convertirán los
+datos. Cuando es un objeto único es bien sencillo (<code class="docutils literal notranslate"><span class="pre">LaClaseDelObjeto.class</span></code>) y
+en el caso de arrays, también. Pero cuando tenemos colecciones de datos basadas
+en genéricos debemos recurrir a <a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/type/TypeReference.html">TypeReference</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;&gt;</span><span class="p">(){};</span>
 <span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
 </pre></div>
@@ -457,16 +618,15 @@ el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr> para
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Cuando los atributos de clases incluidas en la traducción
-son secuencias, es indiferente que sea listas o array: la traducción
+son secuencias, es indiferente que sea listas o <em>arrays</em>: la traducción
 se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
-<code class="docutils literal notranslate"><span class="pre">miembros</span></code> de <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a>, que lo hemos definido como un
+<code class="docutils literal notranslate"><span class="pre">miembros</span></code> de <a class="reference internal" href="#class-grupo"><span class="std std-ref">Grupo</span></a>, que lo hemos definido como un
 <em>array</em>, pero podría perfectamente ser una lista.</p>
 </div>
 </section>
 <section id="escritura">
-<span id="json-jackson-write"></span><h3><span class="section-number">2.2.2.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
-<p>Por su parte la escritura a un <abbr title="JavaScript Object Notation">JSON</abbr> desde un modelo de objetos tampoco tiene
-excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p>
+<span id="json-jackson-write"></span><h3><span class="section-number">2.2.1.1.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h3>
+<p>Por su parte la escritura a un <abbr title="JavaScript Object Notation">JSON</abbr> tampoco es excesivamente complicada:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
@@ -504,9 +664,11 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Al escribir, es indiferente si usamos arrays o listas.</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<p>Como se ve el método que realiza la escritura al formato recibe los datos, de
+los cuales puede deducir el tipo y, por consiguiente, no tiene relevancia si
+volcamos un objeto o una secuencia de la naturaleza que sea.</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
 <p>Existe el método <code class="docutils literal notranslate"><span class="pre">writeValueAsString</span></code> que devuelve una cadena con el
 <abbr title="JavaScript Object Notation">JSON</abbr> resultante:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">contenido</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">writeValueAsString</span><span class="p">(</span><span class="n">grupos</span><span class="p">);</span>
@@ -516,7 +678,7 @@ excesivas diferencias respecto a lo que encontraríamos en <cite>GSON</cite>:</p
 </section>
 </section>
 <section id="configuracion-del-mapeo">
-<span id="json-jackson-conf"></span><h2><span class="section-number">2.2.2.2. </span>Configuración del mapeo<a class="headerlink" href="#configuracion-del-mapeo" title="Link to this heading">#</a></h2>
+<span id="json-jackson-conf"></span><h2><span class="section-number">2.2.1.2. </span>Configuración del mapeo<a class="headerlink" href="#configuracion-del-mapeo" title="Link to this heading">#</a></h2>
 <p>Bajo el epígrafe anterior hemos hecho una traducción muy sencilla en la que no
 hemos definido ninguna característica particular para la lectura o la escritura
 del <abbr title="JavaScript Object Notation">JSON</abbr> ni hemos necesitado afinar la traducción de los atributos del objeto:
@@ -525,7 +687,7 @@ son traducibles directamente a algún tipo existente en el formato <abbr title="
 <p>Lo habitual en cambio es que necesitemos configurar el mapeo y eso es lo que
 veremos ahora.</p>
 <section id="creacion-del-mapper">
-<h3><span class="section-number">2.2.2.2.1. </span>Creación del mapper<a class="headerlink" href="#creacion-del-mapper" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.2.1.2.1. </span>Creación del mapper<a class="headerlink" href="#creacion-del-mapper" title="Link to this heading">#</a></h3>
 <p>Cuando queremos configurar las características del mapeo, no debemos crear el
 <em>mapper</em> directamente como hicimos anteriormente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">();</span><span class="w">  </span><span class="c1">// Inmutable, no se puede configurar.</span>
@@ -605,11 +767,11 @@ o deserialización:</p>
 </div>
 </section>
 <section id="anotaciones">
-<span id="json-jackson-annotations"></span><h3><span class="section-number">2.2.2.2.2. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h3>
+<span id="json-jackson-annotations"></span><h3><span class="section-number">2.2.1.2.2. </span>Anotaciones<a class="headerlink" href="#anotaciones" title="Link to this heading">#</a></h3>
 <p>Hemos visto muy por encima cómo trasladar objetos a <abbr title="JavaScript Object Notation">JSON</abbr> y viceversa. La regla
 es que cada atributo del objeto se traduce en una propiedad <abbr title="JavaScript Object Notation">JSON</abbr> con el mismo
-nombre y que conserva el mismo valor<a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Centrémonos en <a class="reference internal" href="01.gson.html#class-alumno"><span class="std std-ref">Alumno</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+nombre y que conserva el mismo valor<a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Centrémonos en <a class="reference internal" href="#class-alumno"><span class="std std-ref">Alumno</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// Atributos</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
@@ -629,7 +791,7 @@ nombre y que conserva el mismo valor<a class="footnote-reference brackets" href=
 <p>Ahora bien, ¿cómo puede personalizarse la serialización para cambiar el nombre
 de un atributo o no serializarlo? La librería para ello utiliza <a class="reference external" href="https://www.geeksforgeeks.org/java/annotations-in-java/">anotaciones</a> que permiten indicar
 todos estos particulares:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// Atributos</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
@@ -685,13 +847,13 @@ atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p>
 </section>
 </section>
 <section id="traduccion-de-tipos-no-primitivos">
-<span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.2.3. </span>Traducción de tipos no primitivos<a class="headerlink" href="#traduccion-de-tipos-no-primitivos" title="Link to this heading">#</a></h2>
+<span id="json-jackson-no-primitivos"></span><h2><span class="section-number">2.2.1.3. </span>Traducción de tipos no primitivos<a class="headerlink" href="#traduccion-de-tipos-no-primitivos" title="Link to this heading">#</a></h2>
 <p>En el ejemplo anterior todos los atributos de los objetos de <em>Java</em> tienen una
 correspondencia con un tipo primitivo de <abbr title="JavaScript Object Notation">JSON</abbr>: cadenas, números, secuencias
 (ya sean <code class="docutils literal notranslate"><span class="pre">Array</span></code> o <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">ArrayList</a>) excepto uno del que no
 nos hemos preocupado, por lo que no hemos defino cómo debe ser su serialización.</p>
 <section id="traducciones-predefinidas">
-<h3><span class="section-number">2.2.2.3.1. </span>Traducciones predefinidas<a class="headerlink" href="#traducciones-predefinidas" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.2.1.3.1. </span>Traducciones predefinidas<a class="headerlink" href="#traducciones-predefinidas" title="Link to this heading">#</a></h3>
 <p>Tampoco es necesario definir una traducción específica en otros casos en que no
 hay correspondencia, pero <em>Jackson</em> nos provee una predeterminada:</p>
 <dl>
@@ -715,7 +877,7 @@ convertidas a cadenas. Por ejemplo, en este caso:</p>
 </pre></div>
 </div>
 <p>los valores se verán como las cadenas <em>INFANTIL</em>, <em>PRIMARIA</em>, <em>ESO</em> en el <abbr title="JavaScript Object Notation">JSON</abbr>.
-De hecho, podríamos definir el atributo <code class="docutils literal notranslate"><span class="pre">etapa</span></code> de <a class="reference internal" href="01.gson.html#class-grupo"><span class="std std-ref">Grupo</span></a> como
+De hecho, podríamos definir el atributo <code class="docutils literal notranslate"><span class="pre">etapa</span></code> de <a class="reference internal" href="#class-grupo"><span class="std std-ref">Grupo</span></a> como
 de tipo <code class="docutils literal notranslate"><span class="pre">Etapa</span></code> y todo seguiría funcionado perfectamente.</p>
 </dd>
 </dl>
@@ -723,7 +885,7 @@ de tipo <code class="docutils literal notranslate"><span class="pre">Etapa</span
 <dt><strong>Fechas</strong></dt><dd><p>Tanto si se usa el antiguo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> como el moderno
 <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, no es necesario definir ningúna traducción si se
 pretenden trasladar a cadenas según el <a class="reference external" href="https://es.wikipedia.org/wiki/ISO_8601">estándar ISO-8601</a>, es decir, si se escriben en el
-<abbr title="JavaScript Object Notation">JSON</abbr> de la forma <code class="docutils literal notranslate"><span class="pre">yyyy-MM-dd</span></code><a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#id7" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<abbr title="JavaScript Object Notation">JSON</abbr> de la forma <code class="docutils literal notranslate"><span class="pre">yyyy-MM-dd</span></code><a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p>
 <p>Si la forma de la cadena es otra (p.ej. <code class="docutils literal notranslate"><span class="pre">dd/MM/yyyy</span></code>) aún es posible de
 manera sencilla indicárselo a la librería mediante una anotación. Imaginemos
 que en vez de almacenar la edad, almacenamos la fecha de nacimiento del
@@ -779,7 +941,7 @@ otro tipo:</p>
 </dl>
 </section>
 <section id="traductor-especifico">
-<h3><span class="section-number">2.2.2.3.2. </span>Traductor específico<a class="headerlink" href="#traductor-especifico" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">2.2.1.3.2. </span>Traductor específico<a class="headerlink" href="#traductor-especifico" title="Link to this heading">#</a></h3>
 <p>La librería incluye un mecanismo para hacer traducciones totalmente arbitrarias
 de cualquier tipo que se nos pueda ocurrir. Ilustrémoslo con la serialización y
 deserialización artesanal de una tipo <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, aunque ya esté resuelto
@@ -855,7 +1017,7 @@ limitamos a usarlas en vez de definirlas nosotros.</p>
 </section>
 </section>
 <section id="control-de-la-serializacion">
-<span id="jackson-writer"></span><h2><span class="section-number">2.2.2.4. </span>Control de la serialización<a class="headerlink" href="#control-de-la-serializacion" title="Link to this heading">#</a></h2>
+<span id="jackson-writer"></span><h2><span class="section-number">2.2.1.4. </span>Control de la serialización<a class="headerlink" href="#control-de-la-serializacion" title="Link to this heading">#</a></h2>
 <p class="rubric">Características generales de serialización</p>
 <p>Ya hemos dicho que algunas características generales de la serialización
 independientes al formato de traducción puede configurarse antes de crear el
@@ -879,7 +1041,7 @@ objetos.</p>
 filtrado estático basado en anotaciones, y los <strong>filtros</strong>, que permiten la
 definición de filtrados programáticos. Para ilustrarlas supongamos que tenemos
 más información referente a los alumnos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
 <span class="hll"><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">telefono</span><span class="p">;</span>
@@ -899,7 +1061,7 @@ interesar proporcionar más o menos información. Para ello se definen tres
 </ul>
 <p>Al anotar la clase podemos indicar a qué vista queremos que pertenezca el
 atributo:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="p">{</span>
 <span class="hll"><span class="w">   </span><span class="nd">@JsonView</span><span class="p">(</span><span class="n">Views</span><span class="p">.</span><span class="na">Public</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
 </span><span class="w">   </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 
@@ -943,21 +1105,26 @@ vista:</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>La librería se descompone en varias con <a class="reference external" href="https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind">jackson-databind</a>
+tendremos soporte básico para <abbr title="JavaScript Object Notation">JSON</abbr>, que es el formato base.</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Siempre que el tipo, claro está, sea un primitivo de <abbr title="JavaScript Object Notation">JSON</abbr> (p. ej. una
 cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
 cosa que expondremos en <a class="reference internal" href="#json-jackson-no-primitivos"><span class="std std-ref">Traducción de tipos no primitivos</span></a>.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
 <p>De hecho, es de este tipo la única excepción que incluimos en nuestro
 ejemplo: hay un dato de tipo <a class="extlink-java-time reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/LocalDate.html">LocalDate</a>, pero como su
 representación a cadena fue la estándar no nos preocupamos de su
 serialización.</p>
 </aside>
-<aside class="footnote brackets" id="id7" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">4</a><span class="fn-bracket">]</span></span>
 <p>En realidad, si en vez de una cadena, el <abbr title="JavaScript Object Notation">JSON</abbr> presenta un número,
 entonces la librería entenderá que el tiempo se ha definido en <a class="reference external" href="https://es.wikipedia.org/wiki/Tiempo_Unix">tiempo
 UNIX</a>. La escritura siempre será
@@ -985,20 +1152,20 @@ en <em>Jackson 2</em>.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="01.gson.html"
+       href="../02.json.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">2.2.1. </span>GSON</p>
+        <p class="prev-next-title"><span class="section-number">2.2. </span><abbr title="JavaScript Object Notation">JSON</abbr></p>
       </div>
     </a>
     <a class="right-next"
-       href="../03.yaml.html"
+       href="02.gson.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">2.3. </span><abbr title="YAML Ain't Markup Language">YAML</abbr></p>
+        <p class="prev-next-title"><span class="section-number">2.2.2. </span>GSON</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1018,22 +1185,22 @@ en <em>Jackson 2</em>.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operativa-basica">2.2.2.1. Operativa básica</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.2.1.1. Lectura</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.2.1.2. Escritura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#operativa-basica">2.2.1.1. Operativa básica</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">2.2.1.1.1. Lectura</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#escritura">2.2.1.1.2. Escritura</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-mapeo">2.2.2.2. Configuración del mapeo</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-mapper">2.2.2.2.1. Creación del mapper</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.2.2.2. Anotaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-mapeo">2.2.1.2. Configuración del mapeo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-mapper">2.2.1.2.1. Creación del mapper</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anotaciones">2.2.1.2.2. Anotaciones</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traduccion-de-tipos-no-primitivos">2.2.2.3. Traducción de tipos no primitivos</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traducciones-predefinidas">2.2.2.3.1. Traducciones predefinidas</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.2.3.2. Traductor específico</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#traduccion-de-tipos-no-primitivos">2.2.1.3. Traducción de tipos no primitivos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traducciones-predefinidas">2.2.1.3.1. Traducciones predefinidas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#traductor-especifico">2.2.1.3.2. Traductor específico</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.2.4. Control de la serialización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-de-la-serializacion">2.2.1.4. Control de la serialización</a></li>
 </ul>
   </nav></div>
 

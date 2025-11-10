@@ -177,8 +177,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../02.formatos/index.html">2. Formatos de información</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../02.formatos/01.csv.html">2.1. <abbr title="Comma-Separated Values">CSV</abbr></a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../02.formatos/02.json.html">2.2. <abbr title="JavaScript Object Notation">JSON</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/01.gson.html">2.2.1. GSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/02.jackson.html">2.2.2. Jackson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/01.jackson.html">2.2.1. Jackson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../02.formatos/02.json/02.gson.html">2.2.2. GSON</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../02.formatos/03.yaml.html">2.3. <abbr title="YAML Ain't Markup Language">YAML</abbr></a></li>
@@ -467,10 +467,9 @@ en vez de con las constantes de enumeración.</p>
 anterior:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Grupo.java</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
 
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Grupo</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">nivel</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Etapa</span><span class="w"> </span><span class="n">etapa</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">grupo</span><span class="p">;</span>
@@ -541,9 +540,7 @@ anterior:</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
-
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Tutor</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Tutor</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">especialidad</span><span class="p">;</span>
 
@@ -580,9 +577,7 @@ anterior:</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Alumno.java</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span>
-
-<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Alumno</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">fechaNacimiento</span><span class="p">;</span>
 
@@ -621,7 +616,7 @@ anterior:</p>
 </pre></div>
 </div>
 </div>
-<p>a los que habría que añadir <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#etapa-enum"><span class="std std-ref">el enum Etapa</span></a>.</p>
+<p>a los que habría que añadir <a class="reference internal" href="../02.formatos/02.json/01.jackson.html#etapa-enum"><span class="std std-ref">el enum Etapa</span></a>.</p>
 <section id="preparativos">
 <h2><span class="section-number">3.2.1. </span>Preparativos<a class="headerlink" href="#preparativos" title="Link to this heading">#</a></h2>
 <p>Para lograr traducir entre el modelo de datos y <abbr title="eXtensible Markup Language">XML</abbr> necesitamos hacer varias
@@ -875,7 +870,7 @@ implementado directamente.</p>
 <section id="escritura">
 <span id="xml-jackson-write"></span><h2><span class="section-number">3.2.2. </span>Escritura<a class="headerlink" href="#escritura" title="Link to this heading">#</a></h2>
 <p>Generar la salida en el programa principal es básicamente
-igual que <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-write"><span class="std std-ref">la escritura en el caso de JSON</span></a>:</p>
+igual que <a class="reference internal" href="../02.formatos/02.json/01.jackson.html#json-jackson-write"><span class="std std-ref">la escritura en el caso de JSON</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.xml&quot;</span><span class="p">);</span>
 
 <span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
@@ -921,13 +916,13 @@ igual que <a class="reference internal" href="../02.formatos/02.json/02.jackson.
 encargado de serializar en formato <abbr title="eXtensible Markup Language">XML</abbr> sería el mismo. Lo mismo puede
 afirmarse en la lectura, que se verá a continuación.</p>
 </div>
-<p>Para traducir <strong>tipos no primitivos</strong>, basta <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-no-primitivos"><span class="std std-ref">hacer exactamente lo mismo
+<p>Para traducir <strong>tipos no primitivos</strong>, basta <a class="reference internal" href="../02.formatos/02.json/01.jackson.html#json-jackson-no-primitivos"><span class="std std-ref">hacer exactamente lo mismo
 que con JSON</span></a>.</p>
 </section>
 <section id="lectura">
 <span id="xml-jackson-read"></span><h2><span class="section-number">3.2.3. </span>Lectura<a class="headerlink" href="#lectura" title="Link to this heading">#</a></h2>
 <p>Habiendo definido las clases con anotaciones como en el apartado anterior, la
-lectura del formato es <a class="reference internal" href="../02.formatos/02.json/02.jackson.html#json-jackson-read"><span class="std std-ref">prácticamente la misma que para JSON</span></a>:</p>
+lectura del formato es <a class="reference internal" href="../02.formatos/02.json/01.jackson.html#json-jackson-read"><span class="std std-ref">prácticamente la misma que para JSON</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">archivo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;grupos.xml&quot;</span><span class="p">);</span>
 
 <span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmlFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>

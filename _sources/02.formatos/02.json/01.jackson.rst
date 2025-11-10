@@ -567,12 +567,16 @@ más información referente a los alumnos:
    }
 
 Los datos de los alumnos no tienen la misma confidencialidad, así que nos podría
-interesar proporcionar más o menos información. Para ello se definen tres
-*vistas* de menor a mayor confidencialidad:
+interesar proporcionar más o menos información. Para ello primero tenemos que
+definir nosotros varias vistas de menor a mayor confidencialidad:
 
-+ Views.Public
-+ Views.Internal
-+ Views.Admin
+.. code-block:: java
+
+   public class Views {
+      public static class Public {}                   /* Menos confidencial */
+      public static class Private extends Public {}
+      public static class Internal extends Private {} /* Más confidencial */
+   }
 
 Al anotar la clase podemos indicar a qué vista queremos que pertenezca el
 atributo:
@@ -584,23 +588,23 @@ atributo:
       @JsonView(Views.Public.class)
       private String nombre;
 
-      // No pertenece a ninguna vista así que se muestra siempre.
+      // Sin vista sólo se mostrará cuando no se activa ninguna vista.
       private LocalDate fechaNacimiento;
 
-      @JsonView(Views.Internal.class)
+      @JsonView(Views.Private.class)
       private int telefono;
 
-      @JsonView(Views.Admin.class)
+      @JsonView(Views.Internal.class)
       private String dni;
    }
 
 Definida la *vista* de cada atributo, en el momento de serializar podemos
 indicar al objeto |ObjectWriter| qué vista debe escribir. En nuestro ejemplo:
 
-+ Sin vista, sólo se serializará sólo ``fechaNacimiento``.
-+ Con Views.Public se serializará ``fechaNacimiento`` y ``nombre``.
-+ Con Views.Internal se añadirá a las anteriores el teléfono.
-+ Con Views.Admin se serializarán todos los atributos.
++ Sin vista, sólo se serializará ``fechaNacimiento``\ [#]_.
++ Con ``Views.Public`` se serializará  ``nombre``.
++ Con ``Views.Private`` se añadirá ``telefono``
++ Con ``Views.Internal`` se serializarán todos los asociados a vista.
 
 Para escribir con vistas, simplemente, debemos crear un *writer* y ajustar la
 vista:
@@ -657,6 +661,11 @@ El otro mecanismo para filtrar atributos es usar **filtros**:
 
    De hecho, la traducción a tiempo *UNIX* era el comportamiento predeterminado
    en *Jackson 2*.
+
+.. [#] En realidad, el comportamiento depende de
+   :jackson-databind:`MapperFeature.DEFAULT_VIEW_INCLUSION <MapperFeature>`. Por
+   defecto está a ``false``. Si estuviera a ``true`` siempre los atributos no
+   asociados a ninguna vista, se mostrarían en cualquier vista.
 
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |Date| replace:: :java-util:`Date <Date>`

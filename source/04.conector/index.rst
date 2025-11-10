@@ -4,7 +4,7 @@ Conectores
 **********
 Las bases de datos relacionales son unos de los soportes más utilizados para
 el almacenamiento organizado de información. Su problema, al ser accedidas
-mediante aplicaciones, es que basan su estructrura en el modelo relacional, que
+mediante aplicaciones, es que basan su estructura en el modelo relacional, que
 no es el modelo que usan los lenguajes de programación para manejar datos. En
 concreto, los más habituales, los lenguajes de |POO| manejan los datos haciendo
 uso del modelo de objetos, por lo que existe una discrepación entre el modo en

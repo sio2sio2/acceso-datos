@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class Tutor implements Serializable {
+public class Tutor {
     private String nombre;
     private String especialidad;
 

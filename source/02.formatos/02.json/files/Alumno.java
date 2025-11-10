@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class Alumno implements Serializable {
+public class Alumno {
     private String nombre;
     private LocalDate fechaNacimiento;
 

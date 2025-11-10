@@ -1,7 +1,6 @@
-import java.io.Serializable;
 import java.util.Arrays;
 
-public class Grupo implements Serializable {
+public class Grupo {
     private short nivel;
     private Etapa etapa;
     private char grupo;

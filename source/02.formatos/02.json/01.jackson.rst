@@ -2,16 +2,40 @@
 
 Jackson
 *******
-Otra librería muy utilizada y que tiene la ventaja de que también soporta
-:ref:`XML <xml>` es la proporcionada por el `proyecto Jackson
-<https://github.com/FasterXML/jackson>`_.
+Un potentísima librería, que tiene la ventaja de que también soporta :ref:`XML
+<xml>` es la proporcionada por el `proyecto Jackson
+<https://github.com/FasterXML/jackson>`_, disponible en su `repositorio de
+mvnrepository.com
+<https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind>`_\ [#]_.
 
-Como :ref:`GSON <json-gson>`, nos permite hacer una conversión automática entre
-el modelo de objetos y |JSON| para lo cual podemos definir las clases para
-:ref:`Tutor <class-tutor>`, |Alumno| y :ref:`Grupo <class-grupo>` exactamente de
-:ref:`la misma forma <gson-auto>`. En este caso, la librería que necesitamos es
-`jackson-databind
-<https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind>`_.
+Permite hacer una conversión automática entre el modelo de objetos y |JSON|.
+Para ilustrarlo, podemos definir las tres clases que modelas el :ref:`archivo
+json propuesto <grupos.json>`:
+
+.. literalinclude:: files/Tutor.java
+   :class: toggle
+   :name: class-tutor
+   :caption: Tutor.java
+
+.. literalinclude:: files/Alumno.java
+   :class: toggle
+   :name: class-alumno
+   :caption: Alumno.java
+
+.. literalinclude:: files/Grupo.java
+   :class: toggle
+   :name: class-grupo
+   :caption: Grupo.java
+
+No nos hemos roto mucho la cabeza: estas tres clases recogen las propiedades que
+se observan en el |JSON| y, además, cumplen los requisitos para ser un
+*JavaBean*, aunque no es indispensable:
+
+.. rst-class:: simple
+
+* Disponen de un constructor sin argumentos.
+* Sus atributos son privados.
+* Dispone de *getters* y *setters* con la convención de nombres apropiada.
 
 .. _json-jackson-basico:
 
@@ -24,7 +48,8 @@ Empecemos por ver cómo leer o escribir :ref:`el archivo JSON de referencia
 
 Lectura
 -------
-El código es muy similar al practicado con `GSON`:
+Básicamente, necesitamos un *mapper* y volcar los datos en el almacenamiento que
+hayamos decidido:
 
 .. code-block:: java
    :emphasize-lines: 2, 5
@@ -40,7 +65,10 @@ El código es muy similar al practicado con `GSON`:
        err.printStackTrace();
    }
 
-Si, en cambio, quisiéramos generar una lista de grupos y no un array:
+Obsérvese que necesitamos indicar en qué objeto de *Java* se convertirán los
+datos. Cuando es un objeto único es bien sencillo (``LaClaseDelObjeto.class``) y
+en el caso de arrays, también. Pero cuando tenemos colecciones de datos basadas
+en genéricos debemos recurrir a |TypeReference|:
 
 .. code-block:: java
 
@@ -48,7 +76,7 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
    List<Grupo> grupos = mapper.readValue(sr, GrupoLista);
 
 .. note:: Cuando los atributos de clases incluidas en la traducción
-   son secuencias, es indiferente que sea listas o array: la traducción
+   son secuencias, es indiferente que sea listas o *arrays*: la traducción
    se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
    ``miembros`` de :ref:`Grupo <class-grupo>`, que lo hemos definido como un
    *array*, pero podría perfectamente ser una lista.
@@ -57,8 +85,7 @@ Si, en cambio, quisiéramos generar una lista de grupos y no un array:
 
 Escritura
 ---------
-Por su parte la escritura a un |JSON| desde un modelo de objetos tampoco tiene
-excesivas diferencias respecto a lo que encontraríamos en `GSON`:
+Por su parte la escritura a un |JSON| tampoco es excesivamente complicada:
 
 .. code-block:: java
    :emphasize-lines: 27, 30
@@ -99,9 +126,11 @@ excesivas diferencias respecto a lo que encontraríamos en `GSON`:
        }
    }
 
-Al escribir, es indiferente si usamos arrays o listas.
+Como se ve el método que realiza la escritura al formato recibe los datos, de
+los cuales puede deducir el tipo y, por consiguiente, no tiene relevancia si
+volcamos un objeto o una secuencia de la naturaleza que sea.
 
-.. note:: Existe el método ``writeValueAsString`` que devuelve una cadena con el
+.. tip:: Existe el método ``writeValueAsString`` que devuelve una cadena con el
    |JSON| resultante:
 
    .. code-block:: java
@@ -216,7 +245,7 @@ nombre y que conserva el mismo valor\ [#]_. Centrémonos en |Alumno|:
 
 .. code-block:: java
 
-   public class Alumno implements Serializable {
+   public class Alumno {
 
        // Atributos
        private String nombre;
@@ -242,7 +271,7 @@ todos estos particulares:
 .. code-block:: java
    :emphasize-lines: 6, 11
 
-   public class Alumno implements Serializable {
+   public class Alumno {
 
        // Atributos
        private String nombre;
@@ -528,7 +557,7 @@ más información referente a los alumnos:
 .. code-block:: java
    :emphasize-lines: 4, 5
 
-   public class Alumno implements Serializable {
+   public class Alumno {
       private String nombre;
       private LocalDate fechaNacimiento;
       private int telefono;
@@ -551,7 +580,7 @@ atributo:
 .. code-block:: java
    :emphasize-lines: 2, 8, 11
 
-   public class Alumno implements Serializable {
+   public class Alumno {
       @JsonView(Views.Public.class)
       private String nombre;
 
@@ -601,6 +630,10 @@ El otro mecanismo para filtrar atributos es usar **filtros**:
 
 .. rubric:: Notas al pie
 
+.. [#] La librería se descompone en varias con `jackson-databind
+   <https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind>`_
+   tendremos soporte básico para |JSON|, que es el formato base.
+
 .. [#] Siempre que el tipo, claro está, sea un primitivo de |JSON| (p. ej. una
    cadena). Si no lo es entonces habrá que definir cómo realizar la traducción,
    cosa que expondremos en :ref:`json-jackson-no-primitivos`.
@@ -632,6 +665,7 @@ El otro mecanismo para filtrar atributos es usar **filtros**:
 .. |YAML| replace:: :abbr:`YAML (YAML Ain't Markup Language)`
 .. |DTO| replace:: :abbr:`DTO (Data Transfer Object)`
 
+.. |Alumno| replace:: :ref:`Alumno <class-alumno>`
 .. |JsonMapper| replace:: :jackson-databind:`JsonMapper <json/JsonMapper>`
 .. |JsonFactory| replace:: :jackson-core:`JsonFactory <json/JsonFactory>`
 .. |JsonMapper.Builder| replace:: :jackson-databind:`JsonMapper.Builder <json/JsonMapper.Builder>`
@@ -641,7 +675,7 @@ El otro mecanismo para filtrar atributos es usar **filtros**:
 .. |DeserializationFeature| replace:: :jackson-databind:`DeserializationFeature`
 .. |MapperBuilder| replace:: :jackson-databind:`MapperBuilder <cfg/MapperBuilder>`
 .. |ObjectMapper| replace:: :jackson-databind:`ObjectMapper`
-.. |Alumno| replace:: :ref:`Alumno <class-alumno>`
 .. |LocalDateSerializer| replace:: :jackson-databind:`LocalDateSerializer <ext/javatime/ser/LocalDateSerializer>`
 .. |LocalDateDeserializer| replace:: :jackson-databind:`LocalDateDeserializer <ext/javatime/deser/LocalDateDeserializer>`
 .. |ObjectWriter| replace:: :jackson-databind:`ObjectWriter <ObjectWriter>`
+.. |TypeReference| replace:: :jackson-core:`TypeReference <type/TypeReference>`

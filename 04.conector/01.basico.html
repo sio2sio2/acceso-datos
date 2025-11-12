@@ -417,7 +417,7 @@ document.write(`
 <section id="conexion">
 <span id="conn-conexion"></span><h2><span class="section-number">4.1.1. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
 <p>Lo primero que debemos aprender es cómo abrir una conexión a la base de datos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbProtocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:&quot;</span><span class="p">;</span>
 </span>
 <span class="c1">// Las bases de datos de SQLite son archivos.</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">dbPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test.db&quot;</span><span class="p">);</span>
@@ -507,7 +507,7 @@ de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.</p>
 <div class="admonition seealso">
 <p class="admonition-title">Ver también</p>
-<p>La conexión a una base de datos es una operación costosa, por lo
+<p>La conexión a una base de datos es una <strong>operación costosa</strong>, por lo
 que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
 se penalizará. Para optimizarlo reaprovechando conexiones, existen los
 <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pools de conexiones</span></a>.</p>
@@ -824,7 +824,7 @@ embargo, es común dejar indefinido su valor y dejar que la base de datos escoja
 uno al agregarlo como registro. En nuestro ejemplo, sería el caso los
 estudiantes. En esos casos, es probable que al insertarlos queramos conocer qué
 identificador se definió. Para ello podemos hacer lo siguiente:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TimeDateFormatter</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TimeDateFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">&quot;dd/MM/yyyy&quot;</span><span class="p">);</span>
 <span class="c1">// centro es un centro que ya tenemos definido.</span>
 <span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="n">profesores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="k">new</span><span class="w"> </span><span class="n">Profesor</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Perico de los Palotes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;12/06/1995&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">),</span><span class="w"> </span><span class="n">centro</span><span class="p">),</span>
@@ -894,23 +894,13 @@ darnos problemas. Eso, de nuevo, se soluciona añadiendo el tercer argumento.</p
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Según el estándar, un nombre que no se encierra entre comillas dobles, se
-sobreentiende escrito todo en mayúsculas. En particular, <strong class="program">SQLite</strong> se
-salta el estándar en este aspecto y no hace esa distinción, incluso aunque
-los nombres sí se hayan entrecomillado. Otra razón que avala el que no
-entrecomillemos es que <strong class="program">MariaDB</strong>/<strong class="program">MySQL</strong> exige que
-cambiemos la configuración predeterminada para soportar el entrecomillado con
-comillas dobles, ya que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> entrecomilla con el acento grave.</p>
-</aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>En las versiones modernas de <abbr title="Java DataBase Connectivity">JDBC</abbr> no es necesario expresar el nombre
 del driver, ya que dispone de mecanismos parar inferir cuál es el driver
 adecuado a partir de la <abbr title="Uniform Resource Locator">URL</abbr> de conexión. En cambio, más adelante, al
 tratar <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">Hibernate</span></a>, sí lo necesitaremos.</p>
 </aside>
-<aside class="footnote brackets" id="id7" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Se han supuesto (excepto para <strong class="program">SQLite</strong> obviamente) conexiones
 <abbr title="Transmission Control Protocol">TCP</abbr>/<abbr title="Internet Protocol">IP</abbr>. Sin embargo, en sistemas <em>UNIX</em> el motor podría permitir
 conexiones a un <em>socket</em> local. Por ejemplo, una <abbr title="Uniform Resource Locator">URL</abbr> a socket local para
@@ -918,21 +908,34 @@ MariaDB podría ser
 <code class="docutils literal notranslate"><span class="pre">jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock</span></code> o
 algo parecido.</p>
 </aside>
-<aside class="footnote brackets" id="id8" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
 <p>Aunque haremos una excepción aclarando cómo están definidas las claves
 primarias en las tablas <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>, <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> y <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>.
 Nuestra intención es que sus identificadores se generen automáticamente sin
 necesidad de que especifiquemos un valor. Eso se hace en <a class="reference external" href="https://sqlite.org/">SQLite</a> con
-<em>AUTOINCREMENT</em>, pero en otros motores se expresa de otro modo, ya que no
-forma parte del estándar. Desde <abbr title="Structured Query Language">SQL</abbr>:2003, existe un modo de expresarlo:
-<code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">[BY</span> <span class="pre">DEFAULT|ALWAYS]</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code>. Sin embargo, <a class="reference external" href="https://sqlite.org/">SQLite</a> no lo
-soporta y por eso lo hemos dejado comentado. En cambio, tiene un comportamento
-curioso: cuando se usa <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> para definir la clave primaria asume el
-comportamento de <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY</span> <span class="pre">DEFAULT</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code> y cuando se usa
-<code class="docutils literal notranslate"><span class="pre">INT</span></code> la clave no se genera y hay que especificarla siempre explícitamente
-(o sea, el comportamiento que esperaríamos al no haber incluido ninguna
-fórmula adicional como <code class="code docutils literal notranslate"><span class="pre">AUTOINCREMENT</span></code> o <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY...</span></code>).</p>
+<em>AUTOINCREMENT</em> (aunque es conveniente leer <a class="reference external" href="https://sqlite.org/autoinc.html">las aclaraciones al respecto</a>), pero en otros motores se expresa de
+otro modo, ya que no forma parte del estándar. Desde <abbr title="Structured Query Language">SQL</abbr>:2003, existe un
+modo de expresarlo: <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">[BY</span> <span class="pre">DEFAULT|ALWAYS]</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code>: ambas
+fórmulas generan un identificar único automáticamente, pero la primera
+permite la inserción manual de valores, mientras que la segunda, no. Sin
+embargo, <a class="reference external" href="https://sqlite.org/">SQLite</a> no lo soporta y por eso lo hemos dejado comentado. En
+cambio, tiene un comportamento curioso: cuando se usa <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> para
+definir la clave primaria asume el comportamento de <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY</span>
+<span class="pre">DEFAULT</span> <span class="pre">AS</span> <span class="pre">IDENTITY</span></code> y cuando se usa <code class="docutils literal notranslate"><span class="pre">INT</span></code> la clave no se genera y hay que
+especificarla siempre explícitamente (o sea, el comportamiento que
+esperaríamos al no haber incluido ninguna fórmula adicional como
+<code class="code docutils literal notranslate"><span class="pre">AUTOINCREMENT</span></code> o <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY...</span></code>).</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Según el estándar, un nombre que no se encierra entre comillas dobles, se
+sobreentiende escrito todo en mayúsculas. En particular, <strong class="program">SQLite</strong> se
+salta el estándar en este aspecto y no hace esa distinción, incluso aunque
+los nombres sí se hayan entrecomillado. Otra razón que avala el que no
+entrecomillemos es que <strong class="program">MariaDB</strong>/<strong class="program">MySQL</strong> exige que
+cambiemos la configuración predeterminada para soportar el entrecomillado con
+comillas dobles, ya que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> entrecomilla con el acento grave.</p>
 </aside>
 </aside>
 </section>

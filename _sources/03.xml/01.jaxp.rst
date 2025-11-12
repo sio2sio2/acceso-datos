@@ -168,117 +168,6 @@ ejemplo, |Element|:
    devuelve el atributo (|Attr|) o el valor del atributo cuyo nombre se
    proporciona en el argumento.
 
-.. _jaxp-dtd:
-
-.. rubric:: Validación
-
-Hemos evitado validar el documento hasta ahora. Sin embargo, la validación puede
-ser interesante o incluso, puede ser preciso, intentar que ni siquiera se haga
-ninguna comprobación en caso de que la declaración exista, pero el |DTD| no.
-
-En primer lugar, si queremos que la validación se lleve a cabo debemos añadir:
-
-.. code-block:: java
-
-   factory.setValidating(true);
-
-Otro aspecto importante es el de la manipulación de la validación, que se lleva
-a cabo definiendo un *resolutor de entidades*.
-
-.. code-block:: java
-   :emphasize-lines: 1,3,4,9,10,15,16
-
-    builder.setEntityResolver(new EntityResolver2() {
-        @Override
-        public InputSource getExternalSubset(String name, String baseURI)
-                throws SAXException, IOException {
-            return null;
-        }
-
-        @Override
-        public InputSource resolveEntity(String publicId, String systemId)
-                throws SAXException, IOException {
-            return resolveEntity(null, publicId, null, systemId);
-        }
-
-        @Override
-        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
-                throws SAXException, IOException {
-
-            if (systemId == null) return null;
-
-            try {
-                systemId = resolvePath(baseURI, systemId);
-            } catch(URISyntaxException e) {
-                return null;
-            }
-            
-            return new InputSource(systemId);
-        }
-
-        private String resolvePath(String base, String path) throws URISyntaxException {
-            if(new URI(path).isAbsolute()) return path;
-            if(base == null) throw new IllegalArgumentException("No puede calcularse una ruta relativa si la base es nula.");
-
-            if(base.contains("!")) {
-                // Nos quedamos con la parte del path dentro del jar
-                Path basePath = Path.of(base.substring(base.indexOf("!") + 1));
-                // Resolvemos el path relativo y devolvemos el recurso.
-                 URL resource = getClass().getResource(basePath.resolveSibling(path).toString());
-                return resource != null ? resource.toString() : null;
-            }
-
-            return new URI(base).resolve(path).toString();
-        }
-
-    });
-
-Debemos fijarnos en el último método. Cuando devuelve `null`, es como, si no
-hubiéramos definido nada, y el procesador obrará como lo hace habitualmente para
-llevar a cabo la validación. En cambio, si devolvemos un :code:`new
-InputSource(cadena)` utilizará el |DTD| que indique esa cadena (puede ser una
-|URL| o un archivo local) con independencia de lo que expresase la declaración
-original.
-
-.. admonition:: Advertencia
-
-   Este código da por hecho que se conoce la ruta del |XML| (``baseURI``). Esto,
-   sin embargo, puede ser cierto o no. Todo este procesamiento lo desencadena
-   :code:`builder.parse()`, el cual permite proporcionar los datos de distinto
-   modo. Puede pasarse un |String| o un |File| en cuyo caso
-   sí se sabrá ``baseURI``. En cambio, si se pasa un |InputStream| (que es
-   *precisamente la forma en la que hemos ilustrado el uso*) no hay modo de
-   conocer su valor y, en consencuencia, será ``null``. Eso sí, en este último
-   caso, se admite un segundo argumento con una cadena que defina ``baseURI``.
-
-¿Qué hace exactamente el código que hemos propuesto? En principio, si
-no hay definido ningun |DTD|, no hace nada. En cambio, si hay definido uno,
-comprueba si el |DTD| se proporciona con ruta absoluta. Si es así, respeta el
-valor y la validación se hará con el valor expresado en el archivo. En cambio,
-si la ruta es relativa, hace una distinción:
-
-* Si ``baseURI`` contiene el carácter ``!`` se ha pasado como |XML| un
-  :ref:`archivo de recursos <file-arc-pro>` y en consecuencia el |DTD| también
-  lo será y hay que buscarlo dentro del paquete |JAR|.
-
-* Si no es así, se resuelve de forma normal la ruta relativa usando como base el
-  |XML| (``baseURI``).
-
-.. tip:: El argumento del constructor de `InputSource` también puede ser un
-   :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
-   escupa nunca un error (incluso aunque el |DTD| de la declaración no se
-   encuentre), podemos hacer hacer lo siguiente:
-
-   .. code-block:: java
-
-      @Override
-      public InputSource resolveEntity(String name, String publicID, String baseURI, String systemID)
-          throws SAXException, IOException {
-              return new InputSource(new StringReader(""));
-      }
-
-.. todo:: ¿Cómo forzar una validación, aunque no haya declaración DOCTYPE?
-
 .. _jaxp-write:
 
 Escritura
@@ -390,6 +279,82 @@ si nuestra intención es usarla una sola vez:
 
    int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.NUMBER)).intValue();
    System.out.println(cantidad);
+
+.. _jaxp-dtd:
+
+Validación
+==========
+Hemos evitado validar el documento hasta ahora. Sin embargo, la validación puede
+ser interesante o incluso, puede ser preciso, intentar que ni siquiera se haga
+ninguna comprobación en caso de que la declaración exista, pero el |DTD| no.
+
+En primer lugar, si queremos que la validación se lleve a cabo debemos añadir:
+
+.. code-block:: java
+
+   factory.setValidating(true);
+
+Otro aspecto importante es el de la manipulación de la validación, que se lleva
+a cabo definiendo un *resolutor de entidades*:
+
+.. literalinclude:: files/MiEntityResolver.java
+   :language: java
+   :caption: MiEntityResolver.java
+   :class: toggle
+   :start-at: public class
+
+Debemos fijarnos en el último método. Cuando devuelve `null`, es como, si no
+hubiéramos definido nada, y el procesador obrará como lo hace habitualmente para
+llevar a cabo la validación. En cambio, si devolvemos un :code:`new
+InputSource(cadena)` utilizará el |DTD| que indique esa cadena (puede ser una
+|URL| o un archivo local) con independencia de lo que expresase la declaración
+original.
+
+Definido, podremos usarlo en el *builder* antes de procesar el documento:
+
+.. code-block:: java
+
+   builder.setEntityResolver(new MiEntityResolver());
+   Document xml = builder.parse(st);
+
+.. admonition:: Advertencia
+
+   Este código da por hecho que se conoce la ruta del |XML| (``baseURI``). Esto,
+   sin embargo, puede ser cierto o no. Todo este procesamiento lo desencadena
+   :code:`builder.parse()`, el cual permite proporcionar los datos de distinto
+   modo. Puede pasarse un |String| o un |File| en cuyo caso
+   sí se sabrá ``baseURI``. En cambio, si se pasa un |InputStream| (que es
+   *precisamente la forma en la que hemos ilustrado el uso*) no hay modo de
+   conocer su valor y, en consencuencia, será ``null``. Eso sí, en este último
+   caso, se admite un segundo argumento con una cadena que defina ``baseURI``.
+
+¿Qué hace exactamente el código que hemos propuesto? En principio, si
+no hay definido ningun |DTD|, no hace nada. En cambio, si hay definido uno,
+comprueba si el |DTD| se proporciona con ruta absoluta. Si es así, respeta el
+valor y la validación se hará con el valor expresado en el archivo. En cambio,
+si la ruta es relativa, hace una distinción:
+
+* Si ``baseURI`` contiene el carácter ``!`` se ha pasado como |XML| un
+  :ref:`archivo de recursos <file-arc-pro>` y en consecuencia el |DTD| también
+  lo será y hay que buscarlo dentro del paquete |JAR|.
+
+* Si no es así, se resuelve de forma normal la ruta relativa usando como base el
+  |XML| (``baseURI``).
+
+.. tip:: El argumento del constructor de `InputSource` también puede ser un
+   :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
+   escupa nunca un error (incluso aunque el |DTD| de la declaración no se
+   encuentre), podemos hacer hacer lo siguiente:
+
+   .. code-block:: java
+
+      @Override
+      public InputSource resolveEntity(String name, String publicID, String baseURI, String systemID)
+          throws SAXException, IOException {
+              return new InputSource(new StringReader(""));
+      }
+
+.. todo:: ¿Cómo forzar una validación, aunque no haya declaración DOCTYPE?
 
 .. rubric:: Notas al pie
 

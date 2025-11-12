@@ -611,15 +611,16 @@ hayamos decidido:</p>
 datos. Cuando es un objeto único es bien sencillo (<code class="docutils literal notranslate"><span class="pre">LaClaseDelObjeto.class</span></code>) y
 en el caso de arrays, también. Pero cuando tenemos colecciones de datos basadas
 en genéricos debemos recurrir a <a class="extlink-jackson-core reference external" href="https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/type/TypeReference.html">TypeReference</a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GrupoLista</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;&gt;</span><span class="p">(){};</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoLista</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TypeReference</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Grupo</span><span class="o">&gt;&gt;</span><span class="p">(){});</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Cuando los atributos de clases incluidas en la traducción
-son secuencias, es indiferente que sea listas o <em>arrays</em>: la traducción
-se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
+<p>Este forma particular de tratar a la secuencia se produce cuando
+es la propia secuencia la raiz del archivo. Si las secuencias son valores de
+propiedades incluidas en el <abbr title="JavaScript Object Notation">JSON</abbr> es irrelevante que en las clases definamos
+el atributo correspondiente como un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a> o un <code class="docutils literal notranslate"><span class="pre">Array</span></code>: la traducción se
+llevará a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
 <code class="docutils literal notranslate"><span class="pre">miembros</span></code> de <a class="reference internal" href="#class-grupo"><span class="std std-ref">Grupo</span></a>, que lo hemos definido como un
 <em>array</em>, pero podría perfectamente ser una lista.</p>
 </div>

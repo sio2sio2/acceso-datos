@@ -72,12 +72,13 @@ en genéricos debemos recurrir a |TypeReference|:
 
 .. code-block:: java
 
-   TypeReference<List<Grupo>> GrupoLista =  new TypeReference<>(){};
-   List<Grupo> grupos = mapper.readValue(sr, GrupoLista);
+   List<Grupo> grupos = mapper.readValue(sr, new TypeReference<List<Grupo>>(){});
 
-.. note:: Cuando los atributos de clases incluidas en la traducción
-   son secuencias, es indiferente que sea listas o *arrays*: la traducción
-   se lleva a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
+.. note:: Este forma particular de tratar a la secuencia se produce cuando
+   es la propia secuencia la raiz del archivo. Si las secuencias son valores de
+   propiedades incluidas en el |JSON| es irrelevante que en las clases definamos
+   el atributo correspondiente como un |List| o un ``Array``: la traducción se
+   llevará a cabo de igual forma. En nuestro ejemplo, es el caso del atributo
    ``miembros`` de :ref:`Grupo <class-grupo>`, que lo hemos definido como un
    *array*, pero podría perfectamente ser una lista.
 
@@ -688,3 +689,5 @@ El otro mecanismo para filtrar atributos es usar **filtros**:
 .. |LocalDateDeserializer| replace:: :jackson-databind:`LocalDateDeserializer <ext/javatime/deser/LocalDateDeserializer>`
 .. |ObjectWriter| replace:: :jackson-databind:`ObjectWriter <ObjectWriter>`
 .. |TypeReference| replace:: :jackson-core:`TypeReference <type/TypeReference>`
+.. |List| replace:: :java-util:`List <List>`
+

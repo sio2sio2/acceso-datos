@@ -132,8 +132,9 @@ El código tiene dos aspectos:
 Tampoco las sentencias de inserción devuelven resultados, por lo que supuesto
 que hayamos definido la clase ``Centro``:
 
-.. literalinclude:: files/CentroS.java
+.. literalinclude:: files/Centro.java
    :language: java
+   :name: clase-centro
    :class: toggle
    :caption: Centro.java
 
@@ -212,8 +213,8 @@ de objetos de Java, Por ejemplo, podríamos hacer esto:
           int id = rs.getInt("id");
           String nombre = rs.getString("nombre");
           String titularidad = rs.getString("titularidad");
-          // Posiblemente titularidad debería ser un enum.
-          centros.add(new Centro(id, nombre, titularidad));
+          // Quizás deberíamos comprobar que titularidad es válido.
+          centros.add(new Centro(id, nombre, Titularidad.fromString(titularidad)));
       }
    }
 

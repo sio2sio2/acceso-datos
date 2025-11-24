@@ -17,6 +17,8 @@ simplificar la creación del pool y abstraernos de qué se usa para crearlo,
 podemos envolverlo en una clase como esta:
 
 .. literalinclude:: files/ConnectionPool.java
+   :class: toggle
+   :caption: ConnectionPool.java
    :name: clase-connectionpool
    :language: java
    :start-at: public class
@@ -45,6 +47,11 @@ mismos parámetros, devolverá el pool ya creado y no otro distinto:
    pool1 == pool4; // false
    ConnectionPool pool5 = PoolConnection.getInstance();  // IllegalArgumentException (hay dos, ¿cuál?)
 
+.. warning:: Obsérvese la |URL| que se ha utilizado en los ejemplos. En el caso
+   particular de *SQLite*, para que las distintas conexiones del *pool* abran
+   conexión a la misma base de datos en memoria, no basta con que la ruta sea
+   :file:`:memory:`, sino que ha de usarse :file:`file::memory:?cache=shared`.
+
 .. _conn-sqlutils:
 
 Tratamiento funcional de las consultas
@@ -57,30 +64,43 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 
 .. literalinclude:: files/SqlUtils.java
    :language: java
+   :class: toggle
+   :caption: ConnectionPool.java
    :start-at: public class
 
-Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
-modo:
+la cual usa una excepción de usuario no protegida que debe estar también
+definida:
+
+.. literalinclude:: files/DataAccessRuntimeException.java
+   :language: java
+   :class: toggle
+   :caption: DataAccessRuntimeException.java
+
+Con estas clases y definiendo un método estático para convertir un registro de
+la tabla *Centro* (esto es, un |ResultSet|) en un objeto ``Centro``:
 
 .. code-block:: java
-   :emphasize-lines: 6-14
+
+   public static Centro resultSetToCentro(ResultSet rs) throws SQLException {
+      int id = rs.getInt("id");
+      String nombre = rs.getString("nombre");
+      Titularidad titularidad = Titularidad.fromString(rs.getString("titularidad"));
+      return new Centro(id, nombre, titularidad);
+   }
+
+se puede obtener un objeto :java-util:`Stream <stream/Stream>` que permita recorrer los
+resultados de la consulta:
+
+.. code-block:: java
+   :emphasize-lines: 6
 
    // No los cerramos, porque se encargara el cierre del flujo de hacerlo.
    Statement stmt = conn.createStatement();
    ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
-
-   try ( // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
-      Stream<Centro> centros = SqlUtils.resultSetToStream(stmt, rs, fila -> {
-         // Esta función puede generar un SQLException
-         int id = fila.getInt("id");
-         String nombre = fila.getString("nombre");
-         // Suponemos que hemos definido mejor Titularidad y hemos creado
-         // un método estático que obtiene Titularidad.PUBLICA a partir de "pública", etc.
-         Titularidad titularidad = Titularidad.fromNombre(fila.getString("titularidad"));
-         return new Centro(id, nombre, titularidad);
-      });
-   ) {
-      //Tratamos el flujo como estimemos más oportuno.
+ 
+   // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
+   try (Stream<Centro> centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro)) {
+      // Tratamos el flujo como estimemos más oportuno.
       for(Centro c: (Iterable<Centro>) centros::iterator) {
          System.out.println(c);
       }
@@ -100,12 +120,7 @@ modo:
          Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
       ) {
-         centros = SqlUtils.resultSetToStream(stmt, rs, fila -> {
-            int id = fila.getInt("id");
-            String nombre = fila.getString("nombre");
-            Titularidad titularidad = Titularidad.fromNombre(fila.getString("titularidad"));
-            return new Centro(id, nombre, titularidad);
-         });
+         centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro);
       }
 
       for(Centro c: centros) {
@@ -129,7 +144,7 @@ modo:
    .. code-block:: java
 
       try(Stream<ResultSet> result = SqlUtils.resultSetToStream(stmt, rs)) {
-         // Tratamiento del rs (sin usar next, porque ya avanza el solo)
+         // Tratamos el resultado como un Stream.
       }
 
 .. _conn-transaction-manager:

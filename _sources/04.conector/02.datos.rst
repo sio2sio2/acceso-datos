@@ -23,23 +23,23 @@ equivalente propio de Java.
 .. table::
    :class: tipos-sql
 
-   +---------------------------+-------------------------+--------------------------------------+
-   | Tipo |SQL|                | Tipo Java\ [#]_         | Método |JDBC| de |PreparedStatement| |
-   +===========================+=========================+======================================+
-   | | CHAR(n)                 | :java-lang:`String`     | setString(int idx, String v)         |
-   | | VARCHAR(n)              |                         |                                      |
-   +---------------------------+-------------------------+--------------------------------------+
-   | | SMALLINT                | | :java-lang:`Short`    | | setShort(int idx, short v)         |
-   | | INTEGER                 | | :java-lang:`Integer`  | | setInt(int idx, int v)             |
-   | | BIGINT                  | | :java-lang:`Long`     | | setLong(int idx, long v)           |
-   +---------------------------+-------------------------+--------------------------------------+
-   | BOOLEAN                   | :java-lang:`Boolean`    | | setBoolean(int idx, boolean v)     |
-   +---------------------------+-------------------------+--------------------------------------+
-   | NUMERIC/DECIMAL\ [#]_     | :java-lang:`BigDecimal` | | setBigDecimal(int idx, BigDecimal) |
-   +---------------------------+-------------------------+--------------------------------------+
-   | | FLOAT, REAL\ [#]_       | | :java-lang:`Float`    | | setFloat(int idx, float v)         |
-   | | FLOAT, DOUBLE PRECISION | | :java-lang:`Double`   | | setDouble(int idx, double v)       |
-   +---------------------------+-------------------------+--------------------------------------+
+   +------------------------------+-------------------------+--------------------------------------+
+   | Tipo |SQL|                   | Tipo Java\ [#]_         | Método |JDBC| de |PreparedStatement| |
+   +==============================+=========================+======================================+
+   | | CHAR(n)                    | :java-lang:`String`     | setString(int idx, String v)         |
+   | | VARCHAR(n)                 |                         |                                      |
+   +------------------------------+-------------------------+--------------------------------------+
+   | | SMALLINT                   | | :java-lang:`Short`    | | setShort(int idx, short v)         |
+   | | INTEGER                    | | :java-lang:`Integer`  | | setInt(int idx, int v)             |
+   | | BIGINT                     | | :java-lang:`Long`     | | setLong(int idx, long v)           |
+   +------------------------------+-------------------------+--------------------------------------+
+   | BOOLEAN                      | :java-lang:`Boolean`    | | setBoolean(int idx, boolean v)     |
+   +------------------------------+-------------------------+--------------------------------------+
+   | NUMERIC/DECIMAL\ [#]_        | :java-lang:`BigDecimal` | | setBigDecimal(int idx, BigDecimal) |
+   +------------------------------+-------------------------+--------------------------------------+
+   | | FLOAT(n), REAL\ [#]_       | | :java-lang:`Float`    | | setFloat(int idx, float v)         |
+   | | FLOAT(n), DOUBLE PRECISION | | :java-lang:`Double`   | | setDouble(int idx, double v)       |
+   +------------------------------+-------------------------+--------------------------------------+
 
 .. note:: No hay más que sustituir `set` por `get` para obtener los métodos de
    |PreparedStatement| necesarios para guardar datos.
@@ -82,7 +82,7 @@ no es un tipo primitivo en Java, pero su uso es trivial:
       );
 
    Internamente, :program:`SQLite` sólo dispone de datos de tipo texto, entero (de
-   diverso tamaño), doble y BLOB; y dependiendo del valor que se suministre usará
+   diverso tamaño), doble y blob; y, dependiendo del valor que se suministre, usará
    un tipo u otro para el dato. Así, ``CHAR`` y ``VARCHAR`` se asimilan a texto,
    ``INTEGER``, ``BIGINT``, ``SMALLINT`` y ``BOOLEAN`` a enteros, ``FLOAT``,
    ``DOBLE`` y ``NUMERIC``/``DECIMAL`` a dobles (por tanto, se perderá la precisión

@@ -426,7 +426,9 @@ document.write(`
 <p>Ya tratamos cómo crear un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>. Si queremos
 simplificar la creación del pool y abstraernos de qué se usa para crearlo,
 podemos envolverlo en una clase como esta:</p>
-<div class="highlight-java notranslate" id="clase-connectionpool"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="clase-connectionpool">
+<div class="code-block-caption"><span class="caption-text">ConnectionPool.java</span><a class="headerlink" href="#clase-connectionpool" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
@@ -519,6 +521,7 @@ podemos envolverlo en una clase como esta:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
 <p>De este modo, para crear un <em>pool</em> con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> basta con hacer lo siguiente<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
 <span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
@@ -539,6 +542,13 @@ mismos parámetros, devolverá el pool ya creado y no otro distinto:</p>
 <span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w">  </span><span class="c1">// IllegalArgumentException (hay dos, ¿cuál?)</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Obsérvese la <abbr title="Uniform Resource Locator">URL</abbr> que se ha utilizado en los ejemplos. En el caso
+particular de <em>SQLite</em>, para que las distintas conexiones del <em>pool</em> abran
+conexión a la misma base de datos en memoria, no basta con que la ruta sea
+<code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>, sino que ha de usarse <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code>.</p>
+</div>
 </section>
 <section id="tratamiento-funcional-de-las-consultas">
 <span id="conn-sqlutils"></span><h2><span class="section-number">4.5.3. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h2>
@@ -547,7 +557,9 @@ Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
 paliarlo podemos definir una clase que haga la conversión (véase el
 <a class="reference download internal" download="" href="../_downloads/34aa125d2ea9c81778b352774cc712b4/SqlUtils.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SqlUtils</span><span class="w"> </span><span class="p">{</span>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">ConnectionPool.java</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SqlUtils</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Implementa un iterador a partir de un ResultSet.</span>
@@ -568,12 +580,12 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">avanzar</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!&quot;</span><span class="p">);</span>
+<span class="w">                        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!&quot;</span><span class="p">);</span>
 <span class="w">                    </span><span class="p">}</span>
 <span class="w">                    </span><span class="n">hasNextElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="n">avanzar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
@@ -599,11 +611,11 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción</span>
-<span class="cm">     * que no necesita ser declarada.</span>
+<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessRuntimeException,</span>
+<span class="cm">     * que es una excepción que no necesita ser declarada.</span>
 <span class="cm">     * @param &lt;T&gt; El tipo que devuelve CheckedFunction.</span>
 <span class="cm">     * @param checked Un &quot;función&quot; CheckedFunction.</span>
-<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por DataAccessException.</span>
+<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por DataAccessRuntimeException.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">checkedToUnchecked</span><span class="p">(</span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">checked</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -611,7 +623,7 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">checked</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">            </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">};</span>
 <span class="w">    </span><span class="p">}</span>
@@ -634,7 +646,7 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">                    </span><span class="n">ac</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+<span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
@@ -657,24 +669,49 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Si incluimos este archivo en nuestro proyecto podremos hacer consultas de este
-modo:</p>
+</div>
+<p>la cual usa una excepción de usuario no protegida que debe estar también
+definida:</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">DataAccessRuntimeException.java</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">edu.acceso.testjdbc</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DataAccessRuntimeException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Con estas clases y definiendo un método estático para convertir un registro de
+la tabla <em>Centro</em> (esto es, un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a>) en un objeto <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">resultSetToCentro</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">));</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>se puede obtener un objeto <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> que permita recorrer los
+resultados de la consulta:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// No los cerramos, porque se encargara el cierre del flujo de hacerlo.</span>
 <span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">);</span>
 
-<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="c1">// try-with-resources para asegurarnos de liberar los recursos (stmt y rs)</span>
-<span class="hll"><span class="w">   </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span class="hll"><span class="w">      </span><span class="c1">// Esta función puede generar un SQLException</span>
-</span><span class="hll"><span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
-</span><span class="hll"><span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
-</span><span class="hll"><span class="w">      </span><span class="c1">// Suponemos que hemos definido mejor Titularidad y hemos creado</span>
-</span><span class="hll"><span class="w">      </span><span class="c1">// un método estático que obtiene Titularidad.PUBLICA a partir de &quot;pública&quot;, etc.</span>
-</span><span class="hll"><span class="w">      </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromNombre</span><span class="p">(</span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">));</span>
-</span><span class="hll"><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
-</span><span class="hll"><span class="w">   </span><span class="p">});</span>
-</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">//Tratamos el flujo como estimemos más oportuno.</span>
+<span class="c1">// try-with-resources para asegurarnos de liberar los recursos (stmt y rs)</span>
+<span class="hll"><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">   </span><span class="c1">// Tratamos el flujo como estimemos más oportuno.</span>
 <span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">centros</span><span class="p">::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
 <span class="w">   </span><span class="p">}</span>
@@ -694,12 +731,7 @@ el objeto <a class="extlink-java-sql reference external" href="https://docs.orac
 <span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="w">   </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">);</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">fila</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getInt</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
-<span class="w">      </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromNombre</span><span class="p">(</span><span class="n">fila</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;titularidad&quot;</span><span class="p">));</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
-<span class="w">   </span><span class="p">});</span>
+<span class="w">   </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -723,7 +755,7 @@ ilustrativo de su uso hemos usado una sentencia <em>try-with-resources</em>.</p>
 transforma la fila (el propio <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a>) en un objeto. En ese caso, se
 obtendrá con cada elemento del flujo la propia fila:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Tratamiento del rs (sin usar next, porque ya avanza el solo)</span>
+<span class="w">   </span><span class="c1">// Tratamos el resultado como un Stream.</span>
 <span class="p">}</span>
 </pre></div>
 </div>

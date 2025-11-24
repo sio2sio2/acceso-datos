@@ -22,12 +22,12 @@ public class SqlUtils {
             if(avanzar) {
                 try {
                     if(rs.isClosed()) {
-                        throw new DataAccessException("ResultSet is closed!!!");
+                        throw new DataAccessRuntimeException("ResultSet is closed!!!");
                     }
                     hasNextElement = rs.next();
                 }
                 catch(SQLException err) {
-                    throw new DataAccessException(err);
+                    throw new DataAccessRuntimeException(err);
                 }
                 finally {
                     avanzar = false;
@@ -53,11 +53,11 @@ public class SqlUtils {
     }
 
     /**
-     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción
-     * que no necesita ser declarada.
+     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessRuntimeException,
+     * que es una excepción que no necesita ser declarada.
      * @param <T> El tipo que devuelve CheckedFunction.
      * @param checked Un "función" CheckedFunction.
-     * @return Una "función" que ha sustituido SQLException por DataAccessException.
+     * @return Una "función" que ha sustituido SQLException por DataAccessRuntimeException.
      */
     public static <T> Function<ResultSet, T> checkedToUnchecked(CheckedFunction<ResultSet, T> checked) {
         return t -> {
@@ -65,7 +65,7 @@ public class SqlUtils {
                 return checked.apply(t);
             }
             catch(SQLException err) {
-                throw new DataAccessException(err);
+                throw new DataAccessRuntimeException(err);
             }
         };
     }
@@ -88,7 +88,7 @@ public class SqlUtils {
                     ac.close();
                 }
                 catch(Exception err) {
-                    throw new DataAccessException(err);
+                    throw new DataAccessRuntimeException(err);
                 }
             });
     }

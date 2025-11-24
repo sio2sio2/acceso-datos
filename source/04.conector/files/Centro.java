@@ -17,7 +17,8 @@ public class Centro implements Entity {
             this.desc = desc;
         }
 
-        public String getDescripcion() {
+        @Override
+        public String toString() {
             return desc;
         }
 
@@ -26,9 +27,11 @@ public class Centro implements Entity {
          * @param desc La descripción
          * @return El elemento Titularidad o null, si no hay ninguno con esa descripción.
          */
-        public static Titularidad fromDesc(String desc) {
+        public static Titularidad fromString(String desc) {
             return Arrays.stream(Titularidad.values())
-                .filter(t -> t.getDescripcion().compareToIgnoreCase(desc) == 0).findFirst().orElse(null);
+                .filter(t -> t.getDescripcion().compareToIgnoreCase(desc) == 0)
+                .findFirst()
+                .orElse(null);
         }
     }
 

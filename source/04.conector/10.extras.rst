@@ -28,26 +28,24 @@ De este modo, para crear un *pool* con HikariCP_ basta con hacer lo siguiente\ [
 .. code-block:: java
 
    // Pool de conexiones de una base SQLite en memoria.
-   ConnectionPool pool = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
-   DataSource ds = pool.getDataSource();
-   Connection conn = pool.getConnection();  // o ds.getConnection()
+   DataSource ds = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
+   Connection conn = ds.getConnection();
 
 Lo interesante de la clase, además de que simplifica la creación del *pool*, es que
 usa un `patrón Singleton`_, de manera que si intentamos crear un pool con los
-mismos parámetros, devolverá el pool ya creado y no otro distinto:
+mismos parámetros, genera una excepción:
 
 .. code-block:: java
 
    ConnectionPool pool1 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
-   ConnectionPool pool2 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
-   pool1 == pool2; // true
+   ConnectionPool pool2 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");  // IllegalStateException
    ConnectionPool pool3 = PoolConnection.getInstance();
    pool1 == pool3; // true
    ConnectionPool pool4 = PoolConnection.getInstance("jdbc:sqlite:caca.db");
    pool1 == pool4; // false
-   ConnectionPool pool5 = PoolConnection.getInstance();  // IllegalArgumentException (hay dos, ¿cuál?)
+   ConnectionPool pool5 = PoolConnection.getInstance();  // IllegalArgumentException (hay dos, ¿cuál es?)
 
-.. warning:: Obsérvese la |URL| que se ha utilizado en los ejemplos. En el caso
+.. caution:: Obsérvese la |URL| que se ha utilizado en los ejemplos. En el caso
    particular de *SQLite*, para que las distintas conexiones del *pool* abran
    conexión a la misma base de datos en memoria, no basta con que la ruta sea
    :file:`:memory:`, sino que ha de usarse :file:`file::memory:?cache=shared`.
@@ -224,7 +222,7 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
         <dependency>
             <groupId>com.github.sio2sio2</groupId>
             <artifactId>sqlutils</artifactId>
-            <version>1.7.0</version>
+            <version>2.0.1</version>
         </dependency>
       </dependencies>
 

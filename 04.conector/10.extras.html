@@ -43,8 +43,8 @@
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=461dccb6"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=677778c1"></script>
     <script>let toggleHintShow = 'Click to show';</script>
@@ -428,14 +428,22 @@ simplificar la creación del pool y abstraernos de qué se usa para crearlo,
 podemos envolverlo en una clase como esta:</p>
 <div class="literal-block-wrapper docutils container" id="clase-connectionpool">
 <div class="code-block-caption"><span class="caption-text">ConnectionPool.java</span><a class="headerlink" href="#clase-connectionpool" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/** Mapa de instancias de ConnectionPool  para implementar el patrón Singleton ampliado */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="cm">/** Número máximo de conexiones en el pool */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">maxConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/** Número mínimo de conexiones en el pool */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">minConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">ConnectionPool</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Crea un {@link HikariDataSource} con la configuración dada.</span>
+<span class="cm">     * @param url URL de la base de datos.</span>
+<span class="cm">     * @param user Usuario de conexión</span>
+<span class="cm">     * @param password Contraseña de conexión</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="nf">createHikariDataSource</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">HikariConfig</span><span class="w"> </span><span class="n">hconfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariConfig</span><span class="p">();</span>
 <span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setJdbcUrl</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
 <span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setUsername</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
@@ -443,48 +451,51 @@ podemos envolverlo en una clase como esta:</p>
 <span class="w">        </span><span class="c1">// Mínimo y máximo de conexiones.</span>
 <span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMaximumPoolSize</span><span class="p">(</span><span class="n">maxConnections</span><span class="p">);</span>
 <span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMinimumIdle</span><span class="p">(</span><span class="n">minConnections</span><span class="p">);</span>
-<span class="w">        </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Genera un pool de conexiones o reaprovecha uno ya creado</span>
-<span class="cm">     * si coinciden los parámetros de creación.</span>
+<span class="cm">     * Genera y almacena una fuente de datos HikariCP con la configuración dada.</span>
+<span class="cm">     * Si los parámetros de configuración coinciden, genera una excepción</span>
 <span class="cm">     * @param url URL de la base de datos.</span>
 <span class="cm">     * @param user Usuario de conexión</span>
 <span class="cm">     * @param password Contraseña de conexión</span>
-<span class="cm">     * @return El pool de conexiones</span>
+<span class="cm">     * @return La fuente de datos HikariCP.</span>
+<span class="cm">     * @throws IllegalArgumentException Si ya existe un pool con la configuración proporcionada.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">hashCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
-<span class="w">        </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">instance</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">().</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
+<span class="w">        </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">instance</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createHikariDataSource</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
 <span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">hashCode</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
 <span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;Ya existe un pool con la configuración proporcionada&quot;</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Genera un pool de conexiones o reaprovecha uno ya creado</span>
-<span class="cm">     * si ya se creo uno con la URL suministrada.</span>
+<span class="cm">     * Devuelve un {@link HikariDataSource} cuando no son necesarios usuario ni contraseña.</span>
 <span class="cm">     * @param url La URL de conexión.</span>
-<span class="cm">     * @return El pool de conexiones.</span>
+<span class="cm">     * @return La fuente de datos HikariCP.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Devuelve un pool de conexiones cuando sólo hay un candidato posible.</span>
 <span class="cm">     * Como efecto secundario, elimina los pools cuyo DataSource esté cerrado.</span>
-<span class="cm">     * @return El pool de conexiones.</span>
+<span class="cm">     * @return La fuente de datos HikariCP.</span>
+<span class="cm">     * @throws IllegalArgumentException Si no hay ningún pool activo o si hay varios candidatos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">        </span><span class="k">switch</span><span class="p">(</span><span class="n">instances</span><span class="p">.</span><span class="na">size</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
-<span class="w">                </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">iterator</span><span class="p">().</span><span class="na">next</span><span class="p">();</span>
-<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">                </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">iterator</span><span class="p">().</span><span class="na">next</span><span class="p">();</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">instance</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
 <span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
 <span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;No hay definido ningún pool activo&quot;</span><span class="p">);</span>
@@ -494,29 +505,20 @@ podemos envolverlo en una clase como esta:</p>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Elimina los pools cuyos DataSource estén cerrados.</span>
+<span class="cm">     * Elimina los DataSources cerrados del mapa de instancias.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">clear</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">entrySet</span><span class="p">()</span>
-<span class="w">            </span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">filter</span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getValue</span><span class="p">().</span><span class="na">isActive</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">filter</span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">!</span><span class="n">e</span><span class="p">.</span><span class="na">getValue</span><span class="p">().</span><span class="na">isClosed</span><span class="p">())</span>
 <span class="w">            </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getKey</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getValue</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="nf">getDataSource</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isActive</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">ds</span><span class="p">.</span><span class="na">isClosed</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">ds</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Cierra todos los pools de conexiones y elimina todas las instancias.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">reset</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">forEach</span><span class="p">(</span><span class="n">HikariDataSource</span><span class="p">::</span><span class="n">close</span><span class="p">);</span>
+<span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -524,26 +526,24 @@ podemos envolverlo en una clase como esta:</p>
 </div>
 <p>De este modo, para crear un <em>pool</em> con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> basta con hacer lo siguiente<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
-<span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
-<span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span><span class="w">  </span><span class="c1">// o ds.getConnection()</span>
+<span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
+<span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>Lo interesante de la clase, además de que simplifica la creación del <em>pool</em>, es que
 usa un <a class="reference external" href="https://es.wikipedia.org/wiki/Singleton">patrón Singleton</a>, de manera que si intentamos crear un pool con los
-mismos parámetros, devolverá el pool ya creado y no otro distinto:</p>
+mismos parámetros, genera una excepción:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
-<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
-<span class="n">pool1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">pool2</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
+<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// IllegalStateException</span>
 <span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span>
 <span class="n">pool1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">pool3</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
 <span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;jdbc:sqlite:caca.db&quot;</span><span class="p">);</span>
 <span class="n">pool1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">pool4</span><span class="p">;</span><span class="w"> </span><span class="c1">// false</span>
-<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w">  </span><span class="c1">// IllegalArgumentException (hay dos, ¿cuál?)</span>
+<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoolConnection</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="w">  </span><span class="c1">// IllegalArgumentException (hay dos, ¿cuál es?)</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Advertencia</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
 <p>Obsérvese la <abbr title="Uniform Resource Locator">URL</abbr> que se ha utilizado en los ejemplos. En el caso
 particular de <em>SQLite</em>, para que las distintas conexiones del <em>pool</em> abran
 conexión a la misma base de datos en memoria, no basta con que la ruta sea
@@ -925,7 +925,7 @@ Github</a> listo para su uso:</p>
 <span class="w">  </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">      </span><span class="nt">&lt;version&gt;</span>1.7.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;version&gt;</span>2.0.1<span class="nt">&lt;/version&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>

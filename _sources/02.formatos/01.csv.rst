@@ -79,7 +79,7 @@ Para leer un |CSV| que se obtiene como flujo de entrada\ [#]_:
 
    try (
       InputStream st = Files.newInputStream(ruta);
-      CSVParser parser = CSVParser.parse(new InputStreamReader(st), CSVFormat.DEFAULT);
+      CSVParser parser = formato.parse(new InputStreamReader(st));
    ) {
       for(CSVRecord registro: parser) {
          // Tratamos cada registro del archivo. Por ejemplo:
@@ -127,7 +127,7 @@ Esta es la lectura más simple que podemos hacer:
      :emphasize-lines: 4
 
      CSVFormat formato = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-         .setHeaderName("nombre", "edad")  // Define otros nombres de columna
+         .setHeader("nombre", "edad")  // Define otros nombres de columna
          .setSkipHeaderRecord(true)
          .setIgnoreSurroundingSpaces(true)
          .get();

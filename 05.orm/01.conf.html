@@ -461,35 +461,42 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">          </span><span class="nt">&lt;version&gt;</span>3.1.1<span class="nt">&lt;/version&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
-<span class="w">     </span><span class="cm">&lt;!-- Opcional para que Hibernate implemente las anotaciones de comprobación --&gt;</span>
+<span class="w">     </span><span class="cm">&lt;!-- Implementación para Hibernate de la especificación anterior --&gt;</span>
 <span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.validator<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-validator<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;version&gt;</span>9.0.1.Final<span class="nt">&lt;/version&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 
-<span class="w">     </span><span class="cm">&lt;!-- Opcional para Expression Language (necesario para Hibernate Validator) --&gt;</span>
+<span class="w">     </span><span class="cm">&lt;!-- Opcional para evaluación dinámica de cadenas de texto (puede necesitarlo Hibernate Validator) --&gt;</span>
 <span class="w">     </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.glassfish<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>jakarta.el<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">        </span><span class="nt">&lt;version&gt;</span>4.0.2<span class="nt">&lt;/version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.glassfish.expressly<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>expressly<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>6.0.0<span class="nt">&lt;/version&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
 </div>
 <p>En resumidas cuentas es:</p>
-<ul class="simple">
+<ul>
 <li><p>El driver <abbr title="Java DataBase Connectivity">JDBC</abbr> para soportar el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que nos interese (para <a class="reference external" href="https://sqlite.org">SQLite</a>
 es <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>).</p></li>
 <li><p>El soporte para <abbr title="Java Persistence API">JPA</abbr> proporcionado por <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">jakarta.persistence-api</a>.</p></li>
 <li><p>El soporte para <a class="reference external" href="https://www.hibernate.org">Hibernate</a>. En el caso particular de SQLite,
 <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a> no soporta de serie <a class="reference external" href="https://sqlite.org">SQLite</a>, por lo que se debe añadir
-uan librería más (<cite>hibernate-community-dialects</cite>).</p></li>
+una librería más (<cite>hibernate-community-dialects</cite>).</p></li>
 <li><p>En principio, basta con lo anterior, pero si se quiere llevar a cabo
 comprobaciones sobre los valores de los datos (p.ej. las <a class="reference internal" href="04.mapeo.html#orm-mapping-check"><span class="std std-ref">referidas más
 adelante</span></a>), serán necesaria la especificación sita en
-<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a>, su implementación en <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a> y
-<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.el/jakarta.el-api">jakarta.el-api</a>, que es necesaria para dicha implementación.</p></li>
+<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a> y su implementación en <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.</p></li>
+<li><p>La última dependencia (<a class="reference external" href="https://mvnrepository.com/artifact/org.glassfish.expressly/expressly">expressly</a>) sólo es necesaria si que utilizan
+anotaciones implementadas por <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a> que aprovechan la
+evaluación dinámica de cadenas. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Min</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;La edad debe ser mayor a {value} años&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">edad</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
 </ul>
 </section>
 <section id="configuracion-de-la-persistencia">
@@ -741,7 +748,7 @@ Por José Miguel Sánchez Alés
 
   <p class="copyright">
     
-      © Copyright CC BY 4.0, 2024-2025, José Miguel Sánchez Alés.
+      © Copyright CC BY 4.0, 2024-2026, José Miguel Sánchez Alés.
       <br/>
     
   </p>

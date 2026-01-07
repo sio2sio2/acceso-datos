@@ -10,7 +10,7 @@ CREATE TABLE Clientes (
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     telefono CHAR(15),
-    id_zona INTEGER NOT NULL,
+    id_zona INTEGER,
 
     CONSTRAINT fk_cli_zon FOREIGN KEY (id_zona) REFERENCES Zonas_Envio(id_zona)
       ON DELETE SET NULL

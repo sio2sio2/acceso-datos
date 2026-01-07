@@ -481,7 +481,7 @@ en el sistema (p.e. <a class="extlink-deb reference external" href="https://pack
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span>
 <span class="w">   </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">);</span>
-<span class="hll"><span class="w">   </span><span class="n">CSVParser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVParser</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="hll"><span class="w">   </span><span class="n">CSVParser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">formato</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">));</span>
 </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="hll"><span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">CSVRecord</span><span class="w"> </span><span class="n">registro</span><span class="p">:</span><span class="w"> </span><span class="n">parser</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">      </span><span class="c1">// Tratamos cada registro del archivo. Por ejemplo:</span>
@@ -524,7 +524,7 @@ a su vez también iterable, lo que hemos preferido usar en este caso.</p></li>
 lista otras variantes del estándar predefinidas indicando cuál es su
 definición. En cualquier caso, podemos definir nosotros mismos el formato:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CSVFormat</span><span class="w"> </span><span class="n">formato</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">Builder</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CSVFormat</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">)</span>
-<span class="w">    </span><span class="p">.</span><span class="na">setHeaderName</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define otros nombres de columna</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edad&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Define otros nombres de columna</span>
 <span class="w">    </span><span class="p">.</span><span class="na">setSkipHeaderRecord</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 <span class="hll"><span class="w">    </span><span class="p">.</span><span class="na">setIgnoreSurroundingSpaces</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
 </span><span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
@@ -637,7 +637,7 @@ Por José Miguel Sánchez Alés
 
   <p class="copyright">
     
-      © Copyright CC BY 4.0, 2024-2025, José Miguel Sánchez Alés.
+      © Copyright CC BY 4.0, 2024-2026, José Miguel Sánchez Alés.
       <br/>
     
   </p>

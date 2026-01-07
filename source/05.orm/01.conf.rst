@@ -56,18 +56,18 @@ Depedencias
              <version>3.1.1</version>
          </dependency>
 
-        <!-- Opcional para que Hibernate implemente las anotaciones de comprobación -->
+        <!-- Implementación para Hibernate de la especificación anterior -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>9.0.1.Final</version>
         </dependency>
 
-        <!-- Opcional para Expression Language (necesario para Hibernate Validator) -->
+        <!-- Opcional para evaluación dinámica de cadenas de texto (puede necesitarlo Hibernate Validator) -->
         <dependency>
-           <groupId>org.glassfish</groupId>
-           <artifactId>jakarta.el</artifactId>
-           <version>4.0.2</version>
+           <groupId>org.glassfish.expressly</groupId>
+           <artifactId>expressly</artifactId>
+           <version>6.0.0</version>
         </dependency>
    </dependencies>
 
@@ -78,12 +78,19 @@ En resumidas cuentas es:
 * El soporte para |JPA| proporcionado por `jakarta.persistence-api`_.
 * El soporte para Hibernate_. En el caso particular de SQLite,
   hibernate-core_ no soporta de serie SQLite_, por lo que se debe añadir
-  uan librería más (`hibernate-community-dialects`).
+  una librería más (`hibernate-community-dialects`).
 * En principio, basta con lo anterior, pero si se quiere llevar a cabo
   comprobaciones sobre los valores de los datos (p.ej. las :ref:`referidas más
   adelante <orm-mapping-check>`), serán necesaria la especificación sita en
-  `jakarta.validation-api`_, su implementación en hibernate-validator_ y
-  `jakarta.el-api`_, que es necesaria para dicha implementación.
+  `jakarta.validation-api`_ y su implementación en hibernate-validator_.
+* La última dependencia (`expressly`_) sólo es necesaria si que utilizan
+  anotaciones implementadas por hibernate-validator_ que aprovechan la
+  evaluación dinámica de cadenas. Por ejemplo:
+
+  .. code:: java
+
+     @Min(value = 18, message = "La edad debe ser mayor a {value} años")
+     private int edad;
 
 Configuración de la persistencia
 --------------------------------
@@ -204,3 +211,4 @@ sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:
 .. _jakarta.persistence-api: https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api
 .. _hibernate-community-dialects: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-community-dialects
 .. _jakarta.el-api: https://mvnrepository.com/artifact/jakarta.el/jakarta.el-api
+.. _expressly: https://mvnrepository.com/artifact/org.glassfish.expressly/expressly

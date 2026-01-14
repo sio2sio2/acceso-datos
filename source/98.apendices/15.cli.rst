@@ -441,6 +441,7 @@ a. Crear un archivo dentro de :file:`src/main/resources` que copie los valores
    por sus valores:
 
    .. code-block:: xml
+      :emphasize-lines: 9
 
       <build>
          <plugins>
@@ -450,12 +451,23 @@ a. Crear un archivo dentro de :file:`src/main/resources` que copie los valores
          <resources>
             <resource>
                <directory>src/main/resources</directory>
+               <filtering>true</filtering>
                <includes>
                   <include>**/*.properties</include>
                </includes>
-               <filtering>true</filtering>
             </resource>
          </resources>
+
+   .. caution:: En ausencia de sección :code:`<resources>` *Maven*, por defecto,
+      incorpora a la compilación todos los archivos que se incluyan dentro de la
+      ruta predefinida :file:`src/main/resources`. pero sin realizar sustitución
+      de variables.  Como nuestra intención es que la haya, necesitamos
+      expresamente declarar la incorporación incluyendo la línea resaltada.
+      Ahora bien, añadir esta sección de recursos, deshabilita este
+      comportamiento predefinido y provoca que entonces sólo se incluya lo
+      explícitamente declarado en la sección: en este caso, cualquier archivo de
+      extensión :file:`.properties` dentro del subárbol
+      :file:`src/main/resources`.
 
 #. Definir un método privado en :ref:`Config <config-picocli>` que cargue en el
    código de Java las propiedades almacenadas en el archivo:

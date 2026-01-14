@@ -190,20 +190,10 @@ sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:
 
    EntityManagerFactory emf = Persistence.createEntityManagerFactory("MiUnidadP", props);
 
-.. caution:: No basta con crear el archivo de recursos, sino que este debe pasar
-   a la aplicación compilada para que la implementación de |JPA| pueda
-   encontrarlo. :ref:`Ya tratamos ello en la primera unidad <file-arc-pro>` y exigía, si usamos
-   :ref:`Maven`, declararlo en :file:`pom.xml` :ref:`como se explica en su apéndice <add-resources>`:
-
-   .. code-block:: xml
-
-      <resource>
-         <directory>src/main/resources</directory>
-         <includes>
-            <include>META-INF/persistence.xml</include>
-         </includes>
-         <filtering>false</filtering>
-      </resource>
+.. warning:: Es necesario que el archivo
+   :file:`META-INF/persistence.xml` pase a la compilación, que es lo que debería
+   ocurrir... a menos que haya usted :ref:`cambiado ese comportamiento al añadir
+   una sección resources al archivo pom.xml <add-resources>`.
 
 .. rubric:: Notas al pie
 

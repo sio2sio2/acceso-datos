@@ -1,23 +1,3 @@
-package edu.acceso.tarea_5_1.core;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-
-/**
- * Clase de utilidad para gestionar múltiples instancias de {@link EntityManagerFactory}.
- * Permite crear instancias a partir del nombre de la unidad de persistencia y un mapa de propiedades,
- * y recuperarlas posteriormente mediante un índice.
- * También proporciona métodos para ejecutar transacciones de forma sencilla.
- */
 public class JpaBackend {
 
     /**
@@ -80,12 +60,16 @@ public class JpaBackend {
     public static EntityManagerFactory getEntityManagerFactory(int index) {
         if(index < 1 || index > keys.size()) throw new IllegalArgumentException("Índice fuera de rango");
 
-        int hashCode = keys.get(index - 1);
+        Integer hashCode = keys.get(index - 1);
+        if(hashCode == null) throw new IllegalStateException("La instancia solicitada ya no existe");
+
         EntityManagerFactory instance = instances.get(hashCode);
-        if(instance != null && instance.isOpen()) return instance;
+        assert instance == null: "Falta de sincronización entre keys e instances";
+
+        if(instance.isOpen()) return instance;
         else {
             instances.remove(hashCode);
-            keys.remove(index - 1);
+            keys.set(index - 1, null);
             throw new IllegalStateException("La instancia solicitada no está disponible");
         }
     }

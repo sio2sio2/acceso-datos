@@ -65,7 +65,12 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
    + ``updatable``, indica si el campo debe incluirse en las sentencias
      ``UPDATE``.
    + ``columnDefinition`` sirve para indicar directamente la definición |SQL|
-     del campo.
+     del campo que se incluiría en una sentencia ``CREATE TABLE``\ [#]_. Por ejemplo:
+
+     .. code-block:: java
+
+        @Column(name = "precio", columnDefinition = "DECIMAL(10, 2) CHECK(precio > 0)")
+        private BigDecimal precio;
 
    La anotación ``@Transient`` evita que el atributo se mapee como campo.
 
@@ -127,6 +132,9 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
       @Version
       @Column(nullable = false)
       private LocalDateTime actualizacion;
+
+   .. caution:: Como de la actualización de este campo deben encargarse |JPA|,
+      nunca deberías definir un *setter* público.
 
 ``@Enumerated``
    Permite indicar cómo almacenar un campo ``enum``:
@@ -324,6 +332,10 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 
       + Con la anotación ``@ManyToOne`` para un atributo que representa el objeto
         (registro) completo, no sólo el identificador.
+      + ``@JoinColumn`` no es estrictamente necesario. En este caso, lo hemos
+        usado porque queríamos escoger el nombre que recibirá el campo
+        correspondiete en la tabla *Estudiante*, y porque queremos hacer la
+        relación opcional.
       + Con un *getter* y un *setter* asociados.
       + Haciendo que el constructor y ``.cargarDatos`` manejen el objeto
         referenciado, no la clave foránea en sí.
@@ -460,8 +472,12 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    comportamiento añadiendo la anotación ``@Access(AccessType.FIELD)`` a la
    clase.
 
+.. [#] A menos que no haya más remedio, no suele ser buena idea utilizarlo, ya que
+   su uso es más que probable que haga el código dependiente del |SGBD|.
+
 .. |JPA| replace:: :abbr:`JPA (Java Persisten API)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. _Hibernate: https://www.hibernate.org

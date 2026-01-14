@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -47,10 +47,10 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=677778c1"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleHintShow = 'Haz clic para mostrar';</script>
+    <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -831,13 +831,26 @@ por sus valores:</p>
 <span class="w">   </span><span class="nt">&lt;resources&gt;</span>
 <span class="w">      </span><span class="nt">&lt;resource&gt;</span>
 <span class="w">         </span><span class="nt">&lt;directory&gt;</span>src/main/resources<span class="nt">&lt;/directory&gt;</span>
-<span class="w">         </span><span class="nt">&lt;includes&gt;</span>
+<span class="hll"><span class="w">         </span><span class="nt">&lt;filtering&gt;</span>true<span class="nt">&lt;/filtering&gt;</span>
+</span><span class="w">         </span><span class="nt">&lt;includes&gt;</span>
 <span class="w">            </span><span class="nt">&lt;include&gt;</span>**/*.properties<span class="nt">&lt;/include&gt;</span>
 <span class="w">         </span><span class="nt">&lt;/includes&gt;</span>
-<span class="w">         </span><span class="nt">&lt;filtering&gt;</span>true<span class="nt">&lt;/filtering&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/resource&gt;</span>
 <span class="w">   </span><span class="nt">&lt;/resources&gt;</span>
 </pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>En ausencia de sección <code class="code docutils literal notranslate"><span class="pre">&lt;resources&gt;</span></code> <em>Maven</em>, por defecto,
+incorpora a la compilación todos los archivos que se incluyan dentro de la
+ruta predefinida <code class="file docutils literal notranslate"><span class="pre">src/main/resources</span></code>. pero sin realizar sustitución
+de variables.  Como nuestra intención es que la haya, necesitamos
+expresamente declarar la incorporación incluyendo la línea resaltada.
+Ahora bien, añadir esta sección de recursos, deshabilita este
+comportamiento predefinido y provoca que entonces sólo se incluya lo
+explícitamente declarado en la sección: en este caso, cualquier archivo de
+extensión <code class="file docutils literal notranslate"><span class="pre">.properties</span></code> dentro del subárbol
+<code class="file docutils literal notranslate"><span class="pre">src/main/resources</span></code>.</p>
 </div>
 </li>
 <li><p>Definir un método privado en <a class="reference internal" href="#config-picocli"><span class="std std-ref">Config</span></a> que cargue en el

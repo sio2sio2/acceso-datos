@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -47,10 +47,10 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=677778c1"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleHintShow = 'Haz clic para mostrar';</script>
+    <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -475,12 +475,16 @@ Podríamos proponer esta:</p>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="nf">getEntityManagerFactory</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">size</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;Índice fuera de rango&quot;</span><span class="p">);</span>
 
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">hashCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">hashCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">keys</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">hashCode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada ya no existe&quot;</span><span class="p">);</span>
+
 <span class="w">        </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">        </span><span class="k">assert</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Falta de sincronización entre keys e instances&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
 <span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">hashCode</span><span class="p">);</span>
-<span class="w">            </span><span class="n">keys</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">            </span><span class="n">keys</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 <span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada no está disponible&quot;</span><span class="p">);</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>

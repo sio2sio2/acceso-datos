@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -47,10 +47,10 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=677778c1"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleHintShow = 'Haz clic para mostrar';</script>
+    <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -669,21 +669,12 @@ sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:</p>
 <span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>No basta con crear el archivo de recursos, sino que este debe pasar
-a la aplicación compilada para que la implementación de <abbr title="Java Persistence API">JPA</abbr> pueda
-encontrarlo. <a class="reference internal" href="../01.archivos/01.gestion.html#file-arc-pro"><span class="std std-ref">Ya tratamos ello en la primera unidad</span></a> y exigía, si usamos
-<a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a>, declararlo en <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">como se explica en su apéndice</span></a>:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;resource&gt;</span>
-<span class="w">   </span><span class="nt">&lt;directory&gt;</span>src/main/resources<span class="nt">&lt;/directory&gt;</span>
-<span class="w">   </span><span class="nt">&lt;includes&gt;</span>
-<span class="w">      </span><span class="nt">&lt;include&gt;</span>META-INF/persistence.xml<span class="nt">&lt;/include&gt;</span>
-<span class="w">   </span><span class="nt">&lt;/includes&gt;</span>
-<span class="w">   </span><span class="nt">&lt;filtering&gt;</span>false<span class="nt">&lt;/filtering&gt;</span>
-<span class="nt">&lt;/resource&gt;</span>
-</pre></div>
-</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Es necesario que el archivo
+<code class="file docutils literal notranslate"><span class="pre">META-INF/persistence.xml</span></code> pase a la compilación, que es lo que debería
+ocurrir… a menos que haya usted <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cambiado ese comportamiento al añadir
+una sección resources al archivo pom.xml</span></a>.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">

@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
     <link rel="stylesheet" href="../_static/general.css" type="text/css" />
     <link rel="stylesheet" href="../_static/particular.css" type="text/css" />
   
@@ -47,10 +47,10 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=677778c1"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleHintShow = 'Haz clic para mostrar';</script>
+    <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -433,8 +433,8 @@ aparte. Se tratará más adelante en <a class="reference internal" href="15.extr
 <span id="orm-mapping-bas"></span><h2><span class="section-number">5.3.1. </span>Anotaciones básicas<a class="headerlink" href="#anotaciones-basicas" title="Link to this heading">#</a></h2>
 <p>Ya introdujimos las anotaciones más básicas al presentar el <a class="reference internal" href="02.basico.html#orm-bas-map"><span class="std std-ref">ejemplo de
 anotación de la clase Centro</span></a>:</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Clase Centro</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Clase Centro</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
 <span class="nd">@Table</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Centro&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Sólo útil si la table se llama de modo diferente.</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="p">{</span>
@@ -512,14 +512,14 @@ son:</p>
 <li><p>Los campos estáticos (<code class="docutils literal notranslate"><span class="pre">static</span></code>), ya que no forman parte del objeto.</p></li>
 <li><p>Los campos con el modificador <code class="docutils literal notranslate"><span class="pre">transient</span></code>.</p></li>
 <li><p>Los atributos sin <em>getter</em> o al menos con un <em>getter</em> que no sea accesible
-(<code class="docutils literal notranslate"><span class="pre">private</span></code>)<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
+(<code class="docutils literal notranslate"><span class="pre">private</span></code>)<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
 <li><p>Los atributos cuyo tipo no se sepa traducir.</p></li>
 <li><p>Los atributos que se heredan de una clase base que no se anotó con
 <code class="docutils literal notranslate"><span class="pre">&#64;Entity</span></code>.</p></li>
 </ul>
 <p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> fuerza a que un atributo se traduzca a campo y
 además permite añadir información sobre la traducción mediante parámetros:</p>
-<ul class="simple">
+<ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> permite indicar un nombre para el campo distinto al nombre del atributo.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nullable</span></code>, si puede contener valores nulos.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">unique</span></code>, si su valor debe ser único.</p></li>
@@ -531,7 +531,12 @@ decimales respectivamente.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">updatable</span></code>, indica si el campo debe incluirse en las sentencias
 <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">columnDefinition</span></code> sirve para indicar directamente la definición <abbr title="Structured Query Language">SQL</abbr>
-del campo.</p></li>
+del campo que se incluiría en una sentencia <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Por ejemplo:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;precio&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">columnDefinition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DECIMAL(10, 2) CHECK(precio &gt; 0)&quot;</span><span class="p">)</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">precio</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
 </ul>
 <p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code> evita que el atributo se mapee como campo.</p>
 </dd>
@@ -578,6 +583,11 @@ un número de versión, un tipo de fecha. Por ejemplo:</p>
 <span class="nd">@Column</span><span class="p">(</span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">actualizacion</span><span class="p">;</span>
 </pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Como de la actualización de este campo deben encargarse <abbr title="Java Persisten API">JPA</abbr>,
+nunca deberías definir un <em>setter</em> público.</p>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Enumerated</span></code></dt><dd><p>Permite indicar cómo almacenar un campo <code class="docutils literal notranslate"><span class="pre">enum</span></code>:</p>
@@ -741,8 +751,8 @@ relacional, ya que la relación sólo se refleja en uno de los extremos: en
 aquel en que se encuentra la clave foránea. Por ejemplo, la relación  la
 relación <strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em> provoca que definamos así la
 clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Clase Estudiante</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Clase Estudiante</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Estudiante</span><span class="w"> </span><span class="p">{</span>
 
@@ -826,6 +836,10 @@ clase <code class="docutils literal notranslate"><span class="pre">Estudiante</s
 <ul class="simple">
 <li><p>Con la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code> para un atributo que representa el objeto
 (registro) completo, no sólo el identificador.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;JoinColumn</span></code> no es estrictamente necesario. En este caso, lo hemos
+usado porque queríamos escoger el nombre que recibirá el campo
+correspondiete en la tabla <em>Estudiante</em>, y porque queremos hacer la
+relación opcional.</p></li>
 <li><p>Con un <em>getter</em> y un <em>setter</em> asociados.</p></li>
 <li><p>Haciendo que el constructor y <code class="docutils literal notranslate"><span class="pre">.cargarDatos</span></code> manejen el objeto
 referenciado, no la clave foránea en sí.</p></li>
@@ -947,12 +961,17 @@ resuelto cómo expresar una relación <strong>1:N</strong>.</p>
 </dl>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Esto, sin embargo, es así, porque por defecto el acceso es por
 propiedades (a través del <em>getter</em>) y no por atributos. Se puede alterar el
 comportamiento añadiendo la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Access(AccessType.FIELD)</span></code> a la
 clase.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>A menos que no haya más remedio, no suele ser buena idea utilizarlo, ya que
+su uso es más que probable que haga el código dependiente del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>.</p>
 </aside>
 </aside>
 </section>

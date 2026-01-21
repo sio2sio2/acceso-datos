@@ -237,10 +237,11 @@ vez de recurrir a ``String.format`` es:
 .. code-block:: java
 
    logger.atWarn()
+         .setMessage("Se evita el registro porque el estudiante ID={} tiene {} años")
          .addArgument(estudiante.getId())
          .addArgument(() -> estudiante.getEdad()) // Este es costoso.
          .setCause(e)   // Opcional, si quisiéramos pasar un error.
-         .log("Se evita el registro porque el estudiante ID={} tiene {} años");
+         .log();
 
 Con todo esto, ya sabemos sobradamente enviar mensajes al registro indicando qué
 nivel de gravedad tienen.

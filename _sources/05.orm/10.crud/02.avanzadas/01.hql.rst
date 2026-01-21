@@ -168,7 +168,7 @@ con menos de 20 años. Hay tres posibilidades:
   .. code-block:: java
 
      LocalDate fecRef = LocalDate.now().minusYears(20);
-     TypedQuery<Estudiante> estudiantes = em.createQuery("FROM Estudiante e WHERE e.edad > :limite", Estudiante.class)
+     TypedQuery<Estudiante> estudiantes = em.createQuery("FROM Estudiante e WHERE e.nacimiento > :limite", Estudiante.class)
          .setParameter("limite", fecRef);
 
 Lo que sí podemos usar son los campos definidos por la relación bidireccional
@@ -176,9 +176,9 @@ entre dos tablas, aunque no tengan reflejo en la base de datos. Por ejemplo:
 
 .. code-block:: java
 
-   TypedQuery<Estudiante> query = em.createQuery(
-      "SELECT c.estudiantes FROM Centro c WHERE c.nombre = :patron"
-   ).setParameter("patron", "%Castillo%");
+   TypedQuery<Estudiante> query = em
+      .createQuery("SELECT c.estudiantes FROM Centro c WHERE c.nombre = :patron", Estudiante.class)
+      .setParameter("patron", "%Castillo%");
 
 .. caution:: |JPA| aplana la lista, de modo que no se obtiene una lista de
    listas, sino, simplemente, una lista de estudiantes.
@@ -222,17 +222,19 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
 .. code-block:: java
 
    TypedQuery<Tuple> query = em.createQuery(
-      "SELECT e.centro.nombre AS nombre, COUNT(e) AS estudiantes FROM Estudiante e GROUP BY e.centro.nombre",
+      "SELECT e.centro AS centro, COUNT(e) AS estudiantes FROM Estudiante e GROUP BY e.centro",
       Tuple.class
    );
    List<Tuple> resultados = query.getResultList();
    for(Tuple t: resultados) {
-      String nombre = t.get("nombre", String.class);
+      Centro centro = t.get("centro", Centro.class);
       Long cantidad = t.get("estudiantes", Long.class);
       System.out.println("%s: %d estudiantes", nombre, cantidad);
    }
 
-.. note:: No es posible agrupar por ``e.centro``.
+.. caution:: Para poder agrupar por centro, la librería debe conocer cuándo dos
+   objetos centro son iguales. Por tanto, deberíamos haber definido en la clase
+   ``Centro`` los métodos ``hashCode()`` y ``equals()``.
 
 .. note:: Obsérvese que al estar consultando ``Estudiante``, los centros sin
    estudiantes no aparecen listados. En cambio, podríamos haber abordado la

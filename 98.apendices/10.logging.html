@@ -674,10 +674,11 @@ lambda como argumento:</p>
 <p>Una variante a esto último que permite pasar los parámetros como argumento, en
 vez de recurrir a <code class="docutils literal notranslate"><span class="pre">String.format</span></code> es:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="p">.</span><span class="na">atWarn</span><span class="p">()</span>
+<span class="w">      </span><span class="p">.</span><span class="na">setMessage</span><span class="p">(</span><span class="s">&quot;Se evita el registro porque el estudiante ID={} tiene {} años&quot;</span><span class="p">)</span>
 <span class="w">      </span><span class="p">.</span><span class="na">addArgument</span><span class="p">(</span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span>
 <span class="w">      </span><span class="p">.</span><span class="na">addArgument</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getEdad</span><span class="p">())</span><span class="w"> </span><span class="c1">// Este es costoso.</span>
 <span class="w">      </span><span class="p">.</span><span class="na">setCause</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w">   </span><span class="c1">// Opcional, si quisiéramos pasar un error.</span>
-<span class="w">      </span><span class="p">.</span><span class="na">log</span><span class="p">(</span><span class="s">&quot;Se evita el registro porque el estudiante ID={} tiene {} años&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="p">.</span><span class="na">log</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>Con todo esto, ya sabemos sobradamente enviar mensajes al registro indicando qué

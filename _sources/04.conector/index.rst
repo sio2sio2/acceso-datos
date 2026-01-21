@@ -7,7 +7,7 @@ el almacenamiento organizado de información. Su problema, al ser accedidas
 mediante aplicaciones, es que basan su estructura en el modelo relacional, que
 no es el modelo que usan los lenguajes de programación para manejar datos. En
 concreto, los más habituales, los lenguajes de |POO| manejan los datos haciendo
-uso del modelo de objetos, por lo que existe una discrepación entre el modo en
+uso del modelo de objetos, por lo que existe una discrepancia entre el modo en
 que tratan los datos los |SGBD| relacionales y el modo en que los tratan los
 lenguajes. Para afrontarlo, los lenguajes utilizan dos estrategias distintas:
 
@@ -56,7 +56,7 @@ Ambas estrategias tienen sus **ventajas** e **inconvenientes**:
       de cuál sea el |SGBD| que gestione los datos frente a los conectores que
       usan sentencias |SQL|, generalmente dependientes de cuál es el |SGBD|. En
       contrapartida, puede resultar muy trabajoso cambiar de |ORM|\ [#]_. Con 
-      conectores, en cambio, hay que usar sentecias |SQL| y estas dependen del
+      conectores, en cambio, hay que usar sentencias |SQL| y estas dependen del
       |SGBD| por lo que un cambio en éste obligará a repasar el código.
 
 En esta unidad abordaremos la primera estrategia y dejaremos la segunda para la
@@ -111,7 +111,7 @@ Además, necesitaremos importar en nuestro proyecto la librería propia de :prog
 
 Tomaremos como base un problema muy sencillo en el que simplemente existen
 centros y estudiantes matriculados en ellos. Podemos representarlo
-gráficamente con el siguente diagrama |E/R|:
+gráficamente con el siguiente diagrama |E/R|:
 
 .. image:: files/er-ec.png
 

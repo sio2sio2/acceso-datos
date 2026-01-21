@@ -161,7 +161,7 @@ Veamos cómo operar, por ejemplo, para hacer persistente un nuevo centro:
 
 Hay, sin embargo, un **grave problema**: cada operación crea, usa y cierra su
 propia conexión, lo que provoca que dos o más conexiones no puedan pertenecer a
-una mismo conexión, es decir, no tenemos **soporte para transacciones**. Lo
+una misma conexión, es decir, no tenemos **soporte para transacciones**. Lo
 interesante sería que, además de poder pasar un |DataSource| para crear un
 objeto |DAO| y que este lo usara para crear sus propias construcciones,
 pudiéramos también poder pasar directamente una conexión y que este la usara sin
@@ -279,7 +279,7 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
   patrón muy socorrido, sobre todo en bases de datos, es el patrón |DAO|.
 + Gran parte de los retos que debemos resolver al programar con *conectores*, ya
   los resuelven las :ref:`herramientas ORM <orm>`, que trataremos a
-  continuación, por lo que en en muchas ocasiones en las que o bien el
+  continuación, por lo que en muchas ocasiones en las que o bien el
   programador no es avezado o bien, aunque lo sea, el rendimiento no es crítico,
   es más inteligente utilizarlas.
 

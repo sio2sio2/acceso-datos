@@ -118,7 +118,7 @@ la sección `<build>` de :file:`pom.xml`\ [#]_:
                   <annotationProcessorPaths>
                       <path>
                           <groupId>org.hibernate.orm</groupId>
-                          <artifactId>hibernate-jpamodelgen</artifactId>
+                          <artifactId>hibernate-processor</artifactId>
                           <version>${hibernate.version}</version>
                       </path>
                   </annotationProcessorPaths>
@@ -129,6 +129,28 @@ la sección `<build>` de :file:`pom.xml`\ [#]_:
 
 Con esto, deberíamos tener disponibles en el proyecto las metaclases
 correspondientes a nuestro modelo (``Centro_`` y ``Estudiante_`` en el ejemplo).
+
+.. caution:: Si usamos javadoc_ para la documentación, esta herramienta busca las
+   clases del código fuente exclusivamente dentro de :file:`src/`, mientras que 
+   las [meta]clases generadas automáticamente por hibernate-processor_ se
+   incluyen en :file:`target/generated-sources/annotations/`. Esta circunstancia
+   debemos indicarla:
+
+   .. code-block:: xml
+      :emphasize-lines: 10
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <!-- La última versión puede consultarse en el repositorio de Maven -->
+          <version>3.11.2</version>
+          <configuration>
+              <source>${maven.compiler.release}</source>
+              <show>private</show>
+              <!-- Debemos añadir annotations para que no den problemas las clases anotadas del Metamodel -->
+              <sourcepath>${project.build.sourceDirectory};${project.build.directory}/generated-sources/annotations</sourcepath>
+          </configuration>
+      </plugin>
 
 Ahora podríamos reescribir el ejemplo anterior así:
 
@@ -458,4 +480,7 @@ También es posible **borrar**:
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 
-.. |CriteriaBuilder| replace:: :hibernate-api:`CriteriaBuilder <query/criteria/HibernateCriteriaBuilder>`
+.. |CriteriaBuilder| replace:: :jakarta-persistence:`criteria/criteriabuilder`
+
+.. _hibernate-processor: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor
+.. _javadoc: https://javadoc.io

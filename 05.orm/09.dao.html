@@ -516,6 +516,7 @@ Podríamos proponer esta:</p>
 <span class="cm">     * Elimina todos los objetos previamente creados.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">reset</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">forEach</span><span class="p">(</span><span class="n">emf</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">close</span><span class="p">());</span>
 <span class="w">        </span><span class="n">instances</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">        </span><span class="n">keys</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
 <span class="w">    </span><span class="p">}</span>

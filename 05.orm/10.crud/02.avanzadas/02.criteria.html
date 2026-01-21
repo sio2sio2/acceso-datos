@@ -419,7 +419,7 @@ document.write(`
 es más verborreico, pero en compensación facilita la construcción dinámica de
 las consultas en tiempo de ejecución, ya que no se basa en una cadena, sino en
 la aplicación de métodos a objetos. Se inspiró en <em>Hibernate Criteria</em>.</p>
-<p>Lo primero antes de construir la consulta es crear un objeto <a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> a
+<p>Lo primero antes de construir la consulta es crear un objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/criteria/criteriabuilder">criteria/criteriabuilder</a> a
 partir del objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaBuilder</span><span class="w"> </span><span class="n">cb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getCriteriaBuilder</span><span class="p">();</span>
 </pre></div>
@@ -510,7 +510,7 @@ la sección <cite>&lt;build&gt;</cite> de <code class="file docutils literal not
 <span class="w">               </span><span class="nt">&lt;annotationProcessorPaths&gt;</span>
 <span class="w">                   </span><span class="nt">&lt;path&gt;</span>
 <span class="w">                       </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">                       </span><span class="nt">&lt;artifactId&gt;</span>hibernate-jpamodelgen<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;artifactId&gt;</span>hibernate-processor<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">                       </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
 <span class="w">                   </span><span class="nt">&lt;/path&gt;</span>
 <span class="w">               </span><span class="nt">&lt;/annotationProcessorPaths&gt;</span>
@@ -522,6 +522,28 @@ la sección <cite>&lt;build&gt;</cite> de <code class="file docutils literal not
 </div>
 <p>Con esto, deberíamos tener disponibles en el proyecto las metaclases
 correspondientes a nuestro modelo (<code class="docutils literal notranslate"><span class="pre">Centro_</span></code> y <code class="docutils literal notranslate"><span class="pre">Estudiante_</span></code> en el ejemplo).</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Si usamos <a class="reference external" href="https://javadoc.io">javadoc</a> para la documentación, esta herramienta busca las
+clases del código fuente exclusivamente dentro de <code class="file docutils literal notranslate"><span class="pre">src/</span></code>, mientras que
+las [meta]clases generadas automáticamente por <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor">hibernate-processor</a> se
+incluyen en <code class="file docutils literal notranslate"><span class="pre">target/generated-sources/annotations/</span></code>. Esta circunstancia
+debemos indicarla:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>maven-javadoc-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- La última versión puede consultarse en el repositorio de Maven --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.11.2<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">        </span><span class="nt">&lt;source&gt;</span>${maven.compiler.release}<span class="nt">&lt;/source&gt;</span>
+<span class="w">        </span><span class="nt">&lt;show&gt;</span>private<span class="nt">&lt;/show&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Debemos añadir annotations para que no den problemas las clases anotadas del Metamodel --&gt;</span>
+<span class="hll"><span class="w">        </span><span class="nt">&lt;sourcepath&gt;</span>${project.build.sourceDirectory};${project.build.directory}/generated-sources/annotations<span class="nt">&lt;/sourcepath&gt;</span>
+</span><span class="w">    </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</pre></div>
+</div>
+</div>
 <p>Ahora podríamos reescribir el ejemplo anterior así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// o</span>
 <span class="n">cb</span><span class="p">.</span><span class="na">createTupleQuery</span><span class="p">();</span>
@@ -541,7 +563,7 @@ correspondientes a nuestro modelo (<code class="docutils literal notranslate"><s
 </section>
 <section id="condiciones">
 <h2><span class="section-number">5.6.2.2.3. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
-<p><a class="extlink-hibernate-api reference external" href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/HibernateCriteriaBuilder.html">CriteriaBuilder</a> tiene definidos métodos que implementan los operadores
+<p><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/criteria/criteriabuilder">criteria/criteriabuilder</a> tiene definidos métodos que implementan los operadores
 básicos de <abbr title="Structured Query Language">SQL</abbr>. Por ejemplo, para escoger los estudiantes no matriculados:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>

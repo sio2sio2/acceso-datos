@@ -22,63 +22,19 @@ Podríamos proponer esta:
    :language: java
    :start-at: public class
 
-Esta clase posibilita la creación de un único objeto por por unidad de
-persistencia. Cada una de estas fábricas se asocia al nombre de la unidad de
-persistencia para que podamos recuperarlas posteriormente cuando nos sean
-necesarias:
+Esta clase crea fábricas de gestores de entidades asociadas a claves, pero las
+oculta y sólo permite utilizar los gestores de entidades a través de
+transacciones.
 
 .. code-block:: java
 
-   public static main(String[] args) throws Exception {}
-      // Propiedades configuradas en tiempo de ejecución.
-      Map<String, String> props = new HashMap<>();
-      props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
-      props.put("hibernate.show_sql", "true");
+   // Propiedades configuradas en tiempo de ejecución.
+   Map<String, String> props = new HashMap<>();
+   props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
+   props.put("hibernate.show_sql", "true");
 
-      JpaBackend.createEntityManagerFactory("MiUnidadP", props);
-
-      // ...
-
-      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory("MiUnidadP")) {
-         operaciones(idx);  // Aquí se crean y usan objetos EntityManager
-      }
-   }
-
-   private static void operaciones(int idx) {
-      // ¡Ojo! No hay que cerrarlo.
-      EntityManagerFactory emf = JpaEmFactory.getInstance("MiUnidadP"); // Devuelve el mismo objeto.
-
-      try(em EntityFactory = emf.createEntityManager()) {
-         EntityTransaction tr = em.getTransaction();
-         try {
-            tr.begin();
-            Centro centro = new Centro(11004866, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
-            em.persist(centro);
-            tr.commit();
-         }
-         catch(Exception e) {
-            if(tr != null && tr.isActive()) tr.rollback();
-            throw new RuntimeException("Error al almacenar el centro", err);
-         }
-      }
-   }
-
-.. tip:: Se ha permitido también que en caso de que sólo se haya creado una
-   fábrica, ni siquiera sea necesario facilitar el índice:
-
-   .. code-block:: java
-
-      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory()) {
-         operaciones();
-      }
-
-Obtener la fábrica, sin embargo, nos obligaría a crear objetos
-:jakarta-persistence:`EntityManager` y a gestionar correctamente las
-transacciones con lo que no abstraería el código de las particularidades del
-almacenamiento. Por ese motivo la clase incluye algunos métodos para manejar
-automáticamente las transacciones:
-
-.. code-block:: java
+   // Configuración en persistence.xml + propiedades dinámicas
+   JpaBackend.createEntityManagerFactory("MiUnidadP", props);
 
    // Podríamos obviar el nombre de la unidad de persistencia, si sólo hubiera una fábrica.
    JpaBackend.transaction("MiUnidadP", em -> {
@@ -86,11 +42,18 @@ automáticamente las transacciones:
       em.persist(centro);
    });
 
-
    // Este método es capaz de devolver lo que devuelve la función del argumento.
-   // Como en el caso anterior, se puede obviar el índice 1.
    Centro otro = JpaBackend.transactionR("MiUnidadP", em -> em.get(Centro.class, 11004866L));
 
+   // Si queremos cerrar y eliminar la fábrica
+   JpaBackend.removeEntityManagerFactory("MiUnidadP");
+
+.. tip:: En caso de que sólo se haya creado una, ni siquiera es necesario usar
+   la clave:
+
+   .. code-block:: java
+
+      Centro otro = JpaBackend.transactionR(em -> em.get(Centro.class, 11004866L));
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`

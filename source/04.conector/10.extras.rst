@@ -71,8 +71,10 @@ definida:
 
 .. literalinclude:: files/DataAccessRuntimeException.java
    :language: java
+   :name: DataAccessRuntimeException
    :class: toggle
    :caption: DataAccessRuntimeException.java
+   :start-at: public class
 
 Con estas clases y definiendo un método estático para convertir un registro de
 la tabla *Centro* (esto es, un |ResultSet|) en un objeto ``Centro``:
@@ -149,30 +151,74 @@ resultados de la consulta:
 
 Gestor de transacciones
 =======================
-Para facilitar la forma en que se gestionan las :ref:`transacciones ya
-estudiadas <conn-transactions>` podemos crear una clase que explote las
-posibilidades del bloque `try-with-resources
-<https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html>`_:
+:ref:`Crear transacciones de forma manual <conn-transactions-create>` es bastante engorroso
+por lo que resulta muy útil construirse algún mecanismo más cómo para llevarlas
+a cabo. Una buena propuesta es ésta:
 
 .. literalinclude:: files/TransactionManager.java
    :language: java
+   :class: toggle
+   :caption: TransactionManager.java
+   :name: TransactionManager
 
-La clase podría usarse del siguiente modo:
+.. caution:: La clase presupone que hemos definido una excepción protegida de usuario
+   ``DataAccessException`` semejante a :ref:`DataAccessRuntimeException
+   <DataAccessRuntimeException>` que captura los errores propios de la
+   persistencia (``SQLException`` en nuestro caso).
+
+Las claves de esta clase son:
+
+- Usa un patrón Singleton ampliado (`Multiton <https://en.wikipedia.org/wiki/Multiton_pattern>`_),
+  de manera que se puede acceder a las distintas instancias mediante una clave
+  definida al crear cada instancia.
+- Automatiza la gestión de transacciones para que el programadador sólo se
+  tenga que preocupar de definir una expresión *lambda* que contenga todas las
+  operaciones que constituyen la transacción.
+- La expresión lambda tiene disponible una conexión para realizar con ella las
+  operaciones. La gestión de esta conexión (su creación y su cierre) debe correr
+  a cuenta del gestor de transacciones, por lo que está protegida para que el
+  programador no la cierre por descuido (su método ``close()`` no tiene ningún
+  efecto).
+
+Este gestor de transacciones soporta múltiples hilos y el acceso a mútiples bases de datos:
 
 .. code-block:: java
 
-   // Se supone que conn es una conexión ya abierta.
-   try (TransaccionManager tm = new TransactionManager(conn)) {
+   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
 
-      // Ejecutamos todas las sentencias que constituyen esta transacción
-      // ...
+   // En cualquier punto del código podemos rescatar el objeto gracias a la clave
+   tm = TransactionManager.get("CENTRO");
 
-      tm.commit(); // Confirmamos en la base de datos.
-   }
-   catch(SQLException err) {
-      // No hay que hacer rollback, ya que se encarga el close().
-      err.printStackTrace();
-   }
+   // Cómo realizar operaciones en una misma transacción
+   tm.transaction(conn -> {
+      String sqlString = "UPDATE centro SET titularidad = ? WHERE id = ?";
+      try {
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004866);
+            pstmt.setString(1, "PUBLICA");
+            pstmt.executeUpdate();
+         }
+
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004039);
+            pstmt.setString(1, "PUBLICA");
+            pstmt.executeUpdate();
+         }
+      } catch(SQLException e) {
+         // Generamos una excepción personalizada que escala al código
+         // externo a la transacción (o también podríamos mostrar algún
+         // mensaje de error y no propagar ninguna excepción).
+         throw new DataAccessException("Error al actualizar datos", e);
+      }
+
+      conn.close() // ¡¡¡NO DEBE HACERSE!!! pero, si se hace, no tiene efecto.
+   });
+
+.. note:: El método también puede capturar el resultado que devuelve la expresión lamda:
+
+   .. code-block:: java
+
+      List<Estudiante> estudiantes = tm.transaction(conn -> obtenerEstudiantes(conn));
 
 Cargar esquema desde archivo
 ============================

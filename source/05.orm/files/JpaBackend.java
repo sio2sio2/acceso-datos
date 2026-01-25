@@ -1,14 +1,29 @@
+package edu.acceso.tarea_5_1.core;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
+
+/**
+ * Clase de utilidad para gestionar múltiples instancias de {@link EntityManagerFactory}.
+ * Permite crear instancias a partir del nombre de la unidad de persistencia y un mapa de propiedades,
+ * y recuperarlas posteriormente mediante el propio nombre de la unidad de persistencia.
+ * También proporciona métodos para ejecutar transacciones de forma sencilla.
+ */
 public class JpaBackend {
 
     /**
-     * Lista de claves hash que representan las instancias creadas.
-     * Se utiliza una lista para mantener el orden de creación y permitir la recuperación por índice.
+     * Mapa que asocia las unidades de persistencias con los objetos {@link EntityManagerFactory} generados.
      */
-    private static ArrayList<Integer> keys = new ArrayList<>();
-    /**
-     * Mapa que asocia las claves hash con las instancias de EntityManagerFactory.
-     */
-    private static Map<Integer, EntityManagerFactory> instances = new HashMap<>();
+    private static Map<String, EntityManagerFactory> emfs = new HashMap<>();
 
     /**
      * Constructor privado para evitar instanciación.
@@ -20,57 +35,48 @@ public class JpaBackend {
      * y un mapa que modifica sus propiedades.
      * @param persistenceUnit El nombre de la unidad de persistencia.
      * @param props El mapa que define las propiedades definidas en tiempo de ejecución.
-     * @return Un índice que representa la instancia creada.
+     * @return El objeto resultante.
      * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.
      * @throws IllegalStateException Si ya existe una instancia con esos parámetros.
      */
-    public static int createEntityManagerFactory(String persistenceUnit, Map<String, String> props) {
+    public static EntityManagerFactory createEntityManagerFactory(String persistenceUnit, Map<String, String> props) {
         if(persistenceUnit == null) throw new IllegalArgumentException("El nombre de la unidad de persistencia no puede ser nulo"); 
 
-        int hashCode = Objects.hash(persistenceUnit, props);
+        EntityManagerFactory emf = emfs.get(persistenceUnit);
+        if(emf != null && emf.isOpen()) throw new IllegalStateException("Ya existe una EntityManagerFactory con esos parámetros");
 
-        EntityManagerFactory instance = instances.get(hashCode);
-        if(instance != null && instance.isOpen()) {
-            throw new IllegalStateException("Ya existe una EntityManagerFactory con esos parámetros");
-        }
-        instance = Persistence.createEntityManagerFactory(persistenceUnit, props);
-        instances.put(hashCode, instance);
-        keys.add(hashCode);
-        return keys.size();
+        emf = Persistence.createEntityManagerFactory(persistenceUnit, props);
+        emfs.put(persistenceUnit, emf);
+        return emf;
     }
 
     /**
      * Genera un {@link EntityManagerFactory} a partir del nombre de la unidad de persistencia
      * Se sobreentiende que no se modifica o añade ninguna propiedad.
      * @param persistenceUnit El nombre de la unidad de persistencia.
-     * @return Un índice que representa la instancia creada.
+     * @return El objeto resultante.
      * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.
      * @throws IllegalStateException Si ya existe una instancia con esos parámetros.
      */
-    public static int createEntityManagerFactory(String persistenceUnit) {
+    public static EntityManagerFactory createEntityManagerFactory(String persistenceUnit) {
         return createEntityManagerFactory(persistenceUnit, null);
     }
 
     /**
      * Devuelve un objeto EntityManagerFactory generado anteriormente.
-     * @param index El índice de la instancia a recuperar.
+     * @param persistenceUnit El nombre de la unidad de persistencia.
      * @return La instancia de EntityManagerFactory correspondiente al índice.
      * @throws IllegalArgumentException Si el índice está fuera de rango.
      */
-    public static EntityManagerFactory getEntityManagerFactory(int index) {
-        if(index < 1 || index > keys.size()) throw new IllegalArgumentException("Índice fuera de rango");
+    public static EntityManagerFactory getEntityManagerFactory(String persistenceUnit) {
+        Objects.requireNonNull(persistenceUnit, "El nombre de la unidad de persistencia no puede ser nulo");
+        EntityManagerFactory emf = emfs.get(persistenceUnit);
+        if(emf == null) throw new IllegalArgumentException("No existe ningún objeto asociado a ese nombre de unidad de persistencia");
 
-        Integer hashCode = keys.get(index - 1);
-        if(hashCode == null) throw new IllegalStateException("La instancia solicitada ya no existe");
-
-        EntityManagerFactory instance = instances.get(hashCode);
-        assert instance == null: "Falta de sincronización entre keys e instances";
-
-        if(instance.isOpen()) return instance;
+        if(emf.isOpen()) return emf;
         else {
-            instances.remove(hashCode);
-            keys.set(index - 1, null);
-            throw new IllegalStateException("La instancia solicitada no está disponible");
+            emfs.remove(persistenceUnit);
+            throw new IllegalStateException("La instancia solicitada no está disponible. Pruebe a crearla de nuevo.");
         }
     }
 
@@ -80,12 +86,12 @@ public class JpaBackend {
      * @throws IllegalStateException Si no hay ninguna instancia o si hay varias.
      */
     public static EntityManagerFactory getEntityManagerFactory() {
-        EntityManagerFactory instance = null;
+        EntityManagerFactory emf = null;
 
-        switch(instances.size()) {
+        switch(emfs.size()) {
             case 1:
-                instance = instances.values().iterator().next();
-                if(instance.isOpen()) return instance;
+                emf = emfs.values().iterator().next();
+                if(emf.isOpen()) return emf;
                 else {
                     reset();
                     throw new IllegalStateException("La instancia solicitada no está disponible");
@@ -98,24 +104,23 @@ public class JpaBackend {
     }
 
     /**
-     * Elimina todos los objetos previamente creados.
+     * Cierra y elimina todos los objetos {@link EntityManagerFactory} previamente creados.
      */
     public static void reset() {
-        instances.values().forEach(emf -> emf.close());
-        instances.clear();
-        keys.clear();
+        emfs.values().forEach(emf -> emf.close());
+        emfs.clear();
     }
 
     // Transacciones.
     /**
      * Ejecuta una acción dentro de una transacción, devolviendo un resultado.
      * @param <T> El tipo de resultado de la acción.
-     * @param index El índice de la instancia a utilizar.
+     * @param persistenceUnit El nombre de la unidad de persistencia.
      * @param action La acción a ejecutar.
      * @return El resultado de la acción.
      */
-    public static <T> T transactionR(Integer index, Function<EntityManager, T> action) {
-        EntityManagerFactory emf = index != null?getEntityManagerFactory(index):getEntityManagerFactory();
+    public static <T> T transactionR(String persistenceUnit, Function<EntityManager, T> action) {
+        EntityManagerFactory emf = persistenceUnit != null ? getEntityManagerFactory(persistenceUnit) : getEntityManagerFactory();
         try(EntityManager em = emf.createEntityManager()) {
             EntityTransaction tx = em.getTransaction();
             try {
@@ -125,14 +130,18 @@ public class JpaBackend {
                 return result;
             }
             catch(Exception e) {
-                if(tx != null && tx.isActive()) tx.rollback();
+                try {
+                    if(tx != null && tx.isActive()) tx.rollback();
+                } catch(PersistenceException pe) {
+                    e.addSuppressed(pe);
+                }
                 throw new RuntimeException("Fallo en la transacción", e);
             }
         }
     }
 
     /**
-     * Versión sin índice de {@link #transactionR(Integer, Function)} para cuando sólo hay una instancia.
+     * Versión sin índice de {@link #transactionR(String, Function)} para cuando sólo hay una instancia.
      * @param <T> El tipo de resultado de la acción.
      * @param action La acción a ejecutar.
      * @return El resultado de la acción.
@@ -143,18 +152,18 @@ public class JpaBackend {
 
     /**
      * Ejecuta una acción dentro de una transacción, sin devolver resultado.
-     * @param index El índice de la instancia a utilizar.
+     * @param persistenceUnit El nombre de la unidad de persistencia.
      * @param action La acción a ejecutar.
      */
-    public static void transaction(Integer index, Consumer<EntityManager> action) {
-        transactionR(index, em -> {
+    public static void transaction(String persistenceUnit, Consumer<EntityManager> action) {
+        transactionR(persistenceUnit, em -> {
             action.accept(em);
             return null;
         });
     }
 
     /**
-     * Versión sin índice de {@link #transaction(Integer, Consumer)} para cuando sólo hay una instancia.
+     * Versión sin índice de {@link #transaction(String, Consumer)} para cuando sólo hay una instancia.
      * @param action La acción a ejecutar.
      */
     public static void transaction(Consumer<EntityManager> action) {

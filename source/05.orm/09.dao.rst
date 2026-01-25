@@ -22,10 +22,10 @@ Podríamos proponer esta:
    :language: java
    :start-at: public class
 
-Esta clase implementa un `patrón Singleton`_ ampliado que posibilita la creación
-de una única fábrica por entidad de persistencia. Cada una de estas fábricas se
-asocia a un índice a partir del **1** para que podamos recuperarlas
-posteriormente cuando nos sean necesarias:
+Esta clase posibilita la creación de un único objeto por por unidad de
+persistencia. Cada una de estas fábricas se asocia al nombre de la unidad de
+persistencia para que podamos recuperarlas posteriormente cuando nos sean
+necesarias:
 
 .. code-block:: java
 
@@ -35,18 +35,18 @@ posteriormente cuando nos sean necesarias:
       props.put("jakarta.persistence.jdbc.url", "jdbc:sqlite:centro.db");
       props.put("hibernate.show_sql", "true");
 
-      int idx = JpaBackend.createEntityManagerFactory("MiUnidadP", props);
+      JpaBackend.createEntityManagerFactory("MiUnidadP", props);
 
       // ...
 
-      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory(idx)) {
+      try(EntityManagerFactory emf = JpaBackend.getEntityManagerFactory("MiUnidadP")) {
          operaciones(idx);  // Aquí se crean y usan objetos EntityManager
       }
    }
 
    private static void operaciones(int idx) {
       // ¡Ojo! No hay que cerrarlo.
-      EntityManagerFactory emf = JpaEmFactory.getInstance(idx); // Devuelve el mismo objeto.
+      EntityManagerFactory emf = JpaEmFactory.getInstance("MiUnidadP"); // Devuelve el mismo objeto.
 
       try(em EntityFactory = emf.createEntityManager()) {
          EntityTransaction tr = em.getTransaction();
@@ -80,9 +80,8 @@ automáticamente las transacciones:
 
 .. code-block:: java
 
-   // Usamos la fábrica 1 para hacer persistente un centro.
-   // También podríamos obviar el índice, si sólo hubiera una fábrica
-   JpaBackend.transaction(1, em -> {
+   // Podríamos obviar el nombre de la unidad de persistencia, si sólo hubiera una fábrica.
+   JpaBackend.transaction("MiUnidadP", em -> {
       Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
       em.persist(centro);
    });
@@ -90,7 +89,7 @@ automáticamente las transacciones:
 
    // Este método es capaz de devolver lo que devuelve la función del argumento.
    // Como en el caso anterior, se puede obviar el índice 1.
-   Centro otro = JpaBackend.transactionR(1, em -> em.get(Centro.class, 11004866L));
+   Centro otro = JpaBackend.transactionR("MiUnidadP", em -> em.get(Centro.class, 11004866L));
 
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`

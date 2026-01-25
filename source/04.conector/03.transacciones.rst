@@ -18,6 +18,8 @@ venta, o no hacerlas en absoluto para que quede la venta pendiente. En cambio,
 si se hiciera una y no la otra, la base de datos quedaría en un estado
 inconsistente.
 
+.. _conn-transactions-create:
+
 Manejo de transacciones
 -----------------------
 En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
@@ -25,7 +27,7 @@ En los ejemplos con que hemos ilustrado los distintos casos, cada sentencia
 pertenezcan a una misma transacción debemos hacer lo siguiente:
 
 .. code-block:: java
-   :emphasize-lines: 8, 17, 21, 24
+   :emphasize-lines: 9, 18, 23, 32
 
    Centro[] centros = new Centro[] {
       new Centro(11004866, "IES Castillo de Luna", "pública"),
@@ -34,23 +36,34 @@ pertenezcan a una misma transacción debemos hacer lo siguiente:
    };
    String sqlString = "INSERT INTO Centro VALUES (?, ?, ?);"
 
-   conn.setAutoCommit(false);  // Evitamos que cada sentencia implique una transacción
+   try(Connection conn = DriverManager.getConnection(dbUrl)) {
+      conn.setAutoCommit(false);  // Evitamos que cada sentencia implique una transacción
 
-   try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
-       for(Centro centro: centros) {
-           pstmt.setInt(1, centro.getId());
-           pstmt.setString(2, centro.getNombre());
-           pstmt.setString(3, centro.getTitularidad());
-           pstmt.executeUpdate();
-       }
-       conn.commit(); // Después de ejecutar todas las sentencias, las confirmamos.
-   }
-   catch(SQLException err) {
+      try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
+          for(Centro centro: centros) {
+              pstmt.setInt(1, centro.getId());
+              pstmt.setString(2, centro.getNombre());
+              pstmt.setString(3, centro.getTitularidad());
+              pstmt.executeUpdate();
+          }
+          conn.commit(); // Después de ejecutar todas las sentencias, las confirmamos.
+      }
+   } catch(SQLException err) {
+      if(conn != null) {
+         try {
+            conn.rollback();  // Hubo un problema, se deshace todo lo hecho.
+         } catch(SQLException e) {
+            err.addSuppressed(e);
+         }
+      }
       err.printStackTrace();
-      conn.rollback();  // Hubo un problema, se deshace todo lo hecho.
    }
    finally {
-      conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.
+      try {
+         if(conn != null) conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.
+      } catch(SQLException e) {
+         err.printStackTrace();
+      }
    }
 
 .. important:: En el ejemplo, las sentencias son una misma sentencia con
@@ -91,8 +104,12 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
        conn.commit(); // Confirmamos las inserciones.
    }
    catch(SQLException err) {
+      try {
+         conn.rollback();
+      } catch(SQLException e) {
+         err.addSuppressed(e);
+      }
       err.printStackTrace();
-      conn.rollback();  // Hubo un problema, se deshace todo lo hecho.
    }
    finally {
       conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.

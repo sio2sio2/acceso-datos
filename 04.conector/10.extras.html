@@ -1064,7 +1064,9 @@ operaciones que constituyen la transacción.</p></li>
 operaciones. La gestión de esta conexión (su creación y su cierre) debe correr
 a cuenta del gestor de transacciones, por lo que está protegida para que el
 programador no la cierre por descuido (su método <code class="docutils literal notranslate"><span class="pre">close()</span></code> no tiene ningún
-efecto).</p></li>
+efecto). Esta magia se logra gracias al uso del <a class="reference external" href="https://medium.com/&#64;AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01">patrón Proxy</a>
+que permite interceptar los métodos definidos en una interfaz (y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>
+lo es).</p></li>
 </ul>
 <p>Este gestor de transacciones soporta múltiples hilos y el acceso a mútiples bases de datos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;CENTRO&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds</span><span class="p">);</span><span class="w"> </span><span class="c1">// ds es un DataSource ya creado</span>

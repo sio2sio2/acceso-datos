@@ -622,7 +622,10 @@ una clave primaria o un campo con valores únicos), puede usarse el método
 <p class="admonition-title">Prudencia</p>
 <p>Para poder agrupar por centro, la librería debe conocer cuándo dos
 objetos centro son iguales. Por tanto, deberíamos haber definido en la clase
-<code class="docutils literal notranslate"><span class="pre">Centro</span></code> los métodos <code class="docutils literal notranslate"><span class="pre">hashCode()</span></code> y <code class="docutils literal notranslate"><span class="pre">equals()</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code> los métodos <code class="docutils literal notranslate"><span class="pre">hashCode()</span></code> y <code class="docutils literal notranslate"><span class="pre">equals()</span></code>. Una alternativa, que no
+requiere definir esto último, habría sido agrupar por el identificador o el
+nombre del centro (siempre que no hubiera dos centros con el mismo nombre),
+ya que los enteros o las cadenas ya tienen definida de serie la igualdad.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>

@@ -1,50 +1,12 @@
-package edu.acceso.test_dao.backend.sql;
-
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
-import edu.acceso.test_dao.backend.core.Crud;
-import edu.acceso.test_dao.backend.core.DataAccessException;
-import edu.acceso.test_dao.backend.core.ConnProvider;
-import edu.acceso.test_dao.modelo.Centro;
-import edu.acceso.test_dao.modelo.Estudiante;
-
 /**
  * Implementación de {@link Crud} para la entidad {@link Estudiante} usando SQL.
  * Esta clase proporciona métodos para realizar operaciones CRUD sobre estudiantes
  * en una base de datos relacional.
  */
-public class EstudianteSqlDao implements Crud<Estudiante> {
+public class EstudianteSqlDao extends BaseDao<Estudiante> {
 
-    /** Proveedor de conexiones. */
-    private final ConnProvider cp;
-
-    /**
-     * Constructor que inicializa el proveedor de conexiones con un {@link DataSource}.
-     *
-     * @param ds Fuente de datos para obtener conexiones.
-     */
-    public EstudianteSqlDao(DataSource ds) {
-        cp = new ConnProvider(ds);
-    }
-
-    /**
-     * Constructor que inicializa el proveedor de conexiones con una conexión existente.
-     * @param conn Conexión existente para el proveedor de conexiones.
-     */
-    public EstudianteSqlDao(Connection conn) {
-        cp = new ConnProvider(conn);
+    public EstudianteSqlDao(String key) {
+        super(key);
     }
 
     /**
@@ -66,7 +28,7 @@ public class EstudianteSqlDao implements Crud<Estudiante> {
 
         // Carga inmediata.
         if(idCentro != null) {
-            CentroSqlDao centroDao = new CentroSqlDao(conn);
+            CentroSqlDao centroDao = new CentroSqlDao(key);
             try {
                 centro = centroDao.get(idCentro).orElse(null);
                 assert centro != null: "Identificador como clave foránea no existe";

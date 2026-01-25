@@ -178,7 +178,10 @@ Las claves de esta clase son:
   operaciones. La gestión de esta conexión (su creación y su cierre) debe correr
   a cuenta del gestor de transacciones, por lo que está protegida para que el
   programador no la cierre por descuido (su método ``close()`` no tiene ningún
-  efecto).
+  efecto). Esta magia se logra gracias al uso del `patrón Proxy
+  <https://medium.com/@AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01>`_
+  que permite interceptar los métodos definidos en una interfaz (y |Connection|
+  lo es).
 
 Este gestor de transacciones soporta múltiples hilos y el acceso a mútiples bases de datos:
 

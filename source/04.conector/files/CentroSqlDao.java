@@ -1,4 +1,4 @@
-package edu.acceso.test_dao.backend.sql;
+ackage edu.acceso.test_dao.backend.sql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,26 +23,15 @@ import edu.acceso.test_dao.modelo.Centro.Titularidad;
  * Esta clase proporciona métodos para realizar operaciones CRUD sobre centros
  * en una base de datos relacional.
  */
-public class CentroSqlDao implements Crud<Centro> {
-
-    /** Proveedor de conexiones. */
-    private final ConnProvider cp;
+public class CentroSqlDao extends BaseDao<Centro> {
 
     /**
-     * Constructor que inicializa el proveedor de conexiones con un {@link DataSource}.
+     * Constructor
      *
-     * @param ds Fuente de datos para obtener conexiones.
+     * @param key Clave que identifica el {@link DataSource}
      */
-    public CentroSqlDao(DataSource ds) {
-        cp = new ConnProvider(ds);
-    }
-
-    /**
-     * Constructor que inicializa el proveedor de conexiones con una conexión existente.
-     * @param conn Conexión existente para el proveedor de conexiones.
-     */
-    public CentroSqlDao(Connection conn) {
-        cp = new ConnProvider(conn);
+    public CentroSqlDao(String key) {
+        super(key);
     }
 
     /**
@@ -77,7 +66,7 @@ public class CentroSqlDao implements Crud<Centro> {
     public Optional<Centro> get(Long id) throws DataAccessException {
         String sqlString = "SELECT * FROM Centro WHERE id_centro = ?";
 
-        try(Connection conn = cp.getConnection();) {
+        try(Connection conn = getConnection();) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 pstmt.setLong(1, id);
                 try(ResultSet rs = pstmt.executeQuery()) {
@@ -95,7 +84,7 @@ public class CentroSqlDao implements Crud<Centro> {
         String sqlString = "SELECT * FROM Centro";
         List<Centro> centros = new ArrayList<>();
 
-        try(Connection conn = cp.getConnection()) {
+        try(Connection conn = getConnection()) {
             try(Statement pstmt = conn.createStatement()) {
                 try(ResultSet rs = pstmt.executeQuery(sqlString)) {
                     while(rs.next()) {
@@ -114,7 +103,7 @@ public class CentroSqlDao implements Crud<Centro> {
     public boolean delete(Long id) throws DataAccessException {
         String sqlString = "DELETE FROM Centro WHERE id_centro = ?";
 
-        try(Connection conn = cp.getConnection()) {
+        try(Connection conn = getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 pstmt.setLong(1, id);
                 return pstmt.executeUpdate() > 0;
@@ -129,7 +118,7 @@ public class CentroSqlDao implements Crud<Centro> {
     public void insert(Centro centro) throws DataAccessException {
         String sqlString = "INSERT INTO Centro (nombre, titularidad, id_centro) VALUES (?, ?, ?)";
 
-        try(Connection conn = cp.getConnection()) {
+        try(Connection conn = getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 centroToParams(pstmt, centro);
                 pstmt.executeUpdate();
@@ -144,7 +133,7 @@ public class CentroSqlDao implements Crud<Centro> {
     public boolean update(Centro centro) throws DataAccessException {
         String sqlString = "UPDATE Centro SET nombre = ?, titularidad = ? WHERE id_centro = ?";
 
-        try(Connection conn = cp.getConnection()) {
+        try(Connection conn = getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 centroToParams(pstmt, centro);
                 return pstmt.executeUpdate() > 0;
@@ -158,7 +147,7 @@ public class CentroSqlDao implements Crud<Centro> {
     @Override
     public boolean update(Long oldId, Long newId) throws DataAccessException {
         String sqlString = "UPDATE Centro SET id_centro = ? WHERE id_centro = ?";
-        try(Connection conn = cp.getConnection()) {
+        try(Connection conn = getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 pstmt.setLong(1, oldId);
                 pstmt.setLong(2, newId);

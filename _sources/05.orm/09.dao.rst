@@ -20,7 +20,7 @@ Podríamos proponer esta:
    :class: toggle
    :caption: JpaBackend.java
    :language: java
-   :start-at: public class
+   :start-at: /**
 
 Esta clase crea fábricas de gestores de entidades asociadas a claves, pero las
 oculta y sólo permite utilizar los gestores de entidades a través de
@@ -34,26 +34,26 @@ transacciones.
    props.put("hibernate.show_sql", "true");
 
    // Configuración en persistence.xml + propiedades dinámicas
-   JpaBackend.createEntityManagerFactory("MiUnidadP", props);
+   try(JpaBackend jb = JpaBackend.create("MiUnidadP", props)) {
+      // Podríamos obviar el nombre de la unidad de persistencia, si sólo hubiera una fábrica.
+      jb.transaction(em -> {
+         Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
+         em.persist(centro);
+      });
 
-   // Podríamos obviar el nombre de la unidad de persistencia, si sólo hubiera una fábrica.
-   JpaBackend.transaction("MiUnidadP", em -> {
-      Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
-      em.persist(centro);
-   });
+      // Este método es capaz de devolver lo que devuelve la función del argumento.
+      Centro otro = jb.transactionR(em -> em.get(Centro.class, 11004866L));
 
-   // Este método es capaz de devolver lo que devuelve la función del argumento.
-   Centro otro = JpaBackend.transactionR("MiUnidadP", em -> em.get(Centro.class, 11004866L));
+      // Podemos obtener en cualquier momento la propia instancia
+      JpaBackend jb2 = jpaBackend.get("MiUnidadP");
+   }
 
-   // Si queremos cerrar y eliminar la fábrica
-   JpaBackend.removeEntityManagerFactory("MiUnidadP");
-
-.. tip:: En caso de que sólo se haya creado una, ni siquiera es necesario usar
+.. tip:: En caso de que sólo se haya creado una instancia, ni siquiera es necesario usar
    la clave:
 
    .. code-block:: java
 
-      Centro otro = JpaBackend.transactionR(em -> em.get(Centro.class, 11004866L));
+      JpaBackend jb = JpaBackend.get();
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`

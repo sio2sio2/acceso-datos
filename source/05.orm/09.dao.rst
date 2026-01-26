@@ -18,7 +18,7 @@ Podríamos proponer esta:
 
 .. literalinclude:: files/JpaBackend.java
    :class: toggle
-   :caption: JpaBackend.java
+   :caption: JpaBackend.java (:download:`descarga <files/JpaBackend.java>`)
    :language: java
    :start-at: /**
 
@@ -48,12 +48,12 @@ transacciones.
       JpaBackend jb2 = jpaBackend.get("MiUnidadP");
    }
 
-.. tip:: En caso de que sólo se haya creado una instancia, ni siquiera es necesario usar
-   la clave:
+.. tip:: Las transacciones también se pueden abrir con un método estático
+   y el nombre de la unidad de persistencia:
 
    .. code-block:: java
 
-      JpaBackend jb = JpaBackend.get();
+      Centro otro = JpaBackend.transactionR("MiUnidadP", em -> em.get(Centro.class, 11004866L));
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`

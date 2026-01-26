@@ -18,7 +18,7 @@ podemos envolverlo en una clase como esta:
 
 .. literalinclude:: files/ConnectionPool.java
    :class: toggle
-   :caption: ConnectionPool.java
+   :caption: ConnectionPool.java (:download:`descarga <files/ConnectionPool.java>`)
    :name: clase-connectionpool
    :language: java
    :start-at: public class
@@ -28,25 +28,26 @@ De este modo, para crear un *pool* con HikariCP_ basta con hacer lo siguiente\ [
 .. code-block:: java
 
    // Pool de conexiones de una base SQLite en memoria.
-   DataSource ds = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
-   Connection conn = ds.getConnection();
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      DataSource ds = pool.getDataSource();
+      try(Connection conn = ds.getConnection()) {
+         // Hacemos operaciones con la conexión.
+      }
+   }
 
 Lo interesante de la clase, además de que simplifica la creación del *pool*, es que
-usa un `patrón Singleton`_, de manera que si intentamos crear un pool con los
-mismos parámetros, genera una excepción:
+usa un `patrón Multiton`_, de manera que si intentamos crear un pool con la
+misma clave, genera una excepción:
 
 .. code-block:: java
 
-   ConnectionPool pool1 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");
-   ConnectionPool pool2 = PoolConnection.getInstance("jdbc:sqlite:file::memory:?cache=shared");  // IllegalStateException
-   ConnectionPool pool3 = PoolConnection.getInstance();
+   ConnectionPool pool1 = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared");
+   ConnectionPool pool2 = ConnectionPool.create("BD", "jdbc:sqlite:datos.db");  // IllegalStateException
+   ConnectionPool pool3 = ConnectionPool.get("BD");  // Recuperamos el pool.
    pool1 == pool3; // true
-   ConnectionPool pool4 = PoolConnection.getInstance("jdbc:sqlite:caca.db");
-   pool1 == pool4; // false
-   ConnectionPool pool5 = PoolConnection.getInstance();  // IllegalArgumentException (hay dos, ¿cuál es?)
 
 .. caution:: Obsérvese la |URL| que se ha utilizado en los ejemplos. En el caso
-   particular de *SQLite*, para que las distintas conexiones del *pool* abran
+   particular de *SQLite* y HikariCP_, para que las distintas conexiones del *pool* abran
    conexión a la misma base de datos en memoria, no basta con que la ruta sea
    :file:`:memory:`, sino que ha de usarse :file:`file::memory:?cache=shared`.
 
@@ -158,7 +159,7 @@ a cabo. Una buena propuesta es ésta:
 .. literalinclude:: files/TransactionManager.java
    :language: java
    :class: toggle
-   :caption: TransactionManager.java
+   :caption: TransactionManager.java (:download:`descarga <files/TransactionManager.java>`)
    :name: TransactionManager
 
 .. caution:: La clase presupone que hemos definido una excepción protegida de usuario
@@ -271,7 +272,7 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
         <dependency>
             <groupId>com.github.sio2sio2</groupId>
             <artifactId>sqlutils</artifactId>
-            <version>2.0.1</version>
+            <version>2.7.0</version>
         </dependency>
       </dependencies>
 
@@ -296,5 +297,5 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
 .. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
-.. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
+.. _patrón Multiton: https://en.wikipedia.org/wiki/Multiton
 .. _HikariCP: https://github.com/brettwooldridge/HikariCP

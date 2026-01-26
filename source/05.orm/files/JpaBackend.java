@@ -1,18 +1,3 @@
-package edu.acceso.tarea_5_1.backend;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.PersistenceException;
-
 /**
  * Gestiona múltiples instancias de {@link EntityManagerFactory}.
  * Utiliza el patrón Multiton para crear instancias únicas asociadas al nombre de la unidad de persistencia.
@@ -45,13 +30,22 @@ public class JpaBackend implements AutoCloseable {
      * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.
      * @throws IllegalStateException Si ya existe una instancia con esos parámetros.
      */
-    public static JpaBackend createEntityManagerFactory(String persistenceUnit, Map<String, String> props) {
-        Objects.requireNonNull(persistenceUnit, "El nombre de la unidad de persistencia no puede ser nulo");
+    public static JpaBackend create(String persistenceUnit, Map<String, String> props) {
+        Objects.requireNonNull(persistenceUnit, "El nombre de la unidad de persistencia no puede ser nula");
 
-        return entities.compute(persistenceUnit, (k, instance) -> {
-            if(instance != null && instance.isOpen()) throw new IllegalStateException("Ya existe una EntityManagerFactory con esos parámetros");
-            return new JpaBackend(persistenceUnit, Persistence.createEntityManagerFactory(persistenceUnit, props));
-        });
+        if(entities.containsKey(persistenceUnit)) throw new IllegalStateException("Ya hay una instancia asociada a la clave");
+
+
+        JpaBackend instance = new JpaBackend(persistenceUnit, Persistence.createEntityManagerFactory(persistenceUnit, props));
+        JpaBackend previa = entities.putIfAbsent(persistenceUnit, instance);
+
+        // Otro hilo generó una instancia.
+        if(previa != null) {
+            instance.close();
+            throw new IllegalStateException("Ya hay una instancia asociada a la clave");
+        }
+
+        return instance;
     }
 
     /**
@@ -71,7 +65,7 @@ public class JpaBackend implements AutoCloseable {
      * @return La instancia de {@link JpaBackend} creada.
      */
     public static JpaBackend create(String persistenceUnit) {
-        return createEntityManagerFactory(persistenceUnit, null);
+        return create(persistenceUnit, null);
     }
 
     /**
@@ -80,45 +74,24 @@ public class JpaBackend implements AutoCloseable {
      * @return La instancia de {@link JpaBackend} correspondiente.
      * @throws IllegalArgumentException Si el índice está fuera de rango.
      */
-    private static JpaBackend get(String persistenceUnit) {
+    public static JpaBackend get(String persistenceUnit) {
         Objects.requireNonNull(persistenceUnit, "El nombre de la unidad de persistencia no puede ser nulo");
 
         JpaBackend instance = entities.get(persistenceUnit);
         if(instance == null) throw new IllegalArgumentException("No existe ningún objeto asociado a ese nombre de unidad de persistencia");
 
-        if(instance.emf.isOpen()) return instance;
+        if(instance.isOpen()) return instance;
         else {
             entities.remove(persistenceUnit, instance);
-            throw new IllegalStateException("La instancia solicitada no está disponible. Pruebe a crearla de nuevo.");
-        }
-    }
-
-    /**
-     * Devuelve un objeto EntityManagerFactory generado anteriormente. Sólo funciona si se generó uno.
-     * @return La instancia de {@link JpaBackend} correspondiente.
-     * @throws IllegalStateException Si no hay ninguna instancia o si hay varias.
-     */
-    public static JpaBackend get() {
-        // Snapshot atómico de las instancias.
-        JpaBackend[] instances = entities.values().toArray(new JpaBackend[0]);
-
-        switch(instances.length) {
-            case 1:
-                JpaBackend instance = instances[0];
-                if(instance.isOpen()) return instance;
-                else throw new IllegalStateException("La instancia solicitada no está disponible");
-            case 0:
-                throw new IllegalStateException("No hay disponible ninguna instancia");
-            default:
-                throw new IllegalStateException("Invocación ambigua: hay varios candidatos");
+            throw new IllegalStateException("La instancia solicitada no existe.");
         }
     }
 
     @Override
     public void close() {
         if(closed.compareAndSet(false, true)) {
-            entities.remove(persistenceUnit);
-            if(isOpen()) emf.close();
+            entities.remove(persistenceUnit, this);
+            if(emf.isOpen()) emf.close();
         }
     }
 

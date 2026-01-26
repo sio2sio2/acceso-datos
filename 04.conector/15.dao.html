@@ -722,6 +722,8 @@ cierres accidentales ya que del cierre se encarga en exclusiva el propio gestor
 al cerrar la transacción. En conclusión, que nos usarlo en nuestra
 implementación del patrón <abbr title="Data Access Object">DAO</abbr>. Para simplificar las cosas definamos un <abbr title="Data Access Object">DAO</abbr>
 abstracto del que deriven los <abbr title="Data Access Object">DAO</abbr> para cada objeto:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">BaseDao</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Entity</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
@@ -735,6 +737,7 @@ abstracto del que deriven los <abbr title="Data Access Object">DAO</abbr> para c
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
 </div>
 <p>Es decir, construimos las clases <abbr title="Data Access Object">DAO</abbr> pasando la clave que identifica al
 <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> que nos interesa; y, como ya adelantamos, la conexión la obtenemos

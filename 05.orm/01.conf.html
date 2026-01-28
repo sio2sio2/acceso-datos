@@ -438,13 +438,15 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- Driver JDBC para SQLite --&gt;</span>
 <span class="w">      </span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.50.3.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;version&gt;</span>3.51.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- Soporte en Hibernate para SQLite --&gt;</span>
@@ -452,6 +454,7 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">          </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;artifactId&gt;</span>hibernate-community-dialects<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">          </span><span class="nt">&lt;version&gt;</span>${hibernate.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
 <span class="w">      </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">      </span><span class="cm">&lt;!-- Opcional para anotaciones de comprobación --&gt;</span>
@@ -466,6 +469,7 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">         </span><span class="nt">&lt;groupId&gt;</span>org.hibernate.validator<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;artifactId&gt;</span>hibernate-validator<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">         </span><span class="nt">&lt;version&gt;</span>9.1.0.Final<span class="nt">&lt;/version&gt;</span>
+<span class="w">          </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 
 <span class="w">     </span><span class="cm">&lt;!-- Opcional para evaluación dinámica de cadenas de texto (puede necesitarlo Hibernate Validator) --&gt;</span>
@@ -473,6 +477,7 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.glassfish.expressly<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>expressly<span class="nt">&lt;/artifactId&gt;</span>
 <span class="w">        </span><span class="nt">&lt;version&gt;</span>6.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
 <span class="w">     </span><span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
@@ -500,6 +505,19 @@ evaluación dinámica de cadenas. Por ejemplo:</p>
 </div>
 </li>
 </ul>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
+<p>Obsérvense los <em>scopes</em> de las dependencias. Como nuestra intención
+es ceñirnos estrictamente a la especificación <abbr title="Java Persistence API">JPA</abbr>, las implementaciones de
+<a class="reference external" href="https://www.hibernate.org">Hibernate</a> están en el <em>scope</em> <code class="docutils literal notranslate"><span class="pre">runtime</span></code> (véase <a class="reference internal" href="../04.conector/01.basico.html#scope-runtime"><span class="std std-ref">el comentario al
+respecto que se hizo sobre sqlite-jdbc</span></a>). Ahora bien, si se
+prefiere prescindir de hacer explícita la dependencia a las especificaciones
+<abbr title="Java Persistence API">JPA</abbr>, entonces el <em>scope</em> de las librerías de <a class="reference external" href="https://www.hibernate.org">Hibernate</a> deberá ser
+<code class="docutils literal notranslate"><span class="pre">compile</span></code> (o no poner ninguno, que es equivalente), porque, de mantenerlo
+como <code class="docutils literal notranslate"><span class="pre">runtime</span></code>, <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> resolverá la dependencia de las
+especificaciones también con ese <em>scope</em> y no tendremos disponibles en la
+compilación la <abbr title="Application Programming Interface">API</abbr>.</p>
+</div>
 </section>
 <section id="configuracion-de-la-persistencia">
 <h2><span class="section-number">5.1.2. </span>Configuración de la persistencia<a class="headerlink" href="#configuracion-de-la-persistencia" title="Link to this heading">#</a></h2>

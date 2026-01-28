@@ -488,9 +488,10 @@ estamos utilizando al construirla:</p>
 </table>
 </div>
 </li>
-<li><p>El objeto de conexión, creado con las estructuras <em>try-with-resources</em>, para que se cierre automáticamente. Al crear el objeto
-es necesario facilitar la <abbr title="Uniform Resource Locator">URL</abbr>, y un usuario y una contraseña con permisos
-para realizar las operaciones que se deseen llevar a cabo.</p>
+<li><p>El objeto de conexión, creado con las estructuras <em>try-with-resources</em>, para
+que se cierre automáticamente. Al crear el objeto es necesario facilitar la
+<abbr title="Uniform Resource Locator">URL</abbr>, y un usuario y una contraseña con permisos para realizar las
+operaciones que se deseen llevar a cabo.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Como <strong class="program">SQLite</strong> no define permisos para usuarios, sólo es
@@ -502,6 +503,25 @@ podríamos haber definido el método ahorrándonos los dos argumentos:</p>
 </div>
 </li>
 </ul>
+<div class="admonition tip" id="scope-runtime">
+<p class="admonition-title">Truco</p>
+<p>Cuando en nuestra aplicación queremos cargar como dependencia la
+librería que nos proporciona un driver es conveniente hacerlo con el <em>scope</em>
+<code class="docutils literal notranslate"><span class="pre">runtime</span></code>. Por ejemplo:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.51.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="hll"><span class="w">    </span><span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+</span><span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+<p>Esto asegura que la librería estará disponible para su ejecución de la
+aplicación, ya que es necesaria, pero evita que esté disponible en tiempo de
+compilación, lo que se traduce en que el <abbr title="Integrated Development Environment">IDE</abbr> nunca nos sugerirá clases y
+métodos incluidos en ella. Esto último es de importancia, ya que nosotros lo
+que debemos usar exclusivamente son clases proporcionadas por <abbr title="Java DataBase Connectivity">JDBC</abbr>.</p>
+</div>
 <p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.</p>

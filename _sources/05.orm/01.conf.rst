@@ -33,13 +33,15 @@ Depedencias
              <groupId>org.hibernate</groupId>
              <artifactId>hibernate-core</artifactId>
              <version>${hibernate.version}</version>
+             <scope>runtime</scope>
          </dependency>
 
          <!-- Driver JDBC para SQLite -->
          <dependency>
              <groupId>org.xerial</groupId>
              <artifactId>sqlite-jdbc</artifactId>
-             <version>3.50.3.0</version>
+             <version>3.51.1.0</version>
+             <scope>runtime</scope>
          </dependency>
 
          <!-- Soporte en Hibernate para SQLite -->
@@ -47,6 +49,7 @@ Depedencias
              <groupId>org.hibernate.orm</groupId>
              <artifactId>hibernate-community-dialects</artifactId>
              <version>${hibernate.version}</version>
+             <scope>runtime</scope>
          </dependency>
 
          <!-- Opcional para anotaciones de comprobación -->
@@ -61,6 +64,7 @@ Depedencias
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>9.1.0.Final</version>
+             <scope>runtime</scope>
         </dependency>
 
         <!-- Opcional para evaluación dinámica de cadenas de texto (puede necesitarlo Hibernate Validator) -->
@@ -68,6 +72,7 @@ Depedencias
            <groupId>org.glassfish.expressly</groupId>
            <artifactId>expressly</artifactId>
            <version>6.0.0</version>
+           <scope>runtime</scope>
         </dependency>
    </dependencies>
 
@@ -93,6 +98,17 @@ En resumidas cuentas es:
 
      @Min(value = 18, message = "La edad debe ser mayor a {value} años")
      private int edad;
+
+.. caution:: Obsérvense los *scopes* de las dependencias. Como nuestra intención
+   es ceñirnos estrictamente a la especificación |JPA|, las implementaciones de
+   Hibernate_ están en el *scope* ``runtime`` (véase :ref:`el comentario al
+   respecto que se hizo sobre sqlite-jdbc <scope-runtime>`). Ahora bien, si se
+   prefiere prescindir de hacer explícita la dependencia a las especificaciones
+   |JPA|, entonces el *scope* de las librerías de Hibernate_ deberá ser
+   ``compile`` (o no poner ninguno, que es equivalente), porque, de mantenerlo
+   como ``runtime``, :ref:`Maven` resolverá la dependencia de las
+   especificaciones también con ese *scope* y no tendremos disponibles en la
+   compilación la |API|.
 
 Configuración de la persistencia
 --------------------------------
@@ -206,6 +222,7 @@ sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
 
 .. _Hibernate: https://www.hibernate.org
 .. _hibernate-core: https://mvnrepository.com/artifact/org.hibernate/hibernate-core

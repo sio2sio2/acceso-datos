@@ -468,6 +468,9 @@ incluirla en <code class="file docutils literal notranslate"><span class="pre">p
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
 </div>
+<p><em>Maven</em> es inteligente, así que si una dependencia, a su vez, requiere
+de otras dependencias, descargará todas, sin la necesidad de declarar todo el
+árbol dependencias explícitamente en nuestro archivo.</p>
 <p>La página tiene un buscador y puede buscarse a través de él la librería. La del
 ejemplo se haya en la dirección <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">persistence-api</a>,
 y escogiendo la versión deseada, se obtiene el código exacto que debe añadirse
@@ -480,6 +483,31 @@ se calculan si necesidad de incluirlas explícitamente.</p>
 </div>
 <p>Sin embargo, no es necesario efectuar esta operación explícitamente, porque se
 realiza automáticamente al realizar operaciones posteriores.</p>
+<p class="rubric" id="maven-scope">scope</p>
+<p>Al definir una dependencia podemos indicar cuál es su campo de aplicación. Hay
+cuatro fundamentalmente:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">compile</span></code>: la dependencia es necesaria tanto para la compilación como la
+ejecución. Es el <em>scope</em> predeterminado si no se especifica ninguno. Por eso,
+el ejemplo anterior es equivalente a:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">     </span><span class="nt">&lt;groupId&gt;</span>jakarta.persistence<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">     </span><span class="nt">&lt;artifactId&gt;</span>jakarta.persistence-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">     </span><span class="nt">&lt;version&gt;</span>3.2.0<span class="nt">&lt;/version&gt;</span>
+<span class="hll"><span class="w">     </span><span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+</span><span class="w"> </span><span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">provided</span></code>: la dependencia es necesaria sólo para la compilación. Esto
+significa que no se incluirá en el paquete <abbr title="Java ARchive">JAR</abbr> y, por tanto, no estará
+disponible durante la ejecución del programa.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">runtime</span></code>: la dependencia es necesaria para la ejecución, pero no para la
+compilación.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test</span></code>: la dependencia es necesaria para la compilación y la ejecución de
+las pruebas, pero no para el despliegue de la librería o aplicación. Por
+tanto, no se incluye en el paquete <abbr title="Java ARchive">JAR</abbr>.</p></li>
+</ul>
 </section>
 <section id="compilacion">
 <h2><span class="section-number">5.3. </span>Compilación<a class="headerlink" href="#compilacion" title="Link to this heading">#</a></h2>

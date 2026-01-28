@@ -62,6 +62,10 @@ incluirla en :file:`pom.xml`. Por ejemplo:
       <!-- Otras dependencias -->
    </dependencies>
 
+*Maven* es inteligente, así que si una dependencia, a su vez, requiere
+de otras dependencias, descargará todas, sin la necesidad de declarar todo el
+árbol dependencias explícitamente en nuestro archivo.
+
 La página tiene un buscador y puede buscarse a través de él la librería. La del
 ejemplo se haya en la dirección `persistence-api
 <https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api>`_,
@@ -78,6 +82,38 @@ La suborden asociada a la obtención de dependencias es:
 
 Sin embargo, no es necesario efectuar esta operación explícitamente, porque se
 realiza automáticamente al realizar operaciones posteriores.
+
+.. _maven-scope:
+
+.. rubric:: scope
+
+Al definir una dependencia podemos indicar cuál es su campo de aplicación. Hay
+cuatro fundamentalmente:
+
+- ``compile``: la dependencia es necesaria tanto para la compilación como la
+  ejecución. Es el *scope* predeterminado si no se especifica ninguno. Por eso,
+  el ejemplo anterior es equivalente a:
+
+  .. code-block:: xml
+     :emphasize-lines: 5
+
+      <dependency>
+          <groupId>jakarta.persistence</groupId>
+          <artifactId>jakarta.persistence-api</artifactId>
+          <version>3.2.0</version>
+          <scope>compile</scope>
+      </dependency>
+
+- ``provided``: la dependencia es necesaria sólo para la compilación. Esto
+  significa que no se incluirá en el paquete |JAR| y, por tanto, no estará
+  disponible durante la ejecución del programa.
+
+- ``runtime``: la dependencia es necesaria para la ejecución, pero no para la
+  compilación.
+
+- ``test``: la dependencia es necesaria para la compilación y la ejecución de
+  las pruebas, pero no para el despliegue de la librería o aplicación. Por
+  tanto, no se incluye en el paquete |JAR|.
 
 Compilación
 ===========

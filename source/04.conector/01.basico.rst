@@ -53,9 +53,10 @@ En el código de ejemplo, hay dos claves fundamentales:
       SQL Server   `mssql-jdbc`_            com.microsoft.sqlserver.jdbc.SQLServerDriver   `jdbc:sqlserver://<host>[:<port>];databaseName=<base_datos>`
      ============ ======================== ============================================== ==============================================================
 
-* El objeto de conexión, creado con las estructuras *try-with-resources*, para que se cierre automáticamente. Al crear el objeto
-  es necesario facilitar la |URL|, y un usuario y una contraseña con permisos
-  para realizar las operaciones que se deseen llevar a cabo.
+* El objeto de conexión, creado con las estructuras *try-with-resources*, para
+  que se cierre automáticamente. Al crear el objeto es necesario facilitar la
+  |URL|, y un usuario y una contraseña con permisos para realizar las
+  operaciones que se deseen llevar a cabo.
 
   .. note:: Como :program:`SQLite` no define permisos para usuarios, sólo es
      necesaria la |URL|. Se ha dejado explícita esta falta de necesidad, pero
@@ -64,6 +65,28 @@ En el código de ejemplo, hay dos claves fundamentales:
      .. code-block:: java
 
         Connection conn = DriverManager.getConnection(dbUrl);
+
+.. _scope-runtime:
+
+.. tip:: Cuando en nuestra aplicación queremos cargar como dependencia la
+   librería que nos proporciona un driver es conveniente hacerlo con el *scope*
+   ``runtime``. Por ejemplo:
+
+   .. code-block:: xml
+      :emphasize-lines: 5
+
+      <dependency>
+          <groupId>org.xerial</groupId>
+          <artifactId>sqlite-jdbc</artifactId>
+          <version>3.51.1.0</version>
+          <scope>runtime</scope>
+      </dependency>
+
+   Esto asegura que la librería estará disponible para su ejecución de la
+   aplicación, ya que es necesaria, pero evita que esté disponible en tiempo de
+   compilación, lo que se traduce en que el |IDE| nunca nos sugerirá clases y
+   métodos incluidos en ella. Esto último es de importancia, ya que nosotros lo
+   que debemos usar exclusivamente son clases proporcionadas por |JDBC|.
 
 Por supuesto, el código es *completamente inútil*: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
@@ -403,6 +426,7 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
 .. |TCP| replace:: :abbr:`TCP (Transmission Control Protocol)`
 .. |IP| replace:: :abbr:`IP (Internet Protocol)`
 .. |CTE| replace:: :abbr:`CTE (Common Table Expression)`
+.. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
 .. |InputStream| replace:: :java-io:`InputStream <InputStream>`
 .. |Reader| replace:: :java-io:`Reader <Reader>`
 .. |PreparedStatement| replace:: :java-sql:`PreparedStatement <PreparedStatement>`

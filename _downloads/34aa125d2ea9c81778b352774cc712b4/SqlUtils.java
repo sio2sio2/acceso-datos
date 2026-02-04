@@ -1,7 +1,36 @@
+package edu.acceso.sqlutils;
+
+import java.sql.Statement;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.acceso.sqlutils.errors.DataAccessRuntimeException;
+
 /**
  * Clase que implementa algunos métodos estáticos adicionales a JDBC.
  */
 public class SqlUtils {
+    private static final Logger logger = LoggerFactory.getLogger(SqlUtils.class);
 
     /**
      * Implementa un iterador a partir de un ResultSet.
@@ -9,10 +38,12 @@ public class SqlUtils {
     private static class ResultSetIterator implements Iterator<ResultSet> {
 
         private final ResultSet rs;
+        private Statement stmt;
         private boolean avanzar;
         private boolean hasNextElement;
 
-        public ResultSetIterator(ResultSet rs) {
+        public ResultSetIterator(Statement stmt, ResultSet rs) {
+            this.stmt = stmt;
             this.rs = rs;
             avanzar = true;
         }
@@ -21,6 +52,9 @@ public class SqlUtils {
         public boolean hasNext() {
             if(avanzar) {
                 try {
+                    if(stmt.isClosed()) {
+                        throw new DataAccessRuntimeException(new IllegalStateException("Statement is closed!!!"));
+                    }
                     if(rs.isClosed()) {
                         throw new DataAccessRuntimeException("ResultSet is closed!!!");
                     }
@@ -45,19 +79,26 @@ public class SqlUtils {
     }
     
     /**
-     * Como Function<T, R> pero permite propagar una SQLException.
+     * Como Function&lt;T, R&gt; pero permite propagar una SQLException.
+     * @param <T> El tipo del argumento de la función.
+     * @param <R> El tipo del resultado de la función.
      */
     @FunctionalInterface
     public static interface CheckedFunction<T, R> {
+        /** Aplica la función
+         * @param t El argumento de la función.
+         * @return El resultado de la función.
+         * @throws SQLException Si ocurre un error al aplicar la función sobre la base de datos.
+         */
         R apply(T t) throws SQLException;
     }
 
     /**
-     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessRuntimeException,
-     * que es una excepción que no necesita ser declarada.
+     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción
+     * que no necesita ser declarada.
      * @param <T> El tipo que devuelve CheckedFunction.
      * @param checked Un "función" CheckedFunction.
-     * @return Una "función" que ha sustituido SQLException por DataAccessRuntimeException.
+     * @return Una "función" que ha sustituido SQLException por DataAccessException.
      */
     public static <T> Function<ResultSet, T> checkedToUnchecked(CheckedFunction<ResultSet, T> checked) {
         return t -> {
@@ -72,20 +113,19 @@ public class SqlUtils {
 
     /**
      * Genera un flujo con las filas generadas en un ResultSet.
-     * @param ac  La sentencia que generó rs o la conexión sobre la que se
-     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de
-     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el
-     * 	          Stream resultante.
-     * @param rs Los resutados de una consulta.
+     * @param conn La conexión que generó el {@param ResultSet}.
+     * @param stmt La sentencia que generó el {@param ResultSet}.
+     * @param rs Los resultados de una consulta.
      * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.
-     * @throws SQLException Cuando se produce un error al realizar la consulta.
+     * @throws DataAccessRuntimeException Cuando se produce un error al acceder a los datos.
      */
-    public static Stream<ResultSet> resultSetToStream(AutoCloseable ac, ResultSet rs) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new ResultSetIterator(rs), Spliterator.ORDERED), false)
+    public static Stream<ResultSet> resultSetToStream(Connection conn, Statement stmt, ResultSet rs) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new ResultSetIterator(stmt, rs), Spliterator.ORDERED), false)
             .onClose(() -> {
                 try {
                     rs.close();
-                    ac.close();
+                    if(stmt != null) stmt.close();
+                    if(conn != null) conn.close();
                 }
                 catch(Exception err) {
                     throw new DataAccessRuntimeException(err);
@@ -96,16 +136,139 @@ public class SqlUtils {
     /**
      * Genera un flujo de objetos derivados del resultado de una consulta.
      * @param <T> La clase del objeto.
-     * @param ac  La sentencia que generó rs o la conexión sobre la que se
-     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de
-     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el
-     * 	          Stream resultante.
+     * @param conn La conexión que generó el {@param ResultSet}.
+     * @param stmt La sentencia que generó el {@param ResultSet}.
      * @param rs  El objeto que representa los resultado de la consulta.
      * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).
      * @return El flujo de objetos.
-     * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.
+     * @throws DataAccessRuntimeException Cuando se produce un error al acceder a los datos.
      */
-    public static <T> Stream<T> resultSetToStream(AutoCloseable ac, ResultSet rs, CheckedFunction<ResultSet, T> mapper) {
-        return resultSetToStream(ac, rs).map(checkedToUnchecked(mapper));
+    public static <T> Stream<T> resultSetToStream(Connection conn, Statement stmt, ResultSet rs, CheckedFunction<ResultSet, T> mapper) {
+        return resultSetToStream(conn, stmt, rs).map(checkedToUnchecked(mapper));
+    }
+
+    /**
+     * Descompone un guión SQL en las sentencias de que se compone.
+     * @param st Entrada de la que se lee el guión
+     * @return  Una lista con las sentencias separadadas.
+     * @throws IOException Si ocurre un error al leer el flujo de entrada.
+     */
+    public static List<String> splitSQL(InputStream st) throws IOException {
+        Pattern beginPattern = Pattern.compile("\\b(BEGIN|CASE)\\b", Pattern.CASE_INSENSITIVE);
+        Pattern endPattern = Pattern.compile("\\bEND\\b", Pattern.CASE_INSENSITIVE);
+
+        try (
+            InputStreamReader sr = new InputStreamReader(st, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(sr);
+        ) {
+            List<String> sentencias = new ArrayList<>();
+            String linea;
+            String sentencia = "";
+            int contador = 0;
+            while((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if(linea.isEmpty()) continue;
+
+                Matcher beginMatcher = beginPattern.matcher(linea);
+                Matcher endMatcher = endPattern.matcher(linea);
+
+                while(beginMatcher.find()) contador++;
+                while(endMatcher.find()) contador--;
+
+                sentencia += "\n" + linea;
+
+                if(contador == 0 && linea.endsWith(";")) {
+                    logger.trace("Sentencia SQL: {}", sentencia);
+                    sentencias.add(sentencia);
+                    sentencia = "";
+                }
+            }
+            return sentencias;
+        }
+    }
+
+    /**
+     * Ejecuta un guión SQL en la base de datos.
+     * <p>
+     * Si se produce un error, las operaciones se revierten. Desgracidamente,
+     * con MariaDB/MySQL las sentencias DDL (CREATE, DROP, ALTER, etc.) provocan un commit implícito,
+     * por lo que no es posible revertirlas.
+     * @param conn Conexión a la base de datos.
+     * @param st Flujo de entrada con el guión SQL.
+     * @throws SQLException     Si ocurre un error al ejecutar el guión SQL.
+     * @throws IOException      Si ocurre un error al leer el flujo de entrada.
+     */
+    public static void executeSQL(Connection conn, InputStream st) throws SQLException, IOException {
+        boolean originalAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+
+        try (Statement stmt = conn.createStatement()) {
+            for(String sentencia: splitSQL(st)) {
+                stmt.execute(sentencia);
+                logger.debug("Sentencia ejecutada: {}", sentencia);
+            }
+            if(originalAutoCommit) conn.commit();
+        } catch(SQLException err) {
+            logger.error("Error al ejecutar el script SQL, se revierten todas las sentencias ejecutadas.", err);
+            try {
+                conn.rollback();
+            } catch(SQLException rollbackErr) {
+                err.addSuppressed(rollbackErr);
+            }
+            throw err;
+        } finally {
+            conn.setAutoCommit(originalAutoCommit);
+        }
+    }
+
+    /**
+     * Verifica si la base de datos ya ha sido inicializada.
+     * @return true si la base de datos tiene al menos una tabla de usuario, false en caso contrario.
+     * @throws SQLException Si ocurre un error al acceder a los metadatos de la base de datos.
+     */
+    public static boolean isDatabaseInitialized(Connection conn) throws SQLException {
+    DatabaseMetaData metaData = conn.getMetaData();
+
+        // 1. Intentamos obtener catálogo y esquema actuales
+        String catalog = conn.getCatalog();
+        String schema = null;
+        
+        try {// getSchema() no existe en versiones muy antiguas de JDBC
+            schema = conn.getSchema(); 
+        } catch (AbstractMethodError | SQLException e) {
+            // Evitamos fallos con versiones obsoletas de JDBC
+        }
+
+        try (ResultSet tables = metaData.getTables(catalog, schema, "%", new String[]{"TABLE"})) {
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                logger.trace("Hallada tabla en la base de datos: {}. Comprobando si es tabla del sistema...", tableName);
+                
+                // Filtrar tablas del sistema según el SGBD
+                if (!isGenericSystemTable(tableName)) {
+                    logger.debug("{} es una tabla de usuario. Se presupone que la base de datos está completamente inicializada.", tableName);
+                    return true; // Encontramos al menos una tabla de usuario
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verifica si el nombre de la tabla corresponde a una tabla del sistema genérica.
+     * @param tableName El nombre de la tabla.
+     * @return true si es una tabla del sistema, false en caso contrario.
+     */
+    private static boolean isGenericSystemTable(String tableName) {
+        tableName = tableName.toLowerCase();
+        
+        // Lista de tablas del sistema comunes en varios SGBD
+        return  tableName.startsWith("sys") ||               // Oracle, MSSQL, Derby, DB2, H2
+                tableName.contains("information_schema") ||  // MariaDB, MSSQL, MySQL, SQL Server, H2
+                tableName.startsWith("databasechangelog") || // Liquibase
+                tableName.startsWith("flyway_") ||           // Flyway
+                tableName.startsWith("pg_") ||               // PostgreSQL
+                tableName.startsWith("msrepl") ||            // MSSQL Replication
+                tableName.startsWith("sqlite_");             // SQLite
     }
 }

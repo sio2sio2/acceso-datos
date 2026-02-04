@@ -410,9 +410,9 @@ es un poco redundante, ya que el propio <abbr title="Java Persistence API">JPA</
 <abbr title="Data Access Object">DAO</abbr>.</p>
 <p>Lo que sí es muy conveniente es intentar liberar al resto del código de las
 particularidades del acceso, así que conviene encerrarlas en una clase auxiliar.
-Podríamos proponer esta:</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">JpaBackend.java (<a class="reference download internal" download="" href="../_downloads/2fec5f93dbb2d8ae14860e9fc51b2c9e/JpaBackend.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+Podemos proponer ésta como casi calco de <span class="xref std std-ref">ConnectionPool</span>, propuesta en la unidad anterior para <abbr title="Java DataBase Connectivity">JDBC</abbr>:</p>
+<div class="literal-block-wrapper docutils container" id="clase-jpabackend">
+<div class="code-block-caption"><span class="caption-text">JpaBackend.java (<a class="reference download internal" download="" href="../_downloads/2fec5f93dbb2d8ae14860e9fc51b2c9e/JpaBackend.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-jpabackend" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Gestiona múltiples instancias de {@link EntityManagerFactory}.</span>
 <span class="cm"> * Utiliza el patrón Multiton para crear instancias únicas asociadas al nombre de la unidad de persistencia.</span>

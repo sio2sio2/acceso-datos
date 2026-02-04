@@ -553,6 +553,12 @@ conexiones con <strong class="program">SQLite</strong>.</p>
 <span class="n">ds</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">  </span><span class="c1">// Se liberan recursos.</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id4"><span class="problematic" id="id5">HikariCP_</span></a>,
+la ruta debe ser <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code> y no simplemente
+<code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>.</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>Más adelante se sugiere una <a class="reference internal" href="10.extras.html#conn-pool-extra"><span class="std std-ref">estrategia para crear el pool</span></a>.</p>

@@ -486,17 +486,17 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <ul>
 <li><p>El soporte para <abbr title="Java Persistence API">JPA</abbr> que proporciona <a class="reference external" href="https://www.hibernate.org">Hibernate</a> mediante <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate/hibernate-core">hibernate-core</a>.
 Podemos incluir explícitamente , aunque no es necesario, la especificación
-<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">jakarta.persistence-api</a>.</p></li>
+<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">jakarta.persistence-api</a> (con la prevención que más adelante se refiere).</p></li>
 <li><p>Como en nuestro caso particular utilizaremos <a class="reference external" href="https://sqlite.org">SQLite</a>, necesitamos el driver <abbr title="Java DataBase Connectivity">JDBC</abbr>
 correspondiente (<a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>), y el soporte para <em>Hibernate</em>
 (<cite>hibernate-community-dialects</cite>).</p></li>
 <li><p>En principio, basta con lo anterior, pero si se quiere llevar a cabo
 comprobaciones sobre los valores de los datos (p.ej. las <a class="reference internal" href="04.mapeo.html#orm-mapping-check"><span class="std std-ref">referidas más
-adelante</span></a>), serán necesaria la implementación de
-<em>Hibernate</em> de la validación que ofrece <abbr title="Java Persistence API">JPA</abbr>, esto es, <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.
+adelante</span></a>), será necesaria la implementación para la
+especificación <abbr title="Java Persistence API">JPA</abbr> que proporciona <em>Hibernate</em>, esto es, <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a>.
 Como anteriormente, podemos incluir explícitamente la implementación
 (<a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">jakarta.validation-api</a>).</p></li>
-<li><p>La última dependencia (<a class="reference external" href="https://mvnrepository.com/artifact/org.glassfish.expressly/expressly">expressly</a>) sólo es necesaria si que utilizan
+<li><p>La última dependencia (<a class="reference external" href="https://mvnrepository.com/artifact/org.glassfish.expressly/expressly">expressly</a>) sólo es necesaria si se utilizan
 anotaciones implementadas por <a class="reference external" href="https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator">hibernate-validator</a> que aprovechan la
 evaluación dinámica de cadenas. Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Min</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;La edad debe ser mayor a {value} años&quot;</span><span class="p">)</span>
@@ -515,7 +515,7 @@ prefiere prescindir de hacer explícita la dependencia a las especificaciones
 <abbr title="Java Persistence API">JPA</abbr>, entonces el <em>scope</em> de las librerías de <a class="reference external" href="https://www.hibernate.org">Hibernate</a> deberá ser
 <code class="docutils literal notranslate"><span class="pre">compile</span></code> (o no poner ninguno, que es equivalente), porque, de mantenerlo
 como <code class="docutils literal notranslate"><span class="pre">runtime</span></code>, <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> resolverá la dependencia de las
-especificaciones también con ese <em>scope</em> y no tendremos disponibles en la
+especificaciones también con ese <em>scope</em> y no las tendremos disponibles en la
 compilación la <abbr title="Application Programming Interface">API</abbr>.</p>
 </div>
 </section>

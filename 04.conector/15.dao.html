@@ -659,7 +659,7 @@ de objeto que quiera almacenarse en la base de datos. En nuestro ejemplo, se
 particularizará para <a class="reference internal" href="01.basico.html#clase-centro"><span class="std std-ref">Centro</span></a> y para <a class="reference internal" href="#clase-estudiante"><span class="std std-ref">Estudiante</span></a>.</p>
 <p>Llegamos por fin a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, tres clases: una que abstraiga del
-establecimiento de la conexión, que bien podría ser <a class="reference internal" href="10.extras.html#clase-connectionpool"><span class="std std-ref">ConnectionPool</span></a> ) (o una clase más específica de nuestra aplicación que
+establecimiento de la conexión, que bien podría ser <a class="reference internal" href="10.extras.html#connectionpool"><span class="std std-ref">ConnectionPool</span></a> ) (o una clase más específica de nuestra aplicación que
 la use), y otra por cada una de las clases del modelo:</p>
 <div class="pst-scrollable-table-container"><table class="table" id="clase-dao">
 <thead>
@@ -740,8 +740,9 @@ abstracto del que deriven los <abbr title="Data Access Object">DAO</abbr> para c
 </div>
 </div>
 <p>Es decir, construimos las clases <abbr title="Data Access Object">DAO</abbr> pasando la clave que identifica al
-<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> que nos interesa; y, como ya adelantamos, la conexión la obtenemos
-del gestor de transacciones.</p>
+<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> (en realidad, el objeto <a class="reference internal" href="10.extras.html#connectionpool"><span class="std std-ref">ConnectionPool</span></a>) que nos
+interesa; y, como ya adelantamos, la conexión la obtenemos del gestor de
+transacciones.</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>Esto obliga a que cualquier operación, aunque sea única la llevemos
@@ -794,7 +795,7 @@ a cabo dentro de una transacción.</p>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro WHERE id_centro = ?&quot;</span><span class="p">;</span>
 
-<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getConnection</span><span class="p">();)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
 <span class="w">                </span><span class="k">try</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pstmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -899,42 +900,18 @@ no a <strong class="program">SQLite</strong>.</p>
 </div>
 <p>Y <code class="docutils literal notranslate"><span class="pre">EstudianteSqlDao</span></code> se implementará de modo análogo.</p>
 <p>¿Cómo podríamos usar estas clases? Más o menos así:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">createHikariDataSource</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">dbUser</span><span class="p">,</span><span class="w"> </span><span class="n">dbPassword</span><span class="p">);</span>
-<span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;MiBase&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">(</span><span class="n">ConnectioPool</span><span class="w"> </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">dbUser</span><span class="p">,</span><span class="w"> </span><span class="n">dbPassword</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">cp</span><span class="p">.</span><span class="na">setTransactionManager</span><span class="p">();</span>
 
-<span class="c1">// Este DAO ya sabe con qué gestor de transacciones está relacionado.</span>
-<span class="n">CentroDao</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroDao</span><span class="p">(</span><span class="s">&quot;MiBase&quot;</span><span class="p">);</span>
+<span class="w">   </span><span class="c1">// Este DAO ya sabe con qué gestor de transacciones está relacionado.</span>
+<span class="w">   </span><span class="n">CentroDao</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroDao</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">);</span>
 
-<span class="c1">// Creamos una transacción y con ello una conexión.</span>
-<span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">astaroth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
-<span class="w">   </span><span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">astaroth</span><span class="p">);</span><span class="w">  </span><span class="c1">// Usa la conexión asociada a la transacción.</span>
-<span class="p">});</span>
+<span class="w">   </span><span class="n">cp</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">().</span><span class="na">transaction</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">astaroth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
+<span class="w">      </span><span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">astaroth</span><span class="p">);</span><span class="w">  </span><span class="c1">// Usa la conexión asociada a la transacción.</span>
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
 </pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En realidad, nuestro diseño sería más limpio si crearamos una clase
-<code class="docutils literal notranslate"><span class="pre">Conexion</span></code> que:</p>
-<ul class="simple">
-<li><p>Implementara un patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a> para asociar claves a objetos <a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a>
-creados con <code class="docutils literal notranslate"><span class="pre">ConnectionPool</span></code>.</p></li>
-<li><p>Creata en su implementación el objeto <code class="docutils literal notranslate"><span class="pre">TransactionManager</span></code>.</p></li>
-<li><p>Implementara él mismo métodos para crear transacciones y obtener la
-conexión asociada que se apoyaran en los correspondientes del gestor de
-transacciones, Eso permitiría prescindir del uso directo de
-<code class="docutils literal notranslate"><span class="pre">TransactionManager</span></code> en el resto del código.</p></li>
-</ul>
-<p>De este modo, sólo necesitaríamos usar esta clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Conexion</span><span class="w"> </span><span class="n">conexion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Conexion</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;MiBase&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">dbUser</span><span class="p">,</span><span class="w"> </span><span class="n">dbPassword</span><span class="p">);</span>
-<span class="n">Centro</span><span class="w"> </span><span class="n">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CentroDao</span><span class="p">(</span><span class="s">&quot;MiBase&quot;</span><span class="p">);</span>
-
-<span class="n">conexion</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">astaroth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
-<span class="w">   </span><span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">astaroth</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
-</div>
 </div>
 <p>Finalmente hay un último detalle para el cual conviene que mostremos la
 implementación de <code class="docutils literal notranslate"><span class="pre">EstudianteSqlDao</span></code>:</p>

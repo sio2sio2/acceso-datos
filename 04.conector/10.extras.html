@@ -396,10 +396,11 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metadatos">4.5.1. Metadatos</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.5.2. <em>Pool</em> de conexiones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones-personalizadas">4.5.2. Excepciones personalizadas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.5.3. Tratamiento funcional de las consultas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.5.4. Gestor de transacciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.5.5. Cargar esquema desde archivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.5.4. Cargar esquema desde archivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.5.5. Gestor de transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.5.6. <em>Pool</em> de conexiones</a></li>
 </ul>
             </nav>
         </div>
@@ -420,197 +421,76 @@ document.write(`
 <p class="admonition-title">Por hacer</p>
 <p>DatabaseMetaData y ResultSetMetaData.</p>
 </div>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
+<p>Aunque a partir de ahora se enlaza código con algunas propuestas,
+todas ellas están incluidas en un <a class="reference external" href="https://github.com/sio2sio2/sqlutils">repositorio de
+Github llamado sqlutils</a> listo para
+su uso:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- En pom.xml --&gt;</span>
+<span class="nt">&lt;repositories&gt;</span>
+<span class="w">     </span><span class="nt">&lt;repository&gt;</span>
+<span class="w">         </span><span class="nt">&lt;id&gt;</span>jitpack.io<span class="nt">&lt;/id&gt;</span>
+<span class="w">         </span><span class="nt">&lt;url&gt;</span>https://jitpack.io<span class="nt">&lt;/url&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/repository&gt;</span>
+<span class="w"> </span><span class="nt">&lt;/repositories&gt;</span>
+
+<span class="nt">&lt;dependencies&gt;</span>
+<span class="w">  </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;version&gt;</span>3.1.2<span class="nt">&lt;/version&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<p>Es más recomendable usar esta librería auxiliar que bajar el código y
+añadirlo a nuestro proyecto.</p>
+</div>
 </section>
-<section id="pool-de-conexiones">
-<span id="conn-pool-extra"></span><h2><span class="section-number">4.5.2. </span><em>Pool</em> de conexiones<a class="headerlink" href="#pool-de-conexiones" title="Link to this heading">#</a></h2>
-<p>Ya tratamos cómo crear un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>. Si queremos
-simplificar la creación del pool y abstraernos de qué se usa para crearlo,
-podemos envolverlo en una clase como esta:</p>
-<div class="literal-block-wrapper docutils container" id="clase-connectionpool">
-<div class="code-block-caption"><span class="caption-text">ConnectionPool.java (<a class="reference download internal" download="" href="../_downloads/3c2ef39c177c50255f4b7d4e723623c2/ConnectionPool.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-connectionpool" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+<section id="excepciones-personalizadas">
+<h2><span class="section-number">4.5.2. </span>Excepciones personalizadas<a class="headerlink" href="#excepciones-personalizadas" title="Link to this heading">#</a></h2>
+<p>Es conveniente crear nuestras propias excepciones personalizadas para envolver
+las excepciones que pueda generar el acceso a datos. Por ejemplo, para
+excepciones no protegidas:</p>
+<div class="literal-block-wrapper docutils container" id="dataaccessruntimeexception">
+<div class="code-block-caption"><span class="caption-text">DataAccessRuntimeException.java (<a class="reference download internal" download="" href="../_downloads/a0685943a39ec4b04f1ef18782d594cb/DataAccessRuntimeException.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#dataaccessruntimeexception" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DataAccessRuntimeException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="cm">/** Mapa con las instancias creadas **/</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-<span class="w">    </span><span class="cm">/** Número máximo de conexiones en el pool */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">maxConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-<span class="w">    </span><span class="cm">/** Número mínimo de conexiones en el pool */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">minConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="w"> </span><span class="n">closed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
-
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">ConnectionPool</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">HikariConfig</span><span class="w"> </span><span class="n">hconfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariConfig</span><span class="p">();</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setJdbcUrl</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setUsername</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// Mínimo y máximo de conexiones.</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMaximumPoolSize</span><span class="p">(</span><span class="n">maxConnections</span><span class="p">);</span>
-<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMinimumIdle</span><span class="p">(</span><span class="n">minConnections</span><span class="p">);</span>
-
-<span class="w">        </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Crea una instancia a partir de los datos de conexión.</span>
-<span class="cm">     * @param key Clave que identifica la conexión.</span>
-<span class="cm">     * @param dbUrl URL de conexión a la base de datos.</span>
-<span class="cm">     * @param user Usuario de conexión</span>
-<span class="cm">     * @param password Contraseña de conexión</span>
-<span class="cm">     * @throws IllegalStateException Si la instancia ya existe.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">Objects</span><span class="p">.</span><span class="na">requireNonNull</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;La clave no puede ser nula&quot;</span><span class="p">);</span>
-
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instances</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Ya hay una instancia asociada a la clave&quot;</span><span class="p">);</span>
-
-<span class="w">	    </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
-<span class="w">        </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">previa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">putIfAbsent</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
-
-<span class="w">        </span><span class="c1">// Otro hilo generó una instancia.</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">previa</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">instance</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Ya hay una instancia asociada a la clave&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Genera una instancia {@link ConnectionPool} cuando no son necesarios usuario ni contraseña.</span>
-<span class="cm">     * @param url La URL de conexión.</span>
-<span class="cm">     * @return La instancia solicitada.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Obtiene la instancia asociada a una clave.</span>
-<span class="cm">     * @return La instancia solicitada.</span>
-<span class="cm">     * @throws IllegalArgumentException Si no existe la instancia para la clave suministrada.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No existe una instancia para la clave %s&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">key</span><span class="p">));</span>
-
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
-<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada no existe.&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isOpen</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">closed</span><span class="p">.</span><span class="na">get</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">ds</span><span class="p">.</span><span class="na">isClosed</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="nf">getDataSource</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">closed</span><span class="p">.</span><span class="na">compareAndSet</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
-<span class="w">            </span><span class="n">ds</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Verifica si la base de datos ya ha sido inicializada.</span>
-<span class="cm">     * @return true si la base de datos tiene al menos una tabla de usuario, false en caso contrario.</span>
-<span class="cm">     * @throws SQLException Si ocurre un error al acceder a los metadatos de la base de datos.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isDatabaseInitialized</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">DatabaseMetaData</span><span class="w"> </span><span class="n">metaData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getMetaData</span><span class="p">();</span>
-
-<span class="w">            </span><span class="c1">// 1. Intentamos obtener catálogo y esquema actuales</span>
-<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">catalog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getCatalog</span><span class="p">();</span>
-<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">            </span>
-<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="c1">// getSchema() no existe en versiones muy antiguas de JDBC</span>
-<span class="w">                </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getSchema</span><span class="p">();</span><span class="w"> </span>
-<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">AbstractMethodError</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="c1">// Evitamos fallos con versiones obsoletas de JDBC</span>
-<span class="w">            </span><span class="p">}</span>
-
-<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">tables</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">metaData</span><span class="p">.</span><span class="na">getTables</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span><span class="w"> </span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="s">&quot;TABLE&quot;</span><span class="p">}))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="n">String</span><span class="w"> </span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tables</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;TABLE_NAME&quot;</span><span class="p">);</span>
-<span class="w">                    </span>
-<span class="w">                    </span><span class="c1">// Filtrar tablas del sistema según el SGBD</span>
-<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isGenericSystemTable</span><span class="p">(</span><span class="n">tableName</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// Encontramos al menos una tabla de usuario</span>
-<span class="w">                    </span><span class="p">}</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Verifica si el nombre de la tabla corresponde a una tabla del sistema genérica.</span>
-<span class="cm">     * @param tableName El nombre de la tabla.</span>
-<span class="cm">     * @return true si es una tabla del sistema, false en caso contrario.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isGenericSystemTable</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">tableName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tableName</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">();</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="c1">// Lista de tablas del sistema comunes en varios SGBD</span>
-<span class="w">        </span><span class="k">return</span><span class="w">  </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;sys&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">               </span><span class="c1">// Oracle, MSSQL, Derby, DB2, H2</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;information_schema&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">  </span><span class="c1">// MariaDB, MSSQL, MySQL, SQL Server, H2</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;databasechangelog&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="c1">// Liquibase</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;flyway_&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">           </span><span class="c1">// Flyway</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;pg_&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">               </span><span class="c1">// PostgreSQL</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;msrepl&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">            </span><span class="c1">// MSSQL Replication</span>
-<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;sqlite_&quot;</span><span class="p">);</span><span class="w">             </span><span class="c1">// SQLite</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<p>De este modo, para crear un <em>pool</em> con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> basta con hacer lo siguiente<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
-<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Hacemos operaciones con la conexión.</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Lo interesante de la clase, además de que simplifica la creación del <em>pool</em>, es que
-usa un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a>, de manera que si intentamos crear un pool con la
-misma clave, genera una excepción:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">);</span>
-<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:datos.db&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// IllegalStateException</span>
-<span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Recuperamos el pool.</span>
-<span class="n">pool1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">pool3</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
-</pre></div>
-</div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>Obsérvese la <abbr title="Uniform Resource Locator">URL</abbr> que se ha utilizado en los ejemplos. En el caso
-particular de <em>SQLite</em> y <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>, para que las distintas conexiones del <em>pool</em> abran
-conexión a la misma base de datos en memoria, no basta con que la ruta sea
-<code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>, sino que ha de usarse <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code>.</p>
-</div>
+<p>Y escribir otra excepcion protegida que llamada <code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code> que
+derive de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/Exception.html">Exception</a>.</p>
 </section>
 <section id="tratamiento-funcional-de-las-consultas">
 <span id="conn-sqlutils"></span><h2><span class="section-number">4.5.3. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h2>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Por hacer</p>
+<p>Revisar este apartado para utilizar ConnectionWrapper en vez de
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p>
+</div>
 <p><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
 paliarlo podemos definir una clase que haga la conversión (véase el
 <a class="reference download internal" download="" href="../_downloads/34aa125d2ea9c81778b352774cc712b4/SqlUtils.java"><code class="xref download docutils literal notranslate"><span class="pre">codigo</span> <span class="pre">fuente</span></code></a>):</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">SqlUtils.java</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="clase-sqlutils">
+<div class="code-block-caption"><span class="caption-text">SqlUtils.java (<a class="reference download internal" download="" href="../_downloads/a0685943a39ec4b04f1ef18782d594cb/DataAccessRuntimeException.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-sqlutils" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SqlUtils</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Implementa un iterador a partir de un ResultSet.</span>
@@ -618,10 +498,12 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ResultSetIterator</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">;</span>
 <span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">avanzar</span><span class="p">;</span>
 <span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasNextElement</span><span class="p">;</span>
 
-<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="nf">ResultSetIterator</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="nf">ResultSetIterator</span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">;</span>
 <span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">;</span>
 <span class="w">            </span><span class="n">avanzar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
 <span class="w">        </span><span class="p">}</span>
@@ -630,6 +512,9 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">hasNext</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">avanzar</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">stmt</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Statement is closed!!!&quot;</span><span class="p">));</span>
+<span class="w">                    </span><span class="p">}</span>
 <span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">isClosed</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="s">&quot;ResultSet is closed!!!&quot;</span><span class="p">);</span>
 <span class="w">                    </span><span class="p">}</span>
@@ -654,19 +539,26 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Como Function&lt;T, R&gt; pero permite propagar una SQLException.</span>
+<span class="cm">     * Como Function&amp;lt;T, R&amp;gt; pero permite propagar una SQLException.</span>
+<span class="cm">     * @param &lt;T&gt; El tipo del argumento de la función.</span>
+<span class="cm">     * @param &lt;R&gt; El tipo del resultado de la función.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="nd">@FunctionalInterface</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">CheckedFunction</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="cm">/** Aplica la función</span>
+<span class="cm">         * @param t El argumento de la función.</span>
+<span class="cm">         * @return El resultado de la función.</span>
+<span class="cm">         * @throws SQLException Si ocurre un error al aplicar la función sobre la base de datos.</span>
+<span class="cm">         */</span>
 <span class="w">        </span><span class="n">R</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessRuntimeException,</span>
-<span class="cm">     * que es una excepción que no necesita ser declarada.</span>
+<span class="cm">     * Transforma el SQLException que propaga una CheckedFUnction en un DataAccessException, que es una excepción</span>
+<span class="cm">     * que no necesita ser declarada.</span>
 <span class="cm">     * @param &lt;T&gt; El tipo que devuelve CheckedFunction.</span>
 <span class="cm">     * @param checked Un &quot;función&quot; CheckedFunction.</span>
-<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por DataAccessRuntimeException.</span>
+<span class="cm">     * @return Una &quot;función&quot; que ha sustituido SQLException por DataAccessException.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">checkedToUnchecked</span><span class="p">(</span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">checked</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -681,20 +573,19 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Genera un flujo con las filas generadas en un ResultSet.</span>
-<span class="cm">     * @param ac  La sentencia que generó rs o la conexión sobre la que se</span>
-<span class="cm">     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de</span>
-<span class="cm">     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el</span>
-<span class="cm">     * 	          Stream resultante.</span>
-<span class="cm">     * @param rs Los resutados de una consulta.</span>
+<span class="cm">     * @param conn La conexión que generó el {@param ResultSet}.</span>
+<span class="cm">     * @param stmt La sentencia que generó el {@param ResultSet}.</span>
+<span class="cm">     * @param rs Los resultados de una consulta.</span>
 <span class="cm">     * @return Un flujo en el que cada elemento es el siguiente estado del ResultSet proporcionado.</span>
-<span class="cm">     * @throws SQLException Cuando se produce un error al realizar la consulta.</span>
+<span class="cm">     * @throws DataAccessRuntimeException Cuando se produce un error al acceder a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">AutoCloseable</span><span class="w"> </span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Spliterators</span><span class="p">.</span><span class="na">spliteratorUnknownSize</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ResultSetIterator</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
 <span class="w">            </span><span class="p">.</span><span class="na">onClose</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="n">rs</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<span class="w">                    </span><span class="n">ac</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">stmt</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">                </span><span class="k">catch</span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataAccessRuntimeException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
@@ -705,38 +596,140 @@ paliarlo podemos definir una clase que haga la conversión (véase el
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Genera un flujo de objetos derivados del resultado de una consulta.</span>
 <span class="cm">     * @param &lt;T&gt; La clase del objeto.</span>
-<span class="cm">     * @param ac  La sentencia que generó rs o la conexión sobre la que se</span>
-<span class="cm">     * 	          ejecutó la sentencia. Proporciónese una u otra dependiendo de</span>
-<span class="cm">     * 	          qué es lo que quiere cerrar automáticamente al cerrarse el</span>
-<span class="cm">     * 	          Stream resultante.</span>
+<span class="cm">     * @param conn La conexión que generó el {@param ResultSet}.</span>
+<span class="cm">     * @param stmt La sentencia que generó el {@param ResultSet}.</span>
 <span class="cm">     * @param rs  El objeto que representa los resultado de la consulta.</span>
 <span class="cm">     * @param mapper La función que permite transformar la fila en un objeto (puede generar un SQLException).</span>
 <span class="cm">     * @return El flujo de objetos.</span>
-<span class="cm">     * @throws SQLException Cuando Cuando se produce un error al realizar la consulta.</span>
+<span class="cm">     * @throws DataAccessRuntimeException Cuando se produce un error al acceder a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">AutoCloseable</span><span class="w"> </span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<p>la cual usa una excepción de usuario no protegida que debe estar también
-definida:</p>
-<div class="literal-block-wrapper docutils container" id="dataaccessruntimeexception">
-<div class="code-block-caption"><span class="caption-text">DataAccessRuntimeException.java</span><a class="headerlink" href="#dataaccessruntimeexception" title="Link to this code">#</a></div>
-<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DataAccessRuntimeException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">resultSetToStream</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">CheckedFunction</span><span class="o">&lt;</span><span class="n">ResultSet</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mapper</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">).</span><span class="na">map</span><span class="p">(</span><span class="n">checkedToUnchecked</span><span class="p">(</span><span class="n">mapper</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Descompone un guión SQL en las sentencias de que se compone.</span>
+<span class="cm">     * @param st Entrada de la que se lee el guión</span>
+<span class="cm">     * @return  Una lista con las sentencias separadadas.</span>
+<span class="cm">     * @throws IOException Si ocurre un error al leer el flujo de entrada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">splitSQL</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pattern</span><span class="w"> </span><span class="n">beginPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\b(BEGIN|CASE)\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Pattern</span><span class="w"> </span><span class="n">endPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\bEND\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
+<span class="w">            </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
+<span class="w">            </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">contador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">while</span><span class="p">((</span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">linea</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">                </span><span class="n">Matcher</span><span class="w"> </span><span class="n">beginMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beginPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+<span class="w">                </span><span class="n">Matcher</span><span class="w"> </span><span class="n">endMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+
+<span class="w">                </span><span class="k">while</span><span class="p">(</span><span class="n">beginMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">++</span><span class="p">;</span>
+<span class="w">                </span><span class="k">while</span><span class="p">(</span><span class="n">endMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">--</span><span class="p">;</span>
+
+<span class="w">                </span><span class="n">sentencia</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">contador</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Sentencia SQL: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">sentencias</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">sentencias</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataAccessRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Ejecuta un guión SQL en la base de datos.</span>
+<span class="cm">     * &lt;p&gt;</span>
+<span class="cm">     * Si se produce un error, las operaciones se revierten. Desgracidamente,</span>
+<span class="cm">     * con MariaDB/MySQL las sentencias DDL (CREATE, DROP, ALTER, etc.) provocan un commit implícito,</span>
+<span class="cm">     * por lo que no es posible revertirlas.</span>
+<span class="cm">     * @param conn Conexión a la base de datos.</span>
+<span class="cm">     * @param st Flujo de entrada con el guión SQL.</span>
+<span class="cm">     * @throws SQLException     Si ocurre un error al ejecutar el guión SQL.</span>
+<span class="cm">     * @throws IOException      Si ocurre un error al leer el flujo de entrada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">executeSQL</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">originalAutoCommit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getAutoCommit</span><span class="p">();</span>
+<span class="w">        </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="p">:</span><span class="w"> </span><span class="n">splitSQL</span><span class="p">(</span><span class="n">st</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">                </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Sentencia ejecutada: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sentencia</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">originalAutoCommit</span><span class="p">)</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error al ejecutar el script SQL, se revierten todas las sentencias ejecutadas.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">);</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">rollbackErr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">err</span><span class="p">.</span><span class="na">addSuppressed</span><span class="p">(</span><span class="n">rollbackErr</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="n">err</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="n">originalAutoCommit</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Verifica si la base de datos ya ha sido inicializada.</span>
+<span class="cm">     * @return true si la base de datos tiene al menos una tabla de usuario, false en caso contrario.</span>
+<span class="cm">     * @throws SQLException Si ocurre un error al acceder a los metadatos de la base de datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isDatabaseInitialized</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">DatabaseMetaData</span><span class="w"> </span><span class="n">metaData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getMetaData</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 1. Intentamos obtener catálogo y esquema actuales</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">catalog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getCatalog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="c1">// getSchema() no existe en versiones muy antiguas de JDBC</span>
+<span class="w">            </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">getSchema</span><span class="p">();</span><span class="w"> </span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">AbstractMethodError</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Evitamos fallos con versiones obsoletas de JDBC</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">tables</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">metaData</span><span class="p">.</span><span class="na">getTables</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span><span class="w"> </span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="s">&quot;TABLE&quot;</span><span class="p">}))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">String</span><span class="w"> </span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tables</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;TABLE_NAME&quot;</span><span class="p">);</span>
+<span class="w">                </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Hallada tabla en la base de datos: {}. Comprobando si es tabla del sistema...&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tableName</span><span class="p">);</span>
+<span class="w">                </span>
+<span class="w">                </span><span class="c1">// Filtrar tablas del sistema según el SGBD</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isGenericSystemTable</span><span class="p">(</span><span class="n">tableName</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;{} es una tabla de usuario. Se presupone que la base de datos está completamente inicializada.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tableName</span><span class="p">);</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// Encontramos al menos una tabla de usuario</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Verifica si el nombre de la tabla corresponde a una tabla del sistema genérica.</span>
+<span class="cm">     * @param tableName El nombre de la tabla.</span>
+<span class="cm">     * @return true si es una tabla del sistema, false en caso contrario.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isGenericSystemTable</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">tableName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tableName</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">();</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="c1">// Lista de tablas del sistema comunes en varios SGBD</span>
+<span class="w">        </span><span class="k">return</span><span class="w">  </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;sys&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">               </span><span class="c1">// Oracle, MSSQL, Derby, DB2, H2</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;information_schema&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">  </span><span class="c1">// MariaDB, MSSQL, MySQL, SQL Server, H2</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;databasechangelog&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="c1">// Liquibase</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;flyway_&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">           </span><span class="c1">// Flyway</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;pg_&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">               </span><span class="c1">// PostgreSQL</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;msrepl&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">            </span><span class="c1">// MSSQL Replication</span>
+<span class="w">                </span><span class="n">tableName</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;sqlite_&quot;</span><span class="p">);</span><span class="w">             </span><span class="c1">// SQLite</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -810,10 +803,39 @@ obtendrá con cada elemento del flujo la propia fila:</p>
 </div>
 </div>
 </section>
+<section id="cargar-esquema-desde-archivo">
+<h2><span class="section-number">4.5.4. </span>Cargar esquema desde archivo<a class="headerlink" href="#cargar-esquema-desde-archivo" title="Link to this heading">#</a></h2>
+<p>Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
+de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
+las sentencias necesarias se encuentren en un guión <abbr title="Structured Query Language">SQL</abbr> y el programa las lea
+de él, en vez de encontrarse incrustadas en el código.</p>
+<p>Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> no tiene definido un método que nos permita ejecutar un
+guión <abbr title="Structured Query Language">SQL</abbr> completo y que pasemos una cadena larga con todas instrucciones
+separadas por comas, no asegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
+individualmente<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. La única forma segura de poder ejecutar sus sentencias
+es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser">JSQLParser</a> que es
+capaz de procesar el código <abbr title="Structured Query Language">SQL</abbr> y, por tanto, reconocer los elementos de que
+se compone.</p></li>
+<li><p>Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
+algunas premisas:</p>
+<ol class="loweralpha simple">
+<li><p>Los “;” que completan sentencias deben encontrarse a final de línea.</p></li>
+<li><p>No pueden usarse las palabras <code class="docutils literal notranslate"><span class="pre">begin</span></code> o <code class="docutils literal notranslate"><span class="pre">end</span></code> en comentarios, nombres,
+valores, etc.</p></li>
+<li><p>No pueden usarse bloques <code class="docutils literal notranslate"><span class="pre">IF</span></code> en aquellos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que los implementen
+(pero sí usarse el estándar <code class="docutils literal notranslate"><span class="pre">CASE</span></code>).</p></li>
+</ol>
+</li>
+</ul>
+<p>El código de los métodos <code class="docutils literal notranslate"><span class="pre">splitSQL</span></code> y <code class="docutils literal notranslate"><span class="pre">executeSQL</span></code> se encuentra dentro de
+<a class="reference internal" href="#clase-sqlutils"><span class="std std-ref">la clase SqlUtils</span></a> referida anteriormente.</p>
+</section>
 <section id="gestor-de-transacciones">
-<span id="conn-transaction-manager"></span><h2><span class="section-number">4.5.4. </span>Gestor de transacciones<a class="headerlink" href="#gestor-de-transacciones" title="Link to this heading">#</a></h2>
+<span id="conn-transaction-manager"></span><h2><span class="section-number">4.5.5. </span>Gestor de transacciones<a class="headerlink" href="#gestor-de-transacciones" title="Link to this heading">#</a></h2>
 <p><a class="reference internal" href="03.transacciones.html#conn-transactions-create"><span class="std std-ref">Crear transacciones de forma manual</span></a> es bastante engorroso
-por lo que resulta muy útil construirse algún mecanismo más cómo para llevarlas
+por lo que resulta muy útil construirse algún mecanismo más sofisticado cómo para llevarlas
 a cabo. Una buena propuesta es ésta:</p>
 <div class="literal-block-wrapper docutils container" id="transactionmanager">
 <div class="code-block-caption"><span class="caption-text">TransactionManager.java (<a class="reference download internal" download="" href="../_downloads/b6999835fb8719e034ca91c8c9849856/TransactionManager.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#transactionmanager" title="Link to this code">#</a></div>
@@ -1100,8 +1122,7 @@ a cabo. Una buena propuesta es ésta:</p>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>La clase presupone que hemos definido una excepción protegida de usuario
-<code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code> semejante a <a class="reference internal" href="#dataaccessruntimeexception"><span class="std std-ref">DataAccessRuntimeException</span></a> que captura los errores propios de la
-persistencia (<code class="docutils literal notranslate"><span class="pre">SQLException</span></code> en nuestro caso).</p>
+<code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code> semejante a <a class="reference internal" href="#dataaccessruntimeexception"><span class="std std-ref">DataAccessRuntimeException</span></a>.</p>
 </div>
 <p>Las claves de esta clase son:</p>
 <ul class="simple">
@@ -1119,7 +1140,8 @@ efecto). Esta magia se logra gracias al uso del <a class="reference external" hr
 que permite interceptar los métodos definidos en una interfaz (y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>
 lo es).</p></li>
 </ul>
-<p>Este gestor de transacciones soporta múltiples hilos y el acceso a mútiples bases de datos:</p>
+<p>Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
+bases de datos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;CENTRO&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds</span><span class="p">);</span><span class="w"> </span><span class="c1">// ds es un DataSource ya creado</span>
 
 <span class="c1">// En cualquier punto del código podemos rescatar el objeto gracias a la clave</span>
@@ -1159,119 +1181,227 @@ lo es).</p></li>
 </div>
 </div>
 </section>
-<section id="cargar-esquema-desde-archivo">
-<h2><span class="section-number">4.5.5. </span>Cargar esquema desde archivo<a class="headerlink" href="#cargar-esquema-desde-archivo" title="Link to this heading">#</a></h2>
-<p>Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
-de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
-las sentencias necesarias se encuentren en un guión <abbr title="Structured Query Language">SQL</abbr> y el programa las lea
-de él, en vez de encontrarse incrustadas en el código.</p>
-<p>Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> no tiene definido un método que nos permita ejecutar un
-guión <abbr title="Structured Query Language">SQL</abbr> completo y que pasemos una cadena larga con todas instrucciones
-separadas por comas, no asegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
-individualmente<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. La única forma segura de poder ejecutar sus sentencias
-es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser">JSQLParser</a> que es
-capaz de procesar el código <abbr title="Structured Query Language">SQL</abbr> y, por tanto, reconocer los elementos de que
-se compone.</p></li>
-<li><p>Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
-algunas premisas:</p>
-<ol class="loweralpha simple">
-<li><p>Los “;” que completan sentencias deben encontrarse a final de línea.</p></li>
-<li><p>No pueden usarse las palabras <code class="docutils literal notranslate"><span class="pre">begin</span></code> o <code class="docutils literal notranslate"><span class="pre">end</span></code> en comentarios, nombres,
-valores, etc.</p></li>
-<li><p>No pueden usarse bloques <code class="docutils literal notranslate"><span class="pre">IF</span></code> en aquellos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que los implementen
-(pero sí usarse el estándar <code class="docutils literal notranslate"><span class="pre">CASE</span></code>).</p></li>
-</ol>
-</li>
-</ul>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
-<span class="cm"> * Descompone un guión SQL en las sentencias de que se compone.</span>
-<span class="cm"> * @param st Entrada de la que se lee el guión</span>
-<span class="cm"> * @return  Una lista con las sentencias separadadas.</span>
-<span class="cm"> * @throws IOException</span>
-<span class="cm"> */</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">splitSQL</span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">Pattern</span><span class="w"> </span><span class="n">beginPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\b(BEGIN|CASE)\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
-<span class="w">    </span><span class="n">Pattern</span><span class="w"> </span><span class="n">endPattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="s">&quot;\\bEND\\b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="p">);</span>
+<section id="pool-de-conexiones">
+<span id="conn-pool-extra"></span><h2><span class="section-number">4.5.6. </span><em>Pool</em> de conexiones<a class="headerlink" href="#pool-de-conexiones" title="Link to this heading">#</a></h2>
+<p>Ya tratamos cómo crear un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>. Si queremos
+simplificar la creación del pool y abstraernos de qué se usa para crearlo,
+podemos envolverlo en una clase como esta:</p>
+<div class="literal-block-wrapper docutils container" id="connectionpool">
+<div class="code-block-caption"><span class="caption-text">ConnectionPool.java (<a class="reference download internal" download="" href="../_downloads/3c2ef39c177c50255f4b7d4e723623c2/ConnectionPool.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#connectionpool" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConnectionPool</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AutoCloseable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 
-<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">        </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
-<span class="w">        </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">sr</span><span class="p">);</span>
-<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sentencias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">contador</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="k">while</span><span class="p">((</span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">linea</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span>
-<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">linea</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/** Mapa con las instancias creadas **/</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="cm">/** Número máximo de conexiones en el pool */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">maxConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/** Número mínimo de conexiones en el pool */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">minConnections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 
-<span class="w">            </span><span class="n">Matcher</span><span class="w"> </span><span class="n">beginMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beginPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
-<span class="w">            </span><span class="n">Matcher</span><span class="w"> </span><span class="n">endMatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPattern</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">linea</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="w"> </span><span class="n">closed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
 
-<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">beginMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">++</span><span class="p">;</span>
-<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">endMatcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="n">contador</span><span class="o">--</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">ConnectionPool</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">HikariConfig</span><span class="w"> </span><span class="n">hconfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariConfig</span><span class="p">();</span>
+<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setJdbcUrl</span><span class="p">(</span><span class="n">dbUrl</span><span class="p">);</span>
+<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setUsername</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// Mínimo y máximo de conexiones.</span>
+<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMaximumPoolSize</span><span class="p">(</span><span class="n">maxConnections</span><span class="p">);</span>
+<span class="w">        </span><span class="n">hconfig</span><span class="p">.</span><span class="na">setMinimumIdle</span><span class="p">(</span><span class="n">minConnections</span><span class="p">);</span>
 
-<span class="w">            </span><span class="n">sentencia</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">linea</span><span class="p">;</span>
-
-<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">contador</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">linea</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="n">sentencias</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
-<span class="w">                </span><span class="n">sentencia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sentencias</span><span class="p">;</span>
+<span class="w">        </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">hconfig</span><span class="p">);</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
 
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">executeSQL</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Crea una instancia a partir de los datos de conexión.</span>
+<span class="cm">     * @param key Clave que identifica la conexión.</span>
+<span class="cm">     * @param dbUrl URL de conexión a la base de datos.</span>
+<span class="cm">     * @param user Usuario de conexión</span>
+<span class="cm">     * @param password Contraseña de conexión</span>
+<span class="cm">     * @return La instancia solicitada.</span>
+<span class="cm">     * @throws IllegalStateException Si la instancia ya existe.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Objects</span><span class="p">.</span><span class="na">requireNonNull</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;La clave no puede ser nula&quot;</span><span class="p">);</span>
 
-<span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">(</span>
-<span class="w">       </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
-<span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">sentencia</span><span class="p">:</span><span class="w"> </span><span class="n">splitSQL</span><span class="p">(</span><span class="n">st</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">           </span><span class="n">stmt</span><span class="p">.</span><span class="na">addBatch</span><span class="p">(</span><span class="n">sentencia</span><span class="p">);</span>
-<span class="w">       </span><span class="p">}</span>
-<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeBatch</span><span class="p">();</span>
-<span class="w">       </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">catch</span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span>
-<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SQLException</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<span class="w">   </span><span class="p">}</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instances</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Ya hay una instancia asociada a la clave&quot;</span><span class="p">);</span>
+
+<span class="w">	    </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
+<span class="w">        </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Creado nuevo pool de conexiones para la clave {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">previa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">putIfAbsent</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">previa</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Otro hilo creó una instancia para la clave {}: cerrando la recién creada&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">            </span><span class="n">instance</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Ya hay una instancia asociada a la clave&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Genera una instancia {@link ConnectionPool} cuando no son necesarios usuario ni contraseña.</span>
+<span class="cm">     * @param key Clave que identifica la conexión.</span>
+<span class="cm">     * @param dbUrl La URL de conexión.</span>
+<span class="cm">     * @return La instancia solicitada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene la instancia asociada a una clave.</span>
+<span class="cm">     * @param key Clave que identifica la conexión.</span>
+<span class="cm">     * @return La instancia solicitada.</span>
+<span class="cm">     * @throws IllegalArgumentException Si no existe la instancia para la clave suministrada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instances</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No existe una instancia para la clave %s&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">key</span><span class="p">));</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="na">isOpen</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Hallado pool abierto de conexiones para la clave {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Hallado pool de conexiones para la clave {}, pero no está abierto&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">instance</span><span class="p">);</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La instancia solicitada no existe.&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/** Comprueba si el pool de conexiones está abierto</span>
+<span class="cm">     * @return {@code true} si el pool está abierto, {@code false} en caso contrario</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isOpen</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">closed</span><span class="p">.</span><span class="na">get</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">ds</span><span class="p">.</span><span class="na">isClosed</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/** Obtiene el DataSource asociado al pool de conexiones</span>
+<span class="cm">     * @return El DataSource asociado</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="nf">getDataSource</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;Hay un gestor de transacciones asociado a este pool &#39;%s&#39;. A menos de que esté seguro de lo que hace, debería obtener las conexiones a través de él.&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">getKey</span><span class="p">()));</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IllegalStateException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/** Crea un gestor de transacciones {@link TransactionManager} asociado a este pool de conexiones */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setTransactionManager</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">setTransactionManager</span><span class="p">(</span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Crea un gestor de transacciones asociado a este pool de conexiones.</span>
+<span class="cm">     * @param tmClass La clase derivada de {@link TransactionManager} que se va a instanciar.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setTransactionManager</span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">TransactionManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tmClass</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;El ConnectionPool está cerrado&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">ds</span><span class="p">,</span><span class="w"> </span><span class="n">tmClass</span><span class="p">);</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Creado un gestor de transacciones {} asociado a la clave {} de este ConnectionPool&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tmClass</span><span class="p">.</span><span class="na">getSimpleName</span><span class="p">(),</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IllegalStateException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;Ya existe un gestor de transacciones asociado a la clave {}. Quizás lo creó manualmente.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene el gestor de transacciones asociado a este pool de conexiones.</span>
+<span class="cm">     * @return El gestor de transacciones asociado.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">TransactionManager</span><span class="w"> </span><span class="nf">getTransactionManager</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;El ConnectionPool está cerrado&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">IllegalStateException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No hay un gestor de transacciones asociado al pool &#39;%s&#39;. Debe crearlo primero con setTransactionManager().&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">getKey</span><span class="p">()));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">closed</span><span class="p">.</span><span class="na">compareAndSet</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">instances</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">            </span><span class="n">ds</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Pool de conexiones cerrado para la clave {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene la clave que identifica este pool de conexiones.</span>
+<span class="cm">     * @return La clave solicitada.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getKey</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition hint">
-<p class="admonition-title">Consejo</p>
-<p>Podemos añadir ambos métodos a la <a class="reference internal" href="#conn-sqlutils"><span class="std std-ref">clase SqlUtils</span></a> ya propuesta. De hecho, hemos preparado un <a class="reference external" href="https://github.com/sio2sio2/sqlutils">repositorio de
-Github</a> listo para su uso:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- En pom.xml --&gt;</span>
-<span class="nt">&lt;repositories&gt;</span>
-<span class="w">     </span><span class="nt">&lt;repository&gt;</span>
-<span class="w">         </span><span class="nt">&lt;id&gt;</span>jitpack.io<span class="nt">&lt;/id&gt;</span>
-<span class="w">         </span><span class="nt">&lt;url&gt;</span>https://jitpack.io<span class="nt">&lt;/url&gt;</span>
-<span class="w">     </span><span class="nt">&lt;/repository&gt;</span>
-<span class="w"> </span><span class="nt">&lt;/repositories&gt;</span>
+</div>
+<p>La clase sigue el patrón ya ensayado para <a class="reference internal" href="#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>: un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a> que asocia a cada <em>pool</em> de
+conexiones una clave, por lo que crear un <em>pool</em> con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> es muy sencillo<a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
+<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Hacemos operaciones con la conexión.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="nt">&lt;dependencies&gt;</span>
-<span class="w">  </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">      </span><span class="nt">&lt;version&gt;</span>2.7.0<span class="nt">&lt;/version&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/dependency&gt;</span>
-<span class="nt">&lt;/dependencies&gt;</span>
+<span class="c1">// Aquí ya no podemos usar el pool &quot;DB&quot; porque lo hemos cerrado.</span>
+<span class="hll"><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// ERROR: el pool está cerrado.</span>
+</span></pre></div>
+</div>
+<p>La última línea muestra cómo puede recuperarse en cualquier momento el <em>pool</em>,
+siempre que no se haya cerrado.</p>
+<p>El objeto puede utilizarse tal como se ha ilustrado para obtener su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
+y distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá que cerrar convenientemente),
+pero también puede usarse en conjunción con <a class="reference internal" href="#transactionmanager"><span class="std std-ref">TransactionManager</span></a> y dejar que sea el gestor de transacción el que se
+encargue de crear y cerrar la conexión que necesitamos.</p>
+<p><a class="reference internal" href="#transactionmanager"><span class="std std-ref">TransactionManager</span></a></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="n">pool</span><span class="p">.</span><span class="na">setTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// Crea el gestor de nombre &quot;BD&quot;.</span>
+</span>
+<span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
+<span class="hll"><span class="w">   </span><span class="n">pool</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">().</span><span class="na">transaction</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+</span>
+<span class="w">     </span><span class="c1">// Operaciones que comparten una misma transacción</span>
+
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-advertencia admonition">
+<p class="admonition-title">Advertencia</p>
+<p>Cuando existe el gestor de transacciones correspondiente, el método
+<code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo de que es conveniente
+manejar las conexiones a través del gestor, que para eso se ha creado.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En realidad, los métodos <code class="docutils literal notranslate"><span class="pre">setTransactionManager()</span></code> y <code class="docutils literal notranslate"><span class="pre">getTransactionManager()</span></code>
+son una manera de manipular <a class="reference internal" href="#transactionmanager"><span class="std std-ref">TransactionManager</span></a>
+desde el propio objeto <a class="reference internal" href="#connectionpool"><span class="std std-ref">ConnectionPool</span></a>. Utilizarlo
+directamente sigue teniendo el mismo efecto:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Esto equivale a pool.setTransaction()</span>
+<span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">());</span>
+
+<span class="c1">// Esto equivale a pool.getTransaction()</span>
+<span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Transaction</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">1</a><span class="fn-bracket">]</span></span>
 <p>Al método sólo se le proporciona la <abbr title="Uniform Resource Locator">URL</abbr>, porque usamos <em>SQLite</em> como
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Si fuera otro como <em>MySQL</em>, tendríamos también que proporcionar un
 usuario y una contraseña. Por otro lado, en el caso particular de <em>SQLite</em>
@@ -1280,8 +1410,8 @@ que de lo contrario cada conexión que devuelva el <em>pool</em> será una base 
 datos distinta en memoria. Con una base de datos persistente, no habría sido
 necesario.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
 <p>Con <em>SQLite</em> por ejemplo el método <code class="docutils literal notranslate"><span class="pre">.executeUpdate</span></code> sí será capaz de
 ejecutar todas las sentencias <abbr title="Structured Query Language">SQL</abbr>; <code class="docutils literal notranslate"><span class="pre">execute</span></code>, en cambio, no lo hará y
 ejecutará solo la primera. Con otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el comportamiento puede variar.</p>
@@ -1336,10 +1466,11 @@ ejecutará solo la primera. Con otros <abbr title="Sistema Gestor de Bases de Da
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metadatos">4.5.1. Metadatos</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.5.2. <em>Pool</em> de conexiones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#excepciones-personalizadas">4.5.2. Excepciones personalizadas</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.5.3. Tratamiento funcional de las consultas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.5.4. Gestor de transacciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.5.5. Cargar esquema desde archivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-esquema-desde-archivo">4.5.4. Cargar esquema desde archivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-de-transacciones">4.5.5. Gestor de transacciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pool-de-conexiones">4.5.6. <em>Pool</em> de conexiones</a></li>
 </ul>
   </nav></div>
 

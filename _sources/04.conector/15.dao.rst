@@ -94,7 +94,7 @@ particularizará para :ref:`Centro <clase-centro>` y para :ref:`Estudiante
 Llegamos por fin a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, tres clases: una que abstraiga del
 establecimiento de la conexión, que bien podría ser :ref:`ConnectionPool
-<clase-connectionpool>` ) (o una clase más específica de nuestra aplicación que
+<ConnectionPool>` ) (o una clase más específica de nuestra aplicación que
 la use), y otra por cada una de las clases del modelo:
 
 .. table::
@@ -160,8 +160,9 @@ abstracto del que deriven los |DAO| para cada objeto:
    :start-at: public abstract class
 
 Es decir, construimos las clases |DAO| pasando la clave que identifica al
-|DataSource| que nos interesa; y, como ya adelantamos, la conexión la obtenemos
-del gestor de transacciones.
+|DataSource| (en realidad, el objeto :ref:`ConnectionPool <ConnectionPool>`) que nos
+interesa; y, como ya adelantamos, la conexión la obtenemos del gestor de
+transacciones.
 
 .. caution:: Esto obliga a que cualquier operación, aunque sea única la llevemos
    a cabo dentro de una transacción.
@@ -187,40 +188,17 @@ Y ``EstudianteSqlDao`` se implementará de modo análogo.
 
 .. code-block:: java
 
-   DataSource ds = ConnectionPool.createHikariDataSource(dbUrl, dbUser, dbPassword);
-   TransactionManager tm = TransactionManager.create("MiBase", ds);
+   try(ConnectioPool cp = ConnectionPool.create("DB", dbUrl, dbUser, dbPassword)) {
+      cp.setTransactionManager();
 
-   // Este DAO ya sabe con qué gestor de transacciones está relacionado.
-   CentroDao centroDao = new CentroDao("MiBase");
+      // Este DAO ya sabe con qué gestor de transacciones está relacionado.
+      CentroDao centroDao = new CentroDao("DB");
 
-   // Creamos una transacción y con ello una conexión.
-   tm.transaction(conn -> {
-      Centro astaroth = new Centro(11701164L, "IES Astaroth",Titularidad.PUBLICA);
-      centroDao.insert(astaroth);  // Usa la conexión asociada a la transacción.
-   });
-
-.. note:: En realidad, nuestro diseño sería más limpio si crearamos una clase
-   ``Conexion`` que:
-
-   + Implementara un patrón Multiton_ para asociar claves a objetos |DataSource|
-     creados con ``ConnectionPool``.
-   + Creata en su implementación el objeto ``TransactionManager``.
-   + Implementara él mismo métodos para crear transacciones y obtener la
-     conexión asociada que se apoyaran en los correspondientes del gestor de
-     transacciones, Eso permitiría prescindir del uso directo de
-     ``TransactionManager`` en el resto del código.
-
-   De este modo, sólo necesitaríamos usar esta clase ``Conexion``:
-
-   .. code-block:: java
-
-      Conexion conexion = Conexion.create("MiBase", dbUrl, dbUser, dbPassword);
-      Centro centroDao = new CentroDao("MiBase");
-
-      conexion.transaction(conn -> {
+      cp.getTransaction().transaction(conn -> {
          Centro astaroth = new Centro(11701164L, "IES Astaroth",Titularidad.PUBLICA);
-         centroDao.insert(astaroth);
+         centroDao.insert(astaroth);  // Usa la conexión asociada a la transacción.
       });
+   }
 
 Finalmente hay un último detalle para el cual conviene que mostremos la
 implementación de ``EstudianteSqlDao``:

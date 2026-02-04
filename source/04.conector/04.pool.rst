@@ -158,6 +158,10 @@ Su uso, por otro lado es muy sencillo:
 
    ds.close();  // Se liberan recursos.
 
+.. warning:: Para el caso particular de usar una base de datos *SQLite* en memoria con HikariCP_,
+   la ruta debe ser :file:`file::memory:?cache=shared` y no simplemente
+   :file:`:memory:`.
+
 .. tip:: Más adelante se sugiere una :ref:`estrategia para crear el pool
    <conn-pool-extra>`.
 

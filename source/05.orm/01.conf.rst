@@ -80,17 +80,17 @@ En resumidas cuentas es:
 
 * El soporte para |JPA| que proporciona Hibernate_ mediante hibernate-core_.
   Podemos incluir explícitamente , aunque no es necesario, la especificación
-  `jakarta.persistence-api`_.
+  `jakarta.persistence-api`_ (con la prevención que más adelante se refiere).
 * Como en nuestro caso particular utilizaremos SQLite_, necesitamos el driver |JDBC|
   correspondiente (sqlite-jdbc_), y el soporte para *Hibernate*
   (`hibernate-community-dialects`).
 * En principio, basta con lo anterior, pero si se quiere llevar a cabo
   comprobaciones sobre los valores de los datos (p.ej. las :ref:`referidas más
-  adelante <orm-mapping-check>`), serán necesaria la implementación de
-  *Hibernate* de la validación que ofrece |JPA|, esto es, hibernate-validator_.
+  adelante <orm-mapping-check>`), será necesaria la implementación para la
+  especificación |JPA| que proporciona *Hibernate*, esto es, hibernate-validator_.
   Como anteriormente, podemos incluir explícitamente la implementación
   (`jakarta.validation-api`_).
-* La última dependencia (`expressly`_) sólo es necesaria si que utilizan
+* La última dependencia (`expressly`_) sólo es necesaria si se utilizan
   anotaciones implementadas por hibernate-validator_ que aprovechan la
   evaluación dinámica de cadenas. Por ejemplo:
 
@@ -107,7 +107,7 @@ En resumidas cuentas es:
    |JPA|, entonces el *scope* de las librerías de Hibernate_ deberá ser
    ``compile`` (o no poner ninguno, que es equivalente), porque, de mantenerlo
    como ``runtime``, :ref:`Maven` resolverá la dependencia de las
-   especificaciones también con ese *scope* y no tendremos disponibles en la
+   especificaciones también con ese *scope* y no las tendremos disponibles en la
    compilación la |API|.
 
 Configuración de la persistencia

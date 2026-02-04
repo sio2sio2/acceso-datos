@@ -66,7 +66,7 @@ public class CentroSqlDao extends BaseDao<Centro> {
     public Optional<Centro> get(Long id) throws DataAccessException {
         String sqlString = "SELECT * FROM Centro WHERE id_centro = ?";
 
-        try(Connection conn = getConnection();) {
+        try(Connection conn = getConnection()) {
             try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
                 pstmt.setLong(1, id);
                 try(ResultSet rs = pstmt.executeQuery()) {

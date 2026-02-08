@@ -14,9 +14,6 @@ partir del objeto :jakarta-persistence:`EntityManager`:
 
    CriteriaBuilder cb = em.getCriteriaBuilder();
 
-.. tip:: Es mejor crear un único objeto ``CriterioBuilder`` para construir todas
-   las consultas.
-
 A partir de ahora debemos definir qué es lo que se querrá obtener (recordemos
 que estamos haciendo un ``SELECT``) y sobre qué tabla/entidad se quiere hacer la
 consulta. Por ejemplo:
@@ -24,34 +21,36 @@ consulta. Por ejemplo:
 Consulta básica
 ===============
 
+Empecemos por una consulta |SQL| muy básica:
+
 .. code-block:: java
    :name: orm-criteria-select-all
+   :linenos:
+   :lineno-start: 0
 
+   // SELECT e.* FROM Estudiante e
    CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class); // Obtendremos estudiantes.
-   Root<Estudiante> root = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
-   criteria.select(root); // SELECT e.* FROM Estudiante e;
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
+   criteria.select(estudiante); // SELECT e.* FROM Estudiante e;
 
-   TypedQuery<Estudiante> estudiantes = em.createQuery(criteria);
+   TypedQuery<Estudiante> query = em.createQuery(criteria);
 
-Obsérvese que hacemos la consulta al equivalente |SQL|:
+Como queremos obtener objetos ``Estudiante`` (primera línea) y consultamos la
+entidad ``Estudiante`` (segunda línea) es obvio que la consulta es:
 
 .. code-block:: sql
 
-   SELECT e.* FROM Estudiante e;
+   SELECT e.* FROM Estudiante e
 
-Que obtengamos estudiantes (:code:`e.*`) es consecuencia de
-:code:`cb.createQuery(Estudiante.class)` y de que hemos aplicado el método
-``.select`` a ``root`` sin más. Que la consulta se haya hecho sobre Estudiante
-es consecuencia de :code:`criteria.from(Estudiante.class)`.
 
-Si quisiéramos obtener un campo:
+Si quisiéramos obtener un campo, entonces deberíamos alterar las líneas 1 y 3:
 
 .. code-block:: java
    :emphasize-lines: 1, 3
 
    CriteriaQuery<String> criteria = cb.createQuery(String.class); // Obtendremos cadenas
-   Root<Estudiante> root = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
-   criteria.select(root.get("nombre")); // SELECT e.nombre FROM Estudiante e;
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
+   criteria.select(estudiante.get("nombre")); // SELECT e.nombre FROM Estudiante e;
 
    TypedQuery<String> query = em.createQuery(criteria);
 
@@ -61,44 +60,73 @@ Y si varios:
    :emphasize-lines: 1, 3
 
    CriteriaQuery<Object[]> criteria = cb.createQuery(Object[].class);
-   Root<Estudiante> root = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
-   criteria.multiselect(root.get("nombre"), root.get("centro")); // SELECT e.nombre, e.centro FROM Estudiante e;
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
+   criteria.multiselect(estudiante.get("nombre"), estudiante.get("centro")); // SELECT e.nombre, e.centro FROM Estudiante e;
 
-   List<Object[]> campos = em.createQuery(criteria);
+   TypedQuery<Object[]> query = em.createQuery(criteria);
 
-.. tip:: En este último caso, puede usarse también :ref:`Tuple como en JPQL
-   <orm-tuple>`:
+En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>`:
+
+.. code-block:: java
+   :emphasize-lines: 1, 3-6
+
+   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   criteria.multiselect(
+      estudiante.get("nombre").alias("nombre"),
+      estudiante.get("centro").alias("centro")
+   );
+
+   TypedQuery<Tuple> query = em.createQuery(query);
+
+.. tip:: Aunque, si almacenamos las definiciones de los campos, luego podremos
+   recuperarlos más fácilmente sin necesidad de especificar los tipos ni hacer
+   *cast*:
 
    .. code-block:: java
-      :emphasize-lines: 1, 3-6
+      :emphasize-lines: 3-5
 
       CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
-      Root<Estudiante> root = criteria.from(Estudiante.class);
-      criteria.select(cb.tuple(
-         root.get("nombre").alias("nombre"),
-         root.get("centro").alias("centro")
-      ));
+      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+      var nombre = estudiante.get("nombre", String.class).alias("nombre");
+      var centro = estudiante.get("centro", Centro.class).alias("centro")
+      criteria.multiselect(nombre, centro);
 
       TypedQuery<Tuple> query = em.createQuery(query);
 
-.. caution:: No es una buena práctica referir los atributos de las clases con
-   una cadena (:code:`root.get("nombre")`), ya que los errores de digitalización no
-   pueden detectarse en tiempo de compilación. Por ese motivo, es bastante
-   recomendable generar el *Metamodel*, que nos permite escribir:
+   Lo cual nos permite hacer obtener de |Tuple| los valores sin especificar
+   de qué tipo son:
 
    .. code-block:: java
 
-      root.get("nombre");
+      query.getResultList().forEach(t -> {
+         String nombre = t.get(nombre);
+         Centro centro = t.get(centro);
+         System.out.printf("%s: %s.\n", nombre, centro)
+      });
+
+   Justamente a continuación introduciremos el |Metamodel|, que nos ahorrará
+   indicar los tipos incluso al hacer las definiciones.
+
+.. caution:: No es una buena práctica referir los atributos de las clases con
+   una cadena (:code:`estudiante.get("nombre")`), ya que los errores de
+   digitalización o de tipos no pueden detectarse en tiempo de compilación. Por
+   ese motivo, es bastante recomendable generar el |Metamodel|, que nos permite
+   escribir:
+
+   .. code-block:: java
+
+      estudiante.get("nombre");
 
    como:
 
    .. code-block:: java
 
-      root.get(Estudiante_.nombre);
+      estudiante.get(Estudiante_.nombre);
 
    donde ``Estudiante_`` es una clase generada por el compilador.
 
-.. _orm-jra-metamodel:
+.. _orm-jpa-metamodel:
 
 Metamodel
 =========
@@ -155,41 +183,44 @@ correspondientes a nuestro modelo (``Centro_`` y ``Estudiante_`` en el ejemplo).
 Ahora podríamos reescribir el ejemplo anterior así:
 
 .. code-block:: java
-   :emphasize-lines: 5,6
+   :emphasize-lines: 4, 5
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o
    cb.createTupleQuery();
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   criteria.select(cb.tuple(
-      root.get(Estudiante_.nombre).alias("nombre"),
-      root.get(Estudiante_.centro).alias("centro")
-   ));
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   var nombre = estudiante.get(Estudiante_.nombre).alias("nombre");
+   var centro = estudiante.get(Estudiante_.centro).alias("centro");
+   criteria.multiselect(nombre, centro);
 
-   TypedQuery<Tuple> query = em.createQuery(query);
+   TypedQuery<Tuple> query = em.createQuery(criteria);
 
-.. note:: A partir de ahora usaremos las metaclases para referir atributos.
+.. note:: El *Metamodel* también genera ``Estudiante_.NOMBRE`` o
+   ``Estudiante_.CENTRO``, pero sólo son constantes de tipo ``String`` que se
+   sustituyen por las cadenas ``"nombre"`` o ``"centro"``, allí donde están. Por
+   tanto, sólo protegen de los fallos de digitalización, pero no permiten la
+   comprobación estática de tipos o la refactorización de código.
 
 Condiciones
 ===========
 |CriteriaBuilder| tiene definidos métodos que implementan los operadores
-básicos de |SQL|. Por ejemplo, para escoger los estudiantes no matriculados:
+básicos de |SQL|. Por ejemplo, para escoger los **estudiantes no matriculados**:
 
 .. code-block:: java
    :emphasize-lines: 4
 
-   CriteriaQuery<Estudiante> query = cb.createQuery(Estudiante.class);
-   Root<Estudiante> root = query.from(Estudiante.class);
-   query.select(root);
-   query.where(cb.isNull(root.get(Estudiante_.centro)));
+   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   criteria.select(estudiante);
+   criteria.where(cb.isNull(estudiante.get(Estudiante_.centro)));
 
-   TypedQuery<Estudiante> estudiantes = sesion.createQuery(query);
+   TypedQuery<Estudiante> query = em.createQuery(criteria);
 
 Para obtener los estudiantes de un centro determinado (suponiendo que éste
 se almacene en la variable ``centro``) la condición habría sido:
 
 .. code-block:: java
 
-   query.where(cb.equal(root.get(Estudiante_.centro), centro));
+   criteria.where(cb.equal(estudiante.get(Estudiante_.centro), centro));
 
 Ordenación
 ==========
@@ -199,9 +230,9 @@ Para ordenar resultados basta con aplicar el orden a ``criteria``:
    :emphasize-lines: 4
 
    CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   criteria.select(root);
-   criteria.orderBy(cb.desc(root.get(Estudiante_.nacimiento)));
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   criteria.select(estudiante);
+   criteria.orderBy(cb.desc(estudiante.get(Estudiante_.nacimiento)));
 
    TypedQuery<Estudiante> query = em.createQuery(criteria);
 
@@ -210,174 +241,353 @@ Agrupación
 También existe el equivalente a ``GROUP BY``:
 
 .. code-block:: java
-   :emphasize-lines: 7
+   :emphasize-lines: 3-7
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   criteria.select(cb.tuple(
-      root.get(Estudiante_.centro).alias("centro"), 
-      cb.count(root).alias("cantidad")
-   ));
-   criteria.groupBy(root.get(Estudiante_.centro));
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   var centro_p = estudiante.get(Estudiante_.centro);
+   var centro = centro_p.alias("centro");
+   var cantidad = cb.count(estudiante).alias("cantidad");
+   criteria.multiselect(centro, cantidad)
+      .groupBy(centro_p);
 
-   TypedQuery<Tuple> query = sesion.createQuery(query);
+   TypedQuery<Tuple> query = em.createQuery(criteria);
 
 Si ahora quisiéramos ordenar resultados por la cantidad de estudiantes que tiene
 cada centro deberíamos añadir:
 
 .. code-block:: java
 
-   criteria.orderBy(cb.asc(cb.count(root)));
+   criteria.orderBy(cb.asc(cb.count(estudiante)));
 
 ya que no puede usarse el alias. O, si quisiéramos ordenar por el nombre del
 centro:
 
 .. code-block:: java
 
-   criteria.orderBy(cb.asc(root.get(Estudiante_.centro).get(Centro_.nombre)));
+   criteria.orderBy(cb.asc(estudiante.get(Estudiante_.centro).get(Centro_.nombre)));
 
-Joins
-=====
-Como en |JPQL| también se puede relacionar fácilmente entidades. Esto permite
-hacer un ``INNER JOIN``:
+Relaciones
+==========
+Como en |JPQL| también se puede relacionar fácilmente entidades.
 
-.. code-block:: java
-   :emphasize-lines: 3
+.. rubric:: INNER JOIN o, simplemente, JOIN
 
-   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
-   criteria.select(root);
-
-   TypedQuery<Estudiante> query = em.createQuery(criteria);
-
-La consulta equivale a:
+Es la relación más sencilla y relaciona dos entidades en las que cada clave foránea
+en una entidad hace referencia a un identificador de la otra. El resultado es
+que aparecen todos los registros relacionados entre sí. Por tanto:
 
 .. code-block:: sql
 
-   SELECT e.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id;
+   SELECT e.*,c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;
 
-Obsérvese que el *JOIN* viene representado por la variable ``centro`` que se
-define en la línea remarcada. En cambio, si nuestra intención hubiera sido:
+muestra todos los estudiantes matriculados junto a los datos del centro en el
+que está matriculado. La relación es conmutativa y:
 
 .. code-block:: sql
 
-   SELECT c.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id;
-
-la consulta debería haberse construido así:
+   SELECT e.*,c.* FROM Centro c JOIN Estudiante e ON e.centro = c.id;
+   
+devuelve exactamente el mismo resultado. Para implementar esta relación en
+*Criteria API*, podemos hacer:
 
 .. code-block:: java
-   :emphasize-lines: 3
+   :emphasize-lines: 4, 5
 
+   // SELECT c.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id; 
    CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
    criteria.select(centro);
 
-   TypedQuery<Estudiante> query = em.createQuery(criteria);
+   TypedQuery<Centro> query = em.createQuery(criteria);
+   query.getResultList().forEach(System.out::println);  // Imprime centros.
 
-.. note:: Obtendremos muchos centros repetidos así que lo suyo sería haber hecho
-   un ``DISTINCT``:
+La segunda posibilidad, que devuelve el mismo resultado se escribe así:
+
+.. code-block:: java
+   :emphasize-lines: 4, 5
+
+   // SELECT e.* FROM Centro c INNER JOIN Estudiante e ON e.centro = c.id;
+   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
+   Root<Centro> centro = criteria.from(Centro.class);
+   Join<Centro, Estudiante> estudiante = centro.join(Centro_.estudiantes, JoinType.INNER);
+   criteria.select(estudiante);
+
+   TypedQuery<Estudiante> query = em.createQuery(criteria);
+   query.getResultList().forEach(System.out::println);  // Imprime estudiantes.
+
+pero obsérvese que requiere que hubiéramos definido la relación como
+bidireccional.
+
+.. caution:: Hemos afirmado que las consultas son equivalentes, pero no es tal,
+   ya que en el primer caso hemos obtenido centros y en el segundo hemos obtenido
+   estudiantes. La consulta realmente equivalen habría exigido obtener |Tuple|:
 
    .. code-block:: java
 
-      criteria.select(cb.distinct(centro));
+      // SELECT e.*, c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;
+      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+      Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+      var estudiante_a = estudiante.alias("estudiante");
+      var centro_a = centro.alias("centro");
+      criteria.multiselect(estudiante_a, centro_a);
 
-   que devolvería la lista de centros con algún estudiante matriculado.
+De los dos ejemplos anteriores se pueden sacar tres conclusiones:
 
-Si intentáramos obtener lo contrario, la relación de centros sin alumnos
-matriculados, en |SQL| podríamos obtenerla con una de estas dos consultas, que
-son equivalentes:
+a. La relación se establece entre una entidad y el atributo que la relaciona con
+   la otra como en |JPQL| y a diferencia de lo que ocurre en |SQL|, en que se
+   establece la relación entre dos tablas. Por ese motivo, el segundo ejemplo es
+   imposible de llevar a cabo si no se hizo la relación bidireccional.
+
+#. A diferencia de lo que ocurre en la consulta |SQL|, el primero de los
+   ejemplos no devuelve centros duplicados, aunque varios alumnos compartan un
+   mismo centro. Esto se debe al propio comportamiento de |JPA|. Por ese motivo,
+   el *join* explícito no se diferencia en nada de hacer un **join implícito**
+   como este:
+
+   .. code-block:: java
+
+      // Aunque no se exprese el JOIN, éste se realiza para obtener objetos Centro:
+      // SELECT c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;
+      CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
+      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+      criteria.select(estudiante.get(Estudiante._centro));
+
+      TypedQuery<Centro> query = em.createQuery(criteria);
+      query.getResultList().forEach(System.out::println);  // Imprime centros.
+
+#. Para emular el comportamiento de |SQL| y obtener centros repetidos tenemos
+   que evitar obtener entidades puras:
+
+   .. code-block:: java
+      :emphasize-lines: 2, 5
+
+      // SELECT c.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id; 
+      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+      Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+      var centro_a = centro.alias("centro");
+      criteria.multiselect(centro_a);
+
+      TypedQuery<Tuple> query = em.createQuery(criteria);
+      query.getResultList().forEach(t -> {
+         // Imprime centros repetidos.
+         System.out.println("%s.\n", t.get(centro_a));
+      });  
+
+   En este último caso, podría evitarse la repetición usando ``DISTINCT``, tal
+   como se hace en |SQL|:
+
+   .. code-block:: java
+      :emphasize-lines: 2
+
+      criteria.multiselect(centro_a)
+         .distinct(true);
+
+.. rubric:: Carga inmediata
+
+En los tres ejemplos en los que obtenemos centros (el *join* implícito, el
+*join* explícito y el *join* explícito que obtiene tuplas), el hecho de que
+pidamos centros provoca que estos se carguen directamente gracias a la
+consulta). Sin embargo, si nuestra consulta hubiera sido aquella con la que
+comenzamos a estudiar *Criteria API*:
+
+.. code-block:: java
+
+   // SELECT e.* FROM Estudiante e;
+   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   criteria.select(estudiante);
+
+   TypedQuery<Estudiante> query = em.createQuery(criteria);
+   List<Estudiante> estudiantes = query.getResultList();
+
+Esos estudiantes, como consecuecia de la evaluación perezosa, no tendrían sus
+centros precargados y usar ``.getCentro()`` implicaría un ``SELECT`` posterior
+por cada uno de los estudiantes para obtenerlo. Añadir la línea:
+
+.. code-block:: java
+
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+
+no provoca la carga inmediata, ya que no usamos luego ``centro`` en la
+consulta y, por tanto, internamente, no se realiza realmente un *JOIN*.
+Si nuestra intención es obligar a una carga inmediata gracias al *JOIN* interno,
+debemos añadir esta línea:
+
+.. code-block:: java
+   :emphasize-lines: 4
+
+   // SELECT e.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id; 
+   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   estudiante.fetch(Estudiante_.centro, TypeJoin.INNER);
+   criteria.select(estudiante);
+
+   TypedQuery<Estudiante> query = em.createQuery(criteria);
+   List<Estudiante> estudiantes = query.getResultList();
+
+.. seealso:: Consulte para más información el :ref:`epígrafe dedicado a
+   optimización <orm-optimo>`.
+
+.. rubric:: LEFT JOIN
+
+Una relación ``LEFT JOIN`` obtiene los registros relacionados entre sí (como
+``INNER JOIN``) más aquellos presentes en la entidad de la izquierda que no
+están relacionados con ninguno de la derecha. Debido a ello, los campos de la
+derecha aparecen a ``NULL`` en estos registros adicionales. Por ese motivo:
 
 .. code-block:: sql
 
-   SELECT c.* FROM Centro c LEFT JOIN Estudiante e ON e.centro = c.id WHERE e.centro IS NULL;
-   SELECT c.* FROM Estudiante e RIGHT JOIN Centro c ON e.centro = c.id WHERE e.centro IS NULL;
+   SELECT e.*,c.* FROM Estudiante e LEFT JOIN Centro c ON e.centro = c.id;
 
-Al intentar trasladar esto a *Criteria API* nos encontraríamos con los siguientes
-problemas:
+**no** equivale a:
 
-La primera expresión podríamos traducirla así:
+.. code-block:: sql
 
-.. code-block:: java
-   :emphasize-lines: 3, 5
+   SELECT e.*,c.* FROM Centro c LEFT JOIN Estudiante e ON e.centro = c.id;
+   
+ya que la primera consulta, además de los estudiantes matriculados, devuelve los
+no matriculados; pero no los centros sin estudiantes; mientras que la segunda
+consulta devuelve los estudiantes matriculados y los centros sin estudiantes;
+pero no los estudiantes no matriculados.
 
-   CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
-   Root<Centro> root = criteria.from(Centro.class);
-   Join<Centro, Estudiante> estudiante = root.join(Centro_.estudiantes, JoinType.LEFT);
-   criteria.select(centro);
-   criteria.where(cb.isEmpty(root.get(Centro_.estudiantes)));
-
-Obsérvese que en la relación ``root`` hace referencia a un objeto
-``Centro``, luego debemos indicar el campo que liga ``Centro`` con
-``Estudiante``. Es la lista de estudiantes... pero sólo si definimos como
-bidireccional la relación. Si la relación es unidireccional el único campo que
-establece la relación está en ``Estudiante`` y no podremos resolver de este modo
-el problema. Por su parte, la condición es trivial: la lista de estudiantes debe
-estar vacía.
-
-La segunda expresión si tiene teóricamente, pero sólo teóricamente, solución:
+La primera relación se escribe en *Criteria API* así:
 
 .. code-block:: java
+   :emphasize-lines: 4, 5
 
-   // Esto NO VALE. Ni se le ocurra intentarlo.
+   // SELECT e.*,c.* FROM Estudiante e LEFT JOIN Centro c ON e.centro = c.id;
+   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.LEFT);
+   criteria.select(cb.tuple(estudiante.alias("estudiante"), centro.alias("centro")));
+
+mientras que la segunda:
+
+.. code-block:: java
+   :emphasize-lines: 4, 5
+
+   // SELECT e.*,c.* FROM Centro c LEFT JOIN Estudiante e ON e.centro = c.id;
+   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+   Root<Centro> centro = criteria.from(Centro.class);
+   Join<Centro, Estudiante> estudiante = centro.join(Centro_.estudiantes, JoinType.LEFT);
+   criteria.select(cb.tuple(centro.alias("centro"), estudiante.alias("estudiante")));
+
+Pero nótese que esta segunda requiere una relación bidireccional.
+
+Es muy común usar ``LEFT JOIN`` para obtener indirectamente *los centros sin
+alumnos matriculados*:
+
+.. code-block:: java
+   :emphasize-lines: 5
+
+   // SELECT c.* FROM Centro c LEFT JOIN Estudiante e ON c.id = e.centro WHERE e.id IS NULL;
    CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.RIGHT);
-   criteria.select(centro);
-   criteria.where(cb.isNull(root.get(Estudiante_.centro)));
+   Root<Centro> centro = criteria.from(Centro.class);
+   Join<Centro, Estudiante> estudiante = centro.join(Centro_.estudiantes, JoinType.LEFT);
+   criteria.select(centro).where(cb.isNull(estudiante.get("id")));
 
-El problema es que Criteria API **no** implementa ``RIGHT JOIN`` sino solamente
-los tipos ya vistos: ``INNER JOIN`` y ``LEFT JOIN``.
+.. admonition:: Advertencia
+
+   |JPA| no define las relaciones ``RIGHT JOIN``, ya que pueden considerarse
+   redundantes al ser equivalentes a una relación ``LEFT JOIN`` con las
+   entidades cambiadas de orden. Pero eso, como en el ejemplo de arriba, puede
+   obligarnos a tener que definir relaciones bidireccionales para determinadas
+   consultas.
 
 .. rubric:: Subconsultas
    :name: orm-subquery
 
-En consecuencia, el único modo de hacer la consulta con una relación
-unidireccional es recurrir a una **subconsulta**:
+*Criteria API* también ofrece la posibilidad de hacer subconsultas. De hecho, el
+problema anterior podría haberse resuelto con una:
 
 .. code-block:: sql
 
-   SELECT c.* FROM Centro c WHERE c.id NOT IN (SELECT e.id FROM Estudiante e);
+   SELECT c.* FROM Centro c WHERE c.id NOT IN (SELECT e.centro WHERE Estudiante e);
 
-lo que da pie a que intentemos implementar está consulta con subconsulta usando
-*Criteria API*:
+Esta solución, además, no obliga a hacer la relación bidireccional. Veamos cómo
+implementarla con *Criteria API*:
 
 .. code-block:: java
+   :emphasize-lines: 5-7, 11
 
    CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
-   Root<Centro> root = criteria.from(Centro.class);
-   // Preparamos la subconsulta
-   Subquery<Long> subquery = criteria.subquery(Long.class);
-   Root<Estudiante> subroot = subquery.from(Estudiante.class);
-   subquery.select(subroot.get(Estudiante_.centro));
-   // Consulta con subconsulta
-   criteria.select(root);
-   criteria.where(cb.not(root).in(subquery));
+   Root<Centro> centro = criteria.from(Centro.class);
+
+   // Subconsulta
+   Subquery<Long> subquery = criteria.subquery(Long.class) // e.centro es Long
+   Root<Estudiante> subEstudiante = subquery.from(Estudiante.class);
+   subquery.select(subEstudiante.get(Estudiante_.centro).get(Centro_.id));
+
+   // Consulta con la subconsulta.
+   criteria.select(centro)
+      .where(cb.not(centro.get(Centro_.id).in(subquery)));
 
 .. note:: Nótese que aquí podemos comparar directamente centros en vez de
    identificadores de centros.
+
+O bien, si usamos el operador ``EXISTS`` de |SQL|:
+
+.. code-block:: sql
+
+   SELECT c.* FROM Centro c WHERE NOT EXISTS (SELECT 1 FROM Estudiante e WHERE e.centro = c.id);
+
+que traducido a *Criteria API* queda:
+
+.. code-block:: java
+   :emphasize-lines: 5-8, 12
+
+   CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
+   Root<Centro> centro = criteria.from(Centro.class);
+
+   // Subconsulta
+   Subquery<Long> subquery = criteria.subquery(Long.class) // 1 es Long
+   Root<Estudiante> subEstudiante = subquery.from(Estudiante.class);
+   subquery.select(cb.literal(1L))
+      .where(cb.equal(subEstudiante.get(Estudiante_.centro).get(Centro._id), centro.get(Centro._id)));
+
+   // Consulta con la subconsulta
+   criteria.select(centro)
+      .where(cb.not(cb.exists(subquery)));
+
+.. hint:: En términos de rendimiento, de las tres alternativas presentadas la más
+   eficiente es esta última:
+
+   + ``IN`` requiere generar toda las filas de la subconsulta y, además,
+     genera resultados inesperados cuando algunos de los resultados de la
+     subconsulta es nulo ya que en |SQL| estándar la operación :code:`2 IN (1,
+     NULL)` devuelve ``UNKNOWN`` no ``FALSE``. Justamente en este ejemplo, puede
+     haber Estudiantes sin centro, por lo que tendríamos este problema y la
+     alternativa **ni siquiera es válida en este caso**.
+
+   + ``LEFT JOIN`` necesita generar todas las consultas y luego filtrar
+     aquellas nulas. Esto puede generar un resultado intermedio grande que
+     muchas veces lo hace menos eficiente que la alternativa con ``EXISTS``.
+
+   + ``EXISTS`` detiene la comprobación cuando encuentra la primera
+     coincidencia.
 
 .. rubric:: Cadena de consultas
 
 Observemos parte del código ya presentado anteriormente:
 
 .. code-block:: java
+   :emphasize-lines: 3
 
    CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
-   criteria.select(root);
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+   criteria.select(estudiante);
 
-Partidos de ``Estudiante`` (root) y relacionamos con ``Centro`` a través del
-atributo ``centro`` de ``Estudiante``, de ahí que la relación se escriba así:
+Partidos de ``Estudiante`` (*estudiante*) y relacionamos con ``Centro`` a través
+del atributo *centro* de ``Estudiante``, de ahí que la relación se haya escrito
+utilizando el objeto *estudiante*.
 
-.. code-block:: java
-
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
-
-O sea, para relacionar con ``Centro``, *juntamos* ``root`` (que es
-``Estudiante``) a través de su atributo llamado ``centro``. Si deseamos que en
+O sea, para relacionar con ``Centro``, *juntamos* *estudiante* (que es
+``Estudiante``) a través de su atributo llamado *centro*. Si deseamos que en
 la consulta participe una segunda relación, deberemos tener en cuenta con qué
 entidad se relaciona. Si la tercera entidad fuera la entidad ``Grupo``
 relacionada con ``Estudiante`` entonces tendríamos que hacer:
@@ -385,8 +595,8 @@ relacionada con ``Estudiante`` entonces tendríamos que hacer:
 .. code-block:: java
    :emphasize-lines: 2
 
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
-   Join<Estudiante, Curso> curso = root.join(Estudiante_.curso, JoinType.INNER);
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+   Join<Estudiante, Curso> curso = estudiante.join(Estudiante_.curso, JoinType.INNER);
 
 En cambio, si la tercera entidad fuera la entidad ``ComunidadA`` relacionada con
 ``Centro``, entonces la relación se establecería así:
@@ -394,36 +604,8 @@ En cambio, si la tercera entidad fuera la entidad ``ComunidadA`` relacionada con
 .. code-block:: java
    :emphasize-lines: 2
 
-   Join<Estudiante, Centro> centro = root.join(Estudiante_.centro, JoinType.INNER);
+   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
    Join<Centro, ComunidadA> comunidad = centro.join(Centro_.comunidad, JoinType.INNER);
-
-.. rubric:: Carga inmediata
-
-COmo en el caso de |JPQL| puede forzarse una carga inmediata de la entidad
-relacionada sustituyendo el método ``.join`` por el método ``.fetch`` en los
-ejemplos de este epígrafe en que existen *JOINs* explícitos:
-
-.. code-block:: java
-
-   // ...
-   Join<Centro, Estudiante> estudiante = root.fetch(Centro_.estudiantes, JoinType.LEFT);
-   // ...
-   
-Ahora bien, ¿qué ocurre cuando la relación no es explícita?
-
-.. code-block:: java
-   :emphasize-lines: 3
-   
-   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> root = criteria.from(Estudiante.class);
-   root.fetch(root.get(Estudiante_.centro, JoinType.LEFT));
-   criteria.select(root);
-
-La respuesta es que basta con hacerla explícito para poder usar el método
-``.fetch``.
-
-.. seealso:: Consulte para más información el :ref:`epígrafe dedicado a
-   optimización <orm-optimo>`.
 
 Actualización y borrado
 =======================
@@ -432,10 +614,11 @@ desmatricularía a todos los estudiantes cuyo nombre empieza por "J":
 
 .. code-block:: java
 
+   // UPDATE Estudiante SET centro = NULL WHERE nombre LIKE 'J%';
    CriteriaUpdate<Estudiante> update = cb.createCriteriaUpdate(Estudiante.class);
-   Root<Estudiante> root = update.from(Estudiante.class);
-   update.set(root.get(Estudiante_.centro), null);
-   update.where(cb.like(root.get(Estudiante_.nombre), "J%"));
+   Root<Estudiante> estudiante = update.from(Estudiante.class);
+   update.set(estudiante.get(Estudiante_.centro), null);
+   update.where(cb.like(estudiante.get(Estudiante_.nombre), "J%"));
 
    em.createQuery(update).executeUpdate();
 
@@ -443,9 +626,10 @@ También es posible **borrar**:
 
 .. code-block:: java
 
+   // DELETE FROM Estudiante WHERE nombre LIKE 'J%';
    CriteriaDelete<Estudiante> delete = cb.createCriteriaDelete(Estudiante.class);
-   Root<Estudiante> root = delete.from(Estudiante.class);
-   delete.where(cb.like(root.get(Estudiante_.nombre), "J%"));
+   Root<Estudiante> estudiante = delete.from(Estudiante.class);
+   delete.where(cb.like(estudiante.get(Estudiante_.nombre), "J%"));
 
    em.createQuery(delete).executeUpdate();
 
@@ -479,8 +663,11 @@ También es posible **borrar**:
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
 
-.. |CriteriaBuilder| replace:: :jakarta-persistence:`criteria/criteriabuilder`
+.. |CriteriaBuilder| replace:: :jakarta-persistence:`CriteriaBuilder <criteria/criteriabuilder>`
+.. |Tuple| replace:: :jakarta-persistence:`Tuple <Tuple>`
+.. |Metamodel| replace:: :ref:`Metamodel <orm-jpa-metamodel>`
 
 .. _hibernate-processor: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor
 .. _javadoc: https://javadoc.io

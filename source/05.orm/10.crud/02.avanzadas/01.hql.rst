@@ -62,7 +62,7 @@ o un conjunto de campos individuales:
    que siempre se refieren clases y atributos, no tablas y columnas.
 
 .. tip:: Cuando se obtiene varias columnas, en vez de obtener un
-   ``Object[].class`` se puede pedir la obtención de una tupla (``Tuple``) y
+   ``Object[].class`` se puede pedir la obtención de una tupla (|Tuple|) y
    asignar alias a los nombres, lo que hará más amable la obtención posterior de
    los campos individules:
 
@@ -232,12 +232,12 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
       System.out.println("%s: %d estudiantes", nombre, cantidad);
    }
 
-.. caution:: Para poder agrupar por centro, la librería debe conocer cuándo dos
-   objetos centro son iguales. Por tanto, deberíamos haber definido en la clase
-   ``Centro`` los métodos ``hashCode()`` y ``equals()``. Una alternativa, que no
-   requiere definir esto último, habría sido agrupar por el identificador o el
-   nombre del centro (siempre que no hubiera dos centros con el mismo nombre),
-   ya que los enteros o las cadenas ya tienen definida de serie la igualdad.
+.. note:: Para poder agrupar por centro, *Java* debe conocer si dos centros son
+   iguales. Esto podría tentarnos a haber definido en la clase ``Centro`` los
+   métodos ``hashCode()`` y ``equals()``, pero no es necesario porque  |JPA|
+   para las entidades que maneja las considera iguales cuando sus
+   identificadores son iguales. De hecho, la consulta interna |SQL| agrupará por
+   el identificador del centro.
 
 .. note:: Obsérvese que al estar consultando ``Estudiante``, los centros sin
    estudiantes no aparecen listados. En cambio, podríamos haber abordado la
@@ -258,9 +258,9 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
 
    Y en este caso, sí aparecerán todos los centros.
 
-Joins
------
-|JPQL| también permite hacer *joins*, la diferencia fundamental respecto a su
+Relaciones
+----------
+|JPQL| también permite relacionar entidades: la diferencia fundamental respecto a su
 equivalente de |SQL| es que no se usan las entidades sino las referencias entre
 ellas:
 
@@ -299,7 +299,7 @@ ellas:
          "FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombre"
       ).setParameter("nombre", "IES Castillo de Luna");
 
-``FETCH JOIN``
+``JOIN FETCH``
    Es una variante de ``INNER JOIN`` que obtiene los mismos resultados, pero
    aprovecha la consulta para cargar la entidad relacionada inmediatamente:
 
@@ -361,4 +361,5 @@ actualización y borrado:
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+.. |Tuple| replace:: :jakarta-persistence:`Tuple <Tuple>`
 .. _Hibernate: https://www.hibernate.org

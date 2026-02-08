@@ -187,23 +187,23 @@ teléfono a cada centro:
 .. code-block:: java
 
    @ElementCollection
-   @CollectionTable(name = "Telefono", joinColumns = @JoinColum(name = "id_estudiante"))
+   @CollectionTable(name = "Telefono", joinColumns = @JoinColum(name = "centro_id"))
    @Column(name = "numero")
    private List<Integer> telefonos = new ArrayList<>();
 
-Si no se permiten elementos repetidos, puedo optarse por un
-:java-util:`HashSet` en vez de un :java-util:`ArrayList`.
+Esto provocará en la base de datos la creación automática de una tabla adicional:
 
-.. rubric:: Notas al pie
+.. code-block:: sql
 
-.. [#] La entidad hijo es la entidad en que se sitúa la clave foránea y la
-   entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
-   no se ha definido ningún campo extra para significar la relación. En nuestro
-   ejemplo, ``Estudiante`` es la entidad hijo y ``Centro``, la entidad padre.
+   CREATE TABLE Telefono (
+      centro_id   BIGINT NOT NULL,
+      numero      INTEGER NOT NULL,
 
-.. [#] Sólo el identificador de la entidad padre, porque la clave foránea en la
-   entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
-   cambiando cualquier otro campo, no hay ningún efecto que reflejar
+      FOREIGN KEY(centro_id) REFERENCE Centro(id);
+   );
+
+.. note:: Si no se permiten elementos repetidos, puedo optarse por un
+   :java-util:`HashSet` en vez de un :java-util:`ArrayList`.
 
 .. _orm-concurrencia:
 
@@ -318,7 +318,7 @@ ese caso, se aplicarán a todos los registros devueltos por la consulta:
 
 Optimización
 ============
-Así tratar :ref:`JPQL <orm-jpql>` y :ref:`Criteria API <orm-criteria>`
+Al tratar :ref:`JPQL <orm-jpql>` y :ref:`Criteria API <orm-criteria>`
 indicamos que *fetch* permitía forzar una carga inmediata de las entidades
 relacionadas. Ahora bien, ¿cuál es el comportamiento de |JPA| ante las
 relaciones?
@@ -407,7 +407,7 @@ Para definir restricciones **a nivel de aplicación** debemos escribir el archiv
 ``META-INF/validation``:
 
 .. code-block:: xml
-   :emphasize-lines: 9
+   :emphasize-lines: 11
 
    <?xml version="1.0" encoding="UTF-8"?>
    <validation-config
@@ -472,6 +472,17 @@ Podemos definir otras restricciones:
 * ``jakarta.validation.constraints.Positive``
 * ``jakarta.validation.constraints.PositiveOrZero``
 * etc.
+
+.. rubric:: Notas al pie
+
+.. [#] La entidad hijo es la entidad en que se sitúa la clave foránea y la
+   entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
+   no se ha definido ningún campo extra para significar la relación. En nuestro
+   ejemplo, ``Estudiante`` es la entidad hijo y ``Centro``, la entidad padre.
+
+.. [#] Sólo el identificador de la entidad padre, porque la clave foránea en la
+   entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
+   cambiando cualquier otro campo, no hay ningún efecto que reflejar
 
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`

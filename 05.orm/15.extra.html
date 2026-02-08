@@ -581,29 +581,25 @@ relaciones bidireccionales:</p>
 una entidad aparte. Supongamos que quisiéramos añadir un listado de números de
 teléfono a cada centro:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@ElementCollection</span>
-<span class="nd">@CollectionTable</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Telefono&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">joinColumns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id_estudiante&quot;</span><span class="p">))</span>
+<span class="nd">@CollectionTable</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Telefono&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">joinColumns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@JoinColum</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;centro_id&quot;</span><span class="p">))</span>
 <span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;numero&quot;</span><span class="p">)</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">telefonos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 </pre></div>
 </div>
+<p>Esto provocará en la base de datos la creación automática de una tabla adicional:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">Telefono</span><span class="w"> </span><span class="p">(</span>
+<span class="w">   </span><span class="n">centro_id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">   </span><span class="n">numero</span><span class="w">      </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+
+<span class="w">   </span><span class="k">FOREIGN</span><span class="w"> </span><span class="k">KEY</span><span class="p">(</span><span class="n">centro_id</span><span class="p">)</span><span class="w"> </span><span class="n">REFERENCE</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
 <p>Si no se permiten elementos repetidos, puedo optarse por un
 <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashSet.html">java.util.HashSet</a> en vez de un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">java.util.ArrayList</a>.</p>
-<p class="rubric">Notas al pie</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>La entidad hijo es la entidad en que se sitúa la clave foránea y la
-entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
-no se ha definido ningún campo extra para significar la relación. En nuestro
-ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hijo y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
-</aside>
-<aside class="footnote brackets" id="id4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p>Sólo el identificador de la entidad padre, porque la clave foránea en la
-entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
-cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
-</aside>
-</aside>
+</div>
 </section>
 </section>
 <section id="concurrencia">
@@ -704,7 +700,7 @@ pueden bloquer registros individuales.</p>
 </section>
 <section id="optimizacion">
 <span id="orm-optimo"></span><h2><span class="section-number">5.7.4. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h2>
-<p>Así tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
+<p>Al tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
 indicamos que <em>fetch</em> permitía forzar una carga inmediata de las entidades
 relacionadas. Ahora bien, ¿cuál es el comportamiento de <abbr title="Java Persistence API">JPA</abbr> ante las
 relaciones?</p>
@@ -838,10 +834,10 @@ la clase <code class="docutils literal notranslate"><span class="pre">Centro</sp
 <span class="s">        http://xmlns.jcp.org/xml/ns/validation/validation-configuration-2.0.xsd&quot;</span>
 <span class="w">    </span><span class="na">version=</span><span class="s">&quot;2.0&quot;</span><span class="nt">&gt;</span>
 
-<span class="hll"><span class="w">    </span><span class="cm">&lt;!-- Podemos añadir más elementos &lt;constraint-mapping&gt; para repartir</span>
-</span><span class="cm">         la configuración en varios archivos. --&gt;</span>
-<span class="w">    </span><span class="nt">&lt;constraint-mapping&gt;</span>META-INF/constraints.xml<span class="nt">&lt;/constraint-mapping&gt;</span>
-<span class="nt">&lt;/validation-config&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- Podemos añadir más elementos &lt;constraint-mapping&gt; para repartir</span>
+<span class="cm">         la configuración en varios archivos. --&gt;</span>
+<span class="hll"><span class="w">    </span><span class="nt">&lt;constraint-mapping&gt;</span>META-INF/constraints.xml<span class="nt">&lt;/constraint-mapping&gt;</span>
+</span><span class="nt">&lt;/validation-config&gt;</span>
 </pre></div>
 </div>
 <p>Los archivos donde propiamente se definen las restricciones tienen esta pinta:</p>
@@ -894,6 +890,22 @@ la clase <code class="docutils literal notranslate"><span class="pre">Centro</sp
 <li><p><code class="docutils literal notranslate"><span class="pre">jakarta.validation.constraints.PositiveOrZero</span></code></p></li>
 <li><p>etc.</p></li>
 </ul>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>La entidad hijo es la entidad en que se sitúa la clave foránea y la
+entidad padre aquella a la que referencia dicha clave y en la que, por tanto,
+no se ha definido ningún campo extra para significar la relación. En nuestro
+ejemplo, <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code> es la entidad hijo y <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, la entidad padre.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Sólo el identificador de la entidad padre, porque la clave foránea en la
+entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
+cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
+</aside>
+</aside>
 </section>
 </section>
 </section>

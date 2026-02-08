@@ -74,12 +74,36 @@ Y si varios:
 
       CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-      criteria.select(cb.tuple(
+      criteria.multiselect(
          estudiante.get("nombre").alias("nombre"),
          estudiante.get("centro").alias("centro")
-      ));
+      );
 
       TypedQuery<Tuple> query = em.createQuery(query);
+
+   O incluso podemos hacer:
+
+   .. code-block:: java
+      :emphasize-lines: 3-5
+
+      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
+      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+      var nombre = estudiante.get("nombre").alias("nombre");
+      var centro = estudiante.get("centro").alias("centro")
+      criteria.multiselect(nombre, centro);
+
+      TypedQuery<Tuple> query = em.createQuery(query);
+
+   La ventaja de esta última forma se ve al recuperar los datos del |Tuple|:
+
+   .. code-block:: java
+
+      query.getResultList().forEach(t -> {
+         // No hace falta especificar el tipo con un cast o un segundo argumento.
+         String nombre = t.get(nombre);
+         Long centro = t.get(centro);
+      });
+
 
 .. caution:: No es una buena práctica referir los atributos de las clases con
    una cadena (:code:`estudiante.get("nombre")`), ya que los errores de
@@ -155,19 +179,22 @@ correspondientes a nuestro modelo (``Centro_`` y ``Estudiante_`` en el ejemplo).
 Ahora podríamos reescribir el ejemplo anterior así:
 
 .. code-block:: java
-   :emphasize-lines: 5,6
+   :emphasize-lines: 4,6
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o
    cb.createTupleQuery();
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-   criteria.select(cb.tuple(
-      estudiante.get(Estudiante_.nombre).alias("nombre"),
-      estudiante.get(Estudiante_.centro).alias("centro")
-   ));
+   var nombre = estudiante.get(Estudiante_.nombre).alias("nombre");
+   var centro = estudiante.get(Estudiante_.centro).alias("centro");
+   criteria.multiselect(nombre, centro);
 
    TypedQuery<Tuple> query = em.createQuery(criteria);
 
-.. note:: A partir de ahora usaremos las metaclases para referir atributos.
+.. note:: El *metamodel* también genera ``Estudiante_.NOMBRE`` o
+   ``Estudiante_.CENTRO``, pero sólo son constantes de tipo ``String`` que se
+   sustituyen por las cadenas ``"nombre"`` o ``"centro"``, allí donde están. Por
+   tanto, sólo protegen de los fallos de digitalización, pero no permiten la
+   comprobación estática de tipos o la refactorización de código.
 
 Condiciones
 ===========
@@ -210,15 +237,15 @@ Agrupación
 También existe el equivalente a ``GROUP BY``:
 
 .. code-block:: java
-   :emphasize-lines: 7
+   :emphasize-lines: 3-7
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple);
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-   criteria.select(cb.tuple(
-      estudiante.get(Estudiante_.centro).alias("centro"), 
-      cb.count(estudiante).alias("cantidad")
-   ));
-   criteria.groupBy(estudiante.get(Estudiante_.centro));
+   var centro_p = estudiante.get(Estudiante_.centro);
+   var centro = centro_p.alias("centro");
+   var cantidad = cb.count(estudiante).alias("cantidad");
+   criteria.multiselect(centro, cantidad)
+      .groupBy(centro_p);
 
    TypedQuery<Tuple> query = em.createQuery(criteria);
 
@@ -299,7 +326,9 @@ bidireccional.
       CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
       Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
-      criteria.select(cb.tuple(estudiante.alias("estudiante"), centro.alias("centro")));
+      var estudiante_a = estudiante.alias("estudiante");
+      var centro_a = centro.alias("centro");
+      criteria.multiselect(estudiante_a, centro_a);
 
 De los dos ejemplos anteriores se pueden sacar tres conclusiones:
 
@@ -335,12 +364,13 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
       CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
       Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
-      criteria.select(cb.tuple(centro.alias("centro")));
+      var centro_a = centro.alias("centro");
+      criteria.multiselect(centro_a);
 
       TypedQuery<Tuple> query = em.createQuery(criteria);
       query.getResultList().forEach(t -> {
          // Imprime centros repetidos.
-         System.out.println("%s.\n", t.get("centro", Centro.class));
+         System.out.println("%s.\n", t.get(centro_a));
       });  
 
    En este último caso, podría evitarse la repetición usando ``DISTINCT``, tal
@@ -349,7 +379,7 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
    .. code-block:: java
       :emphasize-lines: 2
 
-      criteria.select(cb.tuple(centro.alias("centro")))
+      criteria.multiselect(centro_a)
          .distinct(true);
 
 .. rubric:: Carga inmediata

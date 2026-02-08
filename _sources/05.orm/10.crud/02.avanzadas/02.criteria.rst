@@ -21,27 +21,29 @@ consulta. Por ejemplo:
 Consulta básica
 ===============
 
+Empecemos por una consulta |SQL| muy básica:
+
 .. code-block:: java
    :name: orm-criteria-select-all
+   :linenos:
+   :lineno-start: 0
 
+   // SELECT e.* FROM Estudiante e
    CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class); // Obtendremos estudiantes.
    Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
    criteria.select(estudiante); // SELECT e.* FROM Estudiante e;
 
    TypedQuery<Estudiante> query = em.createQuery(criteria);
 
-Obsérvese que hacemos la consulta al equivalente |SQL|:
+Como queremos obtener objetos ``Estudiante`` (primera línea) y consultamos la
+entidad ``Estudiante`` (segunda línea) es obvio que la consulta es:
 
 .. code-block:: sql
 
-   SELECT e.* FROM Estudiante e;
+   SELECT e.* FROM Estudiante e
 
-Que obtengamos estudiantes (:code:`e.*`) es consecuencia de
-:code:`cb.createQuery(Estudiante.class)` y de que hemos aplicado el método
-``.select`` a *estudiante* sin más. Que la consulta se haya hecho sobre Estudiante
-es consecuencia de :code:`criteria.from(Estudiante.class)`.
 
-Si quisiéramos obtener un campo:
+Si quisiéramos obtener un campo, entonces deberíamos alterar las líneas 1 y 3:
 
 .. code-block:: java
    :emphasize-lines: 1, 3
@@ -63,42 +65,43 @@ Y si varios:
 
    TypedQuery<Object[]> query = em.createQuery(criteria);
 
-.. tip:: En este último caso, puede usarse también :ref:`Tuple como en JPQL
-   <orm-tuple>`:
+En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>`:
 
-   .. code-block:: java
-      :emphasize-lines: 1, 3-6
+.. code-block:: java
+   :emphasize-lines: 1, 3-6
 
-      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
-      Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-      criteria.multiselect(
-         estudiante.get("nombre").alias("nombre"),
-         estudiante.get("centro").alias("centro")
-      );
+   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
+   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
+   criteria.multiselect(
+      estudiante.get("nombre").alias("nombre"),
+      estudiante.get("centro").alias("centro")
+   );
 
-      TypedQuery<Tuple> query = em.createQuery(query);
+   TypedQuery<Tuple> query = em.createQuery(query);
 
-   O incluso podemos hacer:
+.. tip:: Aunque, si almacenamos las definiciones de los campos, luego podremos
+   recuperarlos más fácilmente sin necesidad de especificar los tipos ni hacer
+   *cast*:
 
    .. code-block:: java
       :emphasize-lines: 3-5
 
       CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-      var nombre = estudiante.get("nombre").alias("nombre");
-      var centro = estudiante.get("centro").alias("centro")
+      var nombre = estudiante.get("nombre", String.class).alias("nombre");
+      var centro = estudiante.get("centro", Centro.class).alias("centro")
       criteria.multiselect(nombre, centro);
 
       TypedQuery<Tuple> query = em.createQuery(query);
 
-   La ventaja de esta última forma se ve al recuperar los datos del |Tuple|:
+   Lo cual nos permite hacer
 
    .. code-block:: java
 
       query.getResultList().forEach(t -> {
-         // No hace falta especificar el tipo con un cast o un segundo argumento.
          String nombre = t.get(nombre);
-         Long centro = t.get(centro);
+         Centro centro = t.get(centro);
+         System.out.printf("%s: %s.\n", nombre, centro)
       });
 
 
@@ -176,7 +179,7 @@ correspondientes a nuestro modelo (``Centro_`` y ``Estudiante_`` en el ejemplo).
 Ahora podríamos reescribir el ejemplo anterior así:
 
 .. code-block:: java
-   :emphasize-lines: 4,6
+   :emphasize-lines: 4, 5
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o
    cb.createTupleQuery();

@@ -62,7 +62,7 @@ o un conjunto de campos individuales:
    que siempre se refieren clases y atributos, no tablas y columnas.
 
 .. tip:: Cuando se obtiene varias columnas, en vez de obtener un
-   ``Object[].class`` se puede pedir la obtención de una tupla (``Tuple``) y
+   ``Object[].class`` se puede pedir la obtención de una tupla (|Tuple|) y
    asignar alias a los nombres, lo que hará más amable la obtención posterior de
    los campos individules:
 
@@ -258,9 +258,9 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
 
    Y en este caso, sí aparecerán todos los centros.
 
-Joins
------
-|JPQL| también permite hacer *joins*, la diferencia fundamental respecto a su
+Relaciones
+----------
+|JPQL| también permite relacionar entidades: la diferencia fundamental respecto a su
 equivalente de |SQL| es que no se usan las entidades sino las referencias entre
 ellas:
 
@@ -299,7 +299,7 @@ ellas:
          "FROM Estudiante e LEFT JOIN e.centro c WHERE c.nombre = :nombre"
       ).setParameter("nombre", "IES Castillo de Luna");
 
-``FETCH JOIN``
+``JOIN FETCH``
    Es una variante de ``INNER JOIN`` que obtiene los mismos resultados, pero
    aprovecha la consulta para cargar la entidad relacionada inmediatamente:
 
@@ -361,4 +361,5 @@ actualización y borrado:
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+.. |Tuple| replace:: :jakarta-persistence:`Tuple <Tuple>`
 .. _Hibernate: https://www.hibernate.org

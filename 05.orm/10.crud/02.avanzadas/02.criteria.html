@@ -484,7 +484,8 @@ recuperarlos más fácilmente sin necesidad de especificar los tipos ni hacer
 <span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Lo cual nos permite hacer</p>
+<p>Lo cual nos permite hacer obtener de <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/Tuple">Tuple</a> los valores sin especificar
+de qué tipo son:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">().</span><span class="na">forEach</span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">nombre</span><span class="p">);</span>
 <span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
@@ -492,13 +493,16 @@ recuperarlos más fácilmente sin necesidad de especificar los tipos ni hacer
 <span class="p">});</span>
 </pre></div>
 </div>
+<p>Justamente a continuación introduciremos el <a class="reference internal" href="#orm-jpa-metamodel"><span class="std std-ref">Metamodel</span></a>, que nos ahorrará
+indicar los tipos incluso al hacer las definiciones.</p>
 </div>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
 <p>No es una buena práctica referir los atributos de las clases con
 una cadena (<code class="code docutils literal notranslate"><span class="pre">estudiante.get(&quot;nombre&quot;)</span></code>), ya que los errores de
-digitalización no pueden detectarse en tiempo de compilación. Por ese motivo,
-es bastante recomendable generar el <em>Metamodel</em>, que nos permite escribir:</p>
+digitalización o de tipos no pueden detectarse en tiempo de compilación. Por
+ese motivo, es bastante recomendable generar el <a class="reference internal" href="#orm-jpa-metamodel"><span class="std std-ref">Metamodel</span></a>, que nos permite
+escribir:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">estudiante</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -510,7 +514,7 @@ es bastante recomendable generar el <em>Metamodel</em>, que nos permite escribir
 </div>
 </section>
 <section id="metamodel">
-<span id="orm-jra-metamodel"></span><h2><span class="section-number">5.6.2.2.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
+<span id="orm-jpa-metamodel"></span><h2><span class="section-number">5.6.2.2.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
 <p>Para la habilitar la creación del <em>metamodelo</em>, debemos añadir a
 la sección <cite>&lt;build&gt;</cite> de <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
@@ -571,7 +575,7 @@ debemos indicarla:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>El <em>metamodel</em> también genera <code class="docutils literal notranslate"><span class="pre">Estudiante_.NOMBRE</span></code> o
+<p>El <em>Metamodel</em> también genera <code class="docutils literal notranslate"><span class="pre">Estudiante_.NOMBRE</span></code> o
 <code class="docutils literal notranslate"><span class="pre">Estudiante_.CENTRO</span></code>, pero sólo son constantes de tipo <code class="docutils literal notranslate"><span class="pre">String</span></code> que se
 sustituyen por las cadenas <code class="docutils literal notranslate"><span class="pre">&quot;nombre&quot;</span></code> o <code class="docutils literal notranslate"><span class="pre">&quot;centro&quot;</span></code>, allí donde están. Por
 tanto, sólo protegen de los fallos de digitalización, pero no permiten la

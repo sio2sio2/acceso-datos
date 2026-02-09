@@ -94,7 +94,8 @@ En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>
 
       TypedQuery<Tuple> query = em.createQuery(query);
 
-   Lo cual nos permite hacer
+   Lo cual nos permite hacer obtener de |Tuple| los valores sin especificar
+   de qué tipo son:
 
    .. code-block:: java
 
@@ -104,11 +105,14 @@ En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>
          System.out.printf("%s: %s.\n", nombre, centro)
       });
 
+   Justamente a continuación introduciremos el |Metamodel|, que nos ahorrará
+   indicar los tipos incluso al hacer las definiciones.
 
 .. caution:: No es una buena práctica referir los atributos de las clases con
    una cadena (:code:`estudiante.get("nombre")`), ya que los errores de
-   digitalización no pueden detectarse en tiempo de compilación. Por ese motivo,
-   es bastante recomendable generar el *Metamodel*, que nos permite escribir:
+   digitalización o de tipos no pueden detectarse en tiempo de compilación. Por
+   ese motivo, es bastante recomendable generar el |Metamodel|, que nos permite
+   escribir:
 
    .. code-block:: java
 
@@ -122,7 +126,7 @@ En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>
 
    donde ``Estudiante_`` es una clase generada por el compilador.
 
-.. _orm-jra-metamodel:
+.. _orm-jpa-metamodel:
 
 Metamodel
 =========
@@ -190,7 +194,7 @@ Ahora podríamos reescribir el ejemplo anterior así:
 
    TypedQuery<Tuple> query = em.createQuery(criteria);
 
-.. note:: El *metamodel* también genera ``Estudiante_.NOMBRE`` o
+.. note:: El *Metamodel* también genera ``Estudiante_.NOMBRE`` o
    ``Estudiante_.CENTRO``, pero sólo son constantes de tipo ``String`` que se
    sustituyen por las cadenas ``"nombre"`` o ``"centro"``, allí donde están. Por
    tanto, sólo protegen de los fallos de digitalización, pero no permiten la
@@ -663,6 +667,7 @@ También es posible **borrar**:
 
 .. |CriteriaBuilder| replace:: :jakarta-persistence:`CriteriaBuilder <criteria/criteriabuilder>`
 .. |Tuple| replace:: :jakarta-persistence:`Tuple <Tuple>`
+.. |Metamodel| replace:: :ref:`Metamodel <orm-jpa-metamodel>`
 
 .. _hibernate-processor: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor
 .. _javadoc: https://javadoc.io

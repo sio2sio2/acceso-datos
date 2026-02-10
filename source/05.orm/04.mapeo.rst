@@ -16,7 +16,7 @@ Fundamentalmente sirven para:
 - Definir relaciones entre tablas.
 
 .. seealso:: Bajo este epígrafe se verá cómo definir el mapeo mediante
-   anotaciones. Hay otra estrategia que consiste en un utilizar archivos |XML|
+   anotaciones. Hay otra estrategia que consiste en utilizar archivos |XML|
    aparte. Se tratará más adelante en :ref:`mapeo mediante configuración
    <xml-orm-mapping>`.
 
@@ -35,7 +35,7 @@ anotación de la clase Centro <orm-bas-map>`:
    :start-at: @Entity
 
 Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
-ampliar nuestro conocimientos sobre las anotaciones válidas:
+ampliar nuestros conocimientos sobre las anotaciones válidas:
 
 ``@Column``/``@Transient``
    Por lo general, todos los atributos de la clase, aunque no estén anotados en
@@ -83,7 +83,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
 
       @Id
       @GeneratedValue(strategy = GenerationType.IDENTITY)
-      private Long id
+      private Long id;
 
    que equivale a indicar que el campo identificador es autoincremental
    (``GENERATED ALWAYS AS IDENTITY``). Si no usamos la segunda anotación el
@@ -101,7 +101,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
 ``@Temporal``
    Es útil cuando se usa el tipo antiguo :java-util:`Date <Date>` para indicar
    si se quiere almacenar en la base de datos, sólo la hora
-   (``TemporalType.TIME``) , sólo la fecha (``TemporalType.DATE``) o tanto la
+   (``TemporalType.TIME``), sólo la fecha (``TemporalType.DATE``) o tanto la
    fecha como la hora (``TemporalType.TIMESTAMP``):
 
    .. code-block:: java
@@ -133,7 +133,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
       @Column(nullable = false)
       private LocalDateTime actualizacion;
 
-   .. caution:: Como de la actualización de este campo deben encargarse |JPA|,
+   .. caution:: Como de la actualización de este campo debe encargarse |JPA|,
       nunca deberías definir un *setter* público.
 
 ``@Enumerated``
@@ -143,7 +143,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
 
       @Enumerated(EnumType.STRING)
       @Column(nullable = false)
-      private Titularidad titularidad
+      private Titularidad titularidad;
 
    En este caso, el tipo se guardará como una cadena en la base de datos. Otra
    opción habría sido ``EnumType.ORDINAL``.
@@ -194,7 +194,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
 ``@Convert``/``@Converter``
    Permite definir exactamente la traducción de un atributo a campo y viceversa.
    Para llevar a cabo esta traducción debe definirse una clase que implemente la
-   interfaz ``AttibuteConverter``. Por ejemplo, imaginemos que el tipo
+   interfaz ``AttributeConverter``. Por ejemplo, imaginemos que el tipo
    ``Titularidad`` lo hubiéramos definido así:
 
    .. code-block:: java
@@ -216,12 +216,12 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
          public static Titularidad fromNombre(String nombre) {
             return Arrays.stream(Titularidad.values())
                .filter(t -> t.getNombre().toLowerCase().equals(nombre.toLowerCase()))
-               .findFirst.orElse(null);
+               .findFirst().orElse(null);
          }
       }
 
    y que pretendiéramos almacenar en la base de datos el *nombre* ("Pública" o
-   "Privada"). En ese caso tendríamos que definir un convesor así:
+   "Privada"). En ese caso tendríamos que definir un conversor así:
 
    .. code-block:: java
 
@@ -250,7 +250,7 @@ ampliar nuestro conocimientos sobre las anotaciones válidas:
 
    .. code-block:: java
 
-      @Converter(autoPlay = true)
+      @Converter(autoApply = true)
       public class TitularidadConverter implements AttributeConverter<Titularidad, String> {
          // ... Implementación ...
       }
@@ -270,7 +270,7 @@ equivalente al ``CHECK`` de |SQL|), que requieren importar la librería
 .. code-block::
 
    @PositiveOrZero(message = "La cantidad no puede ser negativa")
-   private int cantidad
+   private int cantidad;
 
    @Positive
    @NotNull
@@ -300,7 +300,7 @@ Las relaciones entre las entidades también se significan mediante anotaciones.
 Hay tres tipos de relaciones binarias en el modelo relacional:
 
 **Relación 1:N**: ``@OneToMany``/``@ManyToOne``
-   Se produce cuando una registro de la primera tabla se relaciona con muchos
+   Se produce cuando un registro de la primera tabla se relaciona con muchos
    registros de la segunda, pero al contrario los registros de la segunda sólo
    se relacionan con uno de la primera.
 
@@ -311,9 +311,9 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    **Unidireccional**
       El modo :dfn:`unidireccional` es el que más fielmente refleja el modelo
       relacional, ya que la relación sólo se refleja en uno de los extremos: en
-      aquel en que se encuentra la clave foránea. Por ejemplo, la relación  la
-      relación **1:N** entre *Centro* y *Estudiante* provoca que definamos así la
-      clase ``Estudiante``:
+      aquel en que se encuentra la clave foránea. Por ejemplo, la relación
+      **1:N** entre *Centro* y *Estudiante* provoca que definamos así la clase
+      ``Estudiante``:
 
       .. literalinclude:: files/Estudiante.java
          :class: toggle
@@ -334,7 +334,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
         (registro) completo, no sólo el identificador.
       + ``@JoinColumn`` no es estrictamente necesario. En este caso, lo hemos
         usado porque queríamos escoger el nombre que recibirá el campo
-        correspondiete en la tabla *Estudiante*, y porque queremos hacer la
+        correspondiente en la tabla *Estudiante*, y porque queremos hacer la
         relación opcional.
       + Con un *getter* y un *setter* asociados.
       + Haciendo que el constructor y ``.cargarDatos`` manejen el objeto
@@ -379,8 +379,8 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 
 **Relación 1:1**: ``@OneToOne``
    Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
-   ninguno) registro de la otra tabla. En |SQL| se resuelve colocando el campo
-   en cualquiera de las dos tablas. En |JPA| para significar este tipo
+   ninguno) de los registros de la otra tabla. En |SQL| se resuelve colocando el
+   campo en cualquiera de las dos tablas. En |JPA| para significar este tipo de
    relaciones se usa la notación ``@OneToOne`` y, como en el caso anterior,
    podemos reflejarla de modo **unidireccional** o **bidireccional**.
 
@@ -399,7 +399,7 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
          @JoinColumn(name = "direccion_id", nullable = false)
          private Direccion direccion;
 
-      porque es en su tabla correspondiente donde decididimos añadir el campo.
+      porque es en su tabla correspondiente donde decidimos añadir el campo.
       Además, deberíamos definir el *getter* y el *setter* correspondientes. 
 
    **Bidireccional**

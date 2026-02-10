@@ -36,7 +36,7 @@ En este ejemplo:
     |SGBD| se encarga de adjudicar uno (``GENERATED AS DEFAULT BY IDENTITY``),
     no hay manera de expresarlo con |JPA|.
 
-+ Los atributos que son campos se notan con ``@Column`` y pueden añadirse
++ Los atributos que son campos se anotan con ``@Column`` y pueden añadirse
   parámetros para afinar la definición (nombre del campo si no coincide con el
   del atributo, restricciones adicionales, longitud si es una cadena). Un
   atributo sin la anotación, no obstante, se añadirá a la tabla como campo, a
@@ -109,8 +109,9 @@ Como puede verse:
   (:jakarta-persistence:`EntityManagerFactory`). Este es un proceso costoso, así
   que deberíamos evitar crear más de una\ [#]_. El código no es realista, ya que
   muy probablemente en una aplicación se requiera obtener y crear objetos en
-  distintos archivos, con lo que la estructura *try-with-resources* no podremos
-  usarla. Sin embargo, nos sirve para ilustrar este ejemplo tan simple.
+  distintos archivos, con lo que no podremos usar la estructura
+  *try-with-resources*. Sin embargo, nos sirve para ilustrar este ejemplo tan
+  simple.
 
 * Es conveniente no reutilizar los objetos :jakarta-persistence:`EntityManager`,
   de suerte que cada transacción debería usar uno nuevo.

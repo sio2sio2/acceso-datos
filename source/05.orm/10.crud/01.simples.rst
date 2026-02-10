@@ -2,13 +2,13 @@
 
 Simples
 *******
-Antes de comenzar a desglosar las cuatro operacioness |CRUD| básicas, es
+Antes de comenzar a desglosar las cuatro operaciones |CRUD| básicas, es
 necesario introducir otro concepto, el de :dfn:`vinculación a la sesión`: un
 objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
 la sesión activa, lo cual ocurre cuando:
 
 a. Lo hemos obtenido previamente de la base de datos en esa misma sesión.
-#. Hemos usando con él un método que supone su vinculación:
+#. Hemos usado con él un método que supone su vinculación:
 
    * ``.persist``, que agrega un nuevo objeto a la base de datos y, por su propia
      naturaleza se usa con un objeto creado *ex novo* y, por tanto, no vinculado.
@@ -87,7 +87,7 @@ datos, desechando todos los cambios que haya podido sufrir en memoria:
       EntityTransaction tx = em.getTransaction();
       try {
          tx.begin();
-         Centro castillo = sesion.find(Centro.class, 11004866L);
+         Centro castillo = em.find(Centro.class, 11004866L);
          // Hacemos cambios en el objeto
          castillo.setNombre("Pongo otro");
          castillo.setTitularidad(Centro.Titularidad.PRIVADA);
@@ -113,7 +113,7 @@ Para actualizar objetos **vinculados** a la sesión se usan sus *setters*:
       EntityTransaction tx = em.getTransaction();
       try {
          tx.begin();
-         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
+         Centro castillo = em.find(Centro.class, 11004866L);  // Objeto vinculado.
          castillo.setNombre("I.E.S. Castillo de Luna");
          tx.commit(); // Se guarda el cambio.
       }      
@@ -172,7 +172,7 @@ Para borrar un objeto **vinculado** a la sesión debe usarse el método
       EntityTransaction tx = em.getTransaction();
       try {
          tx.begin();
-         Centro castillo = sesion.find(Centro.class, 11004866L);  // Objeto vinculado.
+         Centro castillo = em.find(Centro.class, 11004866L);  // Objeto vinculado.
          em.remove(castillo);
          tx.commit(); // Se guarda el cambio.
       }      

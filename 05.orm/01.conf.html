@@ -395,7 +395,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#depedencias">5.1.1. Depedencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">5.1.1. Dependencias</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-de-la-persistencia">5.1.2. Configuración de la persistencia</a></li>
 </ul>
             </nav>
@@ -416,8 +416,8 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <li><p>Importar librerías.</p></li>
 <li><p>Crear una configuración.</p></li>
 </ol>
-<section id="depedencias">
-<h2><span class="section-number">5.1.1. </span>Depedencias<a class="headerlink" href="#depedencias" title="Link to this heading">#</a></h2>
+<section id="dependencias">
+<h2><span class="section-number">5.1.1. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h2>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
 <span class="w">    </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
 <span class="w">    </span><span class="nt">&lt;hibernate.version&gt;</span>7.2.0.Final<span class="nt">&lt;/hibernate.version&gt;</span>
@@ -516,7 +516,7 @@ prefiere prescindir de hacer explícita la dependencia a las especificaciones
 <code class="docutils literal notranslate"><span class="pre">compile</span></code> (o no poner ninguno, que es equivalente), porque, de mantenerlo
 como <code class="docutils literal notranslate"><span class="pre">runtime</span></code>, <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> resolverá la dependencia de las
 especificaciones también con ese <em>scope</em> y no las tendremos disponibles en la
-compilación la <abbr title="Application Programming Interface">API</abbr>.</p>
+compilación de la <abbr title="Application Programming Interface">API</abbr>.</p>
 </div>
 </section>
 <section id="configuracion-de-la-persistencia">
@@ -564,7 +564,7 @@ compilación la <abbr title="Application Programming Interface">API</abbr>.</p>
 la usaremos luego; y hay propiedades cuyos valores dependen del <abbr title="Object-Relational Mapping">ORM</abbr> y el
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> utilizados.</p></li>
 <li><p>El proveedor indica cuál es la implementación <abbr title="Java Persistence API">JPA</abbr> que usaremos. Algunos
-muy usandos son:</p>
+muy usados son:</p>
 <div class="pst-scrollable-table-container"><table class="url-sql table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Proveedor</p></th>
@@ -676,10 +676,11 @@ además, se acompañan de comentarios.</p></li>
 <p>Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
 no están definidos de antemano, sino que se definen en <strong>tiempo de ejecución</strong>?
 En ese caso, puede definirse un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashMap.html">java.util.HashMap</a> que defina las valores de
-propiedades y pasar el mapa cuando se usa la unidad de persistencia para crear
-el objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a> (véase a continuación
-<a class="reference internal" href="02.basico.html#orm-bas-conn"><span class="std std-ref">cómo conectar</span></a>). En ese caso, las definiciones del mapa
-sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:</p>
+las propiedades y pasar el mapa cuando se usa la unidad de persistencia para
+crear el objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a> (véase a
+continuación <a class="reference internal" href="02.basico.html#orm-bas-conn"><span class="std std-ref">cómo conectar</span></a>). En ese caso, las
+definiciones del mapa sobrescribirán a las que pudieran existir en el archivo.
+Por ejemplo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:centro.db&quot;</span><span class="p">);</span>
 <span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">);</span>
@@ -749,7 +750,7 @@ una sección resources al archivo pom.xml</span></a>.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#depedencias">5.1.1. Depedencias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencias">5.1.1. Dependencias</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-de-la-persistencia">5.1.2. Configuración de la persistencia</a></li>
 </ul>
   </nav></div>

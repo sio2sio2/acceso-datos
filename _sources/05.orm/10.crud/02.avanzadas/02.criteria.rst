@@ -46,22 +46,24 @@ entidad ``Estudiante`` (segunda línea) es obvio que la consulta es:
 Si quisiéramos obtener un campo, entonces deberíamos alterar las líneas 1 y 3:
 
 .. code-block:: java
-   :emphasize-lines: 1, 3
+   :emphasize-lines: 2, 4
 
+   // SELECT e.nombre FROM Estudiante e;
    CriteriaQuery<String> criteria = cb.createQuery(String.class); // Obtendremos cadenas
    Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
-   criteria.select(estudiante.get("nombre")); // SELECT e.nombre FROM Estudiante e;
+   criteria.select(estudiante.get("nombre"));
 
    TypedQuery<String> query = em.createQuery(criteria);
 
-Y si varios:
+Y si varios\ [#]_:
 
 .. code-block:: java
-   :emphasize-lines: 1, 3
+   :emphasize-lines: 2, 4
 
+   // SELECT e.nombre, e.nacimiento FROM Estudiante e;
    CriteriaQuery<Object[]> criteria = cb.createQuery(Object[].class);
    Root<Estudiante> estudiante = criteria.from(Estudiante.class); // Consultamos la entidad Estudiante
-   criteria.multiselect(estudiante.get("nombre"), estudiante.get("centro")); // SELECT e.nombre, e.centro FROM Estudiante e;
+   criteria.select(cb.array(estudiante.get("nombre"), estudiante.get("nacimiento")));
 
    TypedQuery<Object[]> query = em.createQuery(criteria);
 
@@ -72,37 +74,38 @@ En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>
 
    CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-   criteria.multiselect(
+   criteria.select(cb.tuple(
       estudiante.get("nombre").alias("nombre"),
-      estudiante.get("centro").alias("centro")
-   );
+      estudiante.get("nacimiento").alias("nacimiento")
+   ));
 
    TypedQuery<Tuple> query = em.createQuery(query);
 
-.. tip:: Aunque, si almacenamos las definiciones de los campos, luego podremos
-   recuperarlos más fácilmente sin necesidad de especificar los tipos ni hacer
-   *cast*:
+Pero en ambos casos, deberemos especificar los tipos (:java-lang:`String`,
+``Centro``) al obtenerlos.
+
+.. tip:: Posiblemente, la solución más elegante es usar :java-lang:`Record`:
 
    .. code-block:: java
-      :emphasize-lines: 3-5
+      :emphasize-lines: 1, 5-7
 
-      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o cb.createTupleQuery();
+      record NombreDate(String nombre, LocalDate nacimiento) {};
+
+      CriteriaQuery<NombreDate> criteria = cb.createQuery(NombreDate.class); // o cb.createTupleQuery();
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-      var nombre = estudiante.get("nombre", String.class).alias("nombre");
-      var centro = estudiante.get("centro", Centro.class).alias("centro")
-      criteria.multiselect(nombre, centro);
+      var nombre = estudiante.get("nombre").as(String.class).alias("nombre");
+      var nacimiento = estudiante.get("nacimiento").as(LocalDate.class).alias("nacimiento");
+      criteria.select(cb.construct(NombreDate.class, nombre, nacimiento));
 
-      TypedQuery<Tuple> query = em.createQuery(query);
+      TypedQuery<NombreDate> query = em.createQuery(query);
 
-   Lo cual nos permite hacer obtener de |Tuple| los valores sin especificar
-   de qué tipo son:
+   el cual nos permite ahorrarnos el tipo al recuperar los datos:
 
    .. code-block:: java
 
-      query.getResultList().forEach(t -> {
-         String nombre = t.get(nombre);
-         Centro centro = t.get(centro);
-         System.out.printf("%s: %s.\n", nombre, centro)
+      query.getResultList().forEach(e -> {
+         // e.nombre() es String; y e.nacimiento(), LocalDate.
+         System.out.printf("%s: %s.\n", e.nombre(), e.nacimiento().format(df));
       });
 
    Justamente a continuación introduciremos el |Metamodel|, que nos ahorrará
@@ -125,6 +128,12 @@ En este último caso, puede usarse también :ref:`Tuple como en JPQL <orm-tuple>
       estudiante.get(Estudiante_.nombre);
 
    donde ``Estudiante_`` es una clase generada por el compilador.
+
+.. note:: La elección de los atributos *nombre* y *nacimiento* no ha sido
+   casual; si hubiéramos escogido otro atributo como *centro*, que hace
+   referencia a la entidad ``Centro``, |JPA| habría hecho internamente una
+   composición con *JOIN*, lo cual no es nuestra intención por ahora; ya que más
+   adelante lo trataremos :ref:`al estudiar las relaciones <orm-criteria-joins>`.
 
 .. _orm-jpa-metamodel:
 
@@ -185,14 +194,16 @@ Ahora podríamos reescribir el ejemplo anterior así:
 .. code-block:: java
    :emphasize-lines: 4, 5
 
-   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class); // o
+   record NombreDate(String nombre, LocalDate nacimiento) {};
+
+   CriteriaQuery<NombreDate> criteria = cb.createQuery(NombreDate.class); // o
    cb.createTupleQuery();
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
    var nombre = estudiante.get(Estudiante_.nombre).alias("nombre");
-   var centro = estudiante.get(Estudiante_.centro).alias("centro");
-   criteria.multiselect(nombre, centro);
+   var centro = estudiante.get(Estudiante_.nacimiento).alias("nacimiento");
+   criteria.select(cb.construct(NombreDate.class, nombre, nacimiento));
 
-   TypedQuery<Tuple> query = em.createQuery(criteria);
+   TypedQuery<NombreDate> query = em.createQuery(criteria);
 
 .. note:: El *Metamodel* también genera ``Estudiante_.NOMBRE`` o
    ``Estudiante_.CENTRO``, pero sólo son constantes de tipo ``String`` que se
@@ -243,29 +254,34 @@ También existe el equivalente a ``GROUP BY``:
 .. code-block:: java
    :emphasize-lines: 3-7
 
-   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple);
+   record CentroCuantos(Centro centro, Long cantidad) {};
+
+   CriteriaQuery<CentroCuantos> criteria = cb.createQuery(CentroCuantos);
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
    var centro_p = estudiante.get(Estudiante_.centro);
    var centro = centro_p.alias("centro");
-   var cantidad = cb.count(estudiante).alias("cantidad");
-   criteria.multiselect(centro, cantidad)
-      .groupBy(centro_p);
+   var cantidad_p = cb.count(estudiante);
+   var cantidad = cantidad_p.alias("cantidad");
+   criteria.select(cb.construct(CentroCuantos.class, centro, cantidad))
+      .groupBy(centro_p);  // No puede usarse el alias, de ahí la variable intermedia centro_p
 
-   TypedQuery<Tuple> query = em.createQuery(criteria);
+   TypedQuery<CentroCuantos> query = em.createQuery(criteria);
 
 Si ahora quisiéramos ordenar resultados por la cantidad de estudiantes que tiene
 cada centro deberíamos añadir:
 
 .. code-block:: java
 
-   criteria.orderBy(cb.asc(cb.count(estudiante)));
+   criteria.orderBy(cb.asc(cantidad_p));
 
 ya que no puede usarse el alias. O, si quisiéramos ordenar por el nombre del
 centro:
 
 .. code-block:: java
 
-   criteria.orderBy(cb.asc(estudiante.get(Estudiante_.centro).get(Centro_.nombre)));
+   criteria.orderBy(cb.asc(centro_p.get(Centro_.nombre)));
+
+.. _orm-criteria-joins:
 
 Relaciones
 ==========
@@ -322,17 +338,20 @@ bidireccional.
 
 .. caution:: Hemos afirmado que las consultas son equivalentes, pero no es tal,
    ya que en el primer caso hemos obtenido centros y en el segundo hemos obtenido
-   estudiantes. La consulta realmente equivalen habría exigido obtener |Tuple|:
+   estudiantes. La consulta realmente equivalente habría exigido no obtener una
+   entidad pura. Por ejemplo:
 
    .. code-block:: java
 
       // SELECT e.*, c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;
-      CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+      record EstudianteCentro(Estudiante estudiante, Centro centro) {};
+
+      CriteriaQuery<EstudianteCentro> criteria = cb.createQuery(EstudianteCentro.class);
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
       Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
       var estudiante_a = estudiante.alias("estudiante");
       var centro_a = centro.alias("centro");
-      criteria.multiselect(estudiante_a, centro_a);
+      criteria.select(EstudiateCentro.class, estudiante_a, centro_a);
 
 De los dos ejemplos anteriores se pueden sacar tres conclusiones:
 
@@ -358,6 +377,12 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
       TypedQuery<Centro> query = em.createQuery(criteria);
       query.getResultList().forEach(System.out::println);  // Imprime centros.
 
+   ¿Por qué es implícito? Porque pedidos objetos ``Centro`` completos y para
+   ello |JPA| no tiene más remedio que recurrir a la relación. Incluso aunque no
+   pidamos objetos ``Centro``, si en la expresiones (por ejemplo, en una condición)
+   incluimos algún atributo de ``Centro``, |JPA| no tendrá más remedio que
+   internamente recurrir al *JOIN*.
+
 #. Para emular el comportamiento de |SQL| y obtener centros repetidos tenemos
    que evitar obtener entidades puras:
 
@@ -369,12 +394,12 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
       Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
       var centro_a = centro.alias("centro");
-      criteria.multiselect(centro_a);
+      criteria.select(cb.tuple(centro_a));
 
       TypedQuery<Tuple> query = em.createQuery(criteria);
       query.getResultList().forEach(t -> {
          // Imprime centros repetidos.
-         System.out.println("%s.\n", t.get(centro_a));
+         System.out.println("%s.\n", t.get("centro", Centro.class));
       });  
 
    En este último caso, podría evitarse la repetición usando ``DISTINCT``, tal
@@ -383,7 +408,7 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
    .. code-block:: java
       :emphasize-lines: 2
 
-      criteria.multiselect(centro_a)
+      criteria.select(cb.tuple(centro_a))
          .distinct(true);
 
 .. rubric:: Carga inmediata
@@ -460,10 +485,12 @@ La primera relación se escribe en *Criteria API* así:
    :emphasize-lines: 4, 5
 
    // SELECT e.*,c.* FROM Estudiante e LEFT JOIN Centro c ON e.centro = c.id;
-   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+   record EstudianteCentro(Estudiante estudiante, Centro centro) {};
+
+   CriteriaQuery<EstudianteCentro> criteria = cb.createQuery(EstudianteCentro.class);
    Root<Estudiante> estudiante = criteria.from(Estudiante.class);
    Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.LEFT);
-   criteria.select(cb.tuple(estudiante.alias("estudiante"), centro.alias("centro")));
+   criteria.select(cb.construct(EstudianteCentro.class, estudiante.alias("estudiante"), centro.alias("centro")));
 
 mientras que la segunda:
 
@@ -471,10 +498,12 @@ mientras que la segunda:
    :emphasize-lines: 4, 5
 
    // SELECT e.*,c.* FROM Centro c LEFT JOIN Estudiante e ON e.centro = c.id;
-   CriteriaQuery<Tuple> criteria = cb.createQuery(Tuple.class);
+   record EstudianteCentro(Estudiante estudiante, Centro centro) {};
+
+   CriteriaQuery<EstudianteCentro> criteria = cb.createQuery(EstudianteCentro.class);
    Root<Centro> centro = criteria.from(Centro.class);
    Join<Centro, Estudiante> estudiante = centro.join(Centro_.estudiantes, JoinType.LEFT);
-   criteria.select(cb.tuple(centro.alias("centro"), estudiante.alias("estudiante")));
+   criteria.select(cb.construct(EstudianteCentro.class, estudiante.alias("estudiante"), centro.alias("centro")));
 
 Pero nótese que esta segunda requiere una relación bidireccional.
 
@@ -502,7 +531,7 @@ alumnos matriculados*:
    :name: orm-subquery
 
 *Criteria API* también ofrece la posibilidad de hacer subconsultas. De hecho, el
-problema anterior podría haberse resuelto con una:
+problema anterior podría haberse resuelto con esta otra consulta\ [#]_:
 
 .. code-block:: sql
 
@@ -520,14 +549,23 @@ implementarla con *Criteria API*:
    // Subconsulta
    Subquery<Long> subquery = criteria.subquery(Long.class) // e.centro es Long
    Root<Estudiante> subEstudiante = subquery.from(Estudiante.class);
-   subquery.select(subEstudiante.get(Estudiante_.centro).get(Centro_.id));
+   subquery.select(subEstudiante.get(Estudiante_.centro));
 
    // Consulta con la subconsulta.
    criteria.select(centro)
-      .where(cb.not(centro.get(Centro_.id).in(subquery)));
+      .where(cb.not(centro.in(subquery)));
 
 .. note:: Nótese que aquí podemos comparar directamente centros en vez de
-   identificadores de centros.
+   identificadores de centros que sería la traducción literal:
+
+   .. code-block:: java 
+
+      subquery.select(subEstudiante.get(Estudiante_.centro).get(Centro_.id));
+
+      // Consulta con la subconsulta.
+      criteria.select(centro)
+         .where(cb.not(centro.get(Centro_.id).in(subquery)));
+
 
 O bien, si usamos el operador ``EXISTS`` de |SQL|:
 
@@ -547,7 +585,8 @@ que traducido a *Criteria API* queda:
    Subquery<Long> subquery = criteria.subquery(Long.class) // 1 es Long
    Root<Estudiante> subEstudiante = subquery.from(Estudiante.class);
    subquery.select(cb.literal(1L))
-      .where(cb.equal(subEstudiante.get(Estudiante_.centro).get(Centro._id), centro.get(Centro._id)));
+      // Como en el caso anterior, no es necesario comparar explícitamente IDs.
+      .where(cb.equal(subEstudiante.get(Estudiante_.centro), centro));
 
    // Consulta con la subconsulta
    criteria.select(centro)
@@ -582,7 +621,7 @@ Observemos parte del código ya presentado anteriormente:
    Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
    criteria.select(estudiante);
 
-Partidos de ``Estudiante`` (*estudiante*) y relacionamos con ``Centro`` a través
+Partimos de ``Estudiante`` (*estudiante*) y relacionamos con ``Centro`` a través
 del atributo *centro* de ``Estudiante``, de ahí que la relación se haya escrito
 utilizando el objeto *estudiante*.
 
@@ -635,6 +674,10 @@ También es posible **borrar**:
 
 .. rubric:: Notas al pie
 
+.. [#] Existe |CriteriaQuery|\ .multiselect para ahorranos |CriteriaBuilder|\
+   .array (o, como usaremos más adelante, |CriteriaBuilder|\ .tuple), pero está
+   marcado como obsoleto desde la versión 3.2.
+
 .. [#] Si utilizáramos otros |ORM| tendríamos que cambiar la referencia al |ORM|
        dentro de ``<annotationProcessorPaths>``. Para **EclipseLink**:
 
@@ -660,12 +703,16 @@ También es posible **borrar**:
               </path>
           </annotationProcessorPaths>
 
+.. [#] En realidad, esta consulta no funciona correctamente. Siga leyendo para
+   saber por qué.
+
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
 
 .. |CriteriaBuilder| replace:: :jakarta-persistence:`CriteriaBuilder <criteria/criteriabuilder>`
+.. |CriteriaQuery| replace:: :jakarta-persistence:`CriteriaQuery <criteria/criteriaquery>`
 .. |Tuple| replace:: :jakarta-persistence:`Tuple <Tuple>`
 .. |Metamodel| replace:: :ref:`Metamodel <orm-jpa-metamodel>`
 

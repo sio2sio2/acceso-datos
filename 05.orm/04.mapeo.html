@@ -426,7 +426,7 @@ Fundamentalmente sirven para:</p>
 <div class="admonition seealso">
 <p class="admonition-title">Ver también</p>
 <p>Bajo este epígrafe se verá cómo definir el mapeo mediante
-anotaciones. Hay otra estrategia que consiste en un utilizar archivos <abbr title="eXtensible Markup Language">XML</abbr>
+anotaciones. Hay otra estrategia que consiste en utilizar archivos <abbr title="eXtensible Markup Language">XML</abbr>
 aparte. Se tratará más adelante en <a class="reference internal" href="15.extra.html#xml-orm-mapping"><span class="std std-ref">mapeo mediante configuración</span></a>.</p>
 </div>
 <section id="anotaciones-basicas">
@@ -503,7 +503,7 @@ anotación de la clase Centro</span></a>:</p>
 </div>
 </div>
 <p>Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
-ampliar nuestro conocimientos sobre las anotaciones válidas:</p>
+ampliar nuestros conocimientos sobre las anotaciones válidas:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code></dt><dd><p>Por lo general, todos los atributos de la clase, aunque no estén anotados en
 absoluto, se consideran campos de la tabla correspondiente. Las excepciones
@@ -545,7 +545,7 @@ identificador; y <code class="docutils literal notranslate"><span class="pre">&#
 automáticamente sus valores. Lo más socorrido es:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Id</span>
 <span class="nd">@GeneratedValue</span><span class="p">(</span><span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GenerationType</span><span class="p">.</span><span class="na">IDENTITY</span><span class="p">)</span>
-<span class="kd">private</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>que equivale a indicar que el campo identificador es autoincremental
@@ -561,7 +561,7 @@ o <code class="docutils literal notranslate"><span class="pre">CLOB</span></code
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Temporal</span></code></dt><dd><p>Es útil cuando se usa el tipo antiguo <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Date.html">Date</a> para indicar
 si se quiere almacenar en la base de datos, sólo la hora
-(<code class="docutils literal notranslate"><span class="pre">TemporalType.TIME</span></code>) , sólo la fecha (<code class="docutils literal notranslate"><span class="pre">TemporalType.DATE</span></code>) o tanto la
+(<code class="docutils literal notranslate"><span class="pre">TemporalType.TIME</span></code>), sólo la fecha (<code class="docutils literal notranslate"><span class="pre">TemporalType.DATE</span></code>) o tanto la
 fecha como la hora (<code class="docutils literal notranslate"><span class="pre">TemporalType.TIMESTAMP</span></code>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Temporal</span><span class="p">(</span><span class="n">TemporalType</span><span class="p">.</span><span class="na">DATE</span><span class="p">)</span><span class="w">  </span><span class="c1">// Sólo almacena la fecha.</span>
 <span class="kd">private</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">;</span>
@@ -586,14 +586,14 @@ un número de versión, un tipo de fecha. Por ejemplo:</p>
 </div>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
-<p>Como de la actualización de este campo deben encargarse <abbr title="Java Persisten API">JPA</abbr>,
+<p>Como de la actualización de este campo debe encargarse <abbr title="Java Persisten API">JPA</abbr>,
 nunca deberías definir un <em>setter</em> público.</p>
 </div>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Enumerated</span></code></dt><dd><p>Permite indicar cómo almacenar un campo <code class="docutils literal notranslate"><span class="pre">enum</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Enumerated</span><span class="p">(</span><span class="n">EnumType</span><span class="p">.</span><span class="na">STRING</span><span class="p">)</span>
 <span class="nd">@Column</span><span class="p">(</span><span class="n">nullable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-<span class="kd">private</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>En este caso, el tipo se guardará como una cadena en la base de datos. Otra
@@ -638,7 +638,7 @@ controlar con qué nombre de columna se traducen es necesario:</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Convert</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Converter</span></code></dt><dd><p>Permite definir exactamente la traducción de un atributo a campo y viceversa.
 Para llevar a cabo esta traducción debe definirse una clase que implemente la
-interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteConverter</span></code>. Por ejemplo, imaginemos que el tipo
+interfaz <code class="docutils literal notranslate"><span class="pre">AttributeConverter</span></code>. Por ejemplo, imaginemos que el tipo
 <code class="docutils literal notranslate"><span class="pre">Titularidad</span></code> lo hubiéramos definido así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">PUBLICA</span><span class="p">(</span><span class="s">&quot;Pública&quot;</span><span class="p">),</span>
@@ -657,13 +657,13 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 <span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Titularidad</span><span class="w"> </span><span class="nf">fromNombre</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">Titularidad</span><span class="p">.</span><span class="na">values</span><span class="p">())</span>
 <span class="w">         </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="na">getNombre</span><span class="p">().</span><span class="na">toLowerCase</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">nombre</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">()))</span>
-<span class="w">         </span><span class="p">.</span><span class="na">findFirst</span><span class="p">.</span><span class="na">orElse</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="w">         </span><span class="p">.</span><span class="na">findFirst</span><span class="p">().</span><span class="na">orElse</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>y que pretendiéramos almacenar en la base de datos el <em>nombre</em> («Pública» o
-«Privada»). En ese caso tendríamos que definir un convesor así:</p>
+«Privada»). En ese caso tendríamos que definir un conversor así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TitularidadConverter</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AttributeConverter</span><span class="o">&lt;</span><span class="n">Titularidad</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">     </span><span class="nd">@Override</span>
@@ -685,7 +685,7 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 </pre></div>
 </div>
 <p>También es posible anotar la clase conversora:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Converter</span><span class="p">(</span><span class="n">autoPlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Converter</span><span class="p">(</span><span class="n">autoApply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TitularidadConverter</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">AttributeConverter</span><span class="o">&lt;</span><span class="n">Titularidad</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// ... Implementación ...</span>
 <span class="p">}</span>
@@ -702,7 +702,7 @@ interfaz <code class="docutils literal notranslate"><span class="pre">AttibuteCo
 equivalente al <code class="docutils literal notranslate"><span class="pre">CHECK</span></code> de <abbr title="Structured Query Language">SQL</abbr>), que requieren importar la librería
 <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api">validation-api</a>. Son variadas. Por ejemplo:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@PositiveOrZero</span><span class="p">(</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;La cantidad no puede ser negativa&quot;</span><span class="p">)</span>
-<span class="n">private</span> <span class="nb">int</span> <span class="n">cantidad</span>
+<span class="n">private</span> <span class="nb">int</span> <span class="n">cantidad</span><span class="p">;</span>
 
 <span class="nd">@Positive</span>
 <span class="nd">@NotNull</span>
@@ -739,7 +739,7 @@ antes de aceptar el valor del atributo.</p>
 <p>Las relaciones entre las entidades también se significan mediante anotaciones.
 Hay tres tipos de relaciones binarias en el modelo relacional:</p>
 <dl>
-<dt><strong>Relación 1:N</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code></dt><dd><p>Se produce cuando una registro de la primera tabla se relaciona con muchos
+<dt><strong>Relación 1:N</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToMany</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;ManyToOne</span></code></dt><dd><p>Se produce cuando un registro de la primera tabla se relaciona con muchos
 registros de la segunda, pero al contrario los registros de la segunda sólo
 se relacionan con uno de la primera.</p>
 <p><abbr title="Java Persisten API">JPA</abbr> establece dos modos de resolver esta relación (y las otras dos que se
@@ -748,9 +748,9 @@ explicarán a continuación): de modo <strong>unidireccional</strong> y de modo
 <dl>
 <dt><strong>Unidireccional</strong></dt><dd><p>El modo <em class="dfn">unidireccional</em> es el que más fielmente refleja el modelo
 relacional, ya que la relación sólo se refleja en uno de los extremos: en
-aquel en que se encuentra la clave foránea. Por ejemplo, la relación  la
-relación <strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em> provoca que definamos así la
-clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
+aquel en que se encuentra la clave foránea. Por ejemplo, la relación
+<strong>1:N</strong> entre <em>Centro</em> y <em>Estudiante</em> provoca que definamos así la clase
+<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">Clase Estudiante</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
@@ -838,7 +838,7 @@ clase <code class="docutils literal notranslate"><span class="pre">Estudiante</s
 (registro) completo, no sólo el identificador.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;JoinColumn</span></code> no es estrictamente necesario. En este caso, lo hemos
 usado porque queríamos escoger el nombre que recibirá el campo
-correspondiete en la tabla <em>Estudiante</em>, y porque queremos hacer la
+correspondiente en la tabla <em>Estudiante</em>, y porque queremos hacer la
 relación opcional.</p></li>
 <li><p>Con un <em>getter</em> y un <em>setter</em> asociados.</p></li>
 <li><p>Haciendo que el constructor y <code class="docutils literal notranslate"><span class="pre">.cargarDatos</span></code> manejen el objeto
@@ -882,8 +882,8 @@ existe en la base de datos, esto es, la información que ofrece
 </dl>
 </dd>
 <dt><strong>Relación 1:1</strong>: <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code></dt><dd><p>Expresa que cada registro de una tabla se relaciona exclusivamente con uno (o
-ninguno) registro de la otra tabla. En <abbr title="Structured Query Language">SQL</abbr> se resuelve colocando el campo
-en cualquiera de las dos tablas. En <abbr title="Java Persisten API">JPA</abbr> para significar este tipo
+ninguno) de los registros de la otra tabla. En <abbr title="Structured Query Language">SQL</abbr> se resuelve colocando el
+campo en cualquiera de las dos tablas. En <abbr title="Java Persisten API">JPA</abbr> para significar este tipo de
 relaciones se usa la notación <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code> y, como en el caso anterior,
 podemos reflejarla de modo <strong>unidireccional</strong> o <strong>bidireccional</strong>.</p>
 <p>Para ilustrarlo, supongamos que añadimos un campo <code class="docutils literal notranslate"><span class="pre">direccion</span></code> a la clase
@@ -897,7 +897,7 @@ diferencia de lo que propusimos al explicar la <a class="reference internal" hre
 <span class="kd">private</span><span class="w"> </span><span class="n">Direccion</span><span class="w"> </span><span class="n">direccion</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>porque es en su tabla correspondiente donde decididimos añadir el campo.
+<p>porque es en su tabla correspondiente donde decidimos añadir el campo.
 Además, deberíamos definir el <em>getter</em> y el <em>setter</em> correspondientes.</p>
 </dd>
 <dt><strong>Bidireccional</strong></dt><dd><p>Además de lo hecho antes, debemos reflejar la relación en el otro extremo

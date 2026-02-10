@@ -8,8 +8,8 @@ especificación |JPA|. Necesitamos dos cosas:
 a. Importar librerías.
 #. Crear una configuración.
 
-Depedencias
------------
+Dependencias
+------------
 
 .. code-block:: xml
 
@@ -108,7 +108,7 @@ En resumidas cuentas es:
    ``compile`` (o no poner ninguno, que es equivalente), porque, de mantenerlo
    como ``runtime``, :ref:`Maven` resolverá la dependencia de las
    especificaciones también con ese *scope* y no las tendremos disponibles en la
-   compilación la |API|.
+   compilación de la |API|.
 
 Configuración de la persistencia
 --------------------------------
@@ -124,7 +124,7 @@ En este archivo:
   |SGBD| utilizados.
 
 * El proveedor indica cuál es la implementación |JPA| que usaremos. Algunos
-  muy usandos son:
+  muy usados son:
 
   .. table::
      :class: url-sql
@@ -193,10 +193,11 @@ En este archivo:
 Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
 no están definidos de antemano, sino que se definen en **tiempo de ejecución**?
 En ese caso, puede definirse un :java-util:`HashMap` que defina las valores de
-propiedades y pasar el mapa cuando se usa la unidad de persistencia para crear
-el objeto :jakarta-persistence:`EntityManagerFactory` (véase a continuación
-:ref:`cómo conectar <orm-bas-conn>`). En ese caso, las definiciones del mapa
-sobrescribirán a las que pudieran existir en el archivo.  Por ejemplo:
+las propiedades y pasar el mapa cuando se usa la unidad de persistencia para
+crear el objeto :jakarta-persistence:`EntityManagerFactory` (véase a
+continuación :ref:`cómo conectar <orm-bas-conn>`). En ese caso, las
+definiciones del mapa sobrescribirán a las que pudieran existir en el archivo.
+Por ejemplo:
 
 .. code-block:: java
 

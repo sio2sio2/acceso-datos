@@ -505,7 +505,7 @@ anotación comentada en el código de más arriba.</p></li>
 no hay manera de expresarlo con <abbr title="Java Persistent API">JPA</abbr>.</p></li>
 </ul>
 </li>
-<li><p>Los atributos que son campos se notan con <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> y pueden añadirse
+<li><p>Los atributos que son campos se anotan con <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> y pueden añadirse
 parámetros para afinar la definición (nombre del campo si no coincide con el
 del atributo, restricciones adicionales, longitud si es una cadena). Un
 atributo sin la anotación, no obstante, se añadirá a la tabla como campo, a
@@ -570,8 +570,9 @@ ilustrar cómo operar con la base de datos:</p>
 (<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a>). Este es un proceso costoso, así
 que deberíamos evitar crear más de una<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. El código no es realista, ya que
 muy probablemente en una aplicación se requiera obtener y crear objetos en
-distintos archivos, con lo que la estructura <em>try-with-resources</em> no podremos
-usarla. Sin embargo, nos sirve para ilustrar este ejemplo tan simple.</p></li>
+distintos archivos, con lo que no podremos usar la estructura
+<em>try-with-resources</em>. Sin embargo, nos sirve para ilustrar este ejemplo tan
+simple.</p></li>
 <li><p>Es conveniente no reutilizar los objetos <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>,
 de suerte que cada transacción debería usar uno nuevo.</p></li>
 </ul>

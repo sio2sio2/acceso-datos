@@ -412,13 +412,13 @@ document.write(`
                   
   <section id="simples">
 <span id="orm-simple-crud"></span><h1><span class="section-number">5.6.1. </span>Simples<a class="headerlink" href="#simples" title="Link to this heading">#</a></h1>
-<p>Antes de comenzar a desglosar las cuatro operacioness <abbr title="Create, Read, Update, Delete">CRUD</abbr> básicas, es
+<p>Antes de comenzar a desglosar las cuatro operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> básicas, es
 necesario introducir otro concepto, el de <em class="dfn">vinculación a la sesión</em>: un
 objeto puede sincronizarse con la base de datos cuando se encuentra vinculado a
 la sesión activa, lo cual ocurre cuando:</p>
 <ol class="loweralpha simple">
 <li><p>Lo hemos obtenido previamente de la base de datos en esa misma sesión.</p></li>
-<li><p>Hemos usando con él un método que supone su vinculación:</p>
+<li><p>Hemos usado con él un método que supone su vinculación:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">.persist</span></code>, que agrega un nuevo objeto a la base de datos y, por su propia
 naturaleza se usa con un objeto creado <em>ex novo</em> y, por tanto, no vinculado.</p></li>
@@ -490,7 +490,7 @@ datos, desechando todos los cambios que haya podido sufrir en memoria:</p>
 <span class="w">   </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span>
 <span class="w">      </span><span class="c1">// Hacemos cambios en el objeto</span>
 <span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;Pongo otro&quot;</span><span class="p">);</span>
 <span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setTitularidad</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PRIVADA</span><span class="p">);</span>
@@ -512,7 +512,7 @@ datos, desechando todos los cambios que haya podido sufrir en memoria:</p>
 <span class="w">   </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado.</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado.</span>
 <span class="hll"><span class="w">      </span><span class="n">castillo</span><span class="p">.</span><span class="na">setNombre</span><span class="p">(</span><span class="s">&quot;I.E.S. Castillo de Luna&quot;</span><span class="p">);</span>
 </span><span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Se guarda el cambio.</span>
 <span class="w">   </span><span class="p">}</span>
@@ -567,7 +567,7 @@ al confirmarlos.</p>
 <span class="w">   </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sesion</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado.</span>
+<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">castillo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">find</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span><span class="w">  </span><span class="c1">// Objeto vinculado.</span>
 <span class="hll"><span class="w">      </span><span class="n">em</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">castillo</span><span class="p">);</span>
 </span><span class="w">      </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w"> </span><span class="c1">// Se guarda el cambio.</span>
 <span class="w">   </span><span class="p">}</span>

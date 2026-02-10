@@ -407,10 +407,17 @@ resolución de aquel ejercicio o, lo que es lo mismo, para un usuario final
 no debería haber ninguna diferencia entre la ejecución de una u otra
 aplicación, porque verá ambas iguales.</p>
 <p>Debe resolver <strong>dos</strong> veces el ejercicio usando dos estrategias distintas:</p>
-<ol class="loweralpha simple">
-<li><p>Libremente con <abbr title="Java Persistent API">JPA</abbr>.</p></li>
+<ol class="loweralpha">
+<li><p>Libremente con <abbr title="Java Persistent API">JPA</abbr> sin tener demasiado en cuenta que ya lo resolvió
+usando conectores.</p></li>
 <li><p>Respetando escrupulosamente el código con que lo resolvió en la unidad
-anterior, es decir, mediante el patrón de diseño <abbr title="Data Access Object">DAO</abbr>.</p></li>
+anterior, es decir, tendrá que cambiar únicamente aquella parte del código
+que conecta con la base de datos, y aquella que realiza las operaciones
+(implementación interna de los objetos <abbr title="Data Access Object">DAO</abbr>); pero debería respetar
+completamente el código que implementa la interfaz de usuario.</p>
+<p>Describa pormenorizadamente en el <code class="file docutils literal notranslate"><span class="pre">README.md</span></code> del proyecto qué
+archivos ha tenido que cambiar y qué cambios ha hecho en ellos.</p>
+</li>
 </ol>
 </li>
 </ol>

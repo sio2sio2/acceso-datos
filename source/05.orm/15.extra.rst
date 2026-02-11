@@ -323,18 +323,23 @@ indicamos que *fetch* permitía forzar una carga inmediata de las entidades
 relacionadas. Ahora bien, ¿cuál es el comportamiento de |JPA| ante las
 relaciones?
 
-Si al anotar una entidad no se especifica nada, las relaciones ``@ManyToOne`` y
-``@OneToOne`` cargan inmediatamente la entidad relacionada, mientras que las
-relaciones ``@OneToMany`` y ``@ManyToMany`` lo hacen de forma perezosa:
+.. admonition:: Advertencia
 
-.. code-block:: java
+   Si al anotar una entidad no se especifica nada, las relaciones ``@ManyToOne``
+   y ``@OneToOne`` cargan inmediatamente la entidad relacionada, mientras que
+   las relaciones ``@OneToMany`` y ``@ManyToMany`` lo hacen de forma perezosa:
 
-   @ManyToOne
-   JoinColum(name = "id_centro", nullable = "false")
-   private Centro centro; // Carga inmediata (eager).
+   .. code-block:: java
 
-   @ManyToMany(mappedBy = "estudiantes")
-   private List<Curso> cursos; // Carga perezosa (lazy).
+      @ManyToOne
+      JoinColum(name = "id_centro", nullable = "false")
+      private Centro centro; // Carga inmediata (eager).
+
+      @ManyToMany(mappedBy = "estudiantes")
+      private List<Curso> cursos; // Carga perezosa (lazy).
+
+.. tip:: La carga predefinida de las relaciones ``@*One`` es *perezosa*,
+   mientras la de las relaciones ``@*Many`` es *inmediata*.
 
 Si quiere modificarse este comportamiento predeterminado, pueden añadirse
 ``FetchType.EAGER`` o ``FetchType.LAZY``, según convenga:
@@ -350,7 +355,7 @@ Si quiere modificarse este comportamiento predeterminado, pueden añadirse
 
 
 Tanto en |JPQL| como en *Criteria API*, los *JOIN* a secas respetan este
-comportamiento derivado de las anotaciones, mientras que los *FETCH JOIN*
+comportamiento derivado de las anotaciones, mientras que los *JOIN FETCH*
 fuerzan siempre la carga inmediata.
 
 .. _xml-orm-mapping:
@@ -360,8 +365,8 @@ Mapeo mediante archivos
 Aunque, como ya hemos visto, el mapeo puede realizarse mediante :ref:`anotaciones al
 propio código de las clases del modelo <orm-mapping>`, también es posible no
 añadir las anotaciones al código Java y crear archivos |XML| aparte que
-sustituyan por completo a estas anotaciones. Para entender cómo crear estos
-archivos es indispensable que entendamos que las anotaciones eran de dos
+sustituyan por completo\ [#]_ a estas anotaciones. Para entender cómo crear
+estos archivos es indispensable que entendamos que las anotaciones eran de dos
 naturalezas distintas:
 
 * Las que definían propiamente el esquema (como ``@Id`` o ``@Colum``).
@@ -372,9 +377,10 @@ epígrafes distintos:
 
 Definición del esquema
 ----------------------
-Antes de crear el archivo para *definir el esquema* debemos indicar en la
-configuración de la unidad de persistencia definida en
-:file:`META-INF/persistence.xml` cuál será tal archivo:
+El |ORM| busca para la definición del mapeo un archivo llamado
+:file:`META-INF/orm.xml`. Si lo llamáramos de otro modo, entonces deberíamos
+indicar en la configuración de la unidad de persistencia
+(:file:`META-INF/persistence.xml`) cuál será su nombre:
 
 .. code-block:: xml
 
@@ -388,8 +394,7 @@ configuración de la unidad de persistencia definida en
 
    </presistence-unit>
 
-Hecho lo cual, podemos definir :file:`META-INF/schema.xml` con la definición del
-esquema:
+Sea como sea, en el archivo podemos definir el mapeo más o menos así:
 
 .. literalinclude:: files/schema.xml
    :class: toggle
@@ -404,7 +409,7 @@ la clase ``Centro``).
 Definición de restricciones
 ---------------------------
 Para definir restricciones **a nivel de aplicación** debemos escribir el archivo
-``META-INF/validation``:
+``META-INF/validation.xml``:
 
 .. code-block:: xml
    :emphasize-lines: 11
@@ -483,6 +488,11 @@ Podemos definir otras restricciones:
 .. [#] Sólo el identificador de la entidad padre, porque la clave foránea en la
    entidad hijo sólo almacena el identificador. Si la entidad padre se actualiza
    cambiando cualquier otro campo, no hay ningún efecto que reflejar
+
+.. [#] O casi. En las últimas versiones de Hibernate_, el :ref:`procesador de
+   anotaciones <orm-jpa-metamodel>` no es capaz de detectar las clases para las
+   que debe generar el metamodelo si no se han anotado con ``@Entity``. Véase
+   `el bug <https://hibernate.atlassian.net/browse/HHH-18722>`_.
 
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`

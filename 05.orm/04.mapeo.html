@@ -843,6 +843,10 @@ relación opcional.</p></li>
 <li><p>Con un <em>getter</em> y un <em>setter</em> asociados.</p></li>
 <li><p>Haciendo que el constructor y <code class="docutils literal notranslate"><span class="pre">.cargarDatos</span></code> manejen el objeto
 referenciado, no la clave foránea en sí.</p></li>
+<li><p>No se ha especificado si la entidad relacionada (objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code>) se
+carga de forma inmediata o perezosa. El comportamiento predeterminado en
+este lado de la relación es <em>EAGER</em>, esto es, carga inmediata (véase
+<a class="reference internal" href="15.extra.html#orm-optimo"><span class="std std-ref">optimización</span></a> para más información).</p></li>
 </ul>
 <p>En definitiva, la traducción de la relación es casi literal con la única
 salvedad de que el atributo no almacena la clave foránea (un identificador),
@@ -859,6 +863,8 @@ anotado con <code class="docutils literal notranslate"><span class="pre">&#64;On
 <code class="docutils literal notranslate"><span class="pre">centro</span></code> de la clase <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>. Además, deberemos definirle un
 <em>getter</em> para poder acceder a su valor. El <em>setter</em>, en cambio, no es
 indispensable.</p>
+<p>A diferencia de lo que ocurre en el otro extremo, en este caso el
+comportamiento predeterminado en la entidad padre es <em>LAZY</em>.</p>
 <p>Esta alternativa nos permite conocer todos los estudiantes matriculados en
 un centro de modo sencillo, pero introduce problemas de sincronización
 con los que deberíamos lidiar. Por ejemplo, establecer como <em>nulo</em> el
@@ -886,6 +892,8 @@ ninguno) de los registros de la otra tabla. En <abbr title="Structured Query Lan
 campo en cualquiera de las dos tablas. En <abbr title="Java Persisten API">JPA</abbr> para significar este tipo de
 relaciones se usa la notación <code class="docutils literal notranslate"><span class="pre">&#64;OneToOne</span></code> y, como en el caso anterior,
 podemos reflejarla de modo <strong>unidireccional</strong> o <strong>bidireccional</strong>.</p>
+<p>El comportamiento predeterminado para la carga en este tipo de relaciones es
+siempre <em>EAGER</em> sea cual sea el extremo.</p>
 <p>Para ilustrarlo, supongamos que añadimos un campo <code class="docutils literal notranslate"><span class="pre">direccion</span></code> a la clase
 <code class="docutils literal notranslate"><span class="pre">Centro</span></code> de tipo <code class="docutils literal notranslate"><span class="pre">Direccion</span></code> y queremos que en la base de datos los
 campos que componen la dirección se mantengan en una tabla independiente (a
@@ -923,7 +931,8 @@ dos casos:</p>
 <ol class="loweralpha">
 <li><p>La relación no tiene atributos propios: <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
 <p>En este caso, puede expresarse la relación <strong>N:M</strong> directamente con
-la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>.</p>
+la anotación <code class="docutils literal notranslate"><span class="pre">&#64;ManyToMany</span></code>, y la carga, a menos que se indique lo
+contrario, es siempre perezosa, sea cual sea el extremo.</p>
 <dl>
 <dt><strong>Unidireccional</strong></dt><dd><p>Creamos el atributo anotado en uno de los dos extremos (el que nos
 resulte más natural). Así podríamos añadir a <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>:</p>

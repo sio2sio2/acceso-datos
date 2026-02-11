@@ -339,6 +339,10 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
       + Con un *getter* y un *setter* asociados.
       + Haciendo que el constructor y ``.cargarDatos`` manejen el objeto
         referenciado, no la clave foránea en sí.
+      + No se ha especificado si la entidad relacionada (objetos ``Centro``) se
+        carga de forma inmediata o perezosa. El comportamiento predeterminado en
+        este lado de la relación es *EAGER*, esto es, carga inmediata (véase
+        :ref:`optimización <orm-optimo>` para más información).
 
       En definitiva, la traducción de la relación es casi literal con la única
       salvedad de que el atributo no almacena la clave foránea (un identificador),
@@ -358,6 +362,9 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
       ``centro`` de la clase ``Estudiante``. Además, deberemos definirle un
       *getter* para poder acceder a su valor. El *setter*, en cambio, no es
       indispensable.
+
+      A diferencia de lo que ocurre en el otro extremo, en este caso el
+      comportamiento predeterminado en la entidad padre es *LAZY*.
 
       Esta alternativa nos permite conocer todos los estudiantes matriculados en
       un centro de modo sencillo, pero introduce problemas de sincronización
@@ -383,6 +390,9 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    campo en cualquiera de las dos tablas. En |JPA| para significar este tipo de
    relaciones se usa la notación ``@OneToOne`` y, como en el caso anterior,
    podemos reflejarla de modo **unidireccional** o **bidireccional**.
+
+   El comportamiento predeterminado para la carga en este tipo de relaciones es
+   siempre *EAGER* sea cual sea el extremo.
 
    Para ilustrarlo, supongamos que añadimos un campo ``direccion`` a la clase
    ``Centro`` de tipo ``Direccion`` y queremos que en la base de datos los
@@ -427,7 +437,8 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
    a. La relación no tiene atributos propios: ``@ManyToMany``.
 
       En este caso, puede expresarse la relación **N:M** directamente con
-      la anotación ``@ManyToMany``.
+      la anotación ``@ManyToMany``, y la carga, a menos que se indique lo
+      contrario, es siempre perezosa, sea cual sea el extremo.
 
       **Unidireccional**
          Creamos el atributo anotado en uno de los dos extremos (el que nos

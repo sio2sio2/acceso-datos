@@ -372,16 +372,22 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
       // SELECT c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;
       CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
       Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-      criteria.select(estudiante.get(Estudiante._centro));
+      criteria.select(estudiante.get(Estudiante_.centro));
 
       TypedQuery<Centro> query = em.createQuery(criteria);
       query.getResultList().forEach(System.out::println);  // Imprime centros.
 
-   ¿Por qué es implícito? Porque pedidos objetos ``Centro`` completos y para
-   ello |JPA| no tiene más remedio que recurrir a la relación. Incluso aunque no
-   pidamos objetos ``Centro``, si en la expresiones (por ejemplo, en una condición)
-   incluimos algún atributo de ``Centro``, |JPA| no tendrá más remedio que
-   internamente recurrir al *JOIN*.
+   ¿Por qué es implícito? Porque se piden objetos ``Centro`` completos y para
+   ello |JPA| no tiene más remedio que recurrir a la relación. Hay aquí que
+   hacer apostilla importante, si no se pidieran objetos ``Centro``, sino
+   objetos ``Estudiante``, pero alguna de las condiciones de la consulta
+   (clausula ``WHERE``) involucrara a algún atributo de ``Centro``, entonces
+   |JPA| no tendría más remedio que internamente construir la consulta usando un
+   *JOIN*. Ahora bien, eso no implica que en los estudiantes obtenidos el atributo
+   ``Centro`` se haya obtenido también. Si la carga se hubiera definido como
+   perezosa, a pesar del *JOIN*, no se habrían obtenidos los centros
+   relacionados y cargar el centro de un estudiante concreto implicaría una
+   consulta adicional.
 
 #. Para emular el comportamiento de |SQL| y obtener centros repetidos tenemos
    que evitar obtener entidades puras:
@@ -416,43 +422,48 @@ a. La relación se establece entre una entidad y el atributo que la relaciona co
 En los tres ejemplos en los que obtenemos centros (el *join* implícito, el
 *join* explícito y el *join* explícito que obtiene tuplas), el hecho de que
 pidamos centros provoca que estos se carguen directamente gracias a la
-consulta). Sin embargo, si nuestra consulta hubiera sido aquella con la que
-comenzamos a estudiar *Criteria API*:
+consulta). Sin embargo, si nuestra consulta hubiera sido una en la que se usa
+carga perezosa como:
 
 .. code-block:: java
 
-   // SELECT e.* FROM Estudiante e;
-   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-   criteria.select(estudiante);
+   // SELECT c.* FROM Centro c;
+   CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
+   Root<Centro> centro = criteria.from(Centro.class);
+   criteria.select(centro);
 
-   TypedQuery<Estudiante> query = em.createQuery(criteria);
-   List<Estudiante> estudiantes = query.getResultList();
+   TypedQuery<Centro> query = em.createQuery(criteria);
+   List<Centro> centros = query.getResultList();
 
-Esos estudiantes, como consecuecia de la evaluación perezosa, no tendrían sus
-centros precargados y usar ``.getCentro()`` implicaría un ``SELECT`` posterior
-por cada uno de los estudiantes para obtenerlo. Añadir la línea:
+Esos centros, como son entidad padre de estudiante, no han cargado de forma
+efectiva la lista de estudiantes matriculados, ya que de forma predeterminada la
+carga es perezosa. En consecuencia, usar ``.getEstudiantes()`` implica una
+consulta posterior para cada uno de los centros. Añadir la línea:
 
 .. code-block:: java
 
-   Join<Estudiante, Centro> centro = estudiante.join(Estudiante_.centro, JoinType.INNER);
+   Join<Centro, Estudiante> estudiante = centro.join(Centro_.estudiantes, JoinType.INNER);
 
-no provoca la carga inmediata, ya que no usamos luego ``centro`` en la
-consulta y, por tanto, internamente, no se realiza realmente un *JOIN*.
+no provoca la carga inmediata, porque aunque forzamos a que se construya la
+consulta con un *JOIN*, no se obtienen expresamente estudiantes en la consulta;
+y el |ORM| construye los objetos ``Centro`` sin atender a que en la consulta se
+obtuvieron estudiantes. La consecuencia es que el *JOIN* es inútil y hemos hecho
+una consulta a la base de datos más costosa para nada.
+
 Si nuestra intención es obligar a una carga inmediata gracias al *JOIN* interno,
 debemos añadir esta línea:
 
 .. code-block:: java
    :emphasize-lines: 4
 
-   // SELECT e.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id; 
-   CriteriaQuery<Estudiante> criteria = cb.createQuery(Estudiante.class);
-   Root<Estudiante> estudiante = criteria.from(Estudiante.class);
-   estudiante.fetch(Estudiante_.centro, TypeJoin.INNER);
-   criteria.select(estudiante);
+   // SELECT c.* FROM Centro c INNER JOIN Estudiante e ON c.id = e.centro;
+   CriteriaQuery<Centro> criteria = cb.createQuery(Centro.class);
+   Root<Centro> centro = criteria.from(Centro.class);
+   centro.fetch(Centro_.estudiantes, TypeJoin.INNER);
+   criteria.select(centro);
 
-   TypedQuery<Estudiante> query = em.createQuery(criteria);
-   List<Estudiante> estudiantes = query.getResultList();
+   TypedQuery<Centro> query = em.createQuery(criteria);
+   List<Centro> centros = query.getResultList();
 
 .. seealso:: Consulte para más información el :ref:`epígrafe dedicado a
    optimización <orm-optimo>`.

@@ -725,17 +725,23 @@ como este:</p>
 <span class="c1">// SELECT c.* FROM Estudiante e JOIN Centro c ON e.centro = c.id;</span>
 <span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">estudiante</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">_centro</span><span class="p">));</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">estudiante</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">));</span>
 
 <span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 <span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">().</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span><span class="w">  </span><span class="c1">// Imprime centros.</span>
 </pre></div>
 </div>
-<p>¿Por qué es implícito? Porque pedidos objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code> completos y para
-ello <abbr title="Java Persistent API">JPA</abbr> no tiene más remedio que recurrir a la relación. Incluso aunque no
-pidamos objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, si en la expresiones (por ejemplo, en una condición)
-incluimos algún atributo de <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, <abbr title="Java Persistent API">JPA</abbr> no tendrá más remedio que
-internamente recurrir al <em>JOIN</em>.</p>
+<p>¿Por qué es implícito? Porque se piden objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code> completos y para
+ello <abbr title="Java Persistent API">JPA</abbr> no tiene más remedio que recurrir a la relación. Hay aquí que
+hacer apostilla importante, si no se pidieran objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, sino
+objetos <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>, pero alguna de las condiciones de la consulta
+(clausula <code class="docutils literal notranslate"><span class="pre">WHERE</span></code>) involucrara a algún atributo de <code class="docutils literal notranslate"><span class="pre">Centro</span></code>, entonces
+<abbr title="Java Persistent API">JPA</abbr> no tendría más remedio que internamente construir la consulta usando un
+<em>JOIN</em>. Ahora bien, eso no implica que en los estudiantes obtenidos el atributo
+<code class="docutils literal notranslate"><span class="pre">Centro</span></code> se haya obtenido también. Si la carga se hubiera definido como
+perezosa, a pesar del <em>JOIN</em>, no se habrían obtenidos los centros
+relacionados y cargar el centro de un estudiante concreto implicaría una
+consulta adicional.</p>
 </li>
 <li><p>Para emular el comportamiento de <abbr title="Structured Query Language">SQL</abbr> y obtener centros repetidos tenemos
 que evitar obtener entidades puras:</p>
@@ -765,35 +771,39 @@ como se hace en <abbr title="Structured Query Language">SQL</abbr>:</p>
 <p>En los tres ejemplos en los que obtenemos centros (el <em>join</em> implícito, el
 <em>join</em> explícito y el <em>join</em> explícito que obtiene tuplas), el hecho de que
 pidamos centros provoca que estos se carguen directamente gracias a la
-consulta). Sin embargo, si nuestra consulta hubiera sido aquella con la que
-comenzamos a estudiar <em>Criteria API</em>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// SELECT e.* FROM Estudiante e;</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">estudiante</span><span class="p">);</span>
+consulta). Sin embargo, si nuestra consulta hubiera sido una en la que se usa
+carga perezosa como:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// SELECT c.* FROM Centro c;</span>
+<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
 
-<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Esos estudiantes, como consecuecia de la evaluación perezosa, no tendrían sus
-centros precargados y usar <code class="docutils literal notranslate"><span class="pre">.getCentro()</span></code> implicaría un <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> posterior
-por cada uno de los estudiantes para obtenerlo. Añadir la línea:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Join</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
+<p>Esos centros, como son entidad padre de estudiante, no han cargado de forma
+efectiva la lista de estudiantes matriculados, ya que de forma predeterminada la
+carga es perezosa. En consecuencia, usar <code class="docutils literal notranslate"><span class="pre">.getEstudiantes()</span></code> implica una
+consulta posterior para cada uno de los centros. Añadir la línea:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Join</span><span class="o">&lt;</span><span class="n">Centro</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">Centro_</span><span class="p">.</span><span class="na">estudiantes</span><span class="p">,</span><span class="w"> </span><span class="n">JoinType</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>no provoca la carga inmediata, ya que no usamos luego <code class="docutils literal notranslate"><span class="pre">centro</span></code> en la
-consulta y, por tanto, internamente, no se realiza realmente un <em>JOIN</em>.
-Si nuestra intención es obligar a una carga inmediata gracias al <em>JOIN</em> interno,
+<p>no provoca la carga inmediata, porque aunque forzamos a que se construya la
+consulta con un <em>JOIN</em>, no se obtienen expresamente estudiantes en la consulta;
+y el <abbr title="Object-Relational Mapping">ORM</abbr> construye los objetos <code class="docutils literal notranslate"><span class="pre">Centro</span></code> sin atender a que en la consulta se
+obtuvieron estudiantes. La consecuencia es que el <em>JOIN</em> es inútil y hemos hecho
+una consulta a la base de datos más costosa para nada.</p>
+<p>Si nuestra intención es obligar a una carga inmediata gracias al <em>JOIN</em> interno,
 debemos añadir esta línea:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// SELECT e.* FROM Estudiante e INNER JOIN Centro c ON e.centro = c.id;</span>
-<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
-<span class="hll"><span class="n">estudiante</span><span class="p">.</span><span class="na">fetch</span><span class="p">(</span><span class="n">Estudiante_</span><span class="p">.</span><span class="na">centro</span><span class="p">,</span><span class="w"> </span><span class="n">TypeJoin</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
-</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">estudiante</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// SELECT c.* FROM Centro c INNER JOIN Estudiante e ON c.id = e.centro;</span>
+<span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Root</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="hll"><span class="n">centro</span><span class="p">.</span><span class="na">fetch</span><span class="p">(</span><span class="n">Centro_</span><span class="p">.</span><span class="na">estudiantes</span><span class="p">,</span><span class="w"> </span><span class="n">TypeJoin</span><span class="p">.</span><span class="na">INNER</span><span class="p">);</span>
+</span><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
 
-<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
+<span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getResultList</span><span class="p">();</span>
 </pre></div>
 </div>
 <div class="admonition seealso">

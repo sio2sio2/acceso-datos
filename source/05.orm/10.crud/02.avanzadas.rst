@@ -8,9 +8,23 @@ la aplicación (p.e. obtener la lista completa de objetos de un mismo tipo). Par
 operaciones más avanzadas (especialmente de lectura), |JPA| ofrece tres
 alternativas:
 
-#. |JPQL|, esto es, *Lenguaje de consultas de Persistencia de Java*.
-#. *Criteria API*
-#. Consultas nativas en |SQL|.
+|JPQL|, esto es, *Lenguaje de consultas de Persistencia de Java*
+   Las consultas se realizan construyendo sentencias (esto es, cadenas)
+   inspiradas en el lenguaje |SQL|. Es relativamente sencillo de aprender
+   para programadores familiarizados con |SQL|.
+
+*Criteria* |API|
+   Se basa en el uso de clases y métodos que van construyendo la consulta.
+   Es más complicado de aprender, pero mucho más versátil para construir
+   consultas dinámicas durante la ejecución del programa. Si, además, su utiliza
+   :ref:`el Metamodel <orm-jpa-metamodel>` el |IDE| podrá analizar estáticamente
+   los errores de digitalización o de tipos, cosa que es imposible si utilizamos
+   |JPQL|.
+
+Consultas nativas en |SQL|
+   Deberían ser el último recurso, ya que provocan que la aplicación dependa de
+   las particularidades del |SGBD|, lo que desbarata una de las ventajas del uso
+   de una herramienta |ORM|.
 
 Analizaremos cómo realizar las tres.
 
@@ -24,3 +38,7 @@ Analizaremos cómo realizar las tres.
 .. |JPQL| replace:: :abbr:`JPQL (Java Persistence Query Language)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
+.. |API| replace:: :abbr:`API (Application Programming Interface)` 
+.. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)` 
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`

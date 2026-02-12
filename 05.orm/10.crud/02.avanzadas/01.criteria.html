@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.6.2.2. Criteria API &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.6.2.1. Criteria API &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -54,11 +54,11 @@
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/10.crud/02.avanzadas/02.criteria';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/10.crud/02.avanzadas/01.criteria';</script>
     <link rel="index" title="Índice" href="../../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../../search.html" />
-    <link rel="next" title="5.6.2.3. SQL nativo" href="03.nativo.html" />
-    <link rel="prev" title="5.6.2.1. JPQL" href="01.hql.html" />
+    <link rel="next" title="5.6.2.2. JPQL" href="02.jpql.html" />
+    <link rel="prev" title="5.6.2. Avanzadas" href="../02.avanzadas.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   </head>
@@ -208,8 +208,8 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../02.avanzadas.html">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">5.6.2.1. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="02.jpql.html">5.6.2.2. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
@@ -301,7 +301,7 @@
       
       
       
-      <li><a href="../../../_sources/05.orm/10.crud/02.avanzadas/02.criteria.rst" target="_blank"
+      <li><a href="../../../_sources/05.orm/10.crud/02.avanzadas/01.criteria.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -395,13 +395,13 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.2.1. Consulta básica</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.2.2. Metamodel</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.3. Condiciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.4. Ordenación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.5. Agrupación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.6.2.2.6. Relaciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.7. Actualización y borrado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.1.1. Consulta básica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.1.2. Metamodel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.1.3. Condiciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.1.4. Ordenación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.1.5. Agrupación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.6.2.1.6. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.1.7. Actualización y borrado</a></li>
 </ul>
             </nav>
         </div>
@@ -414,7 +414,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="criteria-api">
-<span id="orm-criteria"></span><h1><span class="section-number">5.6.2.2. </span>Criteria API<a class="headerlink" href="#criteria-api" title="Link to this heading">#</a></h1>
+<span id="orm-criteria"></span><h1><span class="section-number">5.6.2.1. </span>Criteria API<a class="headerlink" href="#criteria-api" title="Link to this heading">#</a></h1>
 <p><em>Criteria API</em> es un mecanismo alternativo a <abbr title="Java Persistence Query Language">JPQL</abbr> para escribir consultas, que
 es más verborreico, pero en compensación facilita la construcción dinámica de
 las consultas en tiempo de ejecución, ya que no se basa en una cadena, sino en
@@ -428,7 +428,7 @@ partir del objeto <a class="extlink-jakarta-persistence reference external" href
 que estamos haciendo un <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>) y sobre qué tabla/entidad se quiere hacer la
 consulta. Por ejemplo:</p>
 <section id="consulta-basica">
-<h2><span class="section-number">5.6.2.2.1. </span>Consulta básica<a class="headerlink" href="#consulta-basica" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.1.1. </span>Consulta básica<a class="headerlink" href="#consulta-basica" title="Link to this heading">#</a></h2>
 <p>Empecemos por una consulta <abbr title="Structured Query Language">SQL</abbr> muy básica:</p>
 <div class="highlight-java notranslate" id="orm-criteria-select-all"><div class="highlight"><pre><span></span><span class="linenos">0</span><span class="c1">// SELECT e.* FROM Estudiante e</span>
 <span class="linenos">1</span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// Obtendremos estudiantes.</span>
@@ -461,7 +461,7 @@ entidad <code class="docutils literal notranslate"><span class="pre">Estudiante<
 <span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">[]&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">criteria</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>En este último caso, puede usarse también <a class="reference internal" href="01.hql.html#orm-tuple"><span class="std std-ref">Tuple como en JPQL</span></a>:</p>
+<p>En este último caso, puede usarse también <a class="reference internal" href="02.jpql.html#orm-tuple"><span class="std std-ref">Tuple como en JPQL</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Tuple</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Tuple</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w"> </span><span class="c1">// o cb.createTupleQuery();</span>
 </span><span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="hll"><span class="n">criteria</span><span class="p">.</span><span class="na">select</span><span class="p">(</span><span class="n">cb</span><span class="p">.</span><span class="na">tuple</span><span class="p">(</span>
@@ -524,7 +524,7 @@ adelante lo trataremos <a class="reference internal" href="#orm-criteria-joins">
 </div>
 </section>
 <section id="metamodel">
-<span id="orm-jpa-metamodel"></span><h2><span class="section-number">5.6.2.2.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
+<span id="orm-jpa-metamodel"></span><h2><span class="section-number">5.6.2.1.2. </span>Metamodel<a class="headerlink" href="#metamodel" title="Link to this heading">#</a></h2>
 <p>Para la habilitar la creación del <em>metamodelo</em>, debemos añadir a
 la sección <cite>&lt;build&gt;</cite> de <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code><a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
@@ -595,7 +595,7 @@ comprobación estática de tipos o la refactorización de código.</p>
 </div>
 </section>
 <section id="condiciones">
-<h2><span class="section-number">5.6.2.2.3. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.1.3. </span>Condiciones<a class="headerlink" href="#condiciones" title="Link to this heading">#</a></h2>
 <p><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/criteria/criteriabuilder">CriteriaBuilder</a> tiene definidos métodos que implementan los operadores
 básicos de <abbr title="Structured Query Language">SQL</abbr>. Por ejemplo, para escoger los <strong>estudiantes no matriculados</strong>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
@@ -613,7 +613,7 @@ se almacene en la variable <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="ordenacion">
-<h2><span class="section-number">5.6.2.2.4. </span>Ordenación<a class="headerlink" href="#ordenacion" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.1.4. </span>Ordenación<a class="headerlink" href="#ordenacion" title="Link to this heading">#</a></h2>
 <p>Para ordenar resultados basta con aplicar el orden a <code class="docutils literal notranslate"><span class="pre">criteria</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">CriteriaQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cb</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 <span class="n">Root</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">criteria</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">Estudiante</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
@@ -625,7 +625,7 @@ se almacene en la variable <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="agrupacion">
-<h2><span class="section-number">5.6.2.2.5. </span>Agrupación<a class="headerlink" href="#agrupacion" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.1.5. </span>Agrupación<a class="headerlink" href="#agrupacion" title="Link to this heading">#</a></h2>
 <p>También existe el equivalente a <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">record</span> <span class="nc">CentroCuantos</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">cantidad</span><span class="p">)</span><span class="w"> </span><span class="p">{};</span>
 
@@ -653,7 +653,7 @@ centro:</p>
 </div>
 </section>
 <section id="relaciones">
-<span id="orm-criteria-joins"></span><h2><span class="section-number">5.6.2.2.6. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
+<span id="orm-criteria-joins"></span><h2><span class="section-number">5.6.2.1.6. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
 <p>Como en <abbr title="Java Persistence Query Language">JPQL</abbr> también se puede relacionar fácilmente entidades.</p>
 <p class="rubric">INNER JOIN o, simplemente, JOIN</p>
 <p>Es la relación más sencilla y relaciona dos entidades en las que cada clave foránea
@@ -964,7 +964,7 @@ relacionada con <code class="docutils literal notranslate"><span class="pre">Est
 </div>
 </section>
 <section id="actualizacion-y-borrado">
-<h2><span class="section-number">5.6.2.2.7. </span>Actualización y borrado<a class="headerlink" href="#actualizacion-y-borrado" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.6.2.1.7. </span>Actualización y borrado<a class="headerlink" href="#actualizacion-y-borrado" title="Link to this heading">#</a></h2>
 <p>Al igual que <abbr title="Java Persistence Query Language">JPQL</abbr>, también se puede <strong>actualizar</strong> objetos. Por ejemplo, esto
 desmatricularía a todos los estudiantes cuyo nombre empieza por «J»:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// UPDATE Estudiante SET centro = NULL WHERE nombre LIKE &#39;J%&#39;;</span>
@@ -1037,20 +1037,20 @@ saber por qué.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="01.hql.html"
+       href="../02.avanzadas.html"
        title="página anterior">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">5.6.2.1. </span><abbr title="Java Persistence Query Language">JPQL</abbr></p>
+        <p class="prev-next-title"><span class="section-number">5.6.2. </span>Avanzadas</p>
       </div>
     </a>
     <a class="right-next"
-       href="03.nativo.html"
+       href="02.jpql.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.6.2.3. </span><abbr title="Structured Query Language">SQL</abbr> nativo</p>
+        <p class="prev-next-title"><span class="section-number">5.6.2.2. </span><abbr title="Java Persistence Query Language">JPQL</abbr></p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1070,13 +1070,13 @@ saber por qué.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.2.1. Consulta básica</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.2.2. Metamodel</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.2.3. Condiciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.2.4. Ordenación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.2.5. Agrupación</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.6.2.2.6. Relaciones</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.2.7. Actualización y borrado</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consulta-basica">5.6.2.1.1. Consulta básica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metamodel">5.6.2.1.2. Metamodel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condiciones">5.6.2.1.3. Condiciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordenacion">5.6.2.1.4. Ordenación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agrupacion">5.6.2.1.5. Agrupación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relaciones">5.6.2.1.6. Relaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actualizacion-y-borrado">5.6.2.1.7. Actualización y borrado</a></li>
 </ul>
   </nav></div>
 

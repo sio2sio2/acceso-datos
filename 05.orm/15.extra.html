@@ -208,8 +208,8 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
-<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/01.criteria.html">5.6.2.1. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/02.jpql.html">5.6.2.2. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="10.crud/02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
@@ -442,7 +442,7 @@ inconsistente, por lo que conviene cerrarla y comenzar una nueva.</p></li>
 <p>Una lista no exhaustiva de excepciones es esta:</p>
 <dl class="simple">
 <dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NoResultException">NoResultException</a>, <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/NonUniqueResultException">NonUniqueResultException</a></dt><dd><p>Se producen cuando se espera un único resultado (véase
-<a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-singleresult"><span class="std std-ref">.getSingleResult()</span></a>) y no se obtiene eso.</p>
+<a class="reference internal" href="10.crud/02.avanzadas/02.jpql.html#orm-singleresult"><span class="std std-ref">.getSingleResult()</span></a>) y no se obtiene eso.</p>
 </dd>
 <dt><a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/OptimisticLockException">OptimisticLockException</a></dt><dd><p>Esta relacionada con problemas de concurrencia: se lanza cuando se detecta
 que una entidad se modificó por otra transacción después de haber sido
@@ -700,7 +700,7 @@ pueden bloquer registros individuales.</p>
 </section>
 <section id="optimizacion">
 <span id="orm-optimo"></span><h2><span class="section-number">5.7.4. </span>Optimización<a class="headerlink" href="#optimizacion" title="Link to this heading">#</a></h2>
-<p>Al tratar <a class="reference internal" href="10.crud/02.avanzadas/01.hql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
+<p>Al tratar <a class="reference internal" href="10.crud/02.avanzadas/02.jpql.html#orm-jpql"><span class="std std-ref">JPQL</span></a> y <a class="reference internal" href="10.crud/02.avanzadas/01.criteria.html#orm-criteria"><span class="std std-ref">Criteria API</span></a>
 indicamos que <em>fetch</em> permitía forzar una carga inmediata de las entidades
 relacionadas. Ahora bien, ¿cuál es el comportamiento de <abbr title="Java Persistence API">JPA</abbr> ante las
 relaciones?</p>
@@ -915,7 +915,7 @@ cambiando cualquier otro campo, no hay ningún efecto que reflejar</p>
 </aside>
 <aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
-<p>O casi. En las últimas versiones de <a class="reference external" href="https://hibernate.org/">Hibernate</a>, el <a class="reference internal" href="10.crud/02.avanzadas/02.criteria.html#orm-jpa-metamodel"><span class="std std-ref">procesador de
+<p>O casi. En las últimas versiones de <a class="reference external" href="https://hibernate.org/">Hibernate</a>, el <a class="reference internal" href="10.crud/02.avanzadas/01.criteria.html#orm-jpa-metamodel"><span class="std std-ref">procesador de
 anotaciones</span></a> no es capaz de detectar las clases para las
 que debe generar el metamodelo si no se han anotado con <code class="docutils literal notranslate"><span class="pre">&#64;Entity</span></code>. Véase
 <a class="reference external" href="https://hibernate.atlassian.net/browse/HHH-18722">el bug</a>.</p>

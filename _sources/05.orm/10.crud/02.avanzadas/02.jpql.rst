@@ -7,6 +7,11 @@ campos por objetos y atributos; y abstrae de las particularidades de los
 |SGBD|. Deriva de |HQL|, un lenguaje de consulta que diseñó Hibernate_, por lo
 que sus semejanzas son notorias.
 
+Al margen de ello, comporte muchas de las particularidades internas que ya se
+trataron en *Criteria* |API|, puesto que estas particularidades son propias del
+propio |JPA| y no del lenguaje concreto de consulta que se utilice, por lo que
+bajo este epígrafe no se será tan puntual en las explicaciones.
+
 Consulta básica
 ---------------
 Para obtener todos los elementos de un relación basta hacer:
@@ -15,7 +20,7 @@ Para obtener todos los elementos de un relación basta hacer:
    :name: orm-jpql-select-all
 
    // Construimos la consulta.
-   TypedQuery<Centro> query = em.createQuery("FROM Centro", Centro.class);
+   TypedQuery<Centro> query = em.createQuery("SELECT c FROM Centro c", Centro.class);
    // Obtenemos resultados.
    List<Centro> centros = query.getResultList();
 
@@ -23,8 +28,8 @@ donde la palabra *Centro* en la cadena no es el nombre de la tabla,
 sino el nombre de la clase ``Centro`` que, en este caso, coinciden.
 Recordemos que el lenguaje hace referencia a objetos y atributos.
 
-.. note:: La cadena también podría haber sido ":code:`SELECT c FROM
-   Centro c`"
+.. note:: Para esta consulta tan simple, se puede usar la cadena abreviada
+   ":code:`FROM Centro`"
 
 El segundo argumento de ``.createQuery`` permite tipar el resultado de la
 consulta (objetos ``Centro`` en este caso).
@@ -355,6 +360,7 @@ actualización y borrado:
 .. [#] Aunque, todo hay que decirlo, implementan pocos |SGBD|. Lo habitual es
    que refieran esto como :code:`LIMIT n OFFSET i`.
 
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Replace, Update, Delete)`
 .. |HQL| replace:: :abbr:`HQL (Hibernate Query Language)`

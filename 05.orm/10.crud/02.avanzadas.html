@@ -57,7 +57,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/10.crud/02.avanzadas';</script>
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
-    <link rel="next" title="5.6.2.1. JPQL" href="02.avanzadas/01.hql.html" />
+    <link rel="next" title="5.6.2.1. Criteria API" href="02.avanzadas/01.criteria.html" />
     <link rel="prev" title="5.6.1. Simples" href="01.simples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -208,8 +208,8 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">5.6.2. Avanzadas</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
-<li class="toctree-l4"><a class="reference internal" href="02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="02.avanzadas/01.criteria.html">5.6.2.1. Criteria API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="02.avanzadas/02.jpql.html">5.6.2.2. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l4"><a class="reference internal" href="02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </details></li>
@@ -404,16 +404,28 @@ básicas y no cubren con seguridad todas las necesidades que se nos presenten en
 la aplicación (p.e. obtener la lista completa de objetos de un mismo tipo). Para
 operaciones más avanzadas (especialmente de lectura), <abbr title="Java Persistence API">JPA</abbr> ofrece tres
 alternativas:</p>
-<ol class="arabic simple">
-<li><p><abbr title="Java Persistence Query Language">JPQL</abbr>, esto es, <em>Lenguaje de consultas de Persistencia de Java</em>.</p></li>
-<li><p><em>Criteria API</em></p></li>
-<li><p>Consultas nativas en <abbr title="Structured Query Language">SQL</abbr>.</p></li>
-</ol>
+<dl class="simple">
+<dt><abbr title="Java Persistence Query Language">JPQL</abbr>, esto es, <em>Lenguaje de consultas de Persistencia de Java</em></dt><dd><p>Las consultas se realizan construyendo sentencias (esto es, cadenas)
+inspiradas en el lenguaje <abbr title="Structured Query Language">SQL</abbr>. Es relativamente sencillo de aprender
+para programadores familiarizados con <abbr title="Structured Query Language">SQL</abbr>.</p>
+</dd>
+<dt><em>Criteria</em> <abbr title="Application Programming Interface">API</abbr></dt><dd><p>Se basa en el uso de clases y métodos que van construyendo la consulta.
+Es más complicado de aprender, pero mucho más versátil para construir
+consultas dinámicas durante la ejecución del programa. Si, además, su utiliza
+<a class="reference internal" href="02.avanzadas/01.criteria.html#orm-jpa-metamodel"><span class="std std-ref">el Metamodel</span></a> el <abbr title="Integrated Development Environment">IDE</abbr> podrá analizar estáticamente
+los errores de digitalización o de tipos, cosa que es imposible si utilizamos
+<abbr title="Java Persistence Query Language">JPQL</abbr>.</p>
+</dd>
+<dt>Consultas nativas en <abbr title="Structured Query Language">SQL</abbr></dt><dd><p>Deberían ser el último recurso, ya que provocan que la aplicación dependa de
+las particularidades del <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, lo que desbarata una de las ventajas del uso
+de una herramienta <abbr title="Object-Relational Mapping">ORM</abbr>.</p>
+</dd>
+</dl>
 <p>Analizaremos cómo realizar las tres.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="02.avanzadas/01.hql.html">5.6.2.1. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
-<li class="toctree-l1"><a class="reference internal" href="02.avanzadas/02.criteria.html">5.6.2.2. Criteria API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.avanzadas/01.criteria.html">5.6.2.1. Criteria API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.avanzadas/02.jpql.html">5.6.2.2. <abbr title="Java Persistence Query Language">JPQL</abbr></a></li>
 <li class="toctree-l1"><a class="reference internal" href="02.avanzadas/03.nativo.html">5.6.2.3. <abbr title="Structured Query Language">SQL</abbr> nativo</a></li>
 </ul>
 </div>
@@ -440,11 +452,11 @@ alternativas:</p>
       </div>
     </a>
     <a class="right-next"
-       href="02.avanzadas/01.hql.html"
+       href="02.avanzadas/01.criteria.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">5.6.2.1. </span><abbr title="Java Persistence Query Language">JPQL</abbr></p>
+        <p class="prev-next-title"><span class="section-number">5.6.2.1. </span>Criteria API</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

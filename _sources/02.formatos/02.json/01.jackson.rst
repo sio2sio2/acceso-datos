@@ -460,7 +460,7 @@ en la propia librería. Sin embargo, nos sirve para ilustrarlo:
        
        public static DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-       public static class DateSerializer extends JsonSerializer<LocalDate> {
+       public static class DateSerializer extends ValueSerializer<LocalDate> {
 
            @Override
            public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider sp) 
@@ -470,7 +470,7 @@ en la propia librería. Sin embargo, nos sirve para ilustrarlo:
            }
        }
 
-       public static class DateDeserializer extends JsonDeserializer<Date> {
+       public static class DateDeserializer extends ValueDeserializer<LocalDate> {
 
            @Override
            public Date deserialize(JsonParser parser, DeserializationContext context)

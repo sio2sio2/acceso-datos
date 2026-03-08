@@ -421,6 +421,13 @@ en la base de datos.</p>
 las particularidades del acceso a datos estén reducidas a un paquete dentro de
 la aplicación (p.ej. llamado <em>backend</em>), fuera del cual no haya otra cosa que
 objetos.</p>
+<p>A este respecto, podríamos estar tentados de usar el <em>antipatrón</em> <a class="reference external" href="https://linearb.io/blog/what-is-a-god-class">God Class</a>,
+pero este sólo no no dará quebraderos de cabeza en aplicaciones muy simples que
+no se prevee que crezcan en el futuro.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Por hacer</p>
+<p>SEGUIR corrigiendo todo este apartado.</p>
+</div>
 <section id="patron-dao">
 <h2><span class="section-number">4.6.1. </span>Patrón <abbr title="Data Access Object">DAO</abbr><a class="headerlink" href="#patron-dao" title="Link to this heading">#</a></h2>
 <p>Uno de los patrones más usados para lograr la abstracción es el <a class="reference external" href="https://www.baeldung.com/java-dao-pattern">patrón DAO</a>, que se carga de tomar los objetos
@@ -659,7 +666,7 @@ de objeto que quiera almacenarse en la base de datos. En nuestro ejemplo, se
 particularizará para <a class="reference internal" href="01.basico.html#clase-centro"><span class="std std-ref">Centro</span></a> y para <a class="reference internal" href="#clase-estudiante"><span class="std std-ref">Estudiante</span></a>.</p>
 <p>Llegamos por fin a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, tres clases: una que abstraiga del
-establecimiento de la conexión, que bien podría ser <a class="reference internal" href="10.extras.html#connectionpool"><span class="std std-ref">ConnectionPool</span></a> ) (o una clase más específica de nuestra aplicación que
+establecimiento de la conexión, que bien podría ser <a class="reference internal" href="10.extras.html#conn-pool-extra"><span class="std std-ref">ConnectionPool</span></a> ) (o una clase más específica de nuestra aplicación que
 la use), y otra por cada una de las clases del modelo:</p>
 <div class="pst-scrollable-table-container"><table class="table" id="clase-dao">
 <thead>
@@ -722,8 +729,8 @@ cierres accidentales ya que del cierre se encarga en exclusiva el propio gestor
 al cerrar la transacción. En conclusión, que nos usarlo en nuestra
 implementación del patrón <abbr title="Data Access Object">DAO</abbr>. Para simplificar las cosas definamos un <abbr title="Data Access Object">DAO</abbr>
 abstracto del que deriven los <abbr title="Data Access Object">DAO</abbr> para cada objeto:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">BaseDao</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Entity</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
@@ -740,7 +747,7 @@ abstracto del que deriven los <abbr title="Data Access Object">DAO</abbr> para c
 </div>
 </div>
 <p>Es decir, construimos las clases <abbr title="Data Access Object">DAO</abbr> pasando la clave que identifica al
-<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> (en realidad, el objeto <a class="reference internal" href="10.extras.html#connectionpool"><span class="std std-ref">ConnectionPool</span></a>) que nos
+<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> (en realidad, el objeto <a class="reference internal" href="10.extras.html#conn-pool-extra"><span class="std std-ref">ConnectionPool</span></a>) que nos
 interesa; y, como ya adelantamos, la conexión la obtenemos del gestor de
 transacciones.</p>
 <div class="admonition caution">

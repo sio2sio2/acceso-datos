@@ -624,7 +624,7 @@ consideraciones:</p>
 <ol class="arabic">
 <li><p>Al margen de lo anterior, las anotaciones suelen ser necesarias en <abbr title="eXtensible Markup Language">XML</abbr>
 porque en este formato la información se proporciona mediante nodos
-elementos, pero también i mediante nodos atributo. En cambio, en el modelo de
+elementos, pero también mediante nodos atributo. En cambio, en el modelo de
 objetos sólo existen los atributos del objeto. Por tanto, debe existir un
 modo de indicar cuándo quiere mapearse un atributo de objeto a elemento y
 cuando a atributo <abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
@@ -633,7 +633,7 @@ especificar en qué orden queremos que se escriban los atributos si estos
 generan nodos elemento. Se verá más adelante.</p></li>
 <li><p><abbr title="eXtensible Markup Language">XML</abbr> introduce otra dificultad: en <abbr title="JavaScript Object Notation">JSON</abbr> una secuencia o es el elemento
 raíz o el valor de un campo. En cambio, en <abbr title="eXtensible Markup Language">XML</abbr> la casuística es distinta,
-porque no existen las secuencias por se, lo que existen son los nodos
+porque no existen las secuencias <em>per se</em>, lo que existen son los nodos
 elemento que contiene varios nodos elementos del mismo tipo. De este modo nos
 podemos encontrar con:</p>
 <ul>
@@ -702,9 +702,9 @@ anotación <code class="docutils literal notranslate"><span class="pre">&#64;Jso
 <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>. De hecho, se ha mantenido la anotación
 <code class="docutils literal notranslate"><span class="pre">&#64;JsonProperty</span></code> en previsión de que se quisiera también traducir a <abbr title="JavaScript Object Notation">JSON</abbr>, si
 no es el caso, se puede eliminar por completo. La información, además, se
-muestra en forma de nodo atributo, por lo es necesario especificarlo usando
+muestra en forma de nodo atributo, por lo que es necesario especificarlo usando
 también <code class="docutils literal notranslate"><span class="pre">&#64;JacksonXmlProperty</span></code>. Por otro lado, la anotación <code class="docutils literal notranslate"><span class="pre">&#64;JsonFormat</span></code> no
-es ninguna novedad: ya la necesitamos en <abbr title="JavaScript Object Notation">JSON</abbr> para definir cómo escibir la
+es ninguna novedad: ya la necesitamos en <abbr title="JavaScript Object Notation">JSON</abbr> para definir cómo escribir la
 fecha como cadena.</p>
 <p>Pasemos a <code class="docutils literal notranslate"><span class="pre">Grupo</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="nd">@JsonRootName</span><span class="p">(</span><span class="s">&quot;grupo&quot;</span><span class="p">)</span>
@@ -884,7 +884,7 @@ igual que <a class="reference internal" href="../02.formatos/02.json/01.jackson.
 <span class="w">   </span><span class="p">})</span>
 <span class="p">};</span>
 
-<span class="n">XmlFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmLFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="n">XmlFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">XmlFactory</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 <span class="w">   </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">XmlWriteFeature</span><span class="p">.</span><span class="na">WRITE_XML_DECLARATION</span><span class="p">)</span>
 <span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
@@ -931,7 +931,7 @@ lectura del formato es <a class="reference internal" href="../02.formatos/02.jso
 <span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
 <span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newInputStream</span><span class="p">(</span><span class="n">ruta</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">Grupos</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">GruposWrapper</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">grupos</span><span class="p">;</span>
+<span class="w">   </span><span class="n">Grupo</span><span class="o">[]</span><span class="w"> </span><span class="n">grupos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="w"> </span><span class="n">GruposWrapper</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">grupos</span><span class="p">;</span>
 <span class="w">   </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">grupos</span><span class="p">);</span>
 <span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">JacksonIOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">err</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>

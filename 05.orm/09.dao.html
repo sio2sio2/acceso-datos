@@ -424,6 +424,11 @@ Podemos proponer ésta como casi calco de <span class="xref std std-ref">Connect
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">JpaBackend</span><span class="o">&gt;</span><span class="w"> </span><span class="n">entities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Almacena el {@link EntityManager} actual para cada hilo.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">entityManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">;</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="w"> </span><span class="n">closed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
@@ -442,7 +447,7 @@ Podemos proponer ésta como casi calco de <span class="xref std std-ref">Connect
 <span class="cm">     * @param persistenceUnit El nombre de la unidad de persistencia.</span>
 <span class="cm">     * @param props El mapa que define las propiedades definidas en tiempo de ejecución.</span>
 <span class="cm">     * @return La instancia de {@link JpaBackend} creada.</span>
-<span class="cm">     * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.</span>
+<span class="cm">     * @throws NullPointerException Si el nombre de la unidad de persistencia es nulo.</span>
 <span class="cm">     * @throws IllegalStateException Si ya existe una instancia con esos parámetros.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">JpaBackend</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">persistenceUnit</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -520,11 +525,15 @@ Podemos proponer ésta como casi calco de <span class="xref std std-ref">Connect
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">transactionR</span><span class="p">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">EntityManager</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La fábrica de gestores de entidad está cerrada&quot;</span><span class="p">);</span>
 
+<span class="w">        </span><span class="c1">// Ya hay una transacción abierta, así que se reutiliza.</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">entityManager</span><span class="p">.</span><span class="na">get</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">getEntityManager</span><span class="p">());</span>
+
 <span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emf</span><span class="p">.</span><span class="na">createEntityManager</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">entityManager</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
 <span class="w">            </span><span class="n">EntityTransaction</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">getTransaction</span><span class="p">();</span>
 <span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="n">tx</span><span class="p">.</span><span class="na">begin</span><span class="p">();</span>
-<span class="w">                </span><span class="n">T</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">em</span><span class="p">);</span>
+<span class="w">                </span><span class="n">T</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">getEntityManager</span><span class="p">());</span>
 <span class="w">                </span><span class="n">tx</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span>
 <span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
 <span class="w">            </span><span class="p">}</span>
@@ -534,7 +543,10 @@ Podemos proponer ésta como casi calco de <span class="xref std std-ref">Connect
 <span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">PersistenceException</span><span class="w"> </span><span class="n">pe</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">addSuppressed</span><span class="p">(</span><span class="n">pe</span><span class="p">);</span>
 <span class="w">                </span><span class="p">}</span>
-<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Fallo en la transacción&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">PersistenceException</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="n">PersistenceException</span><span class="p">)</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PersistenceException</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">(),</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">entityManager</span><span class="p">.</span><span class="na">remove</span><span class="p">();</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
@@ -568,6 +580,22 @@ Podemos proponer ésta como casi calco de <span class="xref std std-ref">Connect
 <span class="w">        </span><span class="n">get</span><span class="p">(</span><span class="n">persistenceUnit</span><span class="p">).</span><span class="na">transaction</span><span class="p">(</span><span class="n">action</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="c1">// Fin transacciones.</span>
+
+<span class="w">    </span><span class="c1">// TODO:: Debería envolverse en un wrapper que impida su cierre manual con close().</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Devuelve el {@link EntityManager} asociado al hilo actual.</span>
+<span class="cm">     * </span>
+<span class="cm">     * Tiene la limitación de que NO debería cerrarse manualmente, ya que se gestiona automáticamente.</span>
+<span class="cm">     * @return El {@link EntityManager} solicitado.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">EntityManager</span><span class="w"> </span><span class="nf">getEntityManager</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La fábrica de gestores de entidad está cerrada&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entityManager</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">em</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No hay ningún gestor de entidad. Debe ejecutarse dentro de una transacción.&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">em</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>

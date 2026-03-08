@@ -46,7 +46,7 @@ consideraciones:
 
 #. Al margen de lo anterior, las anotaciones suelen ser necesarias en |XML|
    porque en este formato la información se proporciona mediante nodos
-   elementos, pero también i mediante nodos atributo. En cambio, en el modelo de
+   elementos, pero también mediante nodos atributo. En cambio, en el modelo de
    objetos sólo existen los atributos del objeto. Por tanto, debe existir un
    modo de indicar cuándo quiere mapearse un atributo de objeto a elemento y
    cuando a atributo |XML|.
@@ -57,7 +57,7 @@ consideraciones:
 
 #. |XML| introduce otra dificultad: en |JSON| una secuencia o es el elemento
    raíz o el valor de un campo. En cambio, en |XML| la casuística es distinta,
-   porque no existen las secuencias por se, lo que existen son los nodos
+   porque no existen las secuencias *per se*, lo que existen son los nodos
    elemento que contiene varios nodos elementos del mismo tipo. De este modo nos
    podemos encontrar con:
 
@@ -133,9 +133,9 @@ anotación ``@JsonProperty`` (que sobra totalmente), sino de
 ``@JacksonXmlProperty``. De hecho, se ha mantenido la anotación
 ``@JsonProperty`` en previsión de que se quisiera también traducir a |JSON|, si
 no es el caso, se puede eliminar por completo. La información, además, se
-muestra en forma de nodo atributo, por lo es necesario especificarlo usando
+muestra en forma de nodo atributo, por lo que es necesario especificarlo usando
 también ``@JacksonXmlProperty``. Por otro lado, la anotación ``@JsonFormat`` no
-es ninguna novedad: ya la necesitamos en |JSON| para definir cómo escibir la
+es ninguna novedad: ya la necesitamos en |JSON| para definir cómo escribir la
 fecha como cadena.
 
 Pasemos a ``Grupo``:
@@ -337,7 +337,7 @@ igual que :ref:`la escritura en el caso de JSON <json-jackson-write>`:
       })
    };
    
-   XmlFactory factory = XmLFactory.builder()
+   XmlFactory factory = XmlFactory.builder()
       .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
       .build();
 
@@ -390,7 +390,7 @@ lectura del formato es :ref:`prácticamente la misma que para JSON <json-jackson
    ObjectMapper mapper = builder.build();
 
    try (InputStream st = Files.newInputStream(ruta)) {
-      Grupos[] grupos = mapper.readValue(st, GruposWrapper.class).grupos;
+      Grupo[] grupos = mapper.readValue(st, GruposWrapper.class).grupos;
       System.out.println(grupos);
    } catch(JacksonIOException | IOException err) {
       err.printStackTrace();

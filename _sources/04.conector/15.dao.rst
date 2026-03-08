@@ -15,9 +15,14 @@ las particularidades del acceso a datos estén reducidas a un paquete dentro de
 la aplicación (p.ej. llamado *backend*), fuera del cual no haya otra cosa que
 objetos.
 
+A este respecto, podríamos estar tentados de usar el *antipatrón* `God Class`_,
+pero este sólo no no dará quebraderos de cabeza en aplicaciones muy simples que
+no se prevee que crezcan en el futuro.
+
+.. todo:: SEGUIR corrigiendo todo este apartado.
+
 Patrón |DAO|
 ============
-
 Uno de los patrones más usados para lograr la abstracción es el `patrón DAO
 <https://www.baeldung.com/java-dao-pattern>`_, que se carga de tomar los objetos
 de la capa de negocio y transladarlos al soporte de persistencia o viceversa.
@@ -94,7 +99,7 @@ particularizará para :ref:`Centro <clase-centro>` y para :ref:`Estudiante
 Llegamos por fin a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, tres clases: una que abstraiga del
 establecimiento de la conexión, que bien podría ser :ref:`ConnectionPool
-<ConnectionPool>` ) (o una clase más específica de nuestra aplicación que
+<conn-pool-extra>` ) (o una clase más específica de nuestra aplicación que
 la use), y otra por cada una de las clases del modelo:
 
 .. table::
@@ -160,7 +165,7 @@ abstracto del que deriven los |DAO| para cada objeto:
    :start-at: public abstract class
 
 Es decir, construimos las clases |DAO| pasando la clave que identifica al
-|DataSource| (en realidad, el objeto :ref:`ConnectionPool <ConnectionPool>`) que nos
+|DataSource| (en realidad, el objeto :ref:`ConnectionPool <conn-pool-extra>`) que nos
 interesa; y, como ya adelantamos, la conexión la obtenemos del gestor de
 transacciones.
 
@@ -259,3 +264,5 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
 .. |SQLException| replace:: :java-sql:`SQLException <SQLException>`
 .. |Consumer| replace:: :java-function:`Consumer <Consumer>`
+
+.. _God Class: https://linearb.io/blog/what-is-a-god-class

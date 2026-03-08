@@ -86,7 +86,7 @@ hacer diversas pesquisas:
    .. code-block:: java
 
       // apelativo es una variable que contiene el elemento apelativo antedicho
-      apelativo.getTextContent().equals(apelativo.firstChild().getNodeValue());
+      apelativo.getTextContent().equals(apelativo.getFirstChild().getNodeValue());
 
 ``getFirstChild()`` o ``getLastChild()``
    Devuelve el primero o el último **nodo** hijo de aquel. Se ha remarcado nodo,
@@ -258,7 +258,7 @@ podemos seleccionar nodos usando esta tecnología:
 
 .. code-block:: java
 
-   XPath xPath = XPathFactory.newInstance().newXPath();
+   XPath xpath = XPathFactory.newInstance().newXPath();
 
    XPathExpression expresion = xpath.compile("//profesor[@casillero]");
    // xml es el Document del ejemplo anterior.
@@ -271,13 +271,13 @@ si nuestra intención es usarla una sola vez:
 
 .. code-block:: java
 
-   Element profesor = (Element) xPath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); // Mejor que NODESET, porque sabemos que es único
+   Element profesor = (Element) xpath.evaluate("//profesor[@id='p81']", xml, XPathConstants.NODE); // Mejor que NODESET, porque sabemos que es único
    System.out.println(profesor.getTagName());  // profesor
    
-   String apelativo = (String) xPath.evaluate("//profesor[@id='p81']/apelativo", xml, XPathConstants.STRING); 
+   String apelativo = (String) xpath.evaluate("//profesor[@id='p81']/apelativo", xml, XPathConstants.STRING); 
    System.out.println(apelativo);  // Verónica
 
-   int cantidad = ((Double) xPath.evaluate("count(//profesor)", xml, XPathConstants.NUMBER)).intValue();
+   int cantidad = ((Double) xpath.evaluate("count(//profesor)", xml, XPathConstants.NUMBER)).intValue();
    System.out.println(cantidad);
 
 .. _jaxp-dtd:
@@ -325,7 +325,7 @@ Definido, podremos usarlo en el *builder* antes de procesar el documento:
    modo. Puede pasarse un |String| o un |File| en cuyo caso
    sí se sabrá ``baseURI``. En cambio, si se pasa un |InputStream| (que es
    *precisamente la forma en la que hemos ilustrado el uso*) no hay modo de
-   conocer su valor y, en consencuencia, será ``null``. Eso sí, en este último
+   conocer su valor y, en consecuencia, será ``null``. Eso sí, en este último
    caso, se admite un segundo argumento con una cadena que defina ``baseURI``.
 
 ¿Qué hace exactamente el código que hemos propuesto? En principio, si
@@ -344,7 +344,7 @@ si la ruta es relativa, hace una distinción:
 .. tip:: El argumento del constructor de `InputSource` también puede ser un
    :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
    escupa nunca un error (incluso aunque el |DTD| de la declaración no se
-   encuentre), podemos hacer hacer lo siguiente:
+   encuentre), podemos hacer lo siguiente:
 
    .. code-block:: java
 

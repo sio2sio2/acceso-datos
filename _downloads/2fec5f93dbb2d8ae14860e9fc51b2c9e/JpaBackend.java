@@ -1,3 +1,18 @@
+package edu.acceso.examen4_i.backend;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
+
 /**
  * Gestiona múltiples instancias de {@link EntityManagerFactory}.
  * Utiliza el patrón Multiton para crear instancias únicas asociadas al nombre de la unidad de persistencia.
@@ -8,6 +23,11 @@ public class JpaBackend implements AutoCloseable {
      * Mapa que asocia las unidades de persistencias con los objetos {@link EntityManagerFactory} generados.
      */
     private static Map<String, JpaBackend> entities = new ConcurrentHashMap<>();
+
+    /**
+     * Almacena el {@link EntityManager} actual para cada hilo.
+     */
+    private static ThreadLocal<EntityManager> entityManager = new ThreadLocal<>();
 
     private final EntityManagerFactory emf;
     private final String persistenceUnit;
@@ -27,7 +47,7 @@ public class JpaBackend implements AutoCloseable {
      * @param persistenceUnit El nombre de la unidad de persistencia.
      * @param props El mapa que define las propiedades definidas en tiempo de ejecución.
      * @return La instancia de {@link JpaBackend} creada.
-     * @throws IllegalArgumentException Si el nombre de la unidad de persistencia es nulo.
+     * @throws NullPointerException Si el nombre de la unidad de persistencia es nulo.
      * @throws IllegalStateException Si ya existe una instancia con esos parámetros.
      */
     public static JpaBackend create(String persistenceUnit, Map<String, String> props) {
@@ -105,11 +125,15 @@ public class JpaBackend implements AutoCloseable {
     public <T> T transactionR(Function<EntityManager, T> action) {
         if(!isOpen()) throw new IllegalStateException("La fábrica de gestores de entidad está cerrada");
 
+        // Ya hay una transacción abierta, así que se reutiliza.
+        if(entityManager.get() != null) return action.apply(getEntityManager());
+
         try(EntityManager em = emf.createEntityManager()) {
+            entityManager.set(em);
             EntityTransaction tx = em.getTransaction();
             try {
                 tx.begin();
-                T result = action.apply(em);
+                T result = action.apply(getEntityManager());
                 tx.commit();
                 return result;
             }
@@ -119,7 +143,10 @@ public class JpaBackend implements AutoCloseable {
                 } catch(PersistenceException pe) {
                     e.addSuppressed(pe);
                 }
-                throw new RuntimeException("Fallo en la transacción", e);
+                throw e instanceof PersistenceException ? (PersistenceException) e : new PersistenceException(e.getMessage(), e);
+            }
+            finally {
+                entityManager.remove();
             }
         }
     }
@@ -153,4 +180,20 @@ public class JpaBackend implements AutoCloseable {
         get(persistenceUnit).transaction(action);
     }
     // Fin transacciones.
+
+    // TODO:: Debería envolverse en un wrapper que impida su cierre manual con close().
+    /**
+     * Devuelve el {@link EntityManager} asociado al hilo actual.
+     * 
+     * Tiene la limitación de que NO debería cerrarse manualmente, ya que se gestiona automáticamente.
+     * @return El {@link EntityManager} solicitado.
+     */
+    public EntityManager getEntityManager() {
+        if(!isOpen()) throw new IllegalStateException("La fábrica de gestores de entidad está cerrada");
+
+        EntityManager em = entityManager.get();
+        if(em == null) throw new IllegalStateException("No hay ningún gestor de entidad. Debe ejecutarse dentro de una transacción.");
+
+        return em;
+    }
 }

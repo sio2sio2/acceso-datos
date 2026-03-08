@@ -470,12 +470,12 @@ incluirla en <code class="file docutils literal notranslate"><span class="pre">p
 </div>
 <p><em>Maven</em> es inteligente, así que si una dependencia, a su vez, requiere
 de otras dependencias, descargará todas, sin la necesidad de declarar todo el
-árbol dependencias explícitamente en nuestro archivo.</p>
+árbol de dependencias explícitamente en nuestro archivo.</p>
 <p>La página tiene un buscador y puede buscarse a través de él la librería. La del
-ejemplo se haya en la dirección <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">persistence-api</a>,
+ejemplo se halla en la dirección <a class="reference external" href="https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api">persistence-api</a>,
 y escogiendo la versión deseada, se obtiene el código exacto que debe añadirse
 al archivo. Las librerías, además, pueden a su vez contener dependencias, pero
-se calculan si necesidad de incluirlas explícitamente.</p>
+se calculan sin necesidad de incluirlas explícitamente.</p>
 <p>La suborden asociada a la obtención de dependencias es:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>dependency:resolve
 <span class="gp">$ </span>mvn<span class="w"> </span>dependency:tree<span class="w">         </span><span class="c1"># Muestra el árbol de dependencias.</span>
@@ -533,7 +533,7 @@ más modernas. Puede hacerse como una propiedad:</p>
 <span class="nt">&lt;/properties&gt;</span>
 </pre></div>
 </div>
-<p>o directamente configurando explíciamente el <em>plugin</em> (que en principio no
+<p>o directamente configurando explícitamente el <em>plugin</em> (que en principio no
 necesita ser declarado):</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;build&gt;</span>
 <span class="w">    </span><span class="nt">&lt;plugins&gt;</span>
@@ -575,7 +575,7 @@ mantener compatibilidad con un <abbr title="Java Development Kit">JDK</abbr> ant
 <h2><span class="section-number">5.4. </span>Pruebas<a class="headerlink" href="#pruebas" title="Link to this heading">#</a></h2>
 <p>El código que prueba la aplicación debe escribirse bajo <code class="file docutils literal notranslate"><span class="pre">src/test/</span></code> con
 la misma estructura que se uso en <code class="file docutils literal notranslate"><span class="pre">src/main/</span></code>.</p>
-<p>Las subórdenes asociadas a esta fases son:</p>
+<p>Las subórdenes asociadas a esta fase son:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span><span class="nb">test</span><span class="w">              </span><span class="c1"># Compila todo el código (principal y pruebas) y ejecuta las pruebas</span>
 <span class="gp">$ </span>mvn<span class="w"> </span>test-compile<span class="w">      </span><span class="c1"># Sólo compila las pruebas sin llegar a ejecutarlas.</span>
 </pre></div>
@@ -598,7 +598,7 @@ consulte este <a class="reference external" href="https://gist.github.com/sio2si
 <p>Al crear un nuevo proyecto, <em>Maven</em> define su estructura inicial tomando como
 referencia lo que se llama un arquetipo (o ninguno). Como es probable que para
 resolver las tareas del módulo partamos siempre de una misma base, nos ahorrará
-mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.</p>
+mucho tiempo crear un arquetipo personal, así que pongámonos a ello.</p>
 <p>Lo primero es crear un arquetipo en un directorio:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mvn<span class="w"> </span>archetype:generate<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>-DgroupId<span class="o">=</span>edu.acceso.arquetipo<span class="w"> </span><span class="se">\</span>
@@ -621,7 +621,7 @@ mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.</p>
      |               |                         +-- main/
      |               |                               + java/ # ¡Atención!
      |               |                               |   +-- Main.java
-     |               |                               + resource&amp;/
+     |               |                               + resource/
      |               |
      |               +-- META-INF/maven/
      |                               +-- archetype-metadata.xml
@@ -630,7 +630,7 @@ mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.</p>
 </pre></div>
 </div>
 <p>Como no nos interesan las pruebas podemos eliminar <code class="file docutils literal notranslate"><span class="pre">src/test/</span></code> y debemos
-centrarmos en:</p>
+centrarnos en:</p>
 <ol class="arabic simple">
 <li><p>El <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code> del propio arquetipo.</p></li>
 <li><p>El contenido de <code class="file docutils literal notranslate"><span class="pre">src/main/resources/archetype-resources/</span></code> que contiene
@@ -734,7 +734,7 @@ arquetipo no interfiera.</p>
 <span class="gp">$ </span>cat<span class="w"> </span>~/.m2/repository/archetype-catalog.xml<span class="w">              </span><span class="c1"># Comprobamos el registro.</span>
 </pre></div>
 </div>
-<p>En caso de que quisiéramos eliminarlo podríamo eliminar a mano:</p>
+<p>En caso de que quisiéramos eliminarlo, podríamos eliminar a mano:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rm<span class="w"> </span>-rf<span class="w"> </span>~/.m2/repository/edu/acceso/arquetipo/acceso_datos/
 <span class="gp">$ </span>mvn<span class="w"> </span>archetype:crawl
 </pre></div>

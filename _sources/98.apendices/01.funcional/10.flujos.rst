@@ -9,7 +9,7 @@ al aplicar sobre ellas alguna operación:
 
    Stream<Integer> st = Stream.of(1, 2, 3 ,4);
    st.count(); // 4
-   st.count(); // Lo consuminos contando antes, así que se produce un IllegalStateException
+   st.count(); // Lo consumimos contando antes, así que se produce un IllegalStateException
 
 Una de sus características fundamentales es que nos permiten implementar las
 típicas operaciones (`map
@@ -69,7 +69,7 @@ Algunos son:
 ``forEach(Consumer<T> action)``
    que aplica la acción a cada elemento del flujo consumiéndolo por completo
    (como el equivalente para colecciones). Si prefiriésemos consumir el flujo
-   iterando con un bucle, podríamos interpretarlo como un un iterable\ [#]_:
+   iterando con un bucle, podríamos interpretarlo como un iterable\ [#]_:
 
    .. code-block:: java
 
@@ -95,11 +95,11 @@ Algunos son:
    filtro.
 
 ``map(Function<T, R> transformador)``
-   que genera un nuevo flujo en el que los elemento se generan aplicando la
+   que genera un nuevo flujo en el que los elementos se generan aplicando la
    función transformadora a cada elemento del flujo original.
 
 ``reduce(T identity, BinaryOperator<T> accumulator)``
-   que obtiene un valor aplicando acomulativamente la operación proporcionada en
+   que obtiene un valor aplicando acumulativamente la operación proporcionada en
    el segundo argumento. Como valor inicial se usa, el apartado en el primer
    argumento:
 

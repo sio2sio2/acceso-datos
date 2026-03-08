@@ -10,7 +10,7 @@ Como entorno de desarrollo para el seguimiento del módulo recomendamos `Visual
 Studio Code`_, por varios motivos:
 
 * Es *software* libre (`licencia MIT <https://es.wikipedia.org/wiki/Licencia_MIT>`_) y
-  está dispoible para su descarga gratuita en su página web y su código fuente
+  está disponible para su descarga gratuita en su página web y su código fuente
   en `su página de GitHub <https://github.com/microsoft/vscode>`_.
 * Está especialmente diseñado para la escritura de código y dispone de
   innumerables extensión que le dan soporte para muchos lenguajes de
@@ -602,10 +602,26 @@ Obviamente, para programar en *Java*, sea con :program:`Visual Studio Code` o
 con cualquier otro |IDE|, debemos tener instalado |JDK| (o sea, el *paquete de
 desarrollo para Java*). Lo más juicioso en este caso es usar la versión
 desarrollada por OpenJDK_, que publica para distintas plataformas y sistemas
-operativos. En los sistemas *Linux* sus versiones son las versiones de
-referencia\ [#]_, así que podremos instalarla mediante el sistema de paquetería;
-mientras que en *Windows* podemos utilizar los instalables que nos ofrece
-`Adoptium <https://adoptium.net/>`_.
+operativos:
+
++ En los sistemas *Windows* podemos utilizar los instalables que nos ofrece
+  `Adoptium <https://adoptium.net/>`_.
+
++ En los sistemas *Linux* sus versiones son las versiones de referencia, así que
+  podremos instalarla mediante el sistema de paquetería. En particular, en los
+  sistemas basados en *Debian*, hay dos sabores que apuntan a la última versión
+  |LTS|:
+
+  - *default-jdk* (o *default-jre*, si nuestra intención no es desarrollar) que
+    incluyen el soporte completo.
+  - *default-jdk-headless* (o *default-jre-headless*), que excluye el soporte
+    para aplicaciones gráficas.
+
+
+.. note:: *Java* tiene un frecuencia de actualización de 6 meses: cada marzo y
+   septiembre aparece una nueva versión del lenguaje. Sin embargo, sólo algunas
+   de estas versiones son versiones |LTS|. La regla general es que deberíamos
+   intentar usar la última de estas versiones.
 
 Configuración previa
 --------------------
@@ -1169,10 +1185,6 @@ nuestro propósito.
    nivel de perfil, pero la segunda debería ser más propia del nivel de área de
    trabajo.
 
-.. [#] En *Debian*, por ejemplo, los paquetes :deb:`default-jre` y
-   :deb:`default-jdk` apuntan a los paquetes creados con el *software* de
-   OpenJDK_.
-
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
@@ -1180,6 +1192,7 @@ nuestro propósito.
 .. |HTML| replace:: :abbr:`HTML (HyperText Markup Language)`
 .. |JAR| replace:: :abbr:`JAR (Java ARchive)`
 .. |API| replace:: :abbr:`API (Application Programming Inteface)`
+.. |LTS| replace:: :abbr:`LTS (Long Term Support)`
 
 .. _Visual Studio Code: https://code.visualstudio.com/
 .. _Gradle: https://gradle.org/

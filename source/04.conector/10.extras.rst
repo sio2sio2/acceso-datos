@@ -2,7 +2,9 @@
 
 Extras
 ******
-Arrinconamos bajo este epígrafe algunos aspectos adicionales de los conectores:
+Arrinconamos bajo este epígrafe algunos aspectos adicionales de los conectores.
+La mayor parte del código propuesta está incluido en `una librería llamada
+sqlutils <https://github.com/sio2sio2/sqlutils>`_.
 
 Metadatos
 =========
@@ -34,23 +36,242 @@ Metadatos
    Es más recomendable usar esta librería auxiliar que bajar el código y
    añadirlo a nuestro proyecto.
 
-.. conn-custom-exceptions:
+Cargar esquema desde archivo
+============================
+Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
+de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
+las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
+de él, en vez de encontrarse incrustadas en el código.
 
-Excepciones personalizadas
-==========================
-Es conveniente crear nuestras propias excepciones personalizadas para envolver
-las excepciones que pueda generar el acceso a datos. Por ejemplo, para
-excepciones no protegidas:
+Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
+guión |SQL| completo y que pasemos una cadena larga con todas las instrucciones
+separadas por comas, no asegura que el |SGBD| las descomponga y ejecute
+individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
+es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
-.. literalinclude:: files/DataAccessRuntimeException.java
-   :language: java
-   :name: DataAccessRuntimeException
-   :class: toggle
-   :caption: DataAccessRuntimeException.java (:download:`descarga <files/DataAccessRuntimeException.java>`)
-   :start-at: public class
++ `JSQLParser
+  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>`_ que es
+  capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
+  se compone.
 
-Y escribir otra excepcion protegida que llamada ``DataAccessException`` que
-derive de |Exception|.
++ Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
+  algunas premisas:
+
+  a. Los ';' que completan sentencias deben encontrarse a final de línea.
+  #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
+     valores, etc.
+  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
+     (pero sí usarse el estándar ``CASE``).
+
+  El código de los métodos ``splitSQL`` y ``executeSQL`` hace esto mismo
+  y se encuentra en la clase SqlUtils de la librería sqlutils_.
+
+.. _conn-transaction-manager:
+
+Gestor de transacciones
+=======================
+:ref:`Crear transacciones de forma manual <conn-transactions-create>` es bastante engorroso
+por lo que resulta muy útil construirse algún mecanismo más sofisticado para
+llevarlas a cabo. Una buena propuesta es crear una clase que modele
+transacciones (Transaction_) y que, además, de simplificar la creación y terminación de la transacción,
+implemente su anidamiento y ofrezca un par de contextos limitados que luego nos
+serán de utilidad. Para gestionar esta clase puede crear TransactionManager_.
+
+Las claves de esta última clase son:
+
+- Usa un patrón Singleton ampliado (`Multiton <https://en.wikipedia.org/wiki/Multiton_pattern>`_),
+  de manera que se puede acceder a las distintas instancias mediante una clave
+  definida al crear cada instancia.
+- Automatiza la gestión de transacciones para que el programadador sólo se
+  tenga que preocupar de definir una expresión *lambda* que contenga todas las
+  operaciones que constituyen la transacción.
+- La expresión lambda tiene disponible un contexto al cual puede recurrise para
+  realizar las operaciones. Por ejemplo, este contexto provee de la conexión
+  asociada a la transacción. La gestión de esta conexión (su creación y su
+  cierre) debe correr a cuenta del gestor de transacciones, por lo que está
+  protegida para que el programador no la cierre por descuido (su método
+  ``close()`` no tiene ningún efecto). Esta magia se logra gracias al uso del
+  `patrón Proxy <https://medium.com/@AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01>`_
+  que permite interceptar los métodos definidos en una interfaz (y |Connection|
+  lo es).
+- Además, incorpora un mecanismo basado en el :ref:`patrón Observer
+  <observer-pattern>` que permite ampliar su funcionalidad.
+
+Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
+bases de datos:
+
+.. code-block:: java
+
+   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
+
+   // En cualquier punto del código podemos rescatar el objeto gracias a la clave
+   tm = TransactionManager.get("CENTRO");
+
+   // Cómo realizar operaciones dentro de una misma transacción
+   tm.transaction(ctxt -> {
+      String sqlString = "UPDATE centro SET titularidad = ? WHERE id = ?";
+      try {
+         Connection conn = ctxt.connection();
+
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004866);
+            pstmt.setString(1, "PUBLICA");
+            if(pstmt.executeUpdate() == 0) {
+               // Ya se sabe que está actualización nunca se llevará a cabo.
+               logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004866);
+            } else {
+               // En principio no debería haber problemas para llevarla a cabo,
+               // pero no se sabrá hasta que se confirme o deseche la transacción.
+               // Por eso debería posponerse el siguiente registro hasta que se sepa en resultado.
+               // Cómo puede hacerse esto último, lo dejaremos para más adelante.
+               logger.debug("Actualizada a %s la titularidad del centro %d.".formatted("PUBLICA", 11004866));
+            }
+         }
+
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004039);
+            pstmt.setString(1, "PUBLICA");
+            if(pstmt.executeUpdate() == 0) {
+               logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004039);
+            } else {
+               // Registros diferidos que aún no sabemos escribir.
+            }
+         }
+
+         // La conexión en realidad NO DEBE cerrarse, pero no tiene efecto.
+         conn.close();
+
+      } catch(SQLException e) {
+         // Generamos una excepción personalizada que escala al código
+         // externo a la transacción (o también podríamos mostrar algún
+         // mensaje de error y no propagar ninguna excepción).
+         throw new DataAccessException("Error al actualizar datos", e);
+      }
+   });
+
+.. note:: El método también puede capturar el resultado que devuelve la expresión lamda:
+
+   .. code-block:: java
+
+      List<Estudiante> estudiantes = tm.transaction(ctxt -> obtenerEstudiantes(ctxt.connection()));
+
+   Pero ha de tenerse cuidado si la operación implica evaluación perezosa.
+
+Un aspecto muy interesante del gestor es que tiene definidos cinco eventos:
+
+**onBegin**
+   Se produce al comenzar la transacción.
+
+**onCommit**
+   Se produce tras acabar la transacción con éxito y confirmarse los cambios.
+
+**onRollBack**
+   Se produce tras acabar abruptamente la transacción y desecharse los cambios.
+
+**onTransactionStart**
+   Se produce tras comenzar una trasacción anidada.
+
+**onTransactionEnd**
+   Se produce justamente antes de acabar una transacción anidada.
+
+Se pueden definir *listeners* que desencadenen una acción al producirse alguno
+de los cinco eventos antes señalados. Uno muy útil es aquel que permita
+registrar mensajes sólo después de que se conozca el resultado de la
+transacción (LoggingManager_, también está definido en la librería).
+
+La clase es muy simple: al iniciarse la transacción, crea una lista para
+almacenar los mensajes, los cuales pueden irse enviado a lo largo de la
+transacción. Al acabar esta, y, dependiendo de qué haya ocurrido, se imprimirá
+el mensaje de éxito o el de fallo. En el ejemplo ilustrativo anterior podríamos
+haber registrado este *listener* y haberlo usado luego:
+
+.. code-block:: java
+
+   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
+   tm.addListener("logging", new LoggingManager());
+
+   tm.transaction(ctxt -> {
+      // Recuperamos el listener del contexto usando su nombre de registro.
+      LoggingManager lm = ctxt.getEventListener("logging", LoggingManager.class);
+
+      // [...]
+
+         if(pstmt.executeUpdate() == 0) {
+            logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004866);
+         } else {
+            lm.sendMessage(
+               getClass(), // Queremos que el mensaje en el registro se asocie a esta clase
+               Level.DEBUG,
+               "Actualizada a '%s' la titularidad del centro '%d'.".formatted("PUBLICA", 11004866), // Commit.
+               "Transacción fallida: la titularidad del centro '%d' no cambia.".formatted(11004866) // Rollback
+            );
+         }
+
+      // [...]
+   });
+
+.. _conn-pool-extra:
+
+*Pool* de conexiones
+====================
+Ya tratamos cómo crear un :ref:`pool de conexiones <conn-pool>`. Si queremos
+simplificar la creación del pool y abstraernos de qué se usa para crearlo,
+podemos encerrar toda esta lógica en una clase como ConnectionPool_.
+
+La clase sigue el patrón ya ensayado para :ref:`TransactionManager
+<conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
+conexiones una clave, por lo que crear un *pool* con HikariCP_ es muy sencillo\ [#]_:
+
+.. code-block:: java
+   :emphasize-lines: 2, 10
+
+   // Pool de conexiones de una base SQLite en memoria.
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      DataSource ds = pool.getDataSource();
+      try(Connection conn = ds.getConnection()) {
+         // Hacemos operaciones con la conexión.
+      }
+   }
+
+   // Aquí ya no podemos usar el pool "DB" porque lo hemos cerrado.
+   ConnectionPool.get("DB");  // ERROR: el pool está cerrado.
+
+La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
+siempre que no se haya cerrado.
+
+El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
+y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
+convenientemente), pero es más conveniente aprovechar las posibilidades de
+:ref:`TransactionManager <conn-transaction-manager>` y dejar que sea el gestor
+de transacción el que se encargue de crear y cerrar la conexión que necesitamos.
+
+.. code-block:: java
+   :emphasize-lines: 3, 6
+
+   // Pool de conexiones de una base SQLite en memoria.
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      // Creamos un gestor de transacciones para él y, de paso,
+      // registramos un gestor de registros.
+      pool.initTransactionManager(Map.of(
+         "logging", new LoggingManager()
+      ));
+
+      TransactionManager tm = pool.getTransactionManager(); // También puede obtenerse con la clave 'DB'
+
+      // Usamos conexiones gestionadas por el gestor
+      tm.transaction(ctxt -> {
+        // Operaciones que comparten una misma transacción
+      });
+   }
+
+.. admonition:: Advertencia
+
+   Las clases ConnectionPool_ y TransactionManager_ son independientes y puede
+   usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
+   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+   correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
+   de que es conveniente manejar las conexiones a través del gestor, que para
+   eso se ha creado.
 
 .. _conn-sqlutils:
 
@@ -63,15 +284,8 @@ Tratamiento funcional de las consultas
 |ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 :ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
-paliarlo podemos definir una clase que haga la conversión (véase el
-:download:`codigo fuente <files/SqlUtils.java>`):
-
-.. literalinclude:: files/SqlUtils.java
-   :language: java
-   :class: toggle
-   :name: clase-sqlutils
-   :caption: SqlUtils.java (:download:`descarga <files/DataAccessRuntimeException.java>`)
-   :start-at: public class
+paliarlo podemos definir una clase que haga la conversión (véase el código
+fuente de la `clase SqlUtils`_.
 
 Con estas clases y definiendo un método estático para convertir un registro de
 la tabla *Centro* (esto es, un |ResultSet|) en un objeto ``Centro``:
@@ -144,191 +358,11 @@ resultados de la consulta:
          // Tratamos el resultado como un Stream.
       }
 
-Cargar esquema desde archivo
-============================
-Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
-de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
-las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
-de él, en vez de encontrarse incrustadas en el código.
-
-Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
-guión |SQL| completo y que pasemos una cadena larga con todas instrucciones
-separadas por comas, no asegura que el |SGBD| las descomponga y ejecute
-individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
-es descomponerlas primero. Para ello podemos optar por dos estrategias:
-
-+ `JSQLParser
-  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>`_ que es
-  capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
-  se compone.
-
-+ Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
-  algunas premisas:
-
-  a. Los ';' que completan sentencias deben encontrarse a final de línea.
-  #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
-     valores, etc.
-  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
-     (pero sí usarse el estándar ``CASE``).
-
-El código de los métodos ``splitSQL`` y ``executeSQL`` se encuentra dentro de
-:ref:`la clase SqlUtils <clase-sqlutils>` referida anteriormente.
-
-.. _conn-transaction-manager:
-
-Gestor de transacciones
-=======================
-:ref:`Crear transacciones de forma manual <conn-transactions-create>` es bastante engorroso
-por lo que resulta muy útil construirse algún mecanismo más sofisticado cómo para llevarlas
-a cabo. Una buena propuesta es ésta:
-
-.. literalinclude:: files/TransactionManager.java
-   :language: java
-   :class: toggle
-   :caption: TransactionManager.java (:download:`descarga <files/TransactionManager.java>`)
-   :name: TransactionManager
-
-.. caution:: La clase presupone que hemos definido una excepción protegida de usuario
-   ``DataAccessException`` semejante a :ref:`DataAccessRuntimeException
-   <DataAccessRuntimeException>`.
-
-Las claves de esta clase son:
-
-- Usa un patrón Singleton ampliado (`Multiton <https://en.wikipedia.org/wiki/Multiton_pattern>`_),
-  de manera que se puede acceder a las distintas instancias mediante una clave
-  definida al crear cada instancia.
-- Automatiza la gestión de transacciones para que el programadador sólo se
-  tenga que preocupar de definir una expresión *lambda* que contenga todas las
-  operaciones que constituyen la transacción.
-- La expresión lambda tiene disponible una conexión para realizar con ella las
-  operaciones. La gestión de esta conexión (su creación y su cierre) debe correr
-  a cuenta del gestor de transacciones, por lo que está protegida para que el
-  programador no la cierre por descuido (su método ``close()`` no tiene ningún
-  efecto). Esta magia se logra gracias al uso del `patrón Proxy
-  <https://medium.com/@AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01>`_
-  que permite interceptar los métodos definidos en una interfaz (y |Connection|
-  lo es).
-
-Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
-bases de datos:
-
-.. code-block:: java
-
-   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
-
-   // En cualquier punto del código podemos rescatar el objeto gracias a la clave
-   tm = TransactionManager.get("CENTRO");
-
-   // Cómo realizar operaciones en una misma transacción
-   tm.transaction(conn -> {
-      String sqlString = "UPDATE centro SET titularidad = ? WHERE id = ?";
-      try {
-         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
-            pstmt.setInt(2, 11004866);
-            pstmt.setString(1, "PUBLICA");
-            pstmt.executeUpdate();
-         }
-
-         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
-            pstmt.setInt(2, 11004039);
-            pstmt.setString(1, "PUBLICA");
-            pstmt.executeUpdate();
-         }
-      } catch(SQLException e) {
-         // Generamos una excepción personalizada que escala al código
-         // externo a la transacción (o también podríamos mostrar algún
-         // mensaje de error y no propagar ninguna excepción).
-         throw new DataAccessException("Error al actualizar datos", e);
-      }
-
-      conn.close() // ¡¡¡NO DEBE HACERSE!!! pero, si se hace, no tiene efecto.
-   });
-
-.. note:: El método también puede capturar el resultado que devuelve la expresión lamda:
-
-   .. code-block:: java
-
-      List<Estudiante> estudiantes = tm.transaction(conn -> obtenerEstudiantes(conn));
-
-.. _conn-pool-extra:
-
-*Pool* de conexiones
-====================
-Ya tratamos cómo crear un :ref:`pool de conexiones <conn-pool>`. Si queremos
-simplificar la creación del pool y abstraernos de qué se usa para crearlo,
-podemos envolverlo en una clase como esta:
-
-.. literalinclude:: files/ConnectionPool.java
-   :class: toggle
-   :caption: ConnectionPool.java (:download:`descarga <files/ConnectionPool.java>`)
-   :name: ConnectionPool
-   :language: java
-   :start-at: public class
-
-La clase sigue el patrón ya ensayado para :ref:`TransactionManager
-<conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
-conexiones una clave, por lo que crear un *pool* con HikariCP_ es muy sencillo\ [#]_:
-
-.. code-block:: java
-   :emphasize-lines: 2, 10
-
-   // Pool de conexiones de una base SQLite en memoria.
-   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
-      DataSource ds = pool.getDataSource();
-      try(Connection conn = ds.getConnection()) {
-         // Hacemos operaciones con la conexión.
-      }
-   }
-
-   // Aquí ya no podemos usar el pool "DB" porque lo hemos cerrado.
-   ConnectionPool.get("DB");  // ERROR: el pool está cerrado.
-
-La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
-siempre que no se haya cerrado.
-
-El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
-y distintas conexiones |Connection| (que habrá que cerrar convenientemente),
-pero también puede usarse en conjunción con :ref:`TransactionManager
-<TransactionManager>` y dejar que sea el gestor de transacción el que se
-encargue de crear y cerrar la conexión que necesitamos.
-
-:ref:`TransactionManager <TransactionManager>`
-
-.. code-block:: java
-   :emphasize-lines: 3, 6
-
-   // Pool de conexiones de una base SQLite en memoria.
-   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
-      pool.setTransactionManager(); // Crea el gestor de nombre "BD".
-
-      // Usamos conexiones gestionadas por el gestor
-      pool.getTransactionManager().transaction(conn -> {
-
-        // Operaciones que comparten una misma transacción
-
-      });
-   }
-
-.. admonition:: Advertencia
-
-   Cuando existe el gestor de transacciones correspondiente, el método
-   ``getDataSource()`` genera un mensaje advirtiendo de que es conveniente
-   manejar las conexiones a través del gestor, que para eso se ha creado.
-
-.. note:: En realidad, los métodos ``setTransactionManager()`` y ``getTransactionManager()``
-   son una manera de manipular :ref:`TransactionManager <TransactionManager>`
-   desde el propio objeto :ref:`ConnectionPool <ConnectionPool>`. Utilizarlo
-   directamente sigue teniendo el mismo efecto:
-
-   .. code-block:: java
-
-      // Esto equivale a pool.setTransaction()
-      TransactionManager.create("BD", pool.getDataSource());
-
-      // Esto equivale a pool.getTransaction()
-      TransactionManager tm = Transaction.get("BD");
-
 .. rubric:: Notas al pie
+
+.. [#] Con *SQLite* por ejemplo el método ``.executeUpdate`` sí será capaz de
+   ejecutar todas las sentencias |SQL|; ``execute``, en cambio, no lo hará y
+   ejecutará solo la primera. Con otros |SGBD| el comportamiento puede variar.
 
 .. [#] Al método sólo se le proporciona la |URL|, porque usamos *SQLite* como
    |SGBD|. Si fuera otro como *MySQL*, tendríamos también que proporcionar un
@@ -337,10 +371,6 @@ encargue de crear y cerrar la conexión que necesitamos.
    que de lo contrario cada conexión que devuelva el *pool* será una base de
    datos distinta en memoria. Con una base de datos persistente, no habría sido
    necesario.
-
-.. [#] Con *SQLite* por ejemplo el método ``.executeUpdate`` sí será capaz de
-   ejecutar todas las sentencias |SQL|; ``execute``, en cambio, no lo hará y
-   ejecutará solo la primera. Con otros |SGBD| el comportamiento puede variar.
 
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
@@ -353,3 +383,9 @@ encargue de crear y cerrar la conexión que necesitamos.
 .. |Exception| replace:: :java-lang:`Exception <Exception>`
 .. _patrón Multiton: https://en.wikipedia.org/wiki/Multiton
 .. _HikariCP: https://github.com/brettwooldridge/HikariCP
+.. _sqlutils: https://github.com/sio2sio2/sqlutils
+.. _Transaction: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/Transaction.java
+.. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java
+.. _LoggingManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/LoggingManager.java
+.. _clase SqlUtils: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/SqlUtils.java
+.. _ConnectionPool: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java

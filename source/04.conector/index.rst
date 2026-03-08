@@ -2,7 +2,7 @@
 
 Conectores
 **********
-Las bases de datos relacionales son unos de los soportes más utilizados para
+Las bases de datos relacionales son uno de los soportes más utilizados para
 el almacenamiento organizado de información. Su problema, al ser accedidas
 mediante aplicaciones, es que basan su estructura en el modelo relacional, que
 no es el modelo que usan los lenguajes de programación para manejar datos. En

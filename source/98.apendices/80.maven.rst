@@ -64,14 +64,14 @@ incluirla en :file:`pom.xml`. Por ejemplo:
 
 *Maven* es inteligente, así que si una dependencia, a su vez, requiere
 de otras dependencias, descargará todas, sin la necesidad de declarar todo el
-árbol dependencias explícitamente en nuestro archivo.
+árbol de dependencias explícitamente en nuestro archivo.
 
 La página tiene un buscador y puede buscarse a través de él la librería. La del
-ejemplo se haya en la dirección `persistence-api
+ejemplo se halla en la dirección `persistence-api
 <https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api>`_,
 y escogiendo la versión deseada, se obtiene el código exacto que debe añadirse
 al archivo. Las librerías, además, pueden a su vez contener dependencias, pero
-se calculan si necesidad de incluirlas explícitamente.
+se calculan sin necesidad de incluirlas explícitamente.
 
 La suborden asociada a la obtención de dependencias es:
 
@@ -143,7 +143,7 @@ más modernas. Puede hacerse como una propiedad:
       <maven.compiler.release>21</maven.compiler.release>
    </properties>
 
-o directamente configurando explíciamente el *plugin* (que en principio no
+o directamente configurando explícitamente el *plugin* (que en principio no
 necesita ser declarado):
 
 .. code-block:: xml
@@ -185,7 +185,7 @@ Pruebas
 El código que prueba la aplicación debe escribirse bajo :file:`src/test/` con
 la misma estructura que se uso en :file:`src/main/`.
 
-Las subórdenes asociadas a esta fases son:
+Las subórdenes asociadas a esta fase son:
 
 .. code-block:: console
 
@@ -212,7 +212,7 @@ Arquetipos
 Al crear un nuevo proyecto, *Maven* define su estructura inicial tomando como
 referencia lo que se llama un arquetipo (o ninguno). Como es probable que para
 resolver las tareas del módulo partamos siempre de una misma base, nos ahorrará
-mucho tiempo crear un arquetipo personal, así que pongámonos a ellos.
+mucho tiempo crear un arquetipo personal, así que pongámonos a ello.
 
 Lo primero es crear un arquetipo en un directorio:
 
@@ -241,7 +241,7 @@ Esto definirá la estructura básica del arquetipo en el directorio
         |               |                         +-- main/
         |               |                               + java/ # ¡Atención!
         |               |                               |   +-- Main.java
-        |               |                               + resource&/
+        |               |                               + resource/
         |               |
         |               +-- META-INF/maven/
         |                               +-- archetype-metadata.xml
@@ -249,7 +249,7 @@ Esto definirá la estructura básica del arquetipo en el directorio
         +-- test/ ...
 
 Como no nos interesan las pruebas podemos eliminar :file:`src/test/` y debemos
-centrarmos en:
+centrarnos en:
 
 #. El :file:`pom.xml` del propio arquetipo.
 #. El contenido de :file:`src/main/resources/archetype-resources/` que contiene
@@ -312,7 +312,7 @@ Instalado, podemos comprobar que realmente lo está y registrarlo para que el
    $ mvn archetype:crawl                                     # Lo registramos.
    $ cat ~/.m2/repository/archetype-catalog.xml              # Comprobamos el registro.
 
-En caso de que quisiéramos eliminarlo podríamo eliminar a mano:
+En caso de que quisiéramos eliminarlo, podríamos eliminar a mano:
 
 .. code-block:: console
 

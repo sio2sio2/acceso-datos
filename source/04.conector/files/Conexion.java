@@ -8,13 +8,14 @@ public class Conexion implements AutoCloseable {
    /** Clave que identifica esta clase */
    public static final String KEY = new Object().toString();
 
+   private static Conexion instance;
    private final ConnectionPool cp;
 
    private Conexion(String dbUrl, String user, String password) {
+      // Pool de conexiones con HikariCP
       cp = ConnectionPool.create(Conexion.KEY, dbUrl, user, password);
-      // Nuestro ConnectionPool gestiona transacciones con TransactionManager
-      // y gestiona registros para poder diferir mensajes hasta saber cómo
-      // acabó la transacción.
+      // Usamos el gestor de transacciones
+      // con un listener para gestionar registros diferidos
       cp.initTransactionManager(Map.of(
          LoggingManager.KEY, new LoggingManager()
       ));
@@ -32,6 +33,7 @@ public class Conexion implements AutoCloseable {
       if(instance != null) throw new IllegalStateException("Ya se creó la conexión");
 
       instance = new Conexion(dbUrl, user, password);
+      return instance;
    }
 
    /**
@@ -50,9 +52,24 @@ public class Conexion implements AutoCloseable {
     * @param schema El guion SQL con el esquema y los datos iniciales.
     * @return La propia conexión para encadenar llamadas.
     */
-   public Conexion initialize(InputStream schema) {
-      // TODO: Aquí debemos inicializar la base de datos.
-      return this;
+   public Conexion initialize(InputStream schema) throws DataAccessException {
+        Objects.requireNonNull(schema, "El esquema no puede ser nulo");
+
+        transaction(ctxt -> {
+            Connection conn = ctxt.connection();
+
+            // Si la base de datos ya está inicializada, no hacemos nada.
+            if(SqlUtils.isDatabaseInitialized(conn)) return;
+
+            try {
+                SqlUtils.executeSQL(conn, schema);
+            } catch(SQLException e) {
+                throw new DataAccessException("Error al crear el esquema en la base de datos", e);
+            } catch(IOException e) {
+                throw new RuntimeException("Error al intentar leer el esquema", e);
+            }
+        });         
+        return this;
    }
 
    /**
@@ -88,7 +105,7 @@ public class Conexion implements AutoCloseable {
     * @param operations Las operaciones que constituyen la transacción.
     * @throws IllegalStateException Si la conexión ya está cerrada.
     */
-   public void transaction(Transactionable operations) {
+   public void transaction(Transactionable operations) throws DataAccessException {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
       cp.getTransactionManager().transaction(operations);
    }
@@ -111,7 +128,6 @@ public class Conexion implements AutoCloseable {
     */
    public LoggingManager getLoggingManager() {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return cp.getTransactionManager().getEventListener(LoggingManager.KEY, LoggingManager.class);
+      return cp.getTransactionManager().getListener(LoggingManager.KEY, LoggingManager.class);
    }
 }
-

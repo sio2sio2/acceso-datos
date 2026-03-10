@@ -1,20 +1,36 @@
-package edu.acceso.tarea_4_1.infraestructure.persistence.dao;
-
-import java.sql.Connection;
-
-import edu.acceso.sqlutils.crud.Entity;
-import edu.acceso.sqlutils.errors.DataAccessException;
-import edu.acceso.tarea_4_1.infraestructure.persistence.Conexion;
-
+/**
+ * Base para la construcción de todas las clases DAO.
+ * <p>Proporciona el constructor y métodos para simplificar
+ * el acceso a la conexión y al gestor de registros diferidos.
+ */
 public abstract class BaseDao<T extends Entity> implements Crud<T> {
 
-    protected final String key;
+    /** Clave que identifica la conexión */
+    private final Conexion cx;
 
-    BaseDao(String key) {
-        this.key = key;
+
+    /**
+     * Constructor
+     * @param key Clave que identifica la conexión.
+     */
+    protected BaseDao(String key) {
+        // La clave no se necesita en realidad porque Conexion es Singleton.
+        cx = Conexion.get();
     }
 
-    protected Connection getConnection() throws DataAccessException{
-        return TransactionManager.get(key).getConnection();
+    /**
+     * Obtiene el {@link LoggingManager} asociado a la conexión actual.
+     * @return El gestor de logging solicitado.
+     */
+    public LoggingManager getLoggingManager() {
+        return cx.getLoggingManager();
+    }
+
+    /**
+     * Obtiene la conexión asociada a la transacción actual.
+     * @return La conexión solicitada.
+     */
+    public Connection getConnection() {
+        return cx.getConnection();
     }
 }

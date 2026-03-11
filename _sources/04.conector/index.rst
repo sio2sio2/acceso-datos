@@ -129,6 +129,28 @@ El cual en |SQL| se define así:
    :language: sql
    :end-before: -- Datos
 
+.. hint:: Mucho de lo propuesto en esta unidad está incluido en un `repositorio
+   de Github llamado sqlutils <https://github.com/sio2sio2/sqlutils>`_ listo
+   para su uso:
+
+   .. code-block:: xml
+
+      <!-- En pom.xml -->
+      <repositories>
+           <repository>
+               <id>jitpack.io</id>
+               <url>https://jitpack.io</url>
+           </repository>
+       </repositories>
+
+      <dependencies>
+        <dependency>
+            <groupId>com.github.sio2sio2</groupId>
+            <artifactId>sqlutils</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+      </dependencies>
+
 .. rubric:: Contenidos
 
 .. toctree:: 

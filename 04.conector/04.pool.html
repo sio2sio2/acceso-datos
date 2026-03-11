@@ -60,7 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/04.pool';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="4.5. Extras" href="10.extras.html" />
+    <link rel="next" title="4.5. Programación con conectores" href="15.dao.html" />
     <link rel="prev" title="4.3. Transacciones" href="03.transacciones.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -184,8 +184,8 @@
 <li class="toctree-l2"><a class="reference internal" href="02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="10.extras.html">4.5. Extras</a></li>
-<li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.6. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../05.orm/index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -383,6 +383,7 @@
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1. Gestor integrado</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.2. HikariCP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-del-pool">4.4.3. Gestión del pool</a></li>
 </ul>
             </nav>
         </div>
@@ -489,7 +490,7 @@ código equivalente para otros <abbr title="Sistema Gestor de Bases de Datos">SG
 <section id="id1">
 <h2><span class="section-number">4.4.2. </span>HikariCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>La alternativa, que es común a cualquier controlador, es usar una librería
-especializada como <a href="#id2"><span class="problematic" id="id3">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
+especializada como <a href="#id4"><span class="problematic" id="id5">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Con esta librería no tendremos problemas al utilizar un <em>pool</em> de
@@ -541,14 +542,75 @@ conexiones con <strong class="program">SQLite</strong>.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id4"><span class="problematic" id="id5">HikariCP_</span></a>,
+<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id6"><span class="problematic" id="id7">HikariCP_</span></a>,
 la ruta debe ser <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code> y no simplemente
 <code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
-<p>Más adelante se sugiere una <a class="reference internal" href="10.extras.html#conn-pool-extra"><span class="std std-ref">estrategia para crear el pool</span></a>.</p>
+</section>
+<section id="gestion-del-pool">
+<span id="conn-pool-extra"></span><h2><span class="section-number">4.4.3. </span>Gestión del pool<a class="headerlink" href="#gestion-del-pool" title="Link to this heading">#</a></h2>
+<p>Si queremos simplificar la creación del pool y abstraernos de qué se usa para
+crearlo, podemos encerrar toda esta lógica en una clase como <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java">ConnectionPool</a>.</p>
+<p>La clase sigue el patrón ya ensayado para <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>: un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a> que asocia a cada <em>pool</em> de
+conexiones una clave, por lo que crear un <em>pool</em> con <a href="#id8"><span class="problematic" id="id9">HikariCP_</span></a> es muy sencillo<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
+<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
+<span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Hacemos operaciones con la conexión.</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Aquí ya no podemos usar el pool &quot;DB&quot; porque lo hemos cerrado.</span>
+<span class="hll"><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// ERROR: el pool está cerrado.</span>
+</span></pre></div>
 </div>
+<p>La última línea muestra cómo puede recuperarse en cualquier momento el <em>pool</em>,
+siempre que no se haya cerrado.</p>
+<p>El objeto puede utilizarse tal como se ha ilustrado para obtener su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
+y, a partir de él, distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá que cerrar
+convenientemente), pero es más conveniente aprovechar las posibilidades de
+<a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> y dejar que sea el gestor
+de transacción el que se encargue de crear y cerrar la conexión que necesitamos.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="c1">// Creamos un gestor de transacciones para él y, de paso,</span>
+</span><span class="w">   </span><span class="c1">// registramos un gestor de registros.</span>
+<span class="w">   </span><span class="n">pool</span><span class="p">.</span><span class="na">initTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+<span class="hll"><span class="w">      </span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
+</span><span class="w">   </span><span class="p">));</span>
+
+<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// También puede obtenerse con la clave &#39;DB&#39;</span>
+
+<span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
+<span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="c1">// Operaciones que comparten una misma transacción</span>
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-advertencia admonition">
+<p class="admonition-title">Advertencia</p>
+<p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java">ConnectionPool</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
+usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
+conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+correspondiente, el método <code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo
+de que es conveniente manejar las conexiones a través del gestor, que para
+eso se ha creado.</p>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Al método sólo se le proporciona la <abbr title="Uniform Resource Locator">URL</abbr>, porque usamos <em>SQLite</em> como
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Si fuera otro como <em>MySQL</em>, tendríamos también que proporcionar un
+usuario y una contraseña. Por otro lado, en el caso particular de <em>SQLite</em>
+nos vemos obligados añadir el parámetro <code class="code docutils literal notranslate"><span class="pre">cache=shared</span></code> a la <abbr title="Uniform Resource Locator">URL</abbr>, ya
+que de lo contrario cada conexión que devuelva el <em>pool</em> será una base de
+datos distinta en memoria. Con una base de datos persistente, no habría sido
+necesario.</p>
+</aside>
+</aside>
 </section>
 </section>
 
@@ -573,11 +635,11 @@ la ruta debe ser <code class="file docutils literal notranslate"><span class="pr
       </div>
     </a>
     <a class="right-next"
-       href="10.extras.html"
+       href="15.dao.html"
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">4.5. </span>Extras</p>
+        <p class="prev-next-title"><span class="section-number">4.5. </span>Programación con conectores</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -601,6 +663,7 @@ la ruta debe ser <code class="file docutils literal notranslate"><span class="pr
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1. Gestor integrado</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.2. HikariCP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-del-pool">4.4.3. Gestión del pool</a></li>
 </ul>
   </nav></div>
 

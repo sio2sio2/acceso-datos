@@ -162,11 +162,87 @@ Su uso, por otro lado es muy sencillo:
    la ruta debe ser :file:`file::memory:?cache=shared` y no simplemente
    :file:`:memory:`.
 
-.. tip:: Más adelante se sugiere una :ref:`estrategia para crear el pool
-   <conn-pool-extra>`.
+.. _conn-pool-extra:
 
+Gestión del pool
+----------------
+Si queremos simplificar la creación del pool y abstraernos de qué se usa para
+crearlo, podemos encerrar toda esta lógica en una clase como ConnectionPool_.
+
+La clase sigue el patrón ya ensayado para :ref:`TransactionManager
+<conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
+conexiones una clave, por lo que crear un *pool* con HikariCP_ es muy sencillo\ [#]_:
+
+.. code-block:: java
+   :emphasize-lines: 2, 10
+
+   // Pool de conexiones de una base SQLite en memoria.
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      DataSource ds = pool.getDataSource();
+      try(Connection conn = ds.getConnection()) {
+         // Hacemos operaciones con la conexión.
+      }
+   }
+
+   // Aquí ya no podemos usar el pool "DB" porque lo hemos cerrado.
+   ConnectionPool.get("DB");  // ERROR: el pool está cerrado.
+
+La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
+siempre que no se haya cerrado.
+
+El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
+y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
+convenientemente), pero es más conveniente aprovechar las posibilidades de
+:ref:`TransactionManager <conn-transaction-manager>` y dejar que sea el gestor
+de transacción el que se encargue de crear y cerrar la conexión que necesitamos.
+
+.. code-block:: java
+   :emphasize-lines: 3, 6
+
+   // Pool de conexiones de una base SQLite en memoria.
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      // Creamos un gestor de transacciones para él y, de paso,
+      // registramos un gestor de registros.
+      pool.initTransactionManager(Map.of(
+         "logging", new LoggingManager()
+      ));
+
+      TransactionManager tm = pool.getTransactionManager(); // También puede obtenerse con la clave 'DB'
+
+      // Usamos conexiones gestionadas por el gestor
+      tm.transaction(ctxt -> {
+        // Operaciones que comparten una misma transacción
+      });
+   }
+
+.. admonition:: Advertencia
+
+   Las clases ConnectionPool_ y TransactionManager_ son independientes y puede
+   usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
+   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+   correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
+   de que es conveniente manejar las conexiones a través del gestor, que para
+   eso se ha creado.
+
+.. rubric:: Notas al pie
+
+.. [#] Al método sólo se le proporciona la |URL|, porque usamos *SQLite* como
+   |SGBD|. Si fuera otro como *MySQL*, tendríamos también que proporcionar un
+   usuario y una contraseña. Por otro lado, en el caso particular de *SQLite*
+   nos vemos obligados añadir el parámetro :code:`cache=shared` a la |URL|, ya
+   que de lo contrario cada conexión que devuelva el *pool* será una base de
+   datos distinta en memoria. Con una base de datos persistente, no habría sido
+   necesario.
+
+
+
+
+.. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |DriverManager| replace:: :java-sql:`DriverManager <DriverManager>`
 .. |DataSource| replace:: :java-sql:`DataSource <DataSource>`
+.. _ConnectionPool: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java
+.. _patrón Multiton: https://en.wikipedia.org/wiki/Multiton
+.. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java

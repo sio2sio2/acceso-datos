@@ -8,7 +8,6 @@ public abstract class BaseDao<T extends Entity> implements Crud<T> {
     /** Clave que identifica la conexión */
     private final Conexion cx;
 
-
     /**
      * Constructor
      * @param key Clave que identifica la conexión.
@@ -22,7 +21,7 @@ public abstract class BaseDao<T extends Entity> implements Crud<T> {
      * Obtiene el {@link LoggingManager} asociado a la conexión actual.
      * @return El gestor de logging solicitado.
      */
-    public LoggingManager getLoggingManager() {
+    protected LoggingManager getLoggingManager() {
         return cx.getLoggingManager();
     }
 
@@ -30,7 +29,7 @@ public abstract class BaseDao<T extends Entity> implements Crud<T> {
      * Obtiene la conexión asociada a la transacción actual.
      * @return La conexión solicitada.
      */
-    public Connection getConnection() {
+    protected Connection getConnection() {
         return cx.getConnection();
     }
 }

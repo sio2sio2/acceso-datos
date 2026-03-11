@@ -115,4 +115,153 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:
       conn.setAutoCommit(true);  // Volvemos al comportamiento habitual.
    }
 
+.. _conn-transaction-manager:
+
+Gestor de transacciones
+-----------------------
+:ref:`Crear transacciones de forma manual <conn-transactions-create>` es bastante engorroso
+por lo que resulta muy útil construirse algún mecanismo más sofisticado para
+llevarlas a cabo. Una buena propuesta es crear una clase que modele
+transacciones (Transaction_) y que, además, de simplificar la creación y terminación de la transacción,
+implemente su anidamiento y ofrezca un par de contextos limitados que luego nos
+serán de utilidad. Para gestionar esta clase puede crear TransactionManager_.
+
+Las claves de esta última clase son:
+
+- Usa un patrón Singleton ampliado (`Multiton <https://en.wikipedia.org/wiki/Multiton_pattern>`_),
+  de manera que se puede acceder a las distintas instancias mediante una clave
+  definida al crear cada instancia.
+- Automatiza la gestión de transacciones para que el programadador sólo se
+  tenga que preocupar de definir una expresión *lambda* que contenga todas las
+  operaciones que constituyen la transacción.
+- La expresión lambda tiene disponible un contexto al cual puede recurrise para
+  realizar las operaciones. Por ejemplo, este contexto provee de la conexión
+  asociada a la transacción. La gestión de esta conexión (su creación y su
+  cierre) debe correr a cuenta del gestor de transacciones, por lo que está
+  protegida para que el programador no la cierre por descuido (su método
+  ``close()`` no tiene ningún efecto). Esta magia se logra gracias al uso del
+  `patrón Proxy <https://medium.com/@AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01>`_
+  que permite interceptar los métodos definidos en una interfaz (y |Connection|
+  lo es).
+- Además, incorpora un mecanismo basado en el :ref:`patrón Observer
+  <observer-pattern>` que permite ampliar su funcionalidad.
+
+Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
+bases de datos:
+
+.. code-block:: java
+
+   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
+
+   // En cualquier punto del código podemos rescatar el objeto gracias a la clave
+   tm = TransactionManager.get("CENTRO");
+
+   // Cómo realizar operaciones dentro de una misma transacción
+   tm.transaction(ctxt -> {
+      String sqlString = "UPDATE centro SET titularidad = ? WHERE id = ?";
+      try {
+         Connection conn = ctxt.connection();
+
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004866);
+            pstmt.setString(1, "PUBLICA");
+            if(pstmt.executeUpdate() == 0) {
+               // Ya se sabe que está actualización nunca se llevará a cabo.
+               logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004866);
+            } else {
+               // En principio no debería haber problemas para llevarla a cabo,
+               // pero no se sabrá hasta que se confirme o deseche la transacción.
+               // Por eso debería posponerse el siguiente registro hasta que se sepa en resultado.
+               // Cómo puede hacerse esto último, lo dejaremos para más adelante.
+               logger.debug("Actualizada a %s la titularidad del centro %d.".formatted("PUBLICA", 11004866));
+            }
+         }
+
+         try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
+            pstmt.setInt(2, 11004039);
+            pstmt.setString(1, "PUBLICA");
+            if(pstmt.executeUpdate() == 0) {
+               logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004039);
+            } else {
+               // Registros diferidos que aún no sabemos escribir.
+            }
+         }
+
+         // La conexión en realidad NO DEBE cerrarse, pero no tiene efecto.
+         conn.close();
+
+      } catch(SQLException e) {
+         // Generamos una excepción personalizada que escala al código
+         // externo a la transacción (o también podríamos mostrar algún
+         // mensaje de error y no propagar ninguna excepción).
+         throw new DataAccessException("Error al actualizar datos", e);
+      }
+   });
+
+.. note:: El método también puede capturar el resultado que devuelve la expresión lamda:
+
+   .. code-block:: java
+
+      List<Estudiante> estudiantes = tm.transaction(ctxt -> obtenerEstudiantes(ctxt.connection()));
+
+   Pero ha de tenerse cuidado si la operación implica evaluación perezosa.
+
+Un aspecto muy interesante del gestor es que tiene definidos cinco eventos:
+
+**onBegin**
+   Se produce al comenzar la transacción.
+
+**onCommit**
+   Se produce tras acabar la transacción con éxito y confirmarse los cambios.
+
+**onRollBack**
+   Se produce tras acabar abruptamente la transacción y desecharse los cambios.
+
+**onTransactionStart**
+   Se produce tras comenzar una trasacción anidada.
+
+**onTransactionEnd**
+   Se produce justamente antes de acabar una transacción anidada.
+
+Se pueden definir *listeners* que desencadenen una acción al producirse alguno
+de los cinco eventos antes señalados. Uno muy útil es aquel que permita
+registrar mensajes sólo después de que se conozca el resultado de la
+transacción (LoggingManager_, también está definido en la librería).
+
+La clase es muy simple: al iniciarse la transacción, crea una lista para
+almacenar los mensajes, los cuales pueden irse enviado a lo largo de la
+transacción. Al acabar esta, y, dependiendo de qué haya ocurrido, se imprimirá
+el mensaje de éxito o el de fallo. En el ejemplo ilustrativo anterior podríamos
+haber registrado este *listener* y haberlo usado luego:
+
+.. code-block:: java
+
+   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
+   tm.addListener("logging", new LoggingManager());
+
+   tm.transaction(ctxt -> {
+      // Recuperamos el listener del contexto usando su nombre de registro.
+      LoggingManager lm = ctxt.getEventListener("logging", LoggingManager.class);
+
+      // [...]
+
+         if(pstmt.executeUpdate() == 0) {
+            logger.trace("Actualización fallida: no se encuentra el centro {}.", 11004866);
+         } else {
+            lm.sendMessage(
+               getClass(), // Queremos que el mensaje en el registro se asocie a esta clase
+               Level.DEBUG,
+               "Actualizada a '%s' la titularidad del centro '%d'.".formatted("PUBLICA", 11004866), // Commit.
+               "Transacción fallida: la titularidad del centro '%d' no cambia.".formatted(11004866) // Rollback
+            );
+         }
+
+      // [...]
+   });
+
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |Connection| replace:: :java-sql:`Connection <Connection>`
+
+.. _Transaction: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/Transaction.java
+.. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java
+.. _LoggingManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/LoggingManager.java

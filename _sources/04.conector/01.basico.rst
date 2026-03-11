@@ -379,6 +379,122 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
       if(centro == null) pstmt.setNull(3, Types.INTEGER);
       else pstmt.setInt(3, centro.getId());
 
+Cargar del esquema
+==================
+Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
+de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
+las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
+de él, en vez de encontrarse incrustadas en el código.
+
+Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
+guión |SQL| completo y que pasemos una cadena larga con todas las instrucciones
+separadas por comas, no asegura que el |SGBD| las descomponga y ejecute
+individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
+es descomponerlas primero. Para ello podemos optar por dos estrategias:
+
++ `JSQLParser
+  <https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser>`_ que es
+  capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
+  se compone.
+
++ Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
+  algunas premisas:
+
+  a. Los ';' que completan sentencias deben encontrarse a final de línea.
+  #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
+     valores, etc.
+  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
+     (pero sí usarse el estándar ``CASE``).
+
+  El código de los métodos ``splitSQL`` y ``executeSQL`` hace esto mismo
+  y se encuentra en la clase SqlUtils de la librería sqlutils_.
+
+.. _conn-sqlutils:
+
+Tratamiento funcional de las consultas
+======================================
+
+.. todo:: Revisar este apartado para utilizar ConnectionWrapper en vez de
+   |Connection|.
+
+|ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
+Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
+:ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
+paliarlo podemos definir una clase que haga la conversión (véase el código
+fuente de la `clase SqlUtils`_.
+
+Con estas clases y definiendo un método estático para convertir un registro de
+la tabla *Centro* (esto es, un |ResultSet|) en un objeto ``Centro``:
+
+.. code-block:: java
+
+   public static Centro resultSetToCentro(ResultSet rs) throws SQLException {
+      int id = rs.getInt("id");
+      String nombre = rs.getString("nombre");
+      Titularidad titularidad = Titularidad.fromString(rs.getString("titularidad"));
+      return new Centro(id, nombre, titularidad);
+   }
+
+se puede obtener un objeto :java-util:`Stream <stream/Stream>` que permita recorrer los
+resultados de la consulta:
+
+.. code-block:: java
+   :emphasize-lines: 6
+
+   // No los cerramos, porque se encargara el cierre del flujo de hacerlo.
+   Statement stmt = conn.createStatement();
+   ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
+ 
+   // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
+   try (Stream<Centro> centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro)) {
+      // Tratamos el flujo como estimemos más oportuno.
+      for(Centro c: (Iterable<Centro>) centros::iterator) {
+         System.out.println(c);
+      }
+   }
+
+.. warning:: El método es de ejecución perezosa, esto es, genera objetos a
+   medida que se consumen. Esto implica que, mientras necesitemos obtener
+   elementos del flujo, tanto el objeto de consulta como el de conexión deben
+   permanecer abiertos, pues de no ser así, se cerrará también automáticamente
+   el objeto |ResultSet| y dejaremos de obtener filas. Por tanto:
+
+   .. code-block:: java
+
+      Stream<Centro> centros = null;
+
+      try(
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
+      ) {
+         centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro);
+      }
+
+      for(Centro c: centros) {
+         // Jamás obtendremos ningún centro
+         // porque el objeto "rs" está cerrado.
+      }
+
+   no funciona en absoluto. Es indispensable que no cerremos los objetos
+   |Connection|, |Statement| y |ResultSet| para que el ``Stream`` pueda devolver
+   objetos. ¿Cuándo entonces se cierran? De eso se encarga el propio flujo al
+   cerrarse (véase la implementación). Por ese motivo el primer argumento que se
+   pasa al método es la sentencia o la conexión, dependiendo de lo que más nos
+   interese cerrar al terminar de consumir el flujo. Eso sí, debemos asegurarnos
+   de cerrar el flujo al acabar con él, razón por la cual en el ejemplo
+   ilustrativo de su uso hemos usado una sentencia *try-with-resources*.
+
+.. tip:: El método ``resultSetToStream`` permite no definir la función que
+   transforma la fila (el propio |ResultSet|) en un objeto. En ese caso, se
+   obtendrá con cada elemento del flujo la propia fila:
+
+   .. code-block:: java
+
+      try(Stream<ResultSet> result = SqlUtils.resultSetToStream(stmt, rs)) {
+         // Tratamos el resultado como un Stream.
+      }
+
+
 .. rubric:: Notas al pie
 
 .. [#] En las versiones modernas de |JDBC| no es necesario expresar el nombre
@@ -419,6 +535,10 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
    cambiemos la configuración predeterminada para soportar el entrecomillado con
    comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.
 
+.. [#] Con *SQLite* por ejemplo el método ``.executeUpdate`` sí será capaz de
+   ejecutar todas las sentencias |SQL|; ``execute``, en cambio, no lo hará y
+   ejecutará solo la primera. Con otros |SGBD| el comportamiento puede variar.
+
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
@@ -431,6 +551,8 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
 .. |Reader| replace:: :java-io:`Reader <Reader>`
 .. |PreparedStatement| replace:: :java-sql:`PreparedStatement <PreparedStatement>`
 .. |ResultSet| replace:: :java-sql:`ResultSet <ResultSet>`
+.. |Connection| replace:: :java-sql:`Connection <Connection>`
+.. |Statement| replace:: :java-sql:`Statement <Statement>`
 
 .. _SQLite: https://sqlite.org/
 .. _sqlite-jdbc: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
@@ -439,3 +561,5 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
 .. _postgresql: https://mvnrepository.com/artifact/org.postgresql/postgresql
 .. _ojdbc11: https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
 .. _mssql-jdbc: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc
+.. _clase SqlUtils: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/SqlUtils.java
+.. _sqlutils: https://github.com/sio2sio2/sqlutils

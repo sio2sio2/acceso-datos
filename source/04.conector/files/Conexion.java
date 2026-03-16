@@ -38,11 +38,15 @@ public class Conexion implements AutoCloseable {
 
    /**
     * Devuelve el objeto de Conexion.
+    * @param key Clave que identifica la conexión. En realidad, no es necesaria
+    * al ser esto un patrón Singleton, pero se obliga a usar este parámetro por
+    * compatibilidad con el código de TestDAO.
     * @throws IllegalStateException Si el objeto no se había creado antes.
     * @return El objeto solicitado
     */
-   public static Conexion get() {
+   public static Conexion get(String key) {
       if(instance == null) throw new IllegalStateException("No existe ningún objeto de Conexion");
+      if(!KEY.equals(key)) throw new IllegalArgumentException("La clave es inválida. Use la definida en la propia clase");
 
       return instance;
    }

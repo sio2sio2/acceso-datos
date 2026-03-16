@@ -13,8 +13,7 @@ public abstract class BaseDao<T extends Entity> implements Crud<T> {
      * @param key Clave que identifica la conexión.
      */
     protected BaseDao(String key) {
-        // La clave no se necesita en realidad porque Conexion es Singleton.
-        cx = Conexion.get();
+        cx = Conexion.get(key);
     }
 
     /**

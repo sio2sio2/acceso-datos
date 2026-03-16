@@ -185,14 +185,15 @@ Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
 establezca la conexión gracias a un |ConnectionPool| que utilice un
 |TransactionManager|:
 
-.. todo:: Revisar este código
-
 .. literalinclude:: files/Conexion.java
    :language: java
    :class: toggle
    :name: clase-conexion
    :caption: Conexion.java (:download:`descarga <files/Conexion.java>`)
    :start-at: /**
+
+.. note:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
+   necesario. Esta que se muestra aquí es una simplificación.
 
 Con estos mimbres, ya podemos rematar nuestro patrón |DAO|, puesto que la conexión
 que necesitamos, podremos obtenerla de la clase ``Conexion``. Para simplificar
@@ -203,11 +204,6 @@ podemos definir una clase base:
    :class: toggle
    :caption: BaseDao.java (:download:`descarga <files/BaseDao.java>`)
    :start-at: /**
-
-.. note:: En realidad, como consecuencia de nuestra simplificación, no es
-   necesario pasar ningún argumento al constructor, ya que la obtención del
-   objeto ``Conexion`` no lo necesita. Pero para no perder generalidad en los
-   |DAO|, optamos por incluir la clave.
 
 Esta base es muy simple, y simplifica la construcción y el acceso al objeto
 ``Connection`` y al gestor de registros para abstraer a estos objetos de la
@@ -309,3 +305,4 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 .. |TransactionManager| replace:: :ref:`TransactionManager <conn-transaction-manager>`
 
 .. _God Class: https://linearb.io/blog/what-is-a-god-class
+.. _TestDAO: https://github.com/josem-dam/TestDAO

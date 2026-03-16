@@ -676,7 +676,7 @@ pool de conexiones. Recordemos que ya hemos discutido sobre cómo afinar esto
 </div>
 <p>Si partimos de que en ambas clases <abbr title="Data Access Object">DAO</abbr> tenemos un método <code class="docutils literal notranslate"><span class="pre">.getConnection()</span></code>
 que nos proporciona una objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> para realizar las operaciones
-<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación es trivial. Por ejemplo:</p>
+<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación es trivial. Por ejemplo:</p>
 <div class="highlight-java notranslate" id="dao-delete"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
 <span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
@@ -734,10 +734,6 @@ y definirle su <a class="reference internal" href="03.transacciones.html#conn-tr
 <p>Así pues, la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> puede ser simplemente una clase <em>Singleton</em> que
 establezca la conexión gracias a un <a class="reference internal" href="04.pool.html#conn-pool-extra"><span class="std std-ref">ConnectionPool</span></a> que utilice un
 <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>:</p>
-<div class="admonition-todo admonition" id="id3">
-<p class="admonition-title">Por hacer</p>
-<p>Revisar este código</p>
-</div>
 <div class="literal-block-wrapper docutils container" id="clase-conexion">
 <div class="code-block-caption"><span class="caption-text">Conexion.java (<a class="reference download internal" download="" href="../_downloads/f8ae5864257f3cd519a772840cec69c8/Conexion.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-conexion" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
@@ -780,11 +776,15 @@ establezca la conexión gracias a un <a class="reference internal" href="04.pool
 
 <span class="w">   </span><span class="cm">/**</span>
 <span class="cm">    * Devuelve el objeto de Conexion.</span>
+<span class="cm">    * @param key Clave que identifica la conexión. En realidad, no es necesaria</span>
+<span class="cm">    * al ser esto un patrón Singleton, pero se obliga a usar este parámetro por</span>
+<span class="cm">    * compatibilidad con el código de TestDAO.</span>
 <span class="cm">    * @throws IllegalStateException Si el objeto no se había creado antes.</span>
 <span class="cm">    * @return El objeto solicitado</span>
 <span class="cm">    */</span>
-<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Conexion</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Conexion</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">instance</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;No existe ningún objeto de Conexion&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">KEY</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;La clave es inválida. Use la definida en la propia clase&quot;</span><span class="p">);</span>
 
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span>
 <span class="w">   </span><span class="p">}</span>
@@ -876,11 +876,16 @@ establezca la conexión gracias a un <a class="reference internal" href="04.pool
 </pre></div>
 </div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En <a class="reference external" href="https://github.com/josem-dam/TestDAO">TestDAO</a> la clase implementa el patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a>, aun no siendo
+necesario. Esta que se muestra aquí es una simplificación.</p>
+</div>
 <p>Con estos mimbres, ya podemos rematar nuestro patrón <abbr title="Data Access Object">DAO</abbr>, puesto que la conexión
 que necesitamos, podremos obtenerla de la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code>. Para simplificar
 podemos definir una clase base:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Base para la construcción de todas las clases DAO.</span>
 <span class="cm"> * &lt;p&gt;Proporciona el constructor y métodos para simplificar</span>
@@ -896,8 +901,7 @@ podemos definir una clase base:</p>
 <span class="cm">     * @param key Clave que identifica la conexión.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="nf">BaseDao</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="c1">// La clave no se necesita en realidad porque Conexion es Singleton.</span>
-<span class="w">        </span><span class="n">cx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Conexion</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Conexion</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -918,13 +922,6 @@ podemos definir una clase base:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>En realidad, como consecuencia de nuestra simplificación, no es
-necesario pasar ningún argumento al constructor, ya que la obtención del
-objeto <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> no lo necesita. Pero para no perder generalidad en los
-<abbr title="Data Access Object">DAO</abbr>, optamos por incluir la clave.</p>
 </div>
 <p>Esta base es muy simple, y simplifica la construcción y el acceso al objeto
 <code class="docutils literal notranslate"><span class="pre">Connection</span></code> y al gestor de registros para abstraer a estos objetos de la
@@ -1187,7 +1184,7 @@ es más inteligente utilizarlas.</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>En realidad, esta es la gran dificultad.</p>
 </aside>

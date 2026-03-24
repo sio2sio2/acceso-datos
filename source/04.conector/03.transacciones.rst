@@ -223,24 +223,73 @@ Un aspecto muy interesante del gestor es que tiene definidos cinco eventos:
 **onTransactionEnd**
    Se produce justamente antes de acabar una transacción anidada.
 
-Se pueden definir *listeners* que desencadenen una acción al producirse alguno
-de los cinco eventos antes señalados. Uno muy útil es aquel que permita
-registrar mensajes sólo después de que se conozca el resultado de la
-transacción (LoggingManager_, también está definido en la librería).
-
-La clase es muy simple: al iniciarse la transacción, crea una lista para
-almacenar los mensajes, los cuales pueden irse enviado a lo largo de la
-transacción. Al acabar esta, y, dependiendo de qué haya ocurrido, se imprimirá
-el mensaje de éxito o el de fallo. En el ejemplo ilustrativo anterior podríamos
-haber registrado este *listener* y haberlo usado luego:
+Se pueden definir *obervadores* que desencadenen una acción al producirse alguno
+de los cinco eventos antes señalados. Por ejemplo, podríamos definir un
+observador que se limite a llevar la cuenta de las operaciones incluidas en la
+transacción así:
 
 .. code-block:: java
+   :caption: **CounterListener**
+   :class: toggle
+   :name: CounterListener
 
-   TransactionManager tm = TransactionManager.create("CENTRO", ds); // ds es un DataSource ya creado
-   tm.addListener("logging", new LoggingManager());
+   /**
+    Observador que se limita a definir un contador de operaciones
+    y mostrar el resultado al completarse la transacción.
+    */
+   public class CounterListener extends ContextAwareEventListener {
+       // Clave para poder obtener luego el observador.
+       public static final String KEY = new Object().toString();
+
+       // Recurso que queremos manejar con este observador (el propio contador)
+       @Override
+       public Object createResource() {
+           return new AtomicInteger(0);
+       }
+
+       /**
+        * Operación que incrementa el contador: cada vez que operemos dentro
+        * de la transacción debemos usar este método para llevar la cuenta.
+        * @return La cantidad de operaciones hechas hasta el momento.
+        */
+       public int increment() {
+           AtomicInteger counter = getContext().getResource();
+           return counter.incrementAndGet();
+       }
+
+       @Override
+       public void onCommit() {
+           AtomicInteger counter = getContext().getResource();
+           System.out.printf("Se han realizado %d operaciones dentro de esta transacción.\n", counter.get());
+       }
+
+       @Override
+       public void onRollback() {
+           AtomicInteger counter = getContext().getResource();
+           System.out.printf("Se intentaron completar sin llegarse a confirmar %d operaciones dentro de esta transacción.\n", counter.get());
+       }
+
+       // Para los restantes eventos no es necesario hacer nada.
+
+   }
+
+
+En cualquier caso, uno bastante más útil es aquel que permita registrar mensajes
+sólo después de que se conozca el resultado de la transacción (LoggingManager_,
+también está definido en la librería).
+
+Para registrar los observadores en el gestor basta con:
+
+.. code-block:: java
+   :emphasize-lines: 2, 3, 7, 8, 15-20, 22
+
+   TransactionManager tm = TransactionManager.create("CENTRO", ds)  // ds es un DataSource ya creado
+      .addEventListener("counter", new CounterListener())
+      .addEventListener("logging", new LoggingManager());
 
    tm.transaction(ctxt -> {
-      // Recuperamos el listener del contexto usando su nombre de registro.
+      // Recuperamos los observadores del contexto usando su nombre con que se registró.
+      CounterListener counter = ctxt.getEventListener("counter", CounterListener.class);
       LoggingManager lm = ctxt.getEventListener("logging", LoggingManager.class);
 
       // [...]
@@ -255,6 +304,7 @@ haber registrado este *listener* y haberlo usado luego:
                "Transacción fallida: la titularidad del centro '%d' no cambia.".formatted(11004866) // Rollback
             );
          }
+         counter.increment();
 
       // [...]
    });

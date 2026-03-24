@@ -171,13 +171,13 @@ crearlo, podemos encerrar toda esta lógica en una clase como ConnectionPool_.
 
 La clase sigue el patrón ya ensayado para :ref:`TransactionManager
 <conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
-conexiones una clave, por lo que crear un *pool* con HikariCP_ es muy sencillo\ [#]_:
+conexiones una clave, por lo que crear un *pool* es muy sencillo\ [#]_:
 
 .. code-block:: java
    :emphasize-lines: 2, 10
 
    // Pool de conexiones de una base SQLite en memoria.
-   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null)) {
       DataSource ds = pool.getDataSource();
       try(Connection conn = ds.getConnection()) {
          // Hacemos operaciones con la conexión.
@@ -189,6 +189,11 @@ conexiones una clave, por lo que crear un *pool* con HikariCP_ es muy sencillo\ 
 
 La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
 siempre que no se haya cerrado.
+
+Ahora bien, ¿qué se ha usado para crear el *pool*, esto es, el objeto
+|DataSource|\ ? Como no nos hemos preocupado de ello, se ha usado HikariCP_,
+pero se permite añadir un cuarto argumento al metodo ``create`` que habilita la
+creación del objeto con cualquier otro método\ [#]_.
 
 El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
 y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
@@ -234,8 +239,21 @@ de transacción el que se encargue de crear y cerrar la conexión que necesitamo
    datos distinta en memoria. Con una base de datos persistente, no habría sido
    necesario.
 
+.. [#] Pero para ello es necesario añadir el módulo ``sqlutils-hikaricp`` a las
+   dependencias. Por otro lado, para saber cómo obtener el objeto |DataSource|
+   de cualquier otro modo, éche un vistazo a la interfaz `DataSourceFactory
+   <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java>`_
+   y a su implementación con HikariCP_, la clase `HikariCPFactory <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java>`_. De hecho:
 
+   .. code-block:: java
 
+      ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null))
+
+   es equivalente a:
+
+   .. code-block:: java
+
+      ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, new HikariCPFactory()))
 
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`

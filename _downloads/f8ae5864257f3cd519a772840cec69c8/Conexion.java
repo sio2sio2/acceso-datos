@@ -63,7 +63,7 @@ public class Conexion implements AutoCloseable {
             Connection conn = ctxt.connection();
 
             // Si la base de datos ya está inicializada, no hacemos nada.
-            if(SqlUtils.isDatabaseInitialized(conn)) return;
+            if(SqlUtils.isDatabaseEmpty(conn)) return;
 
             try {
                 SqlUtils.executeSQL(conn, schema);

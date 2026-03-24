@@ -436,7 +436,7 @@ código más sencillo y manipulable.</p></li>
 nos abstrae de sus particularidades. Su uso, por tanto, nos independiza
 de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que gestione los datos frente a los conectores que
 usan sentencias <abbr title="Structured Query Language">SQL</abbr>, generalmente dependientes de cuál es el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. En
-contrapartida, puede resultar muy trabajoso cambiar de <abbr title="Object-Relational Mapping">ORM</abbr><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Con
+contrapartida, puede resultar muy trabajoso cambiar de <abbr title="Object-Relational Mapping">ORM</abbr><a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Con
 conectores, en cambio, hay que usar sentencias <abbr title="Structured Query Language">SQL</abbr> y estas dependen del
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> por lo que un cambio en éste obligará a repasar el código.</p></li>
 </ol>
@@ -519,7 +519,7 @@ Estudiante(*id*, nombre, nacimiento, _centro_)
 <p class="admonition-title">Consejo</p>
 <p>Mucho de lo propuesto en esta unidad está incluido en un <a class="reference external" href="https://github.com/sio2sio2/sqlutils">repositorio
 de Github llamado sqlutils</a> listo
-para su uso:</p>
+para su uso<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- En pom.xml --&gt;</span>
 <span class="nt">&lt;repositories&gt;</span>
 <span class="w">     </span><span class="nt">&lt;repository&gt;</span>
@@ -530,9 +530,9 @@ para su uso:</p>
 
 <span class="nt">&lt;dependencies&gt;</span>
 <span class="w">  </span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">      </span><span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+<span class="w">      </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2.sqlutils<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>sqlutils-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">      </span><span class="nt">&lt;version&gt;</span>4.0.0<span class="nt">&lt;/version&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;/dependencies&gt;</span>
 </pre></div>
@@ -551,11 +551,17 @@ para su uso:</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>En <em>Java</em>, sin embargo, disponemos de una especificación oficial
 propuesta para las herramientas <abbr title="Object-Relational Mapping">ORM</abbr> llamada <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">JPA</span></a>, por lo que es
 trivial cambiar de herramienta <abbr title="Object-Relational Mapping">ORM</abbr> entre todas las que la soportan.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>La librería la componen dos módulos más: <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code>, para
+crear un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a> con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> y
+<code class="docutils literal notranslate"><span class="pre">sqlutils-orm</span></code>, que implementa un <em>pseudoorm</em> muy básico.</p>
 </aside>
 </aside>
 </section>

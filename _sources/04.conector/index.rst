@@ -131,7 +131,7 @@ El cual en |SQL| se define así:
 
 .. hint:: Mucho de lo propuesto en esta unidad está incluido en un `repositorio
    de Github llamado sqlutils <https://github.com/sio2sio2/sqlutils>`_ listo
-   para su uso:
+   para su uso\ [#]_:
 
    .. code-block:: xml
 
@@ -145,9 +145,9 @@ El cual en |SQL| se define así:
 
       <dependencies>
         <dependency>
-            <groupId>com.github.sio2sio2</groupId>
-            <artifactId>sqlutils</artifactId>
-            <version>3.8.1</version>
+            <groupId>com.github.sio2sio2.sqlutils</groupId>
+            <artifactId>sqlutils-core</artifactId>
+            <version>4.0.0</version>
         </dependency>
       </dependencies>
 
@@ -165,6 +165,10 @@ El cual en |SQL| se define así:
    propuesta para las herramientas |ORM| llamada :ref:`JPA <orm>`, por lo que es
    trivial cambiar de herramienta |ORM| entre todas las que la soportan.
 
+.. [#] La librería la componen dos módulos más: ``sqlutils-hikaricp``, para
+   crear un :ref:`pool de conexiones <conn-pool>` con HikariCP_ y
+   ``sqlutils-orm``, que implementa un *pseudoorm* muy básico.
+
 .. |POO| replace:: :abbr:`POO (Programación Orientada a Objetos)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |CSV| replace:: :abbr:`CSV (Comma-Separated Values)`
@@ -175,6 +179,7 @@ El cual en |SQL| se define así:
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |E/R| replace:: :abbr:`E/R (Entidad/Relación)`
 
+.. _HikariCP: https://github.com/brettwooldridge/HikariCP
 .. _commons-csv: https://commons.apache.org/proper/commons-csv/project-info.html
 .. _librería Jackson: https://github.com/FasterXML/jackson
 .. _MariaDB: https://mariadb.org/

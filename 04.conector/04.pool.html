@@ -490,7 +490,7 @@ código equivalente para otros <abbr title="Sistema Gestor de Bases de Datos">SG
 <section id="id1">
 <h2><span class="section-number">4.4.2. </span>HikariCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>La alternativa, que es común a cualquier controlador, es usar una librería
-especializada como <a href="#id4"><span class="problematic" id="id5">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
+especializada como <a href="#id6"><span class="problematic" id="id7">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>Con esta librería no tendremos problemas al utilizar un <em>pool</em> de
@@ -542,7 +542,7 @@ conexiones con <strong class="program">SQLite</strong>.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id6"><span class="problematic" id="id7">HikariCP_</span></a>,
+<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id8"><span class="problematic" id="id9">HikariCP_</span></a>,
 la ruta debe ser <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code> y no simplemente
 <code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>.</p>
 </div>
@@ -552,9 +552,9 @@ la ruta debe ser <code class="file docutils literal notranslate"><span class="pr
 <p>Si queremos simplificar la creación del pool y abstraernos de qué se usa para
 crearlo, podemos encerrar toda esta lógica en una clase como <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java">ConnectionPool</a>.</p>
 <p>La clase sigue el patrón ya ensayado para <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>: un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a> que asocia a cada <em>pool</em> de
-conexiones una clave, por lo que crear un <em>pool</em> con <a href="#id8"><span class="problematic" id="id9">HikariCP_</span></a> es muy sencillo<a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+conexiones una clave, por lo que crear un <em>pool</em> es muy sencillo<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="c1">// Hacemos operaciones con la conexión.</span>
@@ -567,6 +567,10 @@ conexiones una clave, por lo que crear un <em>pool</em> con <a href="#id8"><span
 </div>
 <p>La última línea muestra cómo puede recuperarse en cualquier momento el <em>pool</em>,
 siempre que no se haya cerrado.</p>
+<p>Ahora bien, ¿qué se ha usado para crear el <em>pool</em>, esto es, el objeto
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>? Como no nos hemos preocupado de ello, se ha usado <a href="#id10"><span class="problematic" id="id11">HikariCP_</span></a>,
+pero se permite añadir un cuarto argumento al metodo <code class="docutils literal notranslate"><span class="pre">create</span></code> que habilita la
+creación del objeto con cualquier otro método<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <p>El objeto puede utilizarse tal como se ha ilustrado para obtener su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
 y, a partir de él, distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá que cerrar
 convenientemente), pero es más conveniente aprovechar las posibilidades de
@@ -600,7 +604,7 @@ eso se ha creado.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>Al método sólo se le proporciona la <abbr title="Uniform Resource Locator">URL</abbr>, porque usamos <em>SQLite</em> como
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Si fuera otro como <em>MySQL</em>, tendríamos también que proporcionar un
@@ -609,6 +613,20 @@ nos vemos obligados añadir el parámetro <code class="code docutils literal not
 que de lo contrario cada conexión que devuelva el <em>pool</em> será una base de
 datos distinta en memoria. Con una base de datos persistente, no habría sido
 necesario.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Pero para ello es necesario añadir el módulo <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code> a las
+dependencias. Por otro lado, para saber cómo obtener el objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
+de cualquier otro modo, éche un vistazo a la interfaz <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java">DataSourceFactory</a>
+y a su implementación con <a href="#id12"><span class="problematic" id="id13">HikariCP_</span></a>, la clase <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java">HikariCPFactory</a>. De hecho:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>es equivalente a:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariCPFactory</span><span class="p">()))</span>
+</pre></div>
+</div>
 </aside>
 </aside>
 </section>

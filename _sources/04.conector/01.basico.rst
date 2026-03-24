@@ -399,17 +399,10 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
   capaz de procesar el código |SQL| y, por tanto, reconocer los elementos de que
   se compone.
 
-+ Podemos escribir una solución artesanal, si el guión no es complejo y seguimos
-  algunas premisas:
-
-  a. Los ';' que completan sentencias deben encontrarse a final de línea.
-  #. No pueden usarse las palabras ``begin`` o ``end`` en comentarios, nombres,
-     valores, etc.
-  #. No pueden usarse bloques ``IF`` en aquellos |SGBD| que los implementen
-     (pero sí usarse el estándar ``CASE``).
-
-  El código de los métodos ``splitSQL`` y ``executeSQL`` hace esto mismo
-  y se encuentra en la clase SqlUtils de la librería sqlutils_.
++ Podemos escribir una solución artesanal, si el guión no es complejo y se
+  respeta el estándar SQL. El código de los métodos ``splitSQL`` y
+  ``executeSQL`` hace esto mismo y se encuentra en la clase SqlUtils de la
+  librería sqlutils_.
 
 .. _conn-sqlutils:
 

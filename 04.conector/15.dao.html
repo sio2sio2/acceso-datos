@@ -801,7 +801,7 @@ establezca la conexión gracias a un <a class="reference internal" href="04.pool
 <span class="w">            </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">connection</span><span class="p">();</span>
 
 <span class="w">            </span><span class="c1">// Si la base de datos ya está inicializada, no hacemos nada.</span>
-<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">isDatabaseInitialized</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">isDatabaseEmpty</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 
 <span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">executeSQL</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">schema</span><span class="p">);</span>

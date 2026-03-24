@@ -94,10 +94,11 @@ Por supuesto, el código es *completamente inútil*: nos hemos conectado a la ba
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.
 
-.. seealso:: La conexión a una base de datos es una **operación costosa**, por lo
+.. caution:: La conexión a una base de datos es una **operación costosa**, por lo
    que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-   se penalizará. Para optimizarlo reaprovechando conexiones, existen los
-   :ref:`pools de conexiones <conn-pool>`.
+   se penalizará. Lo habitual es una aplicación que sea algo más que una prueba
+   de concepto, es utilizar un :ref:`pool de conexiones <conn-pool>`, que es capaz
+   de reaprovechar conexiones, puesto que en realidad no las acaba de cerrar.
 
 .. _conn-statement:
 

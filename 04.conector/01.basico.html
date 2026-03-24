@@ -522,12 +522,13 @@ que debemos usar exclusivamente son clases proporcionadas por <abbr title="Java 
 <p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.</p>
-<div class="admonition seealso">
-<p class="admonition-title">Ver también</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
 <p>La conexión a una base de datos es una <strong>operación costosa</strong>, por lo
 que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-se penalizará. Para optimizarlo reaprovechando conexiones, existen los
-<a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pools de conexiones</span></a>.</p>
+se penalizará. Lo habitual es una aplicación que sea algo más que una prueba
+de concepto, es utilizar un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>, que es capaz
+de reaprovechar conexiones, puesto que en realidad no las acaba de cerrar.</p>
 </div>
 </section>
 <section id="ejecucion-de-sentencias">

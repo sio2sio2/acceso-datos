@@ -46,7 +46,7 @@ En el código de ejemplo, hay dos claves fundamentales:
       |SGBD|       Librería |JDBC|          Driver\ [#]_                                   |URL|\ [#]_
      ============ ======================== ============================================== ==============================================================
       SQLite       `sqlite-jdbc`_           org.sqlite.JDBC                                `jdbc:sqlite:<ruta>`
-      H2                                    org.h2.Driver                                  | `jdbc:h2:<ruta>`
+      H2           h2_                      org.h2.Driver                                  | `jdbc:h2:<ruta>`
                                                                                            | `jdbc:h2:tcp://<host>:<port>/<ruta>`
       MariaDB      `mariadb-java-client`_   org.mariadb.jdbc.Driver                        `jdbc:mariadb://[<host>[:<port>]]/<base_datos>`
       MySQL        `mysql-connector-j`_     com.mysql.cj.jdbc.Driver                       `jdbc:mysql://[<host>[:<port>]]/[base_datos]`
@@ -84,11 +84,11 @@ En el código de ejemplo, hay dos claves fundamentales:
           <scope>runtime</scope>
       </dependency>
 
-   Esto asegura que la librería estará disponible para su ejecución de la
-   aplicación, ya que es necesaria, pero evita que esté disponible en tiempo de
-   compilación, lo que se traduce en que el |IDE| nunca nos sugerirá clases y
-   métodos incluidos en ella. Esto último es de importancia, ya que nosotros lo
-   que debemos usar exclusivamente son clases proporcionadas por |JDBC|.
+   Esto asegura que la librería estará disponible durante la ejecución de la
+   aplicación, pero evita que esté disponible en tiempo de compilación, lo que
+   se traduce en que el |IDE| nunca nos sugerirá clases y métodos incluidos en
+   ella. Esto último es de importancia, ya que nosotros lo que debemos usar
+   exclusivamente son clases proporcionadas por |JDBC|\ [#]_.
 
 Por supuesto, el código es *completamente inútil*: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
@@ -96,9 +96,9 @@ como leer y escribir datos.
 
 .. caution:: La conexión a una base de datos es una **operación costosa**, por lo
    que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-   se penalizará. Lo habitual es una aplicación que sea algo más que una prueba
-   de concepto, es utilizar un :ref:`pool de conexiones <conn-pool>`, que es capaz
-   de reaprovechar conexiones, puesto que en realidad no las acaba de cerrar.
+   se penalizará. Lo habitual en una aplicación que sea algo más que una prueba
+   de concepto, es utilizar un :ref:`pool de conexiones <conn-pool>`, el cual es
+   capaz de reaprovechar las conexiones. Lo trataremos más adelante.
 
 .. _conn-statement:
 
@@ -177,9 +177,11 @@ podemos hacer:
          new Centro(11701164, "IES Astaroth", "pública")
       }
 
+      // ¡ATENCIÓN!: Ni se le ocurre escribir sentencias como la siguiente,
+      // esto es una primera aproximación.
       String sqlString = "INSERT INTO Centro VALUES (%d, '%s', '%s');"
       for(Centro centro: centros) {
-          stmt.executeUpdate(String.format(sqlString,
+          stmt.executeUpdate(sqlString.formatted(
             centro.getId(),
             centro.getNombre(),
             centro.getTitularidad()
@@ -193,9 +195,9 @@ podemos hacer:
      eficiente. Ya aprenderemos cómo hacer :ref:`operaciones masivas <conn-batch>`.
    * Las sentencias usan valores almacenados en variables y hay que construirlas
      incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
-     usado ``String.format``. Sin embargo, |JDBC| ya viene con un mecanismo
-     específico para realizar esta labor: las :ref:`sentencias parametrizadas
-     <conn-preparedstatement>`.
+     *formateado* la cadena indicando dónde obtener los valores. Sin embargo,
+     |JDBC| ya viene con un mecanismo específico para realizar esta labor: las
+     :ref:`sentencias parametrizadas <conn-preparedstatement>`.
 
    Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
    mejor.
@@ -249,7 +251,7 @@ de objetos de Java, Por ejemplo, podríamos hacer esto:
 
 .. caution:: Los métodos ``.getInt``, ``.getLong``, etc. devuelven tipos
    primitivos (``int``, ``long``, etc.) por lo que cuando en la base de datos el
-   valor del campo es ``NULL``, con incapaces de devolver ``null`` y devuelven
+   valor del campo es ``NULL``, no devuelven ``null``, sino 
    el valor predeterminado del primitivo (p.ej.  ejemplo, **0** en caso de
    ``int`` o ``long``). Si necesitamos diferenciar el valor predeterminado del
    valor nulo, hay dos estrategias. Una consiste en seguir usando estos métodos
@@ -382,8 +384,8 @@ a. El driver debe inferir el tipo |SQL| a partir del tipo de *Java*: eso
       if(centro == null) pstmt.setNull(3, Types.INTEGER);
       else pstmt.setInt(3, centro.getId());
 
-Cargar del esquema
-==================
+Carga del esquema inicial
+=========================
 Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
 de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
 las sentencias necesarias se encuentren en un guión |SQL| y el programa las lea
@@ -391,7 +393,7 @@ de él, en vez de encontrarse incrustadas en el código.
 
 Sin embargo, |JDBC| no tiene definido un método que nos permita ejecutar un
 guión |SQL| completo y que pasemos una cadena larga con todas las instrucciones
-separadas por comas, no asegura que el |SGBD| las descomponga y ejecute
+separadas por puntos y coma, no asegura que el |SGBD| las descomponga y ejecute
 individualmente\ [#]_. La única forma segura de poder ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
@@ -409,10 +411,6 @@ es descomponerlas primero. Para ello podemos optar por dos estrategias:
 
 Tratamiento funcional de las consultas
 ======================================
-
-.. todo:: Revisar este apartado para utilizar ConnectionWrapper en vez de
-   |Connection|.
-
 |ResultSet| permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 :ref:`operaciones funcionales habituales <java-stream-operaciones>`. Para
@@ -441,8 +439,8 @@ resultados de la consulta:
    Statement stmt = conn.createStatement();
    ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
  
-   // try-with-resources para asegurarnos de liberar los recursos (stmt y rs)
-   try (Stream<Centro> centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro)) {
+   // try-with-resources para asegurarnos de liberar los recursos (conn, stmt y rs)
+   try (Stream<Centro> centros = SqlUtils.resultSetToStream(conn, stmt, rs, Main::resultToCentro)) {
       // Tratamos el flujo como estimemos más oportuno.
       for(Centro c: (Iterable<Centro>) centros::iterator) {
          System.out.println(c);
@@ -463,7 +461,7 @@ resultados de la consulta:
          Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery("SELECT * FROM Centro");
       ) {
-         centros = SqlUtils.resultSetToStream(stmt, rs, Main::resultToCentro);
+         centros = SqlUtils.resultSetToStream(conn, stmt, rs, Main::resultToCentro);
       }
 
       for(Centro c: centros) {
@@ -474,11 +472,11 @@ resultados de la consulta:
    no funciona en absoluto. Es indispensable que no cerremos los objetos
    |Connection|, |Statement| y |ResultSet| para que el ``Stream`` pueda devolver
    objetos. ¿Cuándo entonces se cierran? De eso se encarga el propio flujo al
-   cerrarse (véase la implementación). Por ese motivo el primer argumento que se
-   pasa al método es la sentencia o la conexión, dependiendo de lo que más nos
-   interese cerrar al terminar de consumir el flujo. Eso sí, debemos asegurarnos
-   de cerrar el flujo al acabar con él, razón por la cual en el ejemplo
-   ilustrativo de su uso hemos usado una sentencia *try-with-resources*.
+   cerrarse (véase la implementación). Por ese motivo es necesario proporcionar
+   al método los objetos |Connection| y |Statement|.  Eso sí, debemos
+   asegurarnos de cerrar el flujo al acabar con él, razón por la cual en el
+   ejemplo ilustrativo de su uso hemos usado una sentencia
+   *try-with-resources*.
 
 .. tip:: El método ``resultSetToStream`` permite no definir la función que
    transforma la fila (el propio |ResultSet|) en un objeto. En ese caso, se
@@ -490,13 +488,15 @@ resultados de la consulta:
          // Tratamos el resultado como un Stream.
       }
 
+.. tip:: Si no nos interesa cerrar la conexión al cerrar el flujo, podemos pasar
+   ``null`` en el argummento correspondiente.
 
 .. rubric:: Notas al pie
 
 .. [#] En las versiones modernas de |JDBC| no es necesario expresar el nombre
    del driver, ya que dispone de mecanismos parar inferir cuál es el driver
    adecuado a partir de la |URL| de conexión. En cambio, más adelante, al
-   tratar :ref:`Hibernate <orm>`, sí lo necesitaremos.
+   tratar :ref:`JPA <orm>`, sí lo necesitaremos.
 
 .. [#] Se han supuesto (excepto para :program:`SQLite` obviamente) conexiones
    |TCP|/|IP|. Sin embargo, en sistemas *UNIX* el motor podría permitir
@@ -504,6 +504,11 @@ resultados de la consulta:
    MariaDB podría ser
    ``jdbc:mariadb:///mibase?socket=/var/run/mysqld/mysqld.sock`` o
    algo parecido.
+
+.. [#] Ahora bien, si nuestra intención es usar el :ref:`pool de conexiones
+   <conn-pool>` integrado en el driver, sí necesitaremos usar implementación
+   específica para el pool y, en consecuencia, no deberemos incluir
+   ``<runtime>``.
 
 .. [#] Aunque haremos una excepción aclarando cómo están definidas las claves
    primarias en las tablas ``Claustro``, ``Departamento`` y ``Profesor``.
@@ -531,7 +536,7 @@ resultados de la consulta:
    cambiemos la configuración predeterminada para soportar el entrecomillado con
    comillas dobles, ya que este |SGBD| entrecomilla con el acento grave.
 
-.. [#] Con *SQLite* por ejemplo el método ``.executeUpdate`` sí será capaz de
+.. [#] Con *SQLite*, por ejemplo, el método ``.executeUpdate`` sí será capaz de
    ejecutar todas las sentencias |SQL|; ``execute``, en cambio, no lo hará y
    ejecutará solo la primera. Con otros |SGBD| el comportamiento puede variar.
 
@@ -552,6 +557,7 @@ resultados de la consulta:
 
 .. _SQLite: https://sqlite.org/
 .. _sqlite-jdbc: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+.. _h2: https://mvnrepository.com/artifact/com.h2database/h2
 .. _mariadb-java-client: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
 .. _mysql-connector-j: https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 .. _postgresql: https://mvnrepository.com/artifact/org.postgresql/postgresql

@@ -455,19 +455,37 @@ ejecución de las sentencias al motor de la base de datos. Además de la
 <abbr title="Application Programming Interface">API</abbr>, necesitaremos para cada <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> un <em>driver</em> basado en la <abbr title="Application Programming Interface">API</abbr> que
 posibilite la conexión. Este <em>driver</em> sí que será una librería de terceros que
 deberemos incluir en nuestro proyecto.</p>
-<p class="rubric">SQLite</p>
+<p class="rubric">SGBD de referencia</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Procuraremos escribir sentencias <abbr title="Structured Query Language">SQL</abbr> que cumplan el estándar para que
+el código sea lo más portable posible.</p>
+</div>
 <p>Para aprender y practicar el acceso con conectores, podemos escoger cualquier
-<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Utilizaremos en el caso de estos apuntes, <a class="reference external" href="https://sqlite.org/">SQLite</a> por varias razones:</p>
-<ul class="simple">
-<li><p>Comodidad, ya que a diferencia de otros (<a class="reference external" href="https://mariadb.org/">MariaDB</a>, <a class="reference external" href="https://www.oracle.com/es/database/">Oracle</a>, etc) no requiere
-un servidor: la base de datos es un archivo.</p></li>
-<li><p>Es una base de datos empotrada y se usa mucho en aplicaciones que necesitan
-organizar sus datos en una base de datos exclusiva en la que no
-concurrirán otros procesos.</p></li>
-</ul>
-<p>Con la excepción de las propias sentencias <abbr title="Structured Query Language">SQL</abbr> que pueden variar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> o
-<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, las explicaciones serán totalmente válidas. Antes, no obstante, es
-necesario que tengamos <strong>instalado el motor</strong>. En el caso de <strong class="program">SQLite</strong>:</p>
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Ahora bien, lo habitual es que los <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> tengan una arquitectura
+cliente-servidor para propociar el acceso remoto y concurrente a los datos. Esta
+arquitectura está bien; pero, como nuestra intención es aprender a programar con
+bases de datos relacionales y no tanto crear programas reales para producción,
+montar una arquitectura de este tipo puede desviar esfuerzos del propósito
+principal. Por ese motivo (y con independencia de que se propongan ejercicios
+adicionales en que se usen <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> como <a class="reference external" href="https://mariadb.org/">MariaDB</a> o <a class="reference external" href="https://www.oracle.com/es/database/">Oracle</a>), centraremos nuestra
+atención en dos <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que posibilitan el manejo de una base de datos relacional
+sin necesidad de configurar un servidor:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://sqlite.org/">SQLite</a>, que es un <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> escrito en C, cuyas bases de datos son simples
+archivos y se usa ampliamente en aplicaciones escritas en diversos lenguajes
+que organizan sus datos con una base de datos exclusiva sobre la que no
+concurren otros procesos.</p></li>
+<li><p><a class="reference external" href="https://www.h2database.com/html/main.html">H2</a>, que es un <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> programado en Java que ocupa poco espacio y permite
+además de modo <em>standalone</em>, practicar una arquitectura cliente-servidor.</p></li>
+</ol>
+<p>En cualquier caso, las explicaciones serán totalmente válidas para cualquier
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> relacional.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La librería <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a> incluye un motor de <a class="reference external" href="https://sqlite.org/">SQLite</a> para facilitar
+su uso, pero es conveniente que tengamos instalado nosotros mismos el motor
+en el sistema operativo, por si queremos hacer pruebas:</p>
 <ul class="simple" id="rst-simple">
 <li><p>Las distribuciones de <em>Linux</em> suelen incluir un paquete, por lo que su
 instalación es trivial.</p></li>
@@ -475,17 +493,12 @@ instalación es trivial.</p></li>
 La instalación, no obstante, es sencilla:</p>
 <ol class="loweralpha simple">
 <li><p>Guardar los archivos suministrados dentro del <em>zip</em> en un lugar adecuado
-(p.e. <code class="file docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\SQLite</span></code>).</p></li>
+(p.ej. <code class="file docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\SQLite</span></code>).</p></li>
 <li><p>Añadir el directorio al <cite>PATH</cite> del sistema.</p></li>
 </ol>
 </li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Procuramos escribir sentencias <abbr title="Structured Query Language">SQL</abbr> que cumplan el estándar para que
-el código sea lo más portable posible.</p>
 </div>
-<p>Además, necesitaremos importar en nuestro proyecto la librería propia de <strong class="program">SQLite</strong>: <a class="reference external" href="https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc">sqlite-jdbc</a>.</p>
 <p class="rubric" id="ej-centros-alumnos">Ejercicio ilustrativo</p>
 <p>Tomaremos como base un problema muy sencillo en el que simplemente existen
 centros y estudiantes matriculados en ellos. Podemos representarlo
@@ -496,15 +509,15 @@ gráficamente con el siguiente diagrama <abbr title="Entidad/Relación">E/R</abb
 Estudiante(*id*, nombre, nacimiento, _centro_)
 </pre></div>
 </div>
-<p>El cual en <abbr title="Structured Query Language">SQL</abbr> se define así:</p>
+<p>el cual en <abbr title="Structured Query Language">SQL</abbr> se define así:</p>
 <div class="highlight-sql notranslate" id="ec-esquema"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">id</span><span class="w">             </span><span class="nb">INTEGER</span><span class="w">        </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="cm">/* GENERATED BY DEFAULT AS IDENTITY */</span><span class="p">,</span>
+<span class="w">   </span><span class="n">id</span><span class="w">             </span><span class="nb">INTEGER</span><span class="w">        </span><span class="cm">/* GENERATED BY DEFAULT AS IDENTITY */</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
 <span class="w">   </span><span class="n">nombre</span><span class="w">         </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w">   </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">   </span><span class="n">titularidad</span><span class="w">    </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="w">        </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="n">titularidad</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;público&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;privado&#39;</span><span class="p">))</span>
 <span class="p">);</span>
 
 <span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="p">(</span>
-<span class="w">   </span><span class="n">id</span><span class="w">             </span><span class="nb">INTEGER</span><span class="w">        </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="cm">/* GENERATED BY DEFAULT AS IDENTITY */</span><span class="p">,</span>
+<span class="w">   </span><span class="n">id</span><span class="w">             </span><span class="nb">INTEGER</span><span class="w">        </span><span class="cm">/* GENERATED BY DEFAULT AS IDENTITY */</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
 <span class="w">   </span><span class="n">nombre</span><span class="w">         </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span><span class="w">   </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">   </span><span class="n">nacimiento</span><span class="w">     </span><span class="nb">DATE</span><span class="w">           </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <span class="w">   </span><span class="n">centro</span><span class="w">         </span><span class="nb">INTEGER</span><span class="p">,</span>

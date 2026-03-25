@@ -74,37 +74,48 @@ ejecución de las sentencias al motor de la base de datos. Además de la
 posibilite la conexión. Este *driver* sí que será una librería de terceros que
 deberemos incluir en nuestro proyecto.
 
-.. rubric:: SQLite
+.. rubric:: SGBD de referencia
 
-Para aprender y practicar el acceso con conectores, podemos escoger cualquier
-|SGBD|. Utilizaremos en el caso de estos apuntes, SQLite_ por varias razones:
-
-+ Comodidad, ya que a diferencia de otros (MariaDB_, Oracle_, etc) no requiere
-  un servidor: la base de datos es un archivo.
-+ Es una base de datos empotrada y se usa mucho en aplicaciones que necesitan
-  organizar sus datos en una base de datos exclusiva en la que no
-  concurrirán otros procesos.
-
-Con la excepción de las propias sentencias |SQL| que pueden variar de |SGBD| o
-|SGBD|, las explicaciones serán totalmente válidas. Antes, no obstante, es
-necesario que tengamos **instalado el motor**. En el caso de :program:`SQLite`:
-
-.. _rst-simple:
-
-* Las distribuciones de *Linux* suelen incluir un paquete, por lo que su
-  instalación es trivial.
-* Para sistemas *Windows* la página oficial ofrece `binarios precompilados
-  <https://sqlite.org/download.html#win32>`_, pero no un instalador automático.
-  La instalación, no obstante, es sencilla:
-
-  a. Guardar los archivos suministrados dentro del *zip* en un lugar adecuado
-     (p.e. :file:`C:\\Program Files\\SQLite`).
-  #. Añadir el directorio al `PATH` del sistema.
-
-.. note:: Procuramos escribir sentencias |SQL| que cumplan el estándar para que
+.. note:: Procuraremos escribir sentencias |SQL| que cumplan el estándar para que
    el código sea lo más portable posible.
 
-Además, necesitaremos importar en nuestro proyecto la librería propia de :program:`SQLite`: sqlite-jdbc_.
+Para aprender y practicar el acceso con conectores, podemos escoger cualquier
+|SGBD|. Ahora bien, lo habitual es que los |SGBD| tengan una arquitectura
+cliente-servidor para propociar el acceso remoto y concurrente a los datos. Esta
+arquitectura está bien; pero, como nuestra intención es aprender a programar con
+bases de datos relacionales y no tanto crear programas reales para producción,
+montar una arquitectura de este tipo puede desviar esfuerzos del propósito
+principal. Por ese motivo (y con independencia de que se propongan ejercicios
+adicionales en que se usen |SGBD| como MariaDB_ o Oracle_), centraremos nuestra
+atención en dos |SGBD| que posibilitan el manejo de una base de datos relacional
+sin necesidad de configurar un servidor:
+
+#. SQLite_, que es un |SGBD| escrito en C, cuyas bases de datos son simples
+   archivos y se usa ampliamente en aplicaciones escritas en diversos lenguajes
+   que organizan sus datos con una base de datos exclusiva sobre la que no
+   concurren otros procesos.
+
+#. H2_, que es un |SGBD| programado en Java que ocupa poco espacio y permite
+   además de modo *standalone*, practicar una arquitectura cliente-servidor.
+
+En cualquier caso, las explicaciones serán totalmente válidas para cualquier
+|SGBD| relacional.
+
+.. note:: La librería sqlite-jdbc_ incluye un motor de SQLite_ para facilitar
+   su uso, pero es conveniente que tengamos instalado nosotros mismos el motor
+   en el sistema operativo, por si queremos hacer pruebas:
+
+   .. _rst-simple:
+
+   * Las distribuciones de *Linux* suelen incluir un paquete, por lo que su
+     instalación es trivial.
+   * Para sistemas *Windows* la página oficial ofrece `binarios precompilados
+     <https://sqlite.org/download.html#win32>`_, pero no un instalador automático.
+     La instalación, no obstante, es sencilla:
+
+     a. Guardar los archivos suministrados dentro del *zip* en un lugar adecuado
+        (p.ej. :file:`C:\\Program Files\\SQLite`).
+     #. Añadir el directorio al `PATH` del sistema.
 
 .. rubric:: Ejercicio ilustrativo
    :name: ej-centros-alumnos
@@ -122,7 +133,7 @@ Podemos traducir el anterior esquema al modelo relacional así:
    Centro(*id*, nombre, titularidad)
    Estudiante(*id*, nombre, nacimiento, _centro_)
 
-El cual en |SQL| se define así:
+el cual en |SQL| se define así:
 
 .. literalinclude:: files/ec.sql
    :name: ec-esquema
@@ -187,3 +198,7 @@ El cual en |SQL| se define así:
 .. _SQLite: https://sqlite.org/
 .. _sqlite-jdbc: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
 .. _mariadb-java-client: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+.. _H2: https://www.h2database.com/html/main.html
+
+.. |nbsp| unicode:: U+00A0
+   :trim:

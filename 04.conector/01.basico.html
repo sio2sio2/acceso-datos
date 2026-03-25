@@ -387,7 +387,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.1.2.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-del-esquema">4.1.3. Cargar del esquema</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-del-esquema-inicial">4.1.3. Carga del esquema inicial</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.1.4. Tratamiento funcional de las consultas</a></li>
 </ul>
             </nav>
@@ -448,7 +448,7 @@ estamos utilizando al construirla:</p>
 <td><p><cite>jdbc:sqlite:&lt;ruta&gt;</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>H2</p></td>
-<td></td>
+<td><p><a class="reference external" href="https://mvnrepository.com/artifact/com.h2database/h2">h2</a></p></td>
 <td><p>org.h2.Driver</p></td>
 <td><div class="line-block">
 <div class="line"><cite>jdbc:h2:&lt;ruta&gt;</cite></div>
@@ -513,11 +513,11 @@ librería que nos proporciona un driver es conveniente hacerlo con el <em>scope<
 </span><span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
-<p>Esto asegura que la librería estará disponible para su ejecución de la
-aplicación, ya que es necesaria, pero evita que esté disponible en tiempo de
-compilación, lo que se traduce en que el <abbr title="Integrated Development Environment">IDE</abbr> nunca nos sugerirá clases y
-métodos incluidos en ella. Esto último es de importancia, ya que nosotros lo
-que debemos usar exclusivamente son clases proporcionadas por <abbr title="Java DataBase Connectivity">JDBC</abbr>.</p>
+<p>Esto asegura que la librería estará disponible durante la ejecución de la
+aplicación, pero evita que esté disponible en tiempo de compilación, lo que
+se traduce en que el <abbr title="Integrated Development Environment">IDE</abbr> nunca nos sugerirá clases y métodos incluidos en
+ella. Esto último es de importancia, ya que nosotros lo que debemos usar
+exclusivamente son clases proporcionadas por <abbr title="Java DataBase Connectivity">JDBC</abbr><a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 </div>
 <p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
@@ -526,9 +526,9 @@ como leer y escribir datos.</p>
 <p class="admonition-title">Prudencia</p>
 <p>La conexión a una base de datos es una <strong>operación costosa</strong>, por lo
 que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-se penalizará. Lo habitual es una aplicación que sea algo más que una prueba
-de concepto, es utilizar un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>, que es capaz
-de reaprovechar conexiones, puesto que en realidad no las acaba de cerrar.</p>
+se penalizará. Lo habitual en una aplicación que sea algo más que una prueba
+de concepto, es utilizar un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>, el cual es
+capaz de reaprovechar las conexiones. Lo trataremos más adelante.</p>
 </div>
 </section>
 <section id="ejecucion-de-sentencias">
@@ -595,7 +595,7 @@ ella.</p>
 <p>El código tiene dos aspectos:</p>
 <ol class="arabic">
 <li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr>, que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
-forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, por lo que no entraremos en
+forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>, por lo que no entraremos en
 comentarlas.</p>
 <div class="admonition hint">
 <p class="admonition-title">Consejo</p>
@@ -608,7 +608,7 @@ sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases de Datos">SGBD
 permite en caso de que los nombres no contengan caracteres “raros”
 (espacios, etc.) o no se tenga la intención de distinguir nombres
 cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
-<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p></li>
+<em>Persona</em> y otra distinta <em>persona</em> o <em>PERSONA</em>)<a class="footnote-reference brackets" href="#id11" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p></li>
 <li><p>Escribimos para los tipos los nombres que define el estándar.</p></li>
 <li><p>Las cadenas se encierran entre comillas simples.</p></li>
 </ul>
@@ -749,9 +749,11 @@ que hayamos definido la clase <code class="docutils literal notranslate"><span c
 <span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11701164</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Astaroth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pública&quot;</span><span class="p">)</span>
 <span class="w">   </span><span class="p">}</span>
 
+<span class="w">   </span><span class="c1">// ¡ATENCIÓN!: Ni se le ocurre escribir sentencias como la siguiente,</span>
+<span class="w">   </span><span class="c1">// esto es una primera aproximación.</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro VALUES (%d, &#39;%s&#39;, &#39;%s&#39;);&quot;</span>
 <span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span>
+<span class="w">       </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">(</span><span class="n">sqlString</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span>
 <span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span>
 <span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span>
 <span class="w">         </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">()</span>
@@ -768,8 +770,9 @@ torpes por dos razones:</p>
 eficiente. Ya aprenderemos cómo hacer <a class="reference internal" href="03.transacciones.html#conn-batch"><span class="std std-ref">operaciones masivas</span></a>.</p></li>
 <li><p>Las sentencias usan valores almacenados en variables y hay que construirlas
 incluyendo esos valores dentro de las sentencias. Para ello nosotros hemos
-usado <code class="docutils literal notranslate"><span class="pre">String.format</span></code>. Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> ya viene con un mecanismo
-específico para realizar esta labor: las <a class="reference internal" href="#conn-preparedstatement"><span class="std std-ref">sentencias parametrizadas</span></a>.</p></li>
+<em>formateado</em> la cadena indicando dónde obtener los valores. Sin embargo,
+<abbr title="Java DataBase Connectivity">JDBC</abbr> ya viene con un mecanismo específico para realizar esta labor: las
+<a class="reference internal" href="#conn-preparedstatement"><span class="std std-ref">sentencias parametrizadas</span></a>.</p></li>
 </ul>
 <p>Por tanto, no tome estos ejemplos muy en serio. Ya aprenderá a escribirlos
 mejor.</p>
@@ -821,7 +824,7 @@ relacional al modelo de objetos, tal como adelantamos en la introducción.</p>
 <p class="admonition-title">Prudencia</p>
 <p>Los métodos <code class="docutils literal notranslate"><span class="pre">.getInt</span></code>, <code class="docutils literal notranslate"><span class="pre">.getLong</span></code>, etc. devuelven tipos
 primitivos (<code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">long</span></code>, etc.) por lo que cuando en la base de datos el
-valor del campo es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, con incapaces de devolver <code class="docutils literal notranslate"><span class="pre">null</span></code> y devuelven
+valor del campo es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, no devuelven <code class="docutils literal notranslate"><span class="pre">null</span></code>, sino
 el valor predeterminado del primitivo (p.ej.  ejemplo, <strong>0</strong> en caso de
 <code class="docutils literal notranslate"><span class="pre">int</span></code> o <code class="docutils literal notranslate"><span class="pre">long</span></code>). Si necesitamos diferenciar el valor predeterminado del
 valor nulo, hay dos estrategias. Una consiste en seguir usando estos métodos
@@ -940,16 +943,16 @@ darnos problemas. Eso, de nuevo, se soluciona añadiendo el tercer argumento.</p
 </div>
 </section>
 </section>
-<section id="cargar-del-esquema">
-<h2><span class="section-number">4.1.3. </span>Cargar del esquema<a class="headerlink" href="#cargar-del-esquema" title="Link to this heading">#</a></h2>
+<section id="carga-del-esquema-inicial">
+<h2><span class="section-number">4.1.3. </span>Carga del esquema inicial<a class="headerlink" href="#carga-del-esquema-inicial" title="Link to this heading">#</a></h2>
 <p>Es muy común que la primera vez que se ejecuta la aplicación, ésta cree la base
 de datos y defina el esquema y los datos iniciales necesarios. Lo cómodo es que
 las sentencias necesarias se encuentren en un guión <abbr title="Structured Query Language">SQL</abbr> y el programa las lea
 de él, en vez de encontrarse incrustadas en el código.</p>
 <p>Sin embargo, <abbr title="Java DataBase Connectivity">JDBC</abbr> no tiene definido un método que nos permita ejecutar un
 guión <abbr title="Structured Query Language">SQL</abbr> completo y que pasemos una cadena larga con todas las instrucciones
-separadas por comas, no asegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
-individualmente<a class="footnote-reference brackets" href="#id11" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. La única forma segura de poder ejecutar sus sentencias
+separadas por puntos y coma, no asegura que el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> las descomponga y ejecute
+individualmente<a class="footnote-reference brackets" href="#id12" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>. La única forma segura de poder ejecutar sus sentencias
 es descomponerlas primero. Para ello podemos optar por dos estrategias:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser">JSQLParser</a> que es
@@ -963,11 +966,6 @@ librería <a class="reference external" href="https://github.com/sio2sio2/sqluti
 </section>
 <section id="tratamiento-funcional-de-las-consultas">
 <span id="conn-sqlutils"></span><h2><span class="section-number">4.1.4. </span>Tratamiento funcional de las consultas<a class="headerlink" href="#tratamiento-funcional-de-las-consultas" title="Link to this heading">#</a></h2>
-<div class="admonition-todo admonition" id="id6">
-<p class="admonition-title">Por hacer</p>
-<p>Revisar este apartado para utilizar ConnectionWrapper en vez de
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p>
-</div>
 <p><a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> permite ir obteniendo fila a fila los resultados de una consulta.
 Sin embargo, no proporciona una interfaz funcional que nos permita utilizar las
 <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream-operaciones"><span class="std std-ref">operaciones funcionales habituales</span></a>. Para
@@ -989,8 +987,8 @@ resultados de la consulta:</p>
 <span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">);</span>
 
-<span class="c1">// try-with-resources para asegurarnos de liberar los recursos (stmt y rs)</span>
-<span class="hll"><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="c1">// try-with-resources para asegurarnos de liberar los recursos (conn, stmt y rs)</span>
+<span class="hll"><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">   </span><span class="c1">// Tratamos el flujo como estimemos más oportuno.</span>
 <span class="w">   </span><span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">centros</span><span class="p">::</span><span class="n">iterator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
@@ -1011,7 +1009,7 @@ el objeto <a class="extlink-java-sql reference external" href="https://docs.orac
 <span class="w">   </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
 <span class="w">   </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">);</span>
 <span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
+<span class="w">   </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SqlUtils</span><span class="p">.</span><span class="na">resultSetToStream</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">stmt</span><span class="p">,</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">Main</span><span class="p">::</span><span class="n">resultToCentro</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="k">for</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="n">centros</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -1023,11 +1021,11 @@ el objeto <a class="extlink-java-sql reference external" href="https://docs.orac
 <p>no funciona en absoluto. Es indispensable que no cerremos los objetos
 <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>, <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a> y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> para que el <code class="docutils literal notranslate"><span class="pre">Stream</span></code> pueda devolver
 objetos. ¿Cuándo entonces se cierran? De eso se encarga el propio flujo al
-cerrarse (véase la implementación). Por ese motivo el primer argumento que se
-pasa al método es la sentencia o la conexión, dependiendo de lo que más nos
-interese cerrar al terminar de consumir el flujo. Eso sí, debemos asegurarnos
-de cerrar el flujo al acabar con él, razón por la cual en el ejemplo
-ilustrativo de su uso hemos usado una sentencia <em>try-with-resources</em>.</p>
+cerrarse (véase la implementación). Por ese motivo es necesario proporcionar
+al método los objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a>.  Eso sí, debemos
+asegurarnos de cerrar el flujo al acabar con él, razón por la cual en el
+ejemplo ilustrativo de su uso hemos usado una sentencia
+<em>try-with-resources</em>.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
@@ -1040,6 +1038,11 @@ obtendrá con cada elemento del flujo la propia fila:</p>
 </pre></div>
 </div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Si no nos interesa cerrar la conexión al cerrar el flujo, podemos pasar
+<code class="docutils literal notranslate"><span class="pre">null</span></code> en el argummento correspondiente.</p>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id7" role="doc-footnote">
@@ -1047,7 +1050,7 @@ obtendrá con cada elemento del flujo la propia fila:</p>
 <p>En las versiones modernas de <abbr title="Java DataBase Connectivity">JDBC</abbr> no es necesario expresar el nombre
 del driver, ya que dispone de mecanismos parar inferir cuál es el driver
 adecuado a partir de la <abbr title="Uniform Resource Locator">URL</abbr> de conexión. En cambio, más adelante, al
-tratar <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">Hibernate</span></a>, sí lo necesitaremos.</p>
+tratar <a class="reference internal" href="../05.orm/index.html#orm"><span class="std std-ref">JPA</span></a>, sí lo necesitaremos.</p>
 </aside>
 <aside class="footnote brackets" id="id8" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
@@ -1060,6 +1063,12 @@ algo parecido.</p>
 </aside>
 <aside class="footnote brackets" id="id9" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Ahora bien, si nuestra intención es usar el <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a> integrado en el driver, sí necesitaremos usar implementación
+específica para el pool y, en consecuencia, no deberemos incluir
+<code class="docutils literal notranslate"><span class="pre">&lt;runtime&gt;</span></code>.</p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Aunque haremos una excepción aclarando cómo están definidas las claves
 primarias en las tablas <code class="docutils literal notranslate"><span class="pre">Claustro</span></code>, <code class="docutils literal notranslate"><span class="pre">Departamento</span></code> y <code class="docutils literal notranslate"><span class="pre">Profesor</span></code>.
 Nuestra intención es que sus identificadores se generen automáticamente sin
@@ -1077,8 +1086,8 @@ especificarla siempre explícitamente (o sea, el comportamiento que
 esperaríamos al no haber incluido ninguna fórmula adicional como
 <code class="code docutils literal notranslate"><span class="pre">AUTOINCREMENT</span></code> o <code class="code docutils literal notranslate"><span class="pre">GENERATED</span> <span class="pre">BY...</span></code>).</p>
 </aside>
-<aside class="footnote brackets" id="id10" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
 <p>Según el estándar, un nombre que no se encierra entre comillas dobles, se
 sobreentiende escrito todo en mayúsculas. En particular, <strong class="program">SQLite</strong> se
 salta el estándar en este aspecto y no hace esa distinción, incluso aunque
@@ -1087,9 +1096,9 @@ entrecomillemos es que <strong class="program">MariaDB</strong>/<strong class="p
 cambiemos la configuración predeterminada para soportar el entrecomillado con
 comillas dobles, ya que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> entrecomilla con el acento grave.</p>
 </aside>
-<aside class="footnote brackets" id="id11" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
-<p>Con <em>SQLite</em> por ejemplo el método <code class="docutils literal notranslate"><span class="pre">.executeUpdate</span></code> sí será capaz de
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>Con <em>SQLite</em>, por ejemplo, el método <code class="docutils literal notranslate"><span class="pre">.executeUpdate</span></code> sí será capaz de
 ejecutar todas las sentencias <abbr title="Structured Query Language">SQL</abbr>; <code class="docutils literal notranslate"><span class="pre">execute</span></code>, en cambio, no lo hará y
 ejecutará solo la primera. Con otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> el comportamiento puede variar.</p>
 </aside>
@@ -1150,7 +1159,7 @@ ejecutará solo la primera. Con otros <abbr title="Sistema Gestor de Bases de Da
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrizadas">4.1.2.2. Parametrizadas</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargar-del-esquema">4.1.3. Cargar del esquema</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-del-esquema-inicial">4.1.3. Carga del esquema inicial</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tratamiento-funcional-de-las-consultas">4.1.4. Tratamiento funcional de las consultas</a></li>
 </ul>
   </nav></div>

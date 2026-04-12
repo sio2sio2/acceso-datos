@@ -440,7 +440,7 @@ una clase <abbr title="Data Access Object">DAO</abbr>. Recordemos las clases del
 implementación forzaremos a que ambas deriven de una interfaz que nos asegura que
 ambas manejan de igual modo su identificador:</p>
 <div class="literal-block-wrapper docutils container" id="clase-entity">
-<div class="code-block-caption"><span class="caption-text">Entity.java<a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#clase-entity" title="Link to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Entity.java</span><a class="headerlink" href="#clase-entity" title="Link to this code">#</a></div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Entity</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="nf">getId</span><span class="p">();</span>
 <span class="w">   </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
@@ -678,7 +678,7 @@ pool de conexiones. Recordemos que ya hemos discutido sobre cómo afinar esto
 </div>
 <p>Si partimos de que en ambas clases <abbr title="Data Access Object">DAO</abbr> tenemos un método <code class="docutils literal notranslate"><span class="pre">.getConnection()</span></code>
 que nos proporciona una objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> para realizar las operaciones
-<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, la implementación es trivial. Por ejemplo:</p>
+<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación es trivial. Por ejemplo:</p>
 <div class="highlight-java notranslate" id="dao-delete"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
 <span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
@@ -881,8 +881,8 @@ necesario. Esta que se muestra aquí es una simplificación.</p>
 <p>Con estos mimbres, ya podemos rematar nuestro patrón <abbr title="Data Access Object">DAO</abbr>, puesto que la conexión
 que necesitamos, podremos obtenerla de la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code>. Para simplificar
 podemos definir una clase base:</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">BaseDao.java (<a class="reference download internal" download="" href="../_downloads/3ec5588fd97c1b7501baebb83a2a6027/BaseDao.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Base para la construcción de todas las clases DAO.</span>
 <span class="cm"> * &lt;p&gt;Proporciona el constructor y métodos para simplificar</span>
@@ -1162,7 +1162,7 @@ básico como prueba de concepto. Para ello sí se ha implementado la
 posibilidad de usar carga perezosa y puede echarse un ojo al código para
 hacerse una idea de cómo puede lograrse.</p>
 </div>
-<div class="admonition-todo admonition" id="id4">
+<div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Por hacer</p>
 <p>Hablar de una o varias clases <em>Service</em>.</p>
 </div>
@@ -1185,13 +1185,8 @@ es más inteligente utilizarlas.</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> tiene definida esta misma interfaz, así que podemos usarla si
-decidimos usar la librería.</p>
-</aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p>En realidad, esta es la gran dificultad.</p>
 </aside>
 </aside>

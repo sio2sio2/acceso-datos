@@ -3,30 +3,30 @@
 Estrategias de diseño
 =====================
 Cuando analizamos :ref:`conectores <conn>`, ya expusimos que uno de los patrones
-de diseño más socorridos es el patrón |DAO|. Al usar un |ORM| podríamos seguir
-esa misma estrategia y definir una interfaz |CRUD| para crear clases |DAO| para
-todas las entidades del modelo. En este caso, la única salvedad es que las
-implementaciones de los métodos de la interfaz no se basarían en |JDBC| sino en
-|JPA|. Ahora bien, muy comúnmente y a menos que nuestra intención sea
-reaprovechar una interfaz antigua implementada con |JDBC|, obrar de esta manera
-es un poco redundante, ya que el propio |JPA| tiene una orientación semejante a
-|DAO|.
+de diseño más socorridos es el patrón |DAO|. Al usar un |ORM| podemos seguir
+esta misma estrategia sabiendo que hemos sustituido las clases |DAO| por
+anotaciones en las propias clases del modelo.
 
-Lo que sí es muy conveniente es intentar liberar al resto del código de las
-particularidades del acceso, así que conviene encerrarlas en una clase auxiliar.
-Podemos proponer ésta como casi calco de :ref:`ConnectionPool
-<Connectionpool>`, propuesta en la unidad anterior para |JDBC|:
+Es conveniente también definir una clase que abstraiga de la conexión, aunque en
+el caso de |JPA| es bastante más sencilla que el uso de un pool de conexiones; y
+también podemos facilitar la gestión de transacciones aportando un enfoque
+funcional como ya hicimos. Por todo ello, sqlutils_ dispone de un módulo
+``sqlutils-jpa``:
 
-.. literalinclude:: files/JpaBackend.java
-   :class: toggle
-   :caption: JpaBackend.java (:download:`descarga <files/JpaBackend.java>`)
-   :name: clase-jpabackend
-   :language: java
-   :start-at: /**
+.. code-block:: xml
 
-Esta clase crea fábricas de gestores de entidades asociadas a claves, pero las
-oculta y sólo permite utilizar los gestores de entidades a través de
-transacciones.
+   
+   <dependency>
+       <groupId>com.github.sio2sio2.sqlutils</groupId>
+       <artifactId>sqlutils-jpa</artifactId>
+       <version>4.2.0</version>
+   </dependency>
+
+
+
+que implementa una clase gemela a ``JdbcConnection`` llamada
+``JpaConnection`` con un uso y una naturaleza semejante, por lo que podemos
+ilustrar su uso sin muchos preámbulos: 
 
 .. code-block:: java
 
@@ -36,26 +36,47 @@ transacciones.
    props.put("hibernate.show_sql", "true");
 
    // Configuración en persistence.xml + propiedades dinámicas
-   try(JpaBackend jb = JpaBackend.create("MiUnidadP", props)) {
-      // Podríamos obviar el nombre de la unidad de persistencia, si sólo hubiera una fábrica.
-      jb.transaction(em -> {
+   try(JpaConnection jc = JpaConnection.create("MiUnidadP", props)) {
+      // Definimos un gestor de transacciones con registros diferidos
+      jc.withTransactionManager(Map.of("logging", new LoggingManager()));
+
+      TransactionManager tm = jc.getTransactionManager();
+
+      // La transacción puede generar un error DataAccessException, exactamente
+      // el mismo que su correspondiente para conectores.
+      tm.transaction(ctxt -> {
+         // En este caso obtenemos un EntityManager, no un objeto Connection.
+         EntityManager em = ctxt.handle();
+
          Centro centro = new Centro(11004866L, "IES Castillo de Luna", Centro.Titularidad.PUBLICA);
          em.persist(centro);
+         lm.sendMessage(getClass(),
+            Level.DEBUG,
+            "Centro agregado",
+            "Transacción fallida: no puede agregarse el centro"
+         );
       });
 
       // Este método es capaz de devolver lo que devuelve la función del argumento.
-      Centro otro = jb.transactionR(em -> em.get(Centro.class, 11004866L));
-
-      // Podemos obtener en cualquier momento la propia instancia
-      JpaBackend jb2 = jpaBackend.get("MiUnidadP");
+      Centro otro = tm.transactionR(ctxt -> ctxt.handle().get(Centro.class, 11004866L));
    }
 
-.. tip:: Las transacciones también se pueden abrir con un método estático
-   y el nombre de la unidad de persistencia:
+   // Como hemos cerrado el objeto, ya no podemos reutilizarlo
+   JpaConnection jc = JpaConnection.get("MiUnidadP");
 
-   .. code-block:: java
+Obsérvese que el uso de la clase es prácticamente idéntico al de
+``JdbcConnection``:
 
-      Centro otro = JpaBackend.transactionR("MiUnidadP", em -> em.get(Centro.class, 11004866L));
++ Creamos la clase para lo cual necesitamos el nombre de la unidad de
+  persistencia y las propiedades de conexión que modifiquen dinámicamente
+  los valores estáticos definidos en el |XML|.
++ La clase también implementa un patrón Multiton_ cuya clave identificativa
+  es el nombre de la propia unidad de persistencia.
++ Le asociamos un gestor de transacciones que se comporta igual que su
+  correspondiente para conectores y, además, soporta los mismos observadores.
++ Creamos transacciones con la misma estrategia funcional. La diferencia es que,
+  en este caso, el objeto que nos permite operar es un
+  :jakarta-persistence:`EntityManager` y no un :java-sql:`Connection`.
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
@@ -64,3 +85,6 @@ transacciones.
 .. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
 
 .. _patrón Singleton: https://es.wikipedia.org/wiki/Singleton
+.. _sqlutils: https://github.com/sio2sio2/sqlutils
+.. _Multiton: https://en.wikipedia.org/wiki/Multiton
+.. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`

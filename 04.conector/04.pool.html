@@ -53,7 +53,7 @@
     <script>let toggleHintShow = 'Haz clic para mostrar';</script>
     <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -381,9 +381,12 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1. Gestor integrado</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.2. HikariCP</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-del-pool">4.4.3. Gestión del pool</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-gestor">4.4.1. Creación del gestor</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1.1. Gestor integrado</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.1.2. HikariCP</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-avanzada">4.4.2. Gestión avanzada</a></li>
 </ul>
             </nav>
         </div>
@@ -411,16 +414,44 @@ que aún hay una libre y que, si ésta necesitara otra, podría usarla sin
 necesidad de establecer una nueva conexión con la base de datos.</p>
 <p>Para utilizar este mecanismo tenemos dos vías:</p>
 <ul class="simple">
-<li><p>Usar el mecanismo básico que proporciona <abbr title="Java DataBase Connectivity">JDBC</abbr> y que puede servirnos cuando
-no haya gran concurrencia ni necesitamos controlar todos los parámetros del
-<em>pool</em>.</p></li>
-<li><p>Usar una librería especializada como <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>.</p></li>
+<li><p>Usar el mecanismo básico que proporciona, si lo proporciona, el driver <abbr title="Java DataBase Connectivity">JDBC</abbr>
+en cada caso.</p></li>
+<li><p>Lo más recomendable, usar una librería especializada como <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>.</p></li>
 </ul>
+<section id="creacion-del-gestor">
+<h2><span class="section-number">4.4.1. </span>Creación del gestor<a class="headerlink" href="#creacion-del-gestor" title="Link to this heading">#</a></h2>
+<p>La <abbr title="Application Programming Interface">API</abbr> de <abbr title="Java DataBase Connectivity">JDBC</abbr> se limita a definir una clase <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> con un método
+<code class="docutils literal notranslate"><span class="pre">.getConnection()</span></code> que permite obtener conexiones a partir de ella. No
+especifica mucho más, así que no hay ningún mecanismo estándar para crear o
+definir los parámetros del <em>pool</em>.</p>
 <section id="gestor-integrado">
-<h2><span class="section-number">4.4.1. </span>Gestor integrado<a class="headerlink" href="#gestor-integrado" title="Link to this heading">#</a></h2>
-<p>Los <a class="reference internal" href="01.basico.html#conn-drivers"><span class="std std-ref">controladores citados para distintas bases de datos</span></a>
-disponen de un gestor integrado de <em>pools</em> de conexiones, aunque su uso puede
-diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:</p>
+<h3><span class="section-number">4.4.1.1. </span>Gestor integrado<a class="headerlink" href="#gestor-integrado" title="Link to this heading">#</a></h3>
+<p>Muchos de los <a class="reference internal" href="01.basico.html#conn-drivers"><span class="std std-ref">controladores citados para distintas bases de datos</span></a> disponen de un gestor integrado para <em>pools</em> de conexiones; y
+esta es una estrategia para poder crearlos. Esto, sin embargo, tiene dos
+inconvenientes:</p>
+<ul>
+<li><p>Los gestores difieren entre sí, puesto que a lo único que les obliga la
+especificación es a que proporcionen el objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>: cómo llegar a él
+es libre y, en consecuencia, cada uno utilizará clases y métodos distintos.</p>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
+<p>Cuando se pretende usar el gestor integrado <a class="reference internal" href="01.basico.html#scope-runtime"><span class="std std-ref">no debe
+incluirse el scope runtime</span></a> al cargar la librería, puesto
+que necesitaremos usar directamente métodos que están definidos en dicha
+librería y no en <abbr title="Java DataBase Connectivity">JDBC</abbr>.</p>
+</div>
+</li>
+<li><p>No todos los <em>drivers</em> proporcionan un mecanismo para la creación del <em>pool</em>,
+y algunos de los que los proporcionan lo hacen de forma parcial (véase más
+abajo el caso de <a class="reference external" href="https://sqlite.org/">SQLite</a>).</p></li>
+</ul>
+<p class="rubric">SQLite</p>
+<p>El driver de <a class="reference external" href="https://sqlite.org/">SQLite</a> es uno de esos casos en los que se proporciona un gestor,
+pero bastante inútil. Tengamos también presente que este <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> no está pensado
+para la concurrencia, por lo que realiza un bloqueo de la base de datos a nivel
+de archivo, esto es, de toda la base de datos; y los pool de conexiones pierden
+prácticamente toda su utilidad.</p>
+<p>Para obtener un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> puede hacerse lo siguiente:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">dbPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test.db&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="n">dbPath</span><span class="p">);</span>
 
@@ -437,19 +468,15 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition-aclaracion admonition">
-<p class="admonition-title">Aclaración</p>
 <p>En el código anterior los dos objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> generan dos objetos
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> distintos. Sin embargo, es más que probable que ambos estén
-utilizando, en realidad, la misma conexión a la base de datos, ya que se
-crean a partir de un pool de conexiones y al crear el segundo objeto, el
-primero ya se cerró y, por tanto, ha dejado disponible la conexión en el
-pool.</p>
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> distintos. Sin embargo, según la teoría ambos utilizan, en
+realidad, la misma conexión a la base de datos, ya que se crean a partir de
+un pool de conexiones y al crear el segundo objeto, el primero ya se cerró y,
+por tanto, ha dejado disponible la conexión en el pool.</p>
 <p>En cambio, si se hubieran generado directamente con <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a>, ambos
 objetos conectores estarían asociados a dos conexiones distintas.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Advertencia</p>
+<div class="admonition danger">
+<p class="admonition-title">Peligro</p>
 <p>Y, sin embargo, lo anterior no es cierto a consecuencia de un <a class="reference external" href="https://github.com/xerial/sqlite-jdbc/issues/1011">bug
 del controlador de SQLite</a>, que provoca que
 siempre se abra una nueva conexión, sin reaprovechar las ya establecidas. La
@@ -482,21 +509,30 @@ objeto antes de crear el segundo, pero si el código fuera este:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>al crearse el objeto <code class="docutils literal notranslate"><span class="pre">conn2</span></code>, <code class="docutils literal notranslate"><span class="pre">conn1</span></code> se cerrará y quedará inútil. El
-<em>bug</em>, no obstante, es un defecto del controlador para <strong class="program">SQLite</strong>. El
-código equivalente para otros <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> sí debería funcionar correctamente.</p>
+<p>al crearse el objeto <code class="docutils literal notranslate"><span class="pre">conn2</span></code>, <code class="docutils literal notranslate"><span class="pre">conn1</span></code> se cerrará y quedará inútil.</p>
 </div>
+<p class="rubric">H2</p>
+<p>Nuestro otro <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> de referencia sí soporta concurrencia y sí tiene un gestor
+integrado funcional:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">JdbcConnectionPool</span><span class="w"> </span><span class="n">cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
+<span class="n">cp</span><span class="p">.</span><span class="na">setMaxConnections</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span><span class="w"> </span><span class="c1">// Número máximo de conexions simultáneas abiertas.</span>
+
+<span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">DataSource</span><span class="p">)</span><span class="w"> </span><span class="n">cp</span><span class="p">;</span>
+
+<span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="c1">// ... Hacemos operaciones con el objeto Connection ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>En este caso, los ejemplos que para <a class="reference external" href="https://sqlite.org/">SQLite</a> no funcionaron correctamente, para
+<a class="reference external" href="https://www.h2database.com/">H2</a> sí lo harán.</p>
 </section>
 <section id="id1">
-<h2><span class="section-number">4.4.2. </span>HikariCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
-<p>La alternativa, que es común a cualquier controlador, es usar una librería
-especializada como <a href="#id6"><span class="problematic" id="id7">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Con esta librería no tendremos problemas al utilizar un <em>pool</em> de
-conexiones con <strong class="program">SQLite</strong>.</p>
-</div>
-<p>Su uso, por otro lado es muy sencillo:</p>
+<h3><span class="section-number">4.4.1.2. </span>HikariCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>La alternativa, común a cualquier controlador, es usar una librería
+especializada como <a href="#id7"><span class="problematic" id="id8">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
+<p>Su uso es muy sencillo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">dbPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test.db&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="n">dbPath</span><span class="p">);</span>
 
@@ -542,65 +578,127 @@ conexiones con <strong class="program">SQLite</strong>.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id8"><span class="problematic" id="id9">HikariCP_</span></a>,
+<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id9"><span class="problematic" id="id10">HikariCP_</span></a>,
 la ruta debe ser <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code> y no simplemente
 <code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>.</p>
 </div>
 </section>
-<section id="gestion-del-pool">
-<span id="conn-pool-extra"></span><h2><span class="section-number">4.4.3. </span>Gestión del pool<a class="headerlink" href="#gestion-del-pool" title="Link to this heading">#</a></h2>
-<p>Si queremos simplificar la creación del pool y abstraernos de qué se usa para
-crearlo, podemos encerrar toda esta lógica en una clase como <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java">ConnectionPool</a>.</p>
+</section>
+<section id="gestion-avanzada">
+<span id="conn-pool-extra"></span><h2><span class="section-number">4.4.2. </span>Gestión avanzada<a class="headerlink" href="#gestion-avanzada" title="Link to this heading">#</a></h2>
+<p>Hasta ahora hemos visto como crear manualmente un <em>pool</em> de conexiones, pero
+conviene que, al crear un programa, afinemos y abstraigamos al resto de la
+aplicación de cómo se crea el <em>pool</em> encerrado toda la lógica en una clase como
+<a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a>, que propone <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>.</p>
 <p>La clase sigue el patrón ya ensayado para <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>: un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a> que asocia a cada <em>pool</em> de
-conexiones una clave, por lo que crear un <em>pool</em> es muy sencillo<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+conexiones una clave<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
+<span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
 <span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="na">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="c1">// Hacemos operaciones con la conexión.</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1">// Aquí ya no podemos usar el pool &quot;DB&quot; porque lo hemos cerrado.</span>
-<span class="hll"><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// ERROR: el pool está cerrado.</span>
+<span class="hll"><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;DB&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// ERROR: el pool está cerrado.</span>
 </span></pre></div>
 </div>
 <p>La última línea muestra cómo puede recuperarse en cualquier momento el <em>pool</em>,
 siempre que no se haya cerrado.</p>
-<p>Ahora bien, ¿qué se ha usado para crear el <em>pool</em>, esto es, el objeto
-<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>? Como no nos hemos preocupado de ello, se ha usado <a href="#id10"><span class="problematic" id="id11">HikariCP_</span></a>,
-pero se permite añadir un cuarto argumento al metodo <code class="docutils literal notranslate"><span class="pre">create</span></code> que habilita la
-creación del objeto con cualquier otro método<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p>Ahora bien, ¿cómo obtiene esta clase un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>? Cuando el
+desarrollador no se preocupa de ello, como es el caso, la clase intenta usar
+<a href="#id11"><span class="problematic" id="id12">HikariCP_</span></a><a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, porque la creación anterior es equivalente a haber añadido un
+cuarto argumento al metodo <code class="docutils literal notranslate"><span class="pre">create</span></code>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Fábrica de objetos DataSource que usa HikariCP.</span>
+<span class="c1">// Opcionalmente se le puede pasar como argumento</span>
+<span class="c1">// un objeto HikariConfig para modificar los parámentros predeterminados.</span>
+<span class="c1">// Está disponible en el módulo sqlutils-hikaricp.</span>
+<span class="hll"><span class="n">DataSourceFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariCPFactory</span><span class="p">();</span>
+</span>
+<span class="c1">// Le decimos explícitamente a JdbcConnection cómo</span>
+<span class="hll"><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">factory</span><span class="p">);</span>
+</span></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Tenga presente que para que cualquiera de los dos ejemplos
+funcione, necesita importar la dependencia <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code>.</p>
+</div>
 <p>El objeto puede utilizarse tal como se ha ilustrado para obtener su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
 y, a partir de él, distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá que cerrar
 convenientemente), pero es más conveniente aprovechar las posibilidades de
 <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> y dejar que sea el gestor
 de transacción el que se encargue de crear y cerrar la conexión que necesitamos.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="k">try</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="k">try</span><span class="p">(</span><span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="hll"><span class="w">   </span><span class="c1">// Creamos un gestor de transacciones para él y, de paso,</span>
 </span><span class="w">   </span><span class="c1">// registramos un gestor de registros.</span>
-<span class="w">   </span><span class="n">pool</span><span class="p">.</span><span class="na">initTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+<span class="w">   </span><span class="n">jc</span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
 <span class="hll"><span class="w">      </span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
 </span><span class="w">   </span><span class="p">));</span>
 
-<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// También puede obtenerse con la clave &#39;DB&#39;</span>
+<span class="w">   </span><span class="c1">// El gestor de transacciones es sólo accesible a través el gestor de conexiones</span>
+<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span>
 
-<span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
+<span class="w">   </span><span class="c1">// La transacción puede generar un error DataAccessException</span>
 <span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="c1">// Operaciones que comparten una misma transacción</span>
+<span class="w">      </span><span class="c1">// Conexión asociada a la transacción</span>
+<span class="w">      </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">();</span>
+
+<span class="w">     </span><span class="c1">// Ya podemos realizar operaciones con &#39;conn&#39;.</span>
 <span class="w">   </span><span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition-advertencia admonition">
 <p class="admonition-title">Advertencia</p>
-<p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java">ConnectionPool</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
+<p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
 usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+conjuntamente. Por eso, cuando se ha definido el gestor de transacciones
 correspondiente, el método <code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo
 de que es conveniente manejar las conexiones a través del gestor, que para
 eso se ha creado.</p>
+</div>
+<p>Naturalmente, la clase permite pasar otra fábrica que use otro mecanismo
+totalmente distinto para crear el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>. Por ejemplo, aprovechando que
+hemos visto cómo crear uno con el gestor integrado de <a class="reference external" href="https://www.h2database.com/">H2</a>, si utilizáramos este
+<abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>, podríamos definir una fábrica personalizada así:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">H2CPFactoryJava (<a class="reference download internal" download="" href="../_downloads/fd878be5bc3636bfa694ac6f24985515/H2CPFactory.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="toggle highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/**</span>
+ <span class="o">*</span> <span class="n">Fábrica</span> <span class="n">de</span> <span class="n">DataSource</span> <span class="n">para</span> <span class="n">H2</span> <span class="n">Database</span><span class="o">.</span>
+ <span class="o">*/</span>
+<span class="n">public</span> <span class="k">class</span><span class="w"> </span><span class="nc">H2CPFactory</span> <span class="n">implements</span> <span class="n">DataSourceFactory</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">final</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">DEFAULT_POOL_SIZE</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="nb">int</span> <span class="n">poolSize</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">H2CPFactory</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">this</span><span class="p">(</span><span class="n">DEFAULT_POOL_SIZE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">H2CPFactory</span><span class="p">(</span><span class="nb">int</span> <span class="n">poolSize</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">poolSize</span> <span class="o">=</span> <span class="n">poolSize</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">DataSource</span> <span class="n">create</span><span class="p">(</span><span class="n">String</span> <span class="n">url</span><span class="p">,</span> <span class="n">String</span> <span class="n">user</span><span class="p">,</span> <span class="n">String</span> <span class="n">password</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">JdbcConnectionPool</span> <span class="n">ds</span> <span class="o">=</span> <span class="n">JdbcConnectionPool</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">);</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">setMaxConnections</span><span class="p">(</span><span class="n">poolSize</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">ds</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Por supuesto, al usar H2 como <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> no necesitamos definir esta
+clase, ya que podemos usar aprovechar el predefinido en sqlutils-hikaricp
+(puesto que <a href="#id13"><span class="problematic" id="id14">HikariCP_</span></a> lo soporta). El ejemplo sirve para ilustrar cómo
+definir una fábrica con otro mecanismo distinto (p.e. si decidiéramos crear
+el pool de conexiones con una librería distinta como <a class="reference external" href="https://www.mchange.com/projects/c3p0/">C3PO</a>)</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
@@ -616,17 +714,10 @@ necesario.</p>
 </aside>
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
-<p>Pero para ello es necesario añadir el módulo <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code> a las
-dependencias. Por otro lado, para saber cómo obtener el objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
-de cualquier otro modo, éche un vistazo a la interfaz <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java">DataSourceFactory</a>
-y a su implementación con <a href="#id12"><span class="problematic" id="id13">HikariCP_</span></a>, la clase <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java">HikariCPFactory</a>. De hecho:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>es equivalente a:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionPool</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariCPFactory</span><span class="p">()))</span>
-</pre></div>
-</div>
+<p>Pero tendremos que haber cargado el módulo <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code> en las
+dependencias del proyecto. En ese módulo hay una clase denominada
+<a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java">HikariCPFactory</a>
+que implementa la interfaz <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java">DataSourceFactory</a>.</p>
 </aside>
 </aside>
 </section>
@@ -679,9 +770,12 @@ y a su implementación con <a href="#id12"><span class="problematic" id="id13">H
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1. Gestor integrado</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.2. HikariCP</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-del-pool">4.4.3. Gestión del pool</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-gestor">4.4.1. Creación del gestor</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1.1. Gestor integrado</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.1.2. HikariCP</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-avanzada">4.4.2. Gestión avanzada</a></li>
 </ul>
   </nav></div>
 

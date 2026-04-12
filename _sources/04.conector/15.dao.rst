@@ -53,7 +53,9 @@ implementación forzaremos a que ambas deriven de una interfaz que nos asegura q
 ambas manejan de igual modo su identificador:
 
 .. literalinclude:: files/Entity.java
+   :language: java
    :name: clase-Entity
+   :caption: Entity.java\ [#]_
 
 La clase :ref:`Centro <clase-centro>` ya se definió anteriormente.
 mientras que ``Estudiante`` es esta otra:
@@ -178,11 +180,11 @@ bases de datos (asociando una clave a cada uno de ellos) y múltiples hilos (por
 si realizamos programación concurrente). Además, lo programamos de modo que la
 conexión que ofrece está protegida contra cierres manuales, ya que es el gestor
 el que se encarga de abrirla y cerrarla. Por tanto, para resolver el problema
-y complementar este patrón nos basta con usar |ConnectionPool|
+y complementar este patrón nos basta con usar |JdbcConnection|
 y definirle su |TransactionManager| correspondiente.
 
 Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
-establezca la conexión gracias a un |ConnectionPool| que utilice un
+establezca la conexión gracias a un |JdbcConnection| que utilice un
 |TransactionManager|:
 
 .. literalinclude:: files/Conexion.java
@@ -192,7 +194,7 @@ establezca la conexión gracias a un |ConnectionPool| que utilice un
    :caption: Conexion.java (:download:`descarga <files/Conexion.java>`)
    :start-at: /**
 
-.. note:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
+.. attention:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
    necesario. Esta que se muestra aquí es una simplificación.
 
 Con estos mimbres, ya podemos rematar nuestro patrón |DAO|, puesto que la conexión
@@ -262,7 +264,9 @@ segundo *SELECT*.
 .. note:: La librería sqlutils_ implementa, además, una suerte de |ORM| muy
    básico como prueba de concepto. Para ello sí se ha implementado la
    posibilidad de usar carga perezosa y puede echarse un ojo al código para
-   hacerse una idea de cómo se ha hecho.
+   hacerse una idea de cómo puede lograrse.
+
+.. todo:: Hablar de una o varias clases *Service*.
 
 Conclusiones
 ============
@@ -281,6 +285,9 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
   es más inteligente utilizarlas.
 
 .. rubric:: Notas al pie
+
+.. [#] sqlutils_ tiene definida esta misma interfaz, así que podemos usarla si
+   decidimos usar la librería.
 
 .. [#] En realidad, esta es la gran dificultad.
 
@@ -301,7 +308,7 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
 .. |SQLException| replace:: :java-sql:`SQLException <SQLException>`
 .. |Consumer| replace:: :java-function:`Consumer <Consumer>`
-.. |ConnectionPool| replace:: :ref:`ConnectionPool <conn-pool-extra>`
+.. |JdbcConnection| replace:: :ref:`JdbcConnection <conn-pool-extra>`
 .. |TransactionManager| replace:: :ref:`TransactionManager <conn-transaction-manager>`
 
 .. _God Class: https://linearb.io/blog/what-is-a-god-class

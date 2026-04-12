@@ -53,7 +53,7 @@
     <script>let toggleHintShow = 'Haz clic para mostrar';</script>
     <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -394,7 +394,14 @@ de datos al modelo de objetos del lenguaje de programación.</p>
 <p>Las herramientas <abbr title="Object-Relational Mapping">ORM</abbr> son herramientas pensadas para realizar ellas mismas esta
 traducción entre los dos modelos y descargar al programador de esta
 responsabilidad. Como ya se enumeraron las <a class="reference internal" href="../04.conector/index.html#conn-vs-orm"><span class="std std-ref">ventajas e inconvenientes de
-una estrategia frente a la otra</span></a>, no abundaremos más en ello.</p>
+una estrategia frente a la otra</span></a>, no abundaremos más en ello, pero
+sí podemos afinar qué implica su uso. Si hemos utilizado <a class="reference internal" href="../04.conector/15.dao.html#conn-prog"><span class="std std-ref">el patrón ORM al
+programar con conectores</span></a>, habremos notado que las clases <abbr title="Data Access Object">DAO</abbr> son
+las que definen propiamente la traducción entre el objeto Java y el registro
+<abbr title="Structured Query Language">SQL</abbr>. Por tanto, utilizar un <abbr title="Object-Relational Mapping">ORM</abbr> con la misma estrategia de programación
+implica ahorrarnos la creación de estas clases y sustituirlas por unas pequeñas
+indicaciones (anotaciones en la clase del modelo) que ayuden a la librería a
+aclarar la traducción.</p>
 <p><em>Java</em> presenta la enorme ventaja de que define una especificación muy completa
 llamada <abbr title="Java Persistent API">JPA</abbr> para el uso de <abbr title="Object-Relational Mapping">ORM</abbr>, de manera que, si usamos <abbr title="Object-Relational Mapping">ORM</abbr>s
 compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El

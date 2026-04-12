@@ -2,23 +2,18 @@
  * Clase encargada de establecer la conexión a la base de datos.
  * Para una única base de datos, puede usarse el patrón Singleton,
  * en vez del Multiton que se encuentra en TestDao.
- * Se basa en el uso de ConnectionPool y TransactionManager.
+ * Se basa en el uso de JdbcConnection y TransactionManager.
  */
 public class Conexion implements AutoCloseable {
    /** Clave que identifica esta clase */
    public static final String KEY = new Object().toString();
 
    private static Conexion instance;
-   private final ConnectionPool cp;
+   private final JdbcConnection jc;
 
    private Conexion(String dbUrl, String user, String password) {
-      // Pool de conexiones con HikariCP
-      cp = ConnectionPool.create(Conexion.KEY, dbUrl, user, password);
-      // Usamos el gestor de transacciones
-      // con un listener para gestionar registros diferidos
-      cp.initTransactionManager(Map.of(
-         LoggingManager.KEY, new LoggingManager()
-      ));
+      jc = JdbcConnection.create(Conexion.KEY, dbUrl, user, password)
+         .withTransactionManager(Map.of(LoggingManager.KEY, new LoggingManager()));
    }
 
    /**
@@ -77,19 +72,19 @@ public class Conexion implements AutoCloseable {
    }
 
    /**
-    * Informa de si el objeto (o sea, el {@link ConnectionPool} que maneja) sigue abierto
+    * Informa de si el objeto (o sea, el {@link JdbcConnection} que maneja) sigue abierto
     * @return {@code true} si continúa abierto.
     */
    public boolean isOpen() {
-      return cp.isOpen();
+      return jc.isOpen();
    }
 
    /**
-    * Cierra el objeto cerrando el {@link ConnectionPool} que maneja)
+    * Cierra el objeto cerrando el {@link JdbcConnection} que maneja)
     */
    @Override
    public void close() {
-      cp.close();
+      jc.close();
    }
 
    /**
@@ -99,9 +94,9 @@ public class Conexion implements AutoCloseable {
       @return Los datos devueltos por la transacción.
     * @throws IllegalStateSxception Si la conexión ya está cerrada.
     */
-   public <T> T transactionR(TransactionableR<T> operations) throws DataAccessException {
+   public <T> T transactionR(TransactionableR<Connection, T> operations) throws DataAccessException {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return cp.getTransactionManager().transaction(operations);
+      return jc.getTransactionManager().transaction(operations);
    }
 
    /**
@@ -109,9 +104,9 @@ public class Conexion implements AutoCloseable {
     * @param operations Las operaciones que constituyen la transacción.
     * @throws IllegalStateException Si la conexión ya está cerrada.
     */
-   public void transaction(Transactionable operations) throws DataAccessException {
+   public void transaction(Transactionable<Connection> operations) throws DataAccessException {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      cp.getTransactionManager().transaction(operations);
+      jc.getTransactionManager().transaction(operations);
    }
 
    /**
@@ -121,17 +116,17 @@ public class Conexion implements AutoCloseable {
     */
    public Connection getConnection() {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return cp.getTransactionManager().getConnection();
+      return jc.getTransactionManager().getConnection();
    }
 
    /**
-    * Permite acceder cómodamente al gestor de registros diferidos.
-    * Es útil cuando se desea registrar mensajes sólo cuando se conoce
-    * la suerte de la transacción.
+    * Acceso cómodo al gestor de registros diferidos.
+    * Permite registrar mensajes al término de la transacción
+    * para conocer si se confirma o se deshace.
     * @return El gestor de registros solicitado.
     */
    public LoggingManager getLoggingManager() {
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return cp.getTransactionManager().getListener(LoggingManager.KEY, LoggingManager.class);
+      return jc.getTransactionManager().getListener(LoggingManager.KEY, LoggingManager.class);
    }
 }

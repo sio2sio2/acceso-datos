@@ -157,8 +157,8 @@ el cual en |SQL| se define así:
       <dependencies>
         <dependency>
             <groupId>com.github.sio2sio2.sqlutils</groupId>
-            <artifactId>sqlutils-core</artifactId>
-            <version>4.0.0</version>
+            <artifactId>sqlutils-jdbc</artifactId>
+            <version>4.2.0</version>
         </dependency>
       </dependencies>
 

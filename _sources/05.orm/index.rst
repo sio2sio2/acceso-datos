@@ -12,7 +12,14 @@ de datos al modelo de objetos del lenguaje de programación.
 Las herramientas |ORM| son herramientas pensadas para realizar ellas mismas esta
 traducción entre los dos modelos y descargar al programador de esta
 responsabilidad. Como ya se enumeraron las :ref:`ventajas e inconvenientes de
-una estrategia frente a la otra <conn-vs-orm>`, no abundaremos más en ello.
+una estrategia frente a la otra <conn-vs-orm>`, no abundaremos más en ello, pero
+sí podemos afinar qué implica su uso. Si hemos utilizado :ref:`el patrón ORM al
+programar con conectores <conn-prog>`, habremos notado que las clases |DAO| son
+las que definen propiamente la traducción entre el objeto Java y el registro
+|SQL|. Por tanto, utilizar un |ORM| con la misma estrategia de programación
+implica ahorrarnos la creación de estas clases y sustituirlas por unas pequeñas
+indicaciones (anotaciones en la clase del modelo) que ayuden a la librería a
+aclarar la traducción.
 
 *Java* presenta la enorme ventaja de que define una especificación muy completa
 llamada |JPA| para el uso de |ORM|, de manera que, si usamos |ORM|\ s
@@ -46,3 +53,5 @@ aseguráramos que es compatible con |JPA|\ [#]_. Los ejemplos los basaremos en
 .. _MyBatis: https://mybatis.org/mybatis-3/es/
 .. _Hibernate: https://hibernate.org/
 .. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
+.. |DAO| replace:: :abbr:`DAO (Data Access Object)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`

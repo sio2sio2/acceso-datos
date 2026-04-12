@@ -53,7 +53,7 @@
     <script>let toggleHintShow = 'Haz clic para mostrar';</script>
     <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -508,11 +508,11 @@ precisamente), el modo más eficiente para llevarlas a cabo es el siguiente:</p>
 <span id="conn-transaction-manager"></span><h2><span class="section-number">4.3.3. </span>Gestor de transacciones<a class="headerlink" href="#gestor-de-transacciones" title="Link to this heading">#</a></h2>
 <p><a class="reference internal" href="#conn-transactions-create"><span class="std std-ref">Crear transacciones de forma manual</span></a> es bastante engorroso
 por lo que resulta muy útil construirse algún mecanismo más sofisticado para
-llevarlas a cabo. Una buena propuesta es crear una clase que modele
-transacciones (<a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/Transaction.java">Transaction</a>) y que, además, de simplificar la creación y terminación de la transacción,
-implemente su anidamiento y ofrezca un par de contextos limitados que luego nos
-serán de utilidad. Para gestionar esta clase puede crear <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java">TransactionManager</a>.</p>
-<p>Las claves de esta última clase son:</p>
+llevarlas a cabo. Una buena estrategia es crearnos nuestro propio <strong>gestor de
+transacciones</strong> que nos libere de las operaciones de apertura y confirmación o revocación
+y nos permita recuperar fácilmente, si existe, la conexión asociada a la
+transacción actual. En <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a>, se ha codificado para ello la clase <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java">TransactionManager</a><a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Sus claves son:</p>
 <ul class="simple">
 <li><p>Usa un patrón Singleton ampliado (<a class="reference external" href="https://en.wikipedia.org/wiki/Multiton_pattern">Multiton</a>),
 de manera que se puede acceder a las distintas instancias mediante una clave
@@ -529,7 +529,7 @@ protegida para que el programador no la cierre por descuido (su método
 <a class="reference external" href="https://medium.com/&#64;AlexanderObregon/the-proxy-pattern-in-java-and-what-makes-it-flexible-at-runtime-ba5248a4ce01">patrón Proxy</a>
 que permite interceptar los métodos definidos en una interfaz (y <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>
 lo es).</p></li>
-<li><p>Además, incorpora un mecanismo basado en el <a class="reference internal" href="../98.apendices/05.pattern.html#observer-pattern"><span class="std std-ref">patrón Observer</span></a> que permite ampliar su funcionalidad.</p></li>
+<li><p>Además, incorpora un mecanismo basado en el <a class="reference internal" href="../98.apendices/05.pattern.html#observer-pattern"><span class="std std-ref">patrón Observer</span></a> que permite ampliar su funcionalidad a voluntad.</p></li>
 </ul>
 <p>Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
 bases de datos:</p>
@@ -542,7 +542,7 @@ bases de datos:</p>
 <span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE centro SET titularidad = ? WHERE id = ?&quot;</span><span class="p">;</span>
 <span class="w">   </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">connection</span><span class="p">();</span>
+<span class="w">      </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">();</span><span class="w"> </span><span class="c1">// Objeto Connection asociado a la transacción</span>
 
 <span class="w">      </span><span class="k">try</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">preparedStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866</span><span class="p">);</span>
@@ -584,7 +584,8 @@ bases de datos:</p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>El método también puede capturar el resultado que devuelve la expresión lamda:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">obtenerEstudiantes</span><span class="p">(</span><span class="n">ctxt</span><span class="p">.</span><span class="na">connection</span><span class="p">()));</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// obtenerEstudiantes es un método que con una conexión hace un SELECT * FROM Estudiante</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">obtenerEstudiantes</span><span class="p">(</span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">()));</span>
 </pre></div>
 </div>
 <p>Pero ha de tenerse cuidado si la operación implica evaluación perezosa.</p>
@@ -651,8 +652,8 @@ transacción así:</p>
 </div>
 </div>
 <p>En cualquier caso, uno bastante más útil es aquel que permita registrar mensajes
-sólo después de que se conozca el resultado de la transacción (<a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/LoggingManager.java">LoggingManager</a>,
-también está definido en la librería).</p>
+sólo después de que se conozca el resultado de la transacción (por ello la
+librería define <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/tx/event/LoggingManager.java">LoggingManager</a>).</p>
 <p>Para registrar los observadores en el gestor basta con:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransactionManager</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;CENTRO&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds</span><span class="p">)</span><span class="w">  </span><span class="c1">// ds es un DataSource ya creado</span>
 <span class="hll"><span class="w">   </span><span class="p">.</span><span class="na">addEventListener</span><span class="p">(</span><span class="s">&quot;counter&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CounterListener</span><span class="p">())</span>
@@ -681,6 +682,20 @@ también está definido en la librería).</p>
 <span class="p">});</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La clase recuerda el orden en que se registraron los observadores, de
+manera que al abrirse la transacción los ejecuta en tal orden; y al cerrarse
+los ejecuta en orden inverso.</p>
+</div>
+<p class="rubric">Notas al pie</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Existe una versión alternativa para gestionar las transacciones JPA. Ya
+la trataremos en la próxima unidad.</p>
+</aside>
+</aside>
 </section>
 </section>
 

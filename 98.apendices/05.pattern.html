@@ -53,7 +53,7 @@
     <script>let toggleHintShow = 'Haz clic para mostrar';</script>
     <script>let toggleHintHide = 'Haz clic para ocultar';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js?v=1ae7504c"></script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -574,9 +574,6 @@ sirva en cualquier aplicación:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Clase Factory</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Factory</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Nombre del atributo que contendrá los nombres alternativos para la clase.</span>
-<span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;alias&quot;</span><span class="p">;</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Mapa cuyas claves son los nombres asociados a una clase</span>
@@ -587,22 +584,37 @@ sirva en cualquier aplicación:</p>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Constructor que escanea el paquete indicado para obtener las clases que implementan la interfaz dada.</span>
+<span class="cm">     * @param packageName El nombre del paquete.</span>
 <span class="cm">     * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.</span>
-<span class="cm">     * @param packageName El nombre del paquete donde se encuentran las clases que implementan la interfaz.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Factory</span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">packageName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Factory</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">packageName</span><span class="p">,</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">checkPackage</span><span class="p">(</span><span class="n">packageName</span><span class="p">);</span>
-<span class="w">        </span><span class="n">Reflections</span><span class="w"> </span><span class="n">reflections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Reflections</span><span class="p">(</span><span class="n">packageName</span><span class="p">);</span>
 
-<span class="w">        </span><span class="n">classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reflections</span><span class="p">.</span><span class="na">getSubTypesOf</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">)</span>
-<span class="w">            </span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
-<span class="w">            </span><span class="p">.</span><span class="na">flatMap</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">getAliases</span><span class="p">(</span><span class="n">clazz</span><span class="p">).</span><span class="na">stream</span><span class="p">().</span><span class="na">map</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AbstractMap</span><span class="p">.</span><span class="na">SimpleEntry</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span><span class="w"> </span><span class="n">clazz</span><span class="p">)))</span>
-<span class="w">            </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span>
-<span class="w">                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getKey</span><span class="p">,</span>
-<span class="w">                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getValue</span><span class="p">,</span>
-<span class="w">                </span><span class="p">(</span><span class="n">existing</span><span class="p">,</span><span class="w"> </span><span class="n">replacement</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">existing</span><span class="p">,</span>
-<span class="w">                </span><span class="n">HashMap</span><span class="p">::</span><span class="k">new</span>
-<span class="w">            </span><span class="p">));</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ScanResult</span><span class="w"> </span><span class="n">scanResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ClassGraph</span><span class="p">()</span>
+<span class="w">                    </span><span class="p">.</span><span class="na">acceptPackages</span><span class="p">(</span><span class="n">packageName</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">.</span><span class="na">enableClassInfo</span><span class="p">()</span>
+<span class="w">                    </span><span class="p">.</span><span class="na">scan</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="c1">// Obtener todas las clases que implementan la interfaz (o subclases si fuera una clase)</span>
+<span class="w">                </span><span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">&quot;unchecked&quot;</span><span class="p">)</span>
+<span class="w">                </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">implementingClasses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scanResult</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">getClassesImplementing</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">.</span><span class="na">getName</span><span class="p">())</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">loadClasses</span><span class="p">()</span><span class="w">  </span><span class="c1">// Carga las clases en ClassLoader</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">clazz</span><span class="p">)</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">!</span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">reflect</span><span class="p">.</span><span class="na">Modifier</span><span class="p">.</span><span class="na">isAbstract</span><span class="p">(</span><span class="n">clazz</span><span class="p">.</span><span class="na">getModifiers</span><span class="p">()))</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+
+<span class="w">                </span><span class="n">classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">implementingClasses</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">flatMap</span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">getAliases</span><span class="p">(</span><span class="n">clazz</span><span class="p">).</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">                                </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">alias</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AbstractMap</span><span class="p">.</span><span class="na">SimpleEntry</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span><span class="w"> </span><span class="n">clazz</span><span class="p">)))</span>
+<span class="w">                        </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span>
+<span class="w">                                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getKey</span><span class="p">,</span>
+<span class="w">                                </span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="p">::</span><span class="n">getValue</span><span class="p">,</span>
+<span class="w">                                </span><span class="p">(</span><span class="n">existing</span><span class="p">,</span><span class="w"> </span><span class="n">replacement</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">existing</span><span class="p">,</span>
+<span class="w">                                </span><span class="n">HashMap</span><span class="p">::</span><span class="k">new</span>
+<span class="w">                        </span><span class="p">));</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -611,7 +623,7 @@ sirva en cualquier aplicación:</p>
 <span class="cm">     * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Factory</span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">this</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">,</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">.</span><span class="na">getPackageName</span><span class="p">());</span>
+<span class="w">        </span><span class="k">this</span><span class="p">(</span><span class="n">interfaceClass</span><span class="p">.</span><span class="na">getPackageName</span><span class="p">(),</span><span class="w"> </span><span class="n">interfaceClass</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
@@ -664,7 +676,7 @@ sirva en cualquier aplicación:</p>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Obtiene la clase apropiada.</span>
+<span class="cm">     * Obtiene la clase apropiada</span>
 <span class="cm">     * @param value El nombre de la clase o uno de sus alias</span>
 <span class="cm">     * @return La clase correspondiente</span>
 <span class="cm">     * @throws IllegalArgumentException Cuando no existe ninguna clase con ese nombre o alias.</span>
@@ -681,11 +693,7 @@ sirva en cualquier aplicación:</p>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Crea directamente una instancia de la clase correspondiente al nombre o alias dado.</span>
-<span class="cm">     * </span>
-<span class="cm">     * &lt;p&gt;La clase debe tener un constructor sin parámetros y, además, la construcción no debe</span>
-<span class="cm">     * tener dependencias que puedan cruzarse. En ese caso, debe usarse {@code .get(String)},</span>
-<span class="cm">     * que no llega a crear la instancia.</span>
+<span class="cm">     * Crea una instancia de la clase correspondiente al nombre o alias dado</span>
 <span class="cm">     * @param value El nombre de la clase o uno de sus alias</span>
 <span class="cm">     * @return La instancia de la clase correspondiente</span>
 <span class="cm">     * @throws IllegalStateException Cuando no se puede crear la instancia. Habitualmente porque no tiene un constructor sin parámetros.</span>
@@ -700,8 +708,7 @@ sirva en cualquier aplicación:</p>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Obtiene un mapa que asocia cada clase con su lista de alias a partir {@link #classes}.</span>
-<span class="cm">     * Es útil para generar ayuda.</span>
+<span class="cm">     * Obtiene un mapa que asocia cada clase con su lista de alias a partir del mapa que relaciona cada alias con su clase correspondiente</span>
 <span class="cm">     * @return Otro mapa en que cada clase está relacionada con todos los alias que tiene.</span>
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">[]&gt;</span><span class="w"> </span><span class="nf">getAliasesByClass</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -798,6 +805,17 @@ clases correspondientes.</p>
 con todos los nombres con los que está relacionada.</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Esta clase necesita la librería <a class="reference external" href="https://mvnrepository.com/artifact/io.github.classgraph/classgraph">classgraph</a>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">   </span><span class="nt">&lt;groupId&gt;</span>io.github.classgraph<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">   </span><span class="nt">&lt;artifactId&gt;</span>classgraph<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">   </span><span class="nt">&lt;version&gt;</span>4.8.184<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</div>
 </section>
 </section>
 <section id="observer">

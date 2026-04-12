@@ -17,6 +17,18 @@ Studio Code`_, por varios motivos:
   programación.
 * Tiene versiones en los principales sistemas operativos.
 
+.. _vscode-vscodium:
+
+.. hint:: El código de este |IDE| es software libre (véase `su repositorio de
+   GitHub <https://github.com/microsoft/vscode>`_). Sin embargo, la
+   distribución del producto compilado, esto es, `Visual Studio Code`_ en sí,
+   tiene una licencia particular, usa `telemetría
+   <https://es.wikipedia.org/wiki/Telemetr%C3%ADa>`_ y echa mano de un
+   *marketplace* cerrado. Existe una distribución libre del |IDE| llamada
+   VSCodium_ (por analogía con Chromium_) que está libre de telemetría y usa un
+   marketplace abierto (OpenVSX_). En principio, se recomienda usar esta
+   alternativa libre.
+
 Generalidades
 =============
 .. _vscode-language:
@@ -623,13 +635,92 @@ operativos:
    de estas versiones son versiones |LTS|. La regla general es que deberíamos
    intentar usar la última de estas versiones.
 
+Versión de Java
+---------------
+Aunque nos adelantamos, partiendo de que instalaremos `Language Support for Java
+by Red Hat`_ para que nuestro |IDE| soporte el lenguaje, tendremos la necesidad
+tener instalado *Java* por dos razones:
+
+a. La propia extensión, para su funcionamiento (como el autocompletado o para el
+   resaltado de sintaxis), necesita un |JRE| de Java. Por ese motivo, las
+   versiones específicas de la extensión para distintos sistemas operativos como
+   *Windows* o *Linux*\ [#]_, instalan su propia versión de la máquina virtual y
+   así se aseguraran de que funcione, aunque no se haya instalado una |JVM| en
+   el sistema.
+
+#. La compilación y ejecución de nuestros proyectos necesita |JDK|.
+
+Analicemos cómo escoge uno y otro.
+
+.. rubric:: Versión para la extensión
+
+Para escoger qué versión de Java se usará, la extensión hace las siguientes
+comprobación en busca del directorio de instalación de *Java* según el orden en
+que se expresan aquí:
+
+1. Comprueba si en la :ref:`configuración <vscode-config>` se ha definido un
+   directorio para la opción ``java.jdt.ls.java.home``.
+#. En caso de que haya sido así (versiones específicas), usa el |JRE|
+   incorporado en la propia extensión.
+#. El directorio definido por la variable de entorno ``JDK_HOME``.
+#. El directorio definido por la variable de entorno ``JAVA_HOME``.
+#. El ejecutable de *Java* que pueda encontrar revisando el ``PATH`` del
+   sistema.
+
+.. rubric:: Versión para desarrollos
+
+En principio, y en ausencia de configuración específica, se utiliza el |JDK|
+que se usa para ejecutar la extensión. Sin embargo, tiene preferencia la
+lista de máquinas virtuales que podamos incluir en la :ref:`configuración
+<vscode-config>`:
+
+.. code-block:: json
+
+   "java.configuration.runtimes": [
+      {
+         "name": "JavaSE-25",
+         "path": "/usr/lib/jvm/default-java",
+         "default": true
+      },
+      {
+         "name": "JavaSE-21",
+         "path": "/usr/lib/jvm/java-1.21.0-openjdk-amd64",
+         "default": false
+      }
+   ]
+   
+en la cual, como vemos, podemos definir una de ellas como predeterminada. En
+cualquier caso, si hay varias alternativas, se usará la versión más adecuada
+para el proyecto en particular (si usamos :ref:`Maven` podemos definir una).
+
+.. note:: También es posible incluir en el :ref:`launch.json <vscode-java-debug>`
+   qué |JDK| se quiere ejecutar para una de posibilidades de ejecución:
+
+   .. code-block:: java
+      :emphasize-lines: 6
+
+      "configurations": [
+         {
+            "type": "java",
+            "name": "MiApp (help)",
+            "request": "launch",
+            "javaExec": "/usr/lib/jvm/java-1.21.0-openjdk-amd64"
+         }
+      ]
+
+.. seealso:: Para más información, puede leer la `documentación oficial de la
+   extensión sobre este particular
+   <https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements>`_.
+
+
 Configuración previa
 --------------------
 .. table:: Extensiones recomendadas
    :class: vscode-extensions
+   :name: vscode-java-extensions
 
    +-----------------------------------------+---------------------------------------------------------------------------------------+
-   | `Language Support for Java by Red Hat`_ |                                                                                       |
+   | `Language Support for Java by Red Hat`_ | Es la extensión que facilita propiamente el soporte para *Java* al |IDE|.             |
    +-----------------------------------------+---------------------------------------------------------------------------------------+
    | `Project Manager for Java`_             | Facilita la gestión de proyectos de Java, permitiendo directamente la creación de un  |
    |                                         | proyecto, que es un área de  trabajo con una estructura básica ya definida y una      |
@@ -638,7 +729,7 @@ Configuración previa
    | `Debugger for Java`_                    | Permite depurar los programas de Java (puntos de ruptura, ejecución condicional,      |
    |                                         | ejecución paso a paso, etc).                                                          |
    +-----------------------------------------+---------------------------------------------------------------------------------------+
-   | `IntelliCode`_                          | Proporciona sugerencias basadas en |IA|.                                              |
+   | `GitHub Copilot Chat`_                  | Proporciona ayudas basadas en |IA|.                                                   |
    +-----------------------------------------+---------------------------------------------------------------------------------------+
    | `Maven for Java`_                       | Si usamos Maven como gestor de proyecto incorpora utilizades interesantes.            |
    +-----------------------------------------+---------------------------------------------------------------------------------------+
@@ -1185,6 +1276,13 @@ nuestro propósito.
    nivel de perfil, pero la segunda debería ser más propia del nivel de área de
    trabajo.
 
+.. [#] Por defecto, el *marketplace* oficial de Microsoft para `Visual Studio
+   Code`_ detecta el sistema operativo e instala la versión específica para tal
+   sistema operativo, por lo que es probable que este sea nuestro caso.
+   :ref:`VSCodium <vscode-vscodium>`, sin embargo, usa otro marketplace en el
+   que sólo existe la versión universal.
+   
+
 .. |JSON| replace:: :abbr:`JSON (JavaScript Object Notation)`
 .. |IDE| replace:: :abbr:`IDE (Integrated Development Environment)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
@@ -1193,6 +1291,8 @@ nuestro propósito.
 .. |JAR| replace:: :abbr:`JAR (Java ARchive)`
 .. |API| replace:: :abbr:`API (Application Programming Inteface)`
 .. |LTS| replace:: :abbr:`LTS (Long Term Support)`
+.. |JRE| replace:: :abbr:`JRE (Java Runtime Environment)`
+.. |JVM| replace:: :abbr:`JVM (Java Virtual Machine)`
 
 .. _Visual Studio Code: https://code.visualstudio.com/
 .. _Gradle: https://gradle.org/
@@ -1211,3 +1311,7 @@ nuestro propósito.
 .. _Test Runner for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test
 .. _Maven for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven
 .. _Javadoc: https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html
+.. _GitHub Copilot Chat: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat
+.. _VSCodium: https://vscodium.com/
+.. _Chromium: https://www.chromium.org/Home/
+.. _OpenVSX: https://open-vsx.org/

@@ -1,4 +1,4 @@
-package edu.acceso.tarea_2_4.infrastructure.factory;
+package edu.acceso.tarea_4_1.infraestructure.factory;
 
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.reflections.Reflections;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
+
 
 /**
  * Implementa el patrón Factory para escoger una clase entre varias que implementan una misma interfaz
@@ -52,9 +54,6 @@ import org.reflections.Reflections;
  * @param <I> La interfaz que implementan las clases seleccionables.
  */
 public class Factory<I> {
-    /**
-     * Nombre del atributo que contendrá los nombres alternativos para la clase.
-     */
     private final static String alias = "alias";
     /**
      * Mapa cuyas claves son los nombres asociados a una clase
@@ -65,22 +64,37 @@ public class Factory<I> {
 
     /**
      * Constructor que escanea el paquete indicado para obtener las clases que implementan la interfaz dada.
+     * @param packageName El nombre del paquete.
      * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.
-     * @param packageName El nombre del paquete donde se encuentran las clases que implementan la interfaz.
      */
-    public Factory(Class<I> interfaceClass, String packageName) {
+    public Factory(String packageName, Class<I> interfaceClass) {
         checkPackage(packageName);
-        Reflections reflections = new Reflections(packageName);
 
-        classes = reflections.getSubTypesOf(interfaceClass)
-            .stream()
-            .flatMap(clazz -> getAliases(clazz).stream().map(alias -> new AbstractMap.SimpleEntry<>(alias, clazz)))
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (existing, replacement) -> existing,
-                HashMap::new
-            ));
+        try (ScanResult scanResult = new ClassGraph()
+                    .acceptPackages(packageName)
+                    .enableClassInfo()
+                    .scan()) {
+
+                // Obtener todas las clases que implementan la interfaz (o subclases si fuera una clase)
+                @SuppressWarnings("unchecked")
+                List<Class<? extends I>> implementingClasses = scanResult
+                        .getClassesImplementing(interfaceClass.getName())
+                        .loadClasses()  // Carga las clases en ClassLoader
+                        .stream()
+                        .map(clazz -> (Class<? extends I>) clazz)
+                        .filter(clazz -> !java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()))
+                        .collect(Collectors.toList());
+
+                classes = implementingClasses.stream()
+                        .flatMap(clazz -> getAliases(clazz).stream()
+                                .map(alias -> new AbstractMap.SimpleEntry<>(alias, clazz)))
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (existing, replacement) -> existing,
+                                HashMap::new
+                        ));
+        }
     }
 
     /**
@@ -89,7 +103,7 @@ public class Factory<I> {
      * @param interfaceClass La interfaz que implementan todas las clases que se quieren encontrar.
      */
     public Factory(Class<I> interfaceClass) {
-        this(interfaceClass, interfaceClass.getPackageName());
+        this(interfaceClass.getPackageName(), interfaceClass);
     }
 
     /**
@@ -142,7 +156,7 @@ public class Factory<I> {
     }
 
     /**
-     * Obtiene la clase apropiada.
+     * Obtiene la clase apropiada
      * @param value El nombre de la clase o uno de sus alias
      * @return La clase correspondiente
      * @throws IllegalArgumentException Cuando no existe ninguna clase con ese nombre o alias.
@@ -159,11 +173,7 @@ public class Factory<I> {
     }
 
     /**
-     * Crea directamente una instancia de la clase correspondiente al nombre o alias dado.
-     * 
-     * <p>La clase debe tener un constructor sin parámetros y, además, la construcción no debe
-     * tener dependencias que puedan cruzarse. En ese caso, debe usarse {@code .get(String)},
-     * que no llega a crear la instancia.
+     * Crea una instancia de la clase correspondiente al nombre o alias dado
      * @param value El nombre de la clase o uno de sus alias
      * @return La instancia de la clase correspondiente
      * @throws IllegalStateException Cuando no se puede crear la instancia. Habitualmente porque no tiene un constructor sin parámetros.
@@ -178,8 +188,7 @@ public class Factory<I> {
     }
 
     /**
-     * Obtiene un mapa que asocia cada clase con su lista de alias a partir {@link #classes}.
-     * Es útil para generar ayuda.
+     * Obtiene un mapa que asocia cada clase con su lista de alias a partir del mapa que relaciona cada alias con su clase correspondiente
      * @return Otro mapa en que cada clase está relacionada con todos los alias que tiene.
      */
     public Map<Class<? extends I>, String[]> getAliasesByClass() {

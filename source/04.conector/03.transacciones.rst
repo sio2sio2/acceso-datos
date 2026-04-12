@@ -121,12 +121,12 @@ Gestor de transacciones
 -----------------------
 :ref:`Crear transacciones de forma manual <conn-transactions-create>` es bastante engorroso
 por lo que resulta muy útil construirse algún mecanismo más sofisticado para
-llevarlas a cabo. Una buena propuesta es crear una clase que modele
-transacciones (Transaction_) y que, además, de simplificar la creación y terminación de la transacción,
-implemente su anidamiento y ofrezca un par de contextos limitados que luego nos
-serán de utilidad. Para gestionar esta clase puede crear TransactionManager_.
+llevarlas a cabo. Una buena estrategia es crearnos nuestro propio **gestor de
+transacciones** que nos libere de las operaciones de apertura y confirmación o revocación
+y nos permita recuperar fácilmente, si existe, la conexión asociada a la
+transacción actual. En sqlutils_, se ha codificado para ello la clase TransactionManager_\ [#]_.
 
-Las claves de esta última clase son:
+Sus claves son:
 
 - Usa un patrón Singleton ampliado (`Multiton <https://en.wikipedia.org/wiki/Multiton_pattern>`_),
   de manera que se puede acceder a las distintas instancias mediante una clave
@@ -144,7 +144,7 @@ Las claves de esta última clase son:
   que permite interceptar los métodos definidos en una interfaz (y |Connection|
   lo es).
 - Además, incorpora un mecanismo basado en el :ref:`patrón Observer
-  <observer-pattern>` que permite ampliar su funcionalidad.
+  <observer-pattern>` que permite ampliar su funcionalidad a voluntad.
 
 Este gestor de transacciones soporta múltiples hilos y el acceso a múltiples
 bases de datos:
@@ -160,7 +160,7 @@ bases de datos:
    tm.transaction(ctxt -> {
       String sqlString = "UPDATE centro SET titularidad = ? WHERE id = ?";
       try {
-         Connection conn = ctxt.connection();
+         Connection conn = ctxt.handle(); // Objeto Connection asociado a la transacción
 
          try(PreparedStatement pstmt = conn.preparedStatement(sqlString)) {
             pstmt.setInt(2, 11004866);
@@ -202,7 +202,8 @@ bases de datos:
 
    .. code-block:: java
 
-      List<Estudiante> estudiantes = tm.transaction(ctxt -> obtenerEstudiantes(ctxt.connection()));
+      // obtenerEstudiantes es un método que con una conexión hace un SELECT * FROM Estudiante
+      List<Estudiante> estudiantes = tm.transaction(ctxt -> obtenerEstudiantes(ctxt.handle()));
 
    Pero ha de tenerse cuidado si la operación implica evaluación perezosa.
 
@@ -275,8 +276,8 @@ transacción así:
 
 
 En cualquier caso, uno bastante más útil es aquel que permita registrar mensajes
-sólo después de que se conozca el resultado de la transacción (LoggingManager_,
-también está definido en la librería).
+sólo después de que se conozca el resultado de la transacción (por ello la
+librería define LoggingManager_).
 
 Para registrar los observadores en el gestor basta con:
 
@@ -309,9 +310,18 @@ Para registrar los observadores en el gestor basta con:
       // [...]
    });
 
+.. note:: La clase recuerda el orden en que se registraron los observadores, de
+   manera que al abrirse la transacción los ejecuta en tal orden; y al cerrarse
+   los ejecuta en orden inverso.
+
+.. rubric:: Notas al pie
+
+.. [#] Existe una versión alternativa para gestionar las transacciones JPA. Ya
+   la trataremos en la próxima unidad.
+
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 
-.. _Transaction: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/Transaction.java
-.. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java
-.. _LoggingManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/LoggingManager.java
+.. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java
+.. _LoggingManager: https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/tx/event/LoggingManager.java
+.. _sqlutils: https://github.com/sio2sio2/sqlutils

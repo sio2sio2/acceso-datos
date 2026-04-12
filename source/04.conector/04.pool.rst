@@ -1,7 +1,7 @@
 .. _conn-pool:
 
 *Pool* de conexiones
-====================
+********************
 Abrir una conexión a la base de datos es un proceso costoso en recursos por lo
 que, si prevemos que nuestra aplicación abrirá y cerrará varias conexiones, es
 conveniente utilizar un :dfn:`pool de conexiones`, que no es más que un
@@ -20,18 +20,47 @@ necesidad de establecer una nueva conexión con la base de datos.
 
 Para utilizar este mecanismo tenemos dos vías:
 
-+ Usar el mecanismo básico que proporciona |JDBC| y que puede servirnos cuando
-  no haya gran concurrencia ni necesitamos controlar todos los parámetros del
-  *pool*.
-
-+ Usar una librería especializada como `HikariCP
++ Usar el mecanismo básico que proporciona, si lo proporciona, el driver |JDBC|
+  en cada caso.
++ Lo más recomendable, usar una librería especializada como `HikariCP
   <https://github.com/brettwooldridge/HikariCP>`_.
+
+Creación del gestor
+===================
+La |API| de |JDBC| se limita a definir una clase |DataSource| con un método
+``.getConnection()`` que permite obtener conexiones a partir de ella. No
+especifica mucho más, así que no hay ningún mecanismo estándar para crear o
+definir los parámetros del *pool*.
 
 Gestor integrado
 ----------------
-Los :ref:`controladores citados para distintas bases de datos <conn-drivers>`
-disponen de un gestor integrado de *pools* de conexiones, aunque su uso puede
-diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:
+Muchos de los :ref:`controladores citados para distintas bases de datos
+<conn-drivers>` disponen de un gestor integrado para *pools* de conexiones; y
+esta es una estrategia para poder crearlos. Esto, sin embargo, tiene dos
+inconvenientes:
+
+- Los gestores difieren entre sí, puesto que a lo único que les obliga la
+  especificación es a que proporcionen el objeto |DataSource|: cómo llegar a él
+  es libre y, en consecuencia, cada uno utilizará clases y métodos distintos.
+
+  .. attention:: Cuando se pretende usar el gestor integrado :ref:`no debe
+     incluirse el scope runtime <scope-runtime>` al cargar la librería, puesto
+     que necesitaremos usar directamente métodos que están definidos en dicha
+     librería y no en |JDBC|.
+
+- No todos los *drivers* proporcionan un mecanismo para la creación del *pool*,
+  y algunos de los que los proporcionan lo hacen de forma parcial (véase más
+  abajo el caso de SQLite_).
+
+.. rubric:: SQLite
+
+El driver de SQLite_ es uno de esos casos en los que se proporciona un gestor,
+pero bastante inútil. Tengamos también presente que este |SGBD| no está pensado
+para la concurrencia, por lo que realiza un bloqueo de la base de datos a nivel
+de archivo, esto es, de toda la base de datos; y los pool de conexiones pierden
+prácticamente toda su utilidad.
+
+Para obtener un objeto |DataSource| puede hacerse lo siguiente:
 
 .. code-block:: java
 
@@ -50,19 +79,16 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:
       // que se marcó como inactiva, al cerrarse.
    }
 
-.. admonition:: Aclaración
+En el código anterior los dos objetos |DataSource| generan dos objetos
+|Connection| distintos. Sin embargo, según la teoría ambos utilizan, en
+realidad, la misma conexión a la base de datos, ya que se crean a partir de
+un pool de conexiones y al crear el segundo objeto, el primero ya se cerró y,
+por tanto, ha dejado disponible la conexión en el pool.
 
-   En el código anterior los dos objetos |DataSource| generan dos objetos
-   |Connection| distintos. Sin embargo, es más que probable que ambos estén
-   utilizando, en realidad, la misma conexión a la base de datos, ya que se
-   crean a partir de un pool de conexiones y al crear el segundo objeto, el
-   primero ya se cerró y, por tanto, ha dejado disponible la conexión en el
-   pool.
+En cambio, si se hubieran generado directamente con |DriverManager|, ambos
+objetos conectores estarían asociados a dos conexiones distintas.
 
-   En cambio, si se hubieran generado directamente con |DriverManager|, ambos
-   objetos conectores estarían asociados a dos conexiones distintas.
-
-.. warning:: Y, sin embargo, lo anterior no es cierto a consecuencia de un `bug
+.. danger:: Y, sin embargo, lo anterior no es cierto a consecuencia de un `bug
    del controlador de SQLite
    <https://github.com/xerial/sqlite-jdbc/issues/1011>`_, que provoca que
    siempre se abra una nueva conexión, sin reaprovechar las ya establecidas. La
@@ -99,20 +125,35 @@ diferir ligeramente entre ellos. Por lo demás, es sencillo de usar:
          // Ni aquí tampoco.
       }
 
-   al crearse el objeto ``conn2``, ``conn1`` se cerrará y quedará inútil. El
-   *bug*, no obstante, es un defecto del controlador para :program:`SQLite`. El
-   código equivalente para otros |SGBD| sí debería funcionar correctamente.
+   al crearse el objeto ``conn2``, ``conn1`` se cerrará y quedará inútil.
+
+.. rubric:: H2
+
+Nuestro otro |SGBD| de referencia sí soporta concurrencia y sí tiene un gestor
+integrado funcional:
+
+.. code-block:: java
+
+   JdbcConnectionPool cp = JdbcConnectionPool.create(url, user, password);
+   cp.setMaxConnections(6); // Número máximo de conexions simultáneas abiertas.
+
+   DataSource ds = (DataSource) cp;
+
+   try(Connection conn = ds.getConnection()) {
+
+     // ... Hacemos operaciones con el objeto Connection ...
+   }
+
+En este caso, los ejemplos que para SQLite_ no funcionaron correctamente, para
+H2_ sí lo harán.
 
 HikariCP
 --------
-La alternativa, que es común a cualquier controlador, es usar una librería
+La alternativa, común a cualquier controlador, es usar una librería
 especializada como HikariCP_, que tiene `repositorio de Maven
 <https://mvnrepository.com/artifact/com.zaxxer/HikariCP>`_.
 
-.. note:: Con esta librería no tendremos problemas al utilizar un *pool* de
-   conexiones con :program:`SQLite`.
-
-Su uso, por otro lado es muy sencillo:
+Su uso es muy sencillo:
 
 .. code-block:: java
 
@@ -164,36 +205,54 @@ Su uso, por otro lado es muy sencillo:
 
 .. _conn-pool-extra:
 
-Gestión del pool
-----------------
-Si queremos simplificar la creación del pool y abstraernos de qué se usa para
-crearlo, podemos encerrar toda esta lógica en una clase como ConnectionPool_.
+Gestión avanzada
+================
+Hasta ahora hemos visto como crear manualmente un *pool* de conexiones, pero
+conviene que, al crear un programa, afinemos y abstraigamos al resto de la
+aplicación de cómo se crea el *pool* encerrado toda la lógica en una clase como
+JdbcConnection_, que propone sqlutils_.
 
 La clase sigue el patrón ya ensayado para :ref:`TransactionManager
 <conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
-conexiones una clave, por lo que crear un *pool* es muy sencillo\ [#]_:
+conexiones una clave\ [#]_:
 
 .. code-block:: java
    :emphasize-lines: 2, 10
 
    // Pool de conexiones de una base SQLite en memoria.
-   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null)) {
-      DataSource ds = pool.getDataSource();
+   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null)) {
+      DataSource ds = jc.getDataSource();
       try(Connection conn = ds.getConnection()) {
          // Hacemos operaciones con la conexión.
       }
    }
 
    // Aquí ya no podemos usar el pool "DB" porque lo hemos cerrado.
-   ConnectionPool.get("DB");  // ERROR: el pool está cerrado.
+   JdbcConnection.get("DB");  // ERROR: el pool está cerrado.
 
 La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
 siempre que no se haya cerrado.
 
-Ahora bien, ¿qué se ha usado para crear el *pool*, esto es, el objeto
-|DataSource|\ ? Como no nos hemos preocupado de ello, se ha usado HikariCP_,
-pero se permite añadir un cuarto argumento al metodo ``create`` que habilita la
-creación del objeto con cualquier otro método\ [#]_.
+Ahora bien, ¿cómo obtiene esta clase un objeto |DataSource|\ ? Cuando el
+desarrollador no se preocupa de ello, como es el caso, la clase intenta usar
+HikariCP_\ [#]_, porque la creación anterior es equivalente a haber añadido un
+cuarto argumento al metodo ``create``:
+
+.. code-block:: java
+   :emphasize-lines: 5, 8
+
+   // Fábrica de objetos DataSource que usa HikariCP.
+   // Opcionalmente se le puede pasar como argumento
+   // un objeto HikariConfig para modificar los parámentros predeterminados.
+   // Está disponible en el módulo sqlutils-hikaricp.
+   DataSourceFactory factory = new HikariCPFactory();
+
+   // Le decimos explícitamente a JdbcConnection cómo
+   JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, factory);
+
+.. warning:: Tenga presente que para que cualquiera de los dos ejemplos
+   funcione, necesita importar la dependencia ``sqlutils-hikaricp``.
+
 
 El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
 y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
@@ -205,29 +264,50 @@ de transacción el que se encargue de crear y cerrar la conexión que necesitamo
    :emphasize-lines: 3, 6
 
    // Pool de conexiones de una base SQLite en memoria.
-   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
       // Creamos un gestor de transacciones para él y, de paso,
       // registramos un gestor de registros.
-      pool.initTransactionManager(Map.of(
+      jc.withTransactionManager(Map.of(
          "logging", new LoggingManager()
       ));
 
-      TransactionManager tm = pool.getTransactionManager(); // También puede obtenerse con la clave 'DB'
+      // El gestor de transacciones es sólo accesible a través el gestor de conexiones
+      TransactionManager tm = pool.getTransactionManager();
 
-      // Usamos conexiones gestionadas por el gestor
+      // La transacción puede generar un error DataAccessException
       tm.transaction(ctxt -> {
-        // Operaciones que comparten una misma transacción
+         // Conexión asociada a la transacción
+         Connection conn = ctxt.handle();
+
+        // Ya podemos realizar operaciones con 'conn'.
       });
    }
 
 .. admonition:: Advertencia
 
-   Las clases ConnectionPool_ y TransactionManager_ son independientes y puede
+   Las clases JdbcConnection_ y TransactionManager_ son independientes y puede
    usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+   conjuntamente. Por eso, cuando se ha definido el gestor de transacciones
    correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
    de que es conveniente manejar las conexiones a través del gestor, que para
    eso se ha creado.
+
+Naturalmente, la clase permite pasar otra fábrica que use otro mecanismo
+totalmente distinto para crear el |DataSource|. Por ejemplo, aprovechando que
+hemos visto cómo crear uno con el gestor integrado de H2_, si utilizáramos este
+|SGBD|, podríamos definir una fábrica personalizada así:
+
+.. literalinclude:: files/H2CPFactory.java
+   :caption: H2CPFactoryJava (:download:`descarga <files/H2CPFactory.java>`)
+   :class: toggle
+   :start-at: /**
+
+.. note:: Por supuesto, al usar H2 como |SGBD| no necesitamos definir esta
+   clase, ya que podemos usar aprovechar el predefinido en sqlutils-hikaricp
+   (puesto que HikariCP_ lo soporta). El ejemplo sirve para ilustrar cómo
+   definir una fábrica con otro mecanismo distinto (p.e. si decidiéramos crear
+   el pool de conexiones con una librería distinta como `C3PO
+   <https://www.mchange.com/projects/c3p0/>`_)
 
 .. rubric:: Notas al pie
 
@@ -239,28 +319,23 @@ de transacción el que se encargue de crear y cerrar la conexión que necesitamo
    datos distinta en memoria. Con una base de datos persistente, no habría sido
    necesario.
 
-.. [#] Pero para ello es necesario añadir el módulo ``sqlutils-hikaricp`` a las
-   dependencias. Por otro lado, para saber cómo obtener el objeto |DataSource|
-   de cualquier otro modo, éche un vistazo a la interfaz `DataSourceFactory
-   <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java>`_
-   y a su implementación con HikariCP_, la clase `HikariCPFactory <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java>`_. De hecho:
+.. [#] Pero tendremos que haber cargado el módulo ``sqlutils-hikaricp`` en las
+   dependencias del proyecto. En ese módulo hay una clase denominada
+   `HikariCPFactory
+   <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java>`_
+   que implementa la interfaz `DataSourceFactory
+   <https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-core/src/main/java/edu/acceso/sqlutils/DataSourceFactory.java>`_.
 
-   .. code-block:: java
-
-      ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null))
-
-   es equivalente a:
-
-   .. code-block:: java
-
-      ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, new HikariCPFactory()))
-
+.. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |DriverManager| replace:: :java-sql:`DriverManager <DriverManager>`
 .. |DataSource| replace:: :java-sql:`DataSource <DataSource>`
-.. _ConnectionPool: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java
+.. _sqlutils: https://github.com/sio2sio2/sqlutils
+.. _JdbcConnection: https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java
 .. _patrón Multiton: https://en.wikipedia.org/wiki/Multiton
 .. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java
+.. _SQLite: https://sqlite.org/
+.. _H2: https://www.h2database.com/

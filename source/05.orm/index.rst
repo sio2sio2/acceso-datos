@@ -18,7 +18,7 @@ programar con conectores <conn-prog>`, habremos notado que las clases |DAO| son
 las que definen propiamente la traducción entre el objeto Java y el registro
 |SQL|. Por tanto, utilizar un |ORM| con la misma estrategia de programación
 implica ahorrarnos la creación de estas clases y sustituirlas por unas pequeñas
-indicaciones (anotaciones en la clase del modelo) que ayuden a la librería a
+indicaciones (anotaciones en las clases del modelo) que ayuden a la librería a
 aclarar la traducción.
 
 *Java* presenta la enorme ventaja de que define una especificación muy completa
@@ -27,7 +27,7 @@ compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El
 |ORM| más utilizado en Java es Hibernate_ y es compatible, por lo que esta
 unidad explicará cómo usar esta especificación usando como implementación
 Hibernate_, pero podríamos usar cualquier otro |ORM| siempre que nos
-aseguráramos que es compatible con |JPA|\ [#]_. Los ejemplos los basaremos en
+aseguráramos de que es compatible con |JPA|\ [#]_. Los ejemplos los basaremos en
 :ref:`nuestro caso sobre centros y profesores <ej-centros-alumnos>`.
 
 .. todo:: Investigar el enfoque de MyBatis_ (quizás para la unidad anterior).

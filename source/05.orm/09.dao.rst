@@ -61,7 +61,7 @@ ilustrar su uso sin muchos preámbulos:
       Centro otro = tm.transactionR(ctxt -> ctxt.handle().get(Centro.class, 11004866L));
    }
 
-   // Como hemos cerrado el objeto, ya no podemos reutilizarlo
+   // ERROR: Como hemos cerrado el objeto, ya no podemos reutilizarlo
    JpaConnection jc = JpaConnection.get("MiUnidadP");
 
 Obsérvese que el uso de la clase es prácticamente idéntico al de
@@ -73,10 +73,11 @@ Obsérvese que el uso de la clase es prácticamente idéntico al de
 + La clase también implementa un patrón Multiton_ cuya clave identificativa
   es el nombre de la propia unidad de persistencia.
 + Le asociamos un gestor de transacciones que se comporta igual que su
-  correspondiente para conectores y, además, soporta los mismos observadores.
+  correspondiente para conectores y, además, soporta los mismos observadores
+  (p.ej. ``LoggingManager``).
 + Creamos transacciones con la misma estrategia funcional. La diferencia es que,
   en este caso, el objeto que nos permite operar es un
-  :jakarta-persistence:`EntityManager` y no un :java-sql:`Connection`.
+  :jakarta-persistence:`EntityManager` y no un :java-sql:`Connection <Connection>`.
 
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`

@@ -15,7 +15,7 @@ Dependencias
 
    <properties>
        <maven.compiler.release>21</maven.compiler.release>
-       <hibernate.version>7.2.0.Final</hibernate.version>
+       <hibernate.version>7.3.1.Final</hibernate.version>
    </properties>
 
    <!-- ... -->
@@ -138,6 +138,10 @@ En este archivo:
       BatooJPA      org.batoo.jpa.persistence.PersistenceProviderImpl
      ============= =======================================================
 
+  En cualquier caso, el elemento ``<provider>`` no puede :ref:`cambiar de valor
+  dinámicamente <orm-conf-dyn>`. Si queremos otra configuración alternativa para
+  un |ORM| distinto, necesitamos crear una unidad de persistencia distinta.
+
 * En caso de que no se detecten, se pueden registrar las clases del modelo
   cuyos objetos se quieren hacer persistentes.
 
@@ -190,6 +194,8 @@ En este archivo:
   *DEBUG*), tales sentencias se formatean para que resulten más legibles y,
   además, se acompañan de comentarios.
 
+.. _orm-conf-dyn:
+
 Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
 no están definidos de antemano, sino que se definen en **tiempo de ejecución**?
 En ese caso, puede definirse un :java-util:`HashMap` que defina las valores de
@@ -207,7 +213,7 @@ Por ejemplo:
 
    EntityManagerFactory emf = Persistence.createEntityManagerFactory("MiUnidadP", props);
 
-.. warning:: Es necesario que el archivo
+.. attention:: Es necesario que el archivo
    :file:`META-INF/persistence.xml` pase a la compilación, que es lo que debería
    ocurrir... a menos que haya usted :ref:`cambiado ese comportamiento al añadir
    una sección resources al archivo pom.xml <add-resources>`.

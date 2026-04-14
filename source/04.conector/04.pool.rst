@@ -43,7 +43,7 @@ inconvenientes:
   especificación es a que proporcionen el objeto |DataSource|: cómo llegar a él
   es libre y, en consecuencia, cada uno utilizará clases y métodos distintos.
 
-  .. attention:: Cuando se pretende usar el gestor integrado :ref:`no debe
+  .. caution:: Cuando se pretende usar el gestor integrado :ref:`no debe
      incluirse el scope runtime <scope-runtime>` al cargar la librería, puesto
      que necesitaremos usar directamente métodos que están definidos en dicha
      librería y no en |JDBC|.
@@ -88,7 +88,7 @@ por tanto, ha dejado disponible la conexión en el pool.
 En cambio, si se hubieran generado directamente con |DriverManager|, ambos
 objetos conectores estarían asociados a dos conexiones distintas.
 
-.. danger:: Y, sin embargo, lo anterior no es cierto a consecuencia de un `bug
+.. warning:: Y, sin embargo, lo anterior no es cierto a consecuencia de un `bug
    del controlador de SQLite
    <https://github.com/xerial/sqlite-jdbc/issues/1011>`_, que provoca que
    siempre se abra una nueva conexión, sin reaprovechar las ya establecidas. La
@@ -210,7 +210,7 @@ Gestión avanzada
 Hasta ahora hemos visto como crear manualmente un *pool* de conexiones, pero
 conviene que, al crear un programa, afinemos y abstraigamos al resto de la
 aplicación de cómo se crea el *pool* encerrado toda la lógica en una clase como
-JdbcConnection_, que propone sqlutils_.
+ConnectionPool_.
 
 La clase sigue el patrón ya ensayado para :ref:`TransactionManager
 <conn-transaction-manager>`: un `patrón Multiton`_ que asocia a cada *pool* de
@@ -220,15 +220,15 @@ conexiones una clave\ [#]_:
    :emphasize-lines: 2, 10
 
    // Pool de conexiones de una base SQLite en memoria.
-   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null)) {
-      DataSource ds = jc.getDataSource();
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null)) {
+      DataSource ds = pool.getDataSource();
       try(Connection conn = ds.getConnection()) {
          // Hacemos operaciones con la conexión.
       }
    }
 
    // Aquí ya no podemos usar el pool "DB" porque lo hemos cerrado.
-   JdbcConnection.get("DB");  // ERROR: el pool está cerrado.
+   ConnectionPool.get("DB");  // ERROR: el pool está cerrado.
 
 La última línea muestra cómo puede recuperarse en cualquier momento el *pool*,
 siempre que no se haya cerrado.
@@ -247,12 +247,8 @@ cuarto argumento al metodo ``create``:
    // Está disponible en el módulo sqlutils-hikaricp.
    DataSourceFactory factory = new HikariCPFactory();
 
-   // Le decimos explícitamente a JdbcConnection cómo
-   JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, factory);
-
-.. warning:: Tenga presente que para que cualquiera de los dos ejemplos
-   funcione, necesita importar la dependencia ``sqlutils-hikaricp``.
-
+   // Le decimos explícitamente a ConnectionPool cómo
+   ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, factory);
 
 El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
 y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
@@ -264,30 +260,26 @@ de transacción el que se encargue de crear y cerrar la conexión que necesitamo
    :emphasize-lines: 3, 6
 
    // Pool de conexiones de una base SQLite en memoria.
-   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+   try(ConnectionPool pool = ConnectionPool.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
       // Creamos un gestor de transacciones para él y, de paso,
       // registramos un gestor de registros.
-      jc.withTransactionManager(Map.of(
+      pool.initTransactionManager(Map.of(
          "logging", new LoggingManager()
       ));
 
-      // El gestor de transacciones es sólo accesible a través el gestor de conexiones
-      TransactionManager tm = pool.getTransactionManager();
+      TransactionManager tm = pool.getTransactionManager(); // También puede obtenerse con la clave 'DB'
 
-      // La transacción puede generar un error DataAccessException
+      // Usamos conexiones gestionadas por el gestor
       tm.transaction(ctxt -> {
-         // Conexión asociada a la transacción
-         Connection conn = ctxt.handle();
-
-        // Ya podemos realizar operaciones con 'conn'.
+        // Operaciones que comparten una misma transacción
       });
    }
 
 .. admonition:: Advertencia
 
-   Las clases JdbcConnection_ y TransactionManager_ son independientes y puede
+   Las clases ConnectionPool_ y TransactionManager_ son independientes y puede
    usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-   conjuntamente. Por eso, cuando se ha definido el gestor de transacciones
+   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
    correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
    de que es conveniente manejar las conexiones a través del gestor, que para
    eso se ha creado.
@@ -301,13 +293,6 @@ hemos visto cómo crear uno con el gestor integrado de H2_, si utilizáramos est
    :caption: H2CPFactoryJava (:download:`descarga <files/H2CPFactory.java>`)
    :class: toggle
    :start-at: /**
-
-.. note:: Por supuesto, al usar H2 como |SGBD| no necesitamos definir esta
-   clase, ya que podemos usar aprovechar el predefinido en sqlutils-hikaricp
-   (puesto que HikariCP_ lo soporta). El ejemplo sirve para ilustrar cómo
-   definir una fábrica con otro mecanismo distinto (p.e. si decidiéramos crear
-   el pool de conexiones con una librería distinta como `C3PO
-   <https://www.mchange.com/projects/c3p0/>`_)
 
 .. rubric:: Notas al pie
 
@@ -333,8 +318,7 @@ hemos visto cómo crear uno con el gestor integrado de H2_, si utilizáramos est
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |DriverManager| replace:: :java-sql:`DriverManager <DriverManager>`
 .. |DataSource| replace:: :java-sql:`DataSource <DataSource>`
-.. _sqlutils: https://github.com/sio2sio2/sqlutils
-.. _JdbcConnection: https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java
+.. _ConnectionPool: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/ConnectionPool.java
 .. _patrón Multiton: https://en.wikipedia.org/wiki/Multiton
 .. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/src/main/java/edu/acceso/sqlutils/tx/TransactionManager.java
 .. _SQLite: https://sqlite.org/

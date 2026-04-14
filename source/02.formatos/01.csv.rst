@@ -7,21 +7,17 @@ podríamos improvisar una biblioteca para su soporte nosotros mismos. Sin embarg
 tiene algunos casos especiales (p.ej. valores entre comillas que pueden contener el
 propio carácter separador), que aconsejan el uso de una biblioteca de terceros.
 Una muy apropiada es `Apache Commons CSV
-<https://commons.apache.org/proper/commons-csv/>`_ de la que
-podemos obtener fácilmente `un JAR listo para su uso
-<https://mvnrepository.com/artifact/org.apache.commons/commons-csv>`_.
+<https://commons.apache.org/proper/commons-csv/>`_ que podemos `obtener fácilmente de
+repositorio
+<https://mvnrepository.com/artifact/org.apache.commons/commons-csv>`_:
 
-.. caution:: Esta biblioteca, a su vez, necesita:
+.. code-block:: xml
 
-   * `Apache Commons IO
-     <https://commons.apache.org/proper/commons-io/>`_ ( `JAR para commons-io
-     <https://mvnrepository.com/artifact/commons-io/commons-io>`_).
-   * `Apache Commons Codec <https://commons.apache.org/proper/commons-codec/>`_
-     (`JAR para commons-codec
-     <https://mvnrepository.com/artifact/commons-codec/commons-codec>`_).
-   
-   Algunas distribuciones de *Linux* traen paquete para su instalación directa
-   en el sistema (p.e. :deb:`este paquete de Debian <libcommons-csv-java>`).
+   <dependency>
+       <groupId>org.apache.commons</groupId>
+       <artifactId>commons-csv</artifactId>
+       <version>1.14.1</version>
+   </dependency>
 
 .. note:: Una alternativa interesante es `OpenCSV
    <https://opencsv.sourceforge.net/>`_.

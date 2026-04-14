@@ -9,7 +9,7 @@ barra invertida "`\\`") y uno de nuestros objetivos al crear una aplicación de
 *Java* es que ésta sea independiente de esta circunstancia. Por tanto, tenemos
 que realizar estas tareas intentando evitar estas dependencias.
 
-.. caution:: *Java* tiene dos |API| distintas para llevar a cabo estas tareas: 
+.. attention:: *Java* tiene dos |API| distintas para llevar a cabo estas tareas: 
 
    + La original que se basa en la clase :java-io:`File`.
    + La surgida a partir de *Java7* basada en :java-nio:`Path <Path>` (interfaz),
@@ -238,8 +238,8 @@ podemos hacer construcciones como esta:
       System.out.println(p);
    }
 
-.. attention:: Con estas herramientas sólo construimos rutas, así que tales rutas
-   no tienen por qué existir.
+.. important:: Estas herramientas contruyen rutas, pero tales rutas no
+   tienen por qué existir en el sistemas de archivos.
 
 .. admonition:: Conclusión
 
@@ -299,12 +299,12 @@ invocar el método.
 
 .. caution:: En los proyectos de *Java* suele existir un directorio
    :file:`resources` para almacenar archivos con datos. El contenido de este
-   directorio acaba en la aplicación en la raíz del *classpath*. Por tanto, el
+   directorio acaba en la raíz del *classpath* de la aplicación. Por tanto, el
    archivo de imagen que hemos puesto de ejemplo, deberíamos haberlo incluido
    en este subdirectorio del proyecto. Ahora bien, con :ref:`Maven` la copia a
-   *classpath* no es automática y hay que declararla en :file:`pom.xml`. Vea un
-   ejemplo de :ref:`cómo añadir archivos de recursos <add-resources>` en
-   uno de los apéndices.
+   *classpath* puede no ser automática, si hemos incluido ``<resources>`` en
+   el archivo :file:`pom.xml`. Vea un ejemplo de :ref:`cómo añadir archivos de
+   recursos <add-resources>` en uno de los apéndices.
 
 .. _file.files:
 

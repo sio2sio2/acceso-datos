@@ -413,7 +413,7 @@
 <p>Un potentísima librería, que tiene la ventaja de que también soporta <a class="reference internal" href="../../03.xml/index.html#xml"><span class="std std-ref">XML</span></a> es la proporcionada por el <a class="reference external" href="https://github.com/FasterXML/jackson">proyecto Jackson</a>, disponible en su <a class="reference external" href="https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind">repositorio de
 mvnrepository.com</a><a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <p>Permite hacer una conversión automática entre el modelo de objetos y <abbr title="JavaScript Object Notation">JSON</abbr>.
-Para ilustrarlo, podemos definir las tres clases que modelas el <a class="reference internal" href="../02.json.html#grupos-json"><span class="std std-ref">archivo
+Para ilustrarlo, podemos definir las tres clases que modela el <a class="reference internal" href="../02.json.html#grupos-json"><span class="std std-ref">archivo
 json propuesto</span></a>:</p>
 <div class="literal-block-wrapper docutils container" id="class-tutor">
 <div class="code-block-caption"><span class="caption-text">Tutor.java</span><a class="headerlink" href="#class-tutor" title="Link to this code">#</a></div>
@@ -700,28 +700,28 @@ complementar la definición las clases del modelo con la técnica del <em>MixIn<
 <span class="w">     </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">JsonReadFeature</span><span class="p">.</span><span class="na">ALLOW_JAVA_COMMENTS</span><span class="p">)</span><span class="w">  </span><span class="c1">// Características particulares de de/serialización</span>
 <span class="w">     </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 
-<span class="c1">// MapperBuilder&lt;?, ?&gt; o JsonMapper.Builder, que es la clase padre.</span>
+<span class="c1">// MapperBuilder&lt;?, ?&gt; o JsonMapper.Builder</span>
 <span class="n">MapperBuilder</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonMapper</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
 <span class="w">     </span><span class="p">.</span><span class="na">enable</span><span class="p">(</span><span class="n">SerializationFeature</span><span class="p">.</span><span class="na">INDENT_OUTPUT</span><span class="p">)</span><span class="w">  </span><span class="c1">// Características generales de de/serialización</span>
 <span class="w">     </span><span class="p">.</span><span class="na">addModule</span><span class="p">(</span><span class="kd">module</span><span class="err">)</span>      <span class="err">//</span> <span class="nc">Supongamos</span><span class="w"> </span><span class="n">que</span><span class="w"> </span><span class="n">hemos</span><span class="w"> </span><span class="n">definido</span><span class="w"> </span><span class="n">ese</span><span class="w"> </span><span class="n">modulo</span><span class="p">.</span><span class="w"> </span><span class="n">Ya</span><span class="w"> </span><span class="n">se</span><span class="w"> </span><span class="n">tratará</span><span class="w"> </span><span class="n">más</span><span class="w"> </span><span class="n">adelante</span>
 <span class="w">     </span><span class="p">.</span><span class="na">addMixIn</span><span class="p">(</span><span class="n">Grupo</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">GrupoMixin</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">   </span><span class="c1">// Mezclamos (ya veremos la utilidad)</span>
 
-<span class="w"> </span><span class="c1">// ObjectMapper o JsonMapper, que es la clase padre.</span>
-<span class="w"> </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="c1">// ObjectMapper o JsonMapper</span>
+<span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
 <p><a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/cfg/MapperBuilder.html">MapperBuilder</a> y <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/ObjectMapper.html">ObjectMapper</a> son clases padre que se comparten con
 otros formatos como <abbr title="YAML Ain't Markup Language">YAML</abbr> o <abbr title="eXtensible Markup Language">XML</abbr>. Si nuestra intención es soportar varios
 formatos, es probable que nos convenga definir <code class="docutils literal notranslate"><span class="pre">builder</span></code> y <code class="docutils literal notranslate"><span class="pre">mapper</span></code> como
 de estas clases respectivamente en vez de las clases más concretas
 <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.Builder.html">JsonMapper.Builder</a> y <a class="extlink-jackson-databind reference external" href="https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/json/JsonMapper.html">JsonMapper</a>.</p>
-</div>
+</details>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El ejemplo ilustra cómo puede habilitarse con <code class="docutils literal notranslate"><span class="pre">.enable()</span></code> una
-característica de serialización que por defecto esté desactiva. y obviamente
+característica de serialización que por defecto esté desactiva y, obviamente,
 puede hacerse al contrario con <code class="docutils literal notranslate"><span class="pre">.disable()</span></code>. También existe <code class="docutils literal notranslate"><span class="pre">.configure()</span></code>
 que añade un segundo argumento <em>booleano</em> para expresar si se quiere
 habilitada o deshabilitada la característica:</p>

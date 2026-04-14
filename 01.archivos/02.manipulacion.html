@@ -478,8 +478,8 @@ que pueden leerse con:</p>
 <span class="n">InputStream</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getResourceAsStream</span><span class="p">(</span><span class="n">rutaRelativa</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
 <p>Se está suponiendo que el código está dentro de un método de
 instancia y, por tanto, se dispone del objeto <code class="docutils literal notranslate"><span class="pre">this</span></code>. Si el método es
 estático, entonces debe utilizarse directamente la clase:</p>
@@ -497,16 +497,6 @@ hacer uso de <a class="extlink-java-io reference external" href="https://docs.or
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>En las siguientes unidades, para el tratamiento de archivos en
-distintos formatos de intercambio de información conocidos intentaremos
-utilizar un método que nos permita convertir la entrada en un objeto
-<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>, aunque pueda existir algún otro menos verborreico que permita
-utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
-entrada no es un archivo sino el teclado o una <abbr title="Uniform Resource Locator">URL</abbr> externa, sabremos cómo
-tratarlo.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
 <p>Cuando establecemos el lector a partir del flujo de entrada, debemos
 indicar qué codificación se usa. Si no se especifica, se sobreentiende que
 la predeterminada de la <abbr title="Java Virtual Machine">JVM</abbr> que coincide con la del sistema operativo, que
@@ -515,13 +505,23 @@ volveremos a indicarlo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.Charset</span><span class="p">;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span>
 
-<span class="n">Charset</span><span class="p">.</span><span class="na">defaultCharset</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
-<span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span><span class="w"> </span><span class="c1">// UTF-8</span>
+<span class="hll"><span class="n">Charset</span><span class="p">.</span><span class="na">defaultCharset</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">;</span><span class="w"> </span><span class="c1">// true</span>
+</span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">st</span><span class="p">);</span><span class="w"> </span><span class="c1">// UTF-8</span>
 </pre></div>
 </div>
 <p>Ahora bien, tenga presente que la codificación del recurso, tanto si se
 trata de un archivo local o remoto, puede no coincidir con la del sistema.</p>
 </div>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
+<p>En las siguientes unidades, para el tratamiento de archivos en
+distintos formatos de intercambio de información conocidos intentaremos
+utilizar un método que nos permita convertir la entrada en un objeto
+<a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>, aunque pueda existir algún otro menos verborreico que permita
+utilizarlo directamente a partir de su nombre. Eso nos asegurará que si la
+entrada no es un archivo sino el teclado o una <abbr title="Uniform Resource Locator">URL</abbr> externa, sabremos cómo
+tratarlo.</p>
+</details>
 <p>Al objeto resultado podemos tratarlo como prefiramos:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">;</span>
 <span class="k">while</span><span class="p">((</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -552,8 +552,8 @@ trata de un archivo local o remoto, puede no coincidir con la del sistema.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">br</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">  </span><span class="c1">// El resto se cierra en cascada.</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">lines()</span></code> devuelve un flujo por líneas (<code class="docutils literal notranslate"><span class="pre">Stream&lt;String&gt;</span></code>)
 al que se pueden aplicar <a class="reference internal" href="../98.apendices/01.funcional/10.flujos.html#java-stream"><span class="std std-ref">estrategias de programación funcional</span></a>.</p>
 </div>

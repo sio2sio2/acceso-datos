@@ -412,8 +412,8 @@ en <em>UNIX</em> el carácter separador es la barra «/» mientras que en <em>Wi
 barra invertida «<cite>\</cite>») y uno de nuestros objetivos al crear una aplicación de
 <em>Java</em> es que ésta sea independiente de esta circunstancia. Por tanto, tenemos
 que realizar estas tareas intentando evitar estas dependencias.</p>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
 <p><em>Java</em> tiene dos <abbr title="Application Programming Interface">API</abbr> distintas para llevar a cabo estas tareas:</p>
 <ul class="simple">
 <li><p>La original que se basa en la clase <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/File.html">java.io.File</a>.</p></li>
@@ -603,10 +603,10 @@ podemos hacer construcciones como esta:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition attention">
-<p class="admonition-title">Atención</p>
-<p>Con estas herramientas sólo construimos rutas, así que tales rutas
-no tienen por qué existir.</p>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>Estas herramientas contruyen rutas, pero tales rutas no
+tienen por qué existir en el sistemas de archivos.</p>
 </div>
 <div class="admonition-conclusion admonition">
 <p class="admonition-title">Conclusión</p>
@@ -659,12 +659,12 @@ invocar el método.</p>
 <p class="admonition-title">Prudencia</p>
 <p>En los proyectos de <em>Java</em> suele existir un directorio
 <code class="file docutils literal notranslate"><span class="pre">resources</span></code> para almacenar archivos con datos. El contenido de este
-directorio acaba en la aplicación en la raíz del <em>classpath</em>. Por tanto, el
+directorio acaba en la raíz del <em>classpath</em> de la aplicación. Por tanto, el
 archivo de imagen que hemos puesto de ejemplo, deberíamos haberlo incluido
 en este subdirectorio del proyecto. Ahora bien, con <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> la copia a
-<em>classpath</em> no es automática y hay que declararla en <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>. Vea un
-ejemplo de <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cómo añadir archivos de recursos</span></a> en
-uno de los apéndices.</p>
+<em>classpath</em> puede no ser automática, si hemos incluido <code class="docutils literal notranslate"><span class="pre">&lt;resources&gt;</span></code> en
+el archivo <code class="file docutils literal notranslate"><span class="pre">pom.xml</span></code>. Vea un ejemplo de <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cómo añadir archivos de
+recursos</span></a> en uno de los apéndices.</p>
 </div>
 </section>
 </section>

@@ -435,7 +435,7 @@ ilustrar su uso sin muchos preámbulos:</p>
 <span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">otro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">transactionR</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="c1">// Como hemos cerrado el objeto, ya no podemos reutilizarlo</span>
+<span class="c1">// ERROR: Como hemos cerrado el objeto, ya no podemos reutilizarlo</span>
 <span class="n">JpaConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaConnection</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -448,10 +448,11 @@ los valores estáticos definidos en el <abbr title="eXtensible Markup Language">
 <li><p>La clase también implementa un patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a> cuya clave identificativa
 es el nombre de la propia unidad de persistencia.</p></li>
 <li><p>Le asociamos un gestor de transacciones que se comporta igual que su
-correspondiente para conectores y, además, soporta los mismos observadores.</p></li>
+correspondiente para conectores y, además, soporta los mismos observadores
+(p.ej. <code class="docutils literal notranslate"><span class="pre">LoggingManager</span></code>).</p></li>
 <li><p>Creamos transacciones con la misma estrategia funcional. La diferencia es que,
 en este caso, el objeto que nos permite operar es un
-<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a> y no un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">java.sql.Connection</a>.</p></li>
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a> y no un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p></li>
 </ul>
 </section>
 

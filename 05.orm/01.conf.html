@@ -406,7 +406,7 @@ especificación <abbr title="Java Persistence API">JPA</abbr>. Necesitamos dos c
 <h2><span class="section-number">5.1.1. </span>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading">#</a></h2>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;properties&gt;</span>
 <span class="w">    </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
-<span class="w">    </span><span class="nt">&lt;hibernate.version&gt;</span>7.2.0.Final<span class="nt">&lt;/hibernate.version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;hibernate.version&gt;</span>7.3.1.Final<span class="nt">&lt;/hibernate.version&gt;</span>
 <span class="nt">&lt;/properties&gt;</span>
 
 <span class="cm">&lt;!-- ... --&gt;</span>
@@ -573,6 +573,9 @@ muy usados son:</p>
 </tbody>
 </table>
 </div>
+<p>En cualquier caso, el elemento <code class="docutils literal notranslate"><span class="pre">&lt;provider&gt;</span></code> no puede <a class="reference internal" href="#orm-conf-dyn"><span class="std std-ref">cambiar de valor
+dinámicamente</span></a>. Si queremos otra configuración alternativa para
+un <abbr title="Object-Relational Mapping">ORM</abbr> distinto, necesitamos crear una unidad de persistencia distinta.</p>
 </li>
 <li><p>En caso de que no se detecten, se pueden registrar las clases del modelo
 cuyos objetos se quieren hacer persistentes.</p></li>
@@ -659,7 +662,7 @@ depuración: se registran las sentencias <abbr title="Structured Query Language"
 <em>DEBUG</em>), tales sentencias se formatean para que resulten más legibles y,
 además, se acompañan de comentarios.</p></li>
 </ul>
-<p>Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
+<p id="orm-conf-dyn">Ahora bien, ¿qué ocurre cuándo los datos de conexión o el tipo de base de datos
 no están definidos de antemano, sino que se definen en <strong>tiempo de ejecución</strong>?
 En ese caso, puede definirse un <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/HashMap.html">java.util.HashMap</a> que defina las valores de
 las propiedades y pasar el mapa cuando se usa la unidad de persistencia para
@@ -674,8 +677,8 @@ Por ejemplo:</p>
 <span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Advertencia</p>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
 <p>Es necesario que el archivo
 <code class="file docutils literal notranslate"><span class="pre">META-INF/persistence.xml</span></code> pase a la compilación, que es lo que debería
 ocurrir… a menos que haya usted <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cambiado ese comportamiento al añadir

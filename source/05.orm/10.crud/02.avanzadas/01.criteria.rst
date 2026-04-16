@@ -167,7 +167,10 @@ la sección `<build>` de :file:`pom.xml`\ [#]_:
 Con esto, deberíamos tener disponibles en el proyecto las metaclases
 correspondientes a nuestro modelo (``Centro_`` y ``Estudiante_`` en el ejemplo).
 
-.. caution:: Si usamos javadoc_ para la documentación, esta herramienta busca las
+.. attention::
+   :collapsible: closed
+
+   Si usamos javadoc_ para la documentación, esta herramienta busca las
    clases del código fuente exclusivamente dentro de :file:`src/`, mientras que 
    las [meta]clases generadas automáticamente por hibernate-processor_ se
    incluyen en :file:`target/generated-sources/annotations/`. Esta circunstancia
@@ -205,7 +208,10 @@ Ahora podríamos reescribir el ejemplo anterior así:
 
    TypedQuery<NombreDate> query = em.createQuery(criteria);
 
-.. note:: El *Metamodel* también genera ``Estudiante_.NOMBRE`` o
+.. note::
+   :collapsible: closed
+
+   El *Metamodel* también genera ``Estudiante_.NOMBRE`` o
    ``Estudiante_.CENTRO``, pero sólo son constantes de tipo ``String`` que se
    sustituyen por las cadenas ``"nombre"`` o ``"centro"``, allí donde están. Por
    tanto, sólo protegen de los fallos de digitalización, pero no permiten la
@@ -603,7 +609,10 @@ que traducido a *Criteria API* queda:
    criteria.select(centro)
       .where(cb.not(cb.exists(subquery)));
 
-.. hint:: En términos de rendimiento, de las tres alternativas presentadas la más
+.. hint::
+   :collapsible: closed
+
+   En términos de rendimiento, de las tres alternativas presentadas la más
    eficiente es esta última:
 
    + ``IN`` requiere generar toda las filas de la subconsulta y, además,

@@ -133,8 +133,8 @@ ampliar nuestros conocimientos sobre las anotaciones válidas:
       @Column(nullable = false)
       private LocalDateTime actualizacion;
 
-   .. caution:: Como de la actualización de este campo debe encargarse |JPA|,
-      nunca deberías definir un *setter* público.
+   .. note:: Como de la actualización de este campo debe encargarse |JPA|,
+      nunca debería definirse un *setter* público.
 
 ``@Enumerated``
    Permite indicar cómo almacenar un campo ``enum``:
@@ -288,7 +288,7 @@ equivalente al ``CHECK`` de |SQL|), que requieren importar la librería
    mientras que el atributo ``nullable`` de ``@Column`` define la restricción en
    la definición del esquema (a nivel de base de datos).
 
-.. note:: Aunque hemos relacionado estas restricciones con el ``CHECK`` de
+.. attention:: Aunque hemos relacionado estas restricciones con el ``CHECK`` de
    |SQL|, la validación que nos ofrece |JPA| no se basa en usarlo (o sea, en
    incluir en la definición de las tablas las cláusulas ``CHECK``
    apropiadas), sino en que la propia aplicación de Java haga las comprobaciones

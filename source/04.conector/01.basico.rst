@@ -70,7 +70,10 @@ En el código de ejemplo, hay dos claves fundamentales:
 
 .. _scope-runtime:
 
-.. tip:: Cuando en nuestra aplicación queremos cargar como dependencia la
+.. hint::
+   :collapsible: closed
+
+   Cuando en nuestra aplicación queremos cargar como dependencia la
    librería que nos proporciona un driver es conveniente hacerlo con el *scope*
    ``runtime``. Por ejemplo:
 
@@ -94,11 +97,11 @@ Por supuesto, el código es *completamente inútil*: nos hemos conectado a la ba
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.
 
-.. caution:: La conexión a una base de datos es una **operación costosa**, por lo
-   que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-   se penalizará. Lo habitual en una aplicación que sea algo más que una prueba
-   de concepto, es utilizar un :ref:`pool de conexiones <conn-pool>`, el cual es
-   capaz de reaprovechar las conexiones. Lo trataremos más adelante.
+.. attention:: La conexión a una base de datos es una **operación costosa**, por
+   lo que, si la aplicación abre y cierra constantemente conexiones, el
+   rendimiento se penalizará. Lo habitual en una aplicación que sea algo más que
+   una prueba de concepto, es utilizar un :ref:`pool de conexiones <conn-pool>`,
+   el cual es capaz de reaprovechar las conexiones. Lo trataremos más adelante.
 
 .. _conn-statement:
 
@@ -133,7 +136,10 @@ El código tiene dos aspectos:
    forma parte de los objetivos de esta unidad\ [#]_, por lo que no entraremos en
    comentarlas.
 
-   .. hint:: No obstante, sí conviene precisar que procuremos al escribirlas
+   .. note::
+      :collapsible: closed
+
+      No obstante, sí conviene precisar que procuremos al escribirlas
       ceñirnos al estándar, a fin de que sean lo más universales posibles y nos
       sea menos costoso cambiar de |SGBD|. A este respecto:
 
@@ -150,10 +156,10 @@ El código tiene dos aspectos:
 
 #. La ejecución de esas sentencias usando |JDBC|. Obsérvese que:
 
-  + Reaprovechamos el mismo objeto :java-sql:`Statement <Statement>` para
-    ejecutarlas todas.
-  + Las ejecutamos usando el método ``executeUpdate``, puesto que su función es
-    modificar el contenido de la base de datos, no obtener información.
+   + Reaprovechamos el mismo objeto :java-sql:`Statement <Statement>` para
+     ejecutarlas todas.
+   + Las ejecutamos usando el método ``executeUpdate``, puesto que su función es
+     modificar el contenido de la base de datos, no obtener información.
 
 Tampoco las sentencias de inserción devuelven resultados, por lo que supuesto
 que hayamos definido la clase ``Centro``:
@@ -221,7 +227,7 @@ Las consultas, en cambio, sí devuelven resultados que deberán procesarse luego
 Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
 objeto |ResultSet| que se va consumiendo a medida que obtenemos registros de él.
 
-.. note:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
+.. hint:: El objeto |ResultSet| hay también que cerrarlo, aunque debería
    cerrarse automáticamente al cerrarse la sentencia que lo originó. En
    cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
    sernos útil.
@@ -447,7 +453,10 @@ resultados de la consulta:
       }
    }
 
-.. warning:: El método es de ejecución perezosa, esto es, genera objetos a
+.. warning::
+   :collapsible: open
+
+   El método es de ejecución perezosa, esto es, genera objetos a
    medida que se consumen. Esto implica que, mientras necesitemos obtener
    elementos del flujo, tanto el objeto de consulta como el de conexión deben
    permanecer abiertos, pues de no ser así, se cerrará también automáticamente
@@ -489,7 +498,7 @@ resultados de la consulta:
       }
 
 .. tip:: Si no nos interesa cerrar la conexión al cerrar el flujo, podemos pasar
-   ``null`` en el argummento correspondiente.
+   ``null`` en el argumento correspondiente.
 
 .. rubric:: Notas al pie
 

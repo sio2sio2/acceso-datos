@@ -36,7 +36,10 @@ podremos inicializar una vez.
 .. tip:: Una variante de este patrón es que queramos crear no una instancia,
    sino varias, dependiendo del valor de uno de los argumentos. En ese caso, el
    atributo ``instance`` se puede convertir en un mapa cuyas claves son
-   esos valores.
+   esos valores. A este *singleton ampliado* se le suele denominar `Multiton
+   <https://en.wikipedia.org/wiki/Multiton_pattern>`_ y hay algunos ejemplos en
+   el texto de estos apuntes (véase, por ejemplo, :ref:`JdbcConnection
+   <conn-pool-extra>`).
 
 Programas multihilo
 -------------------
@@ -175,7 +178,10 @@ instancia:
 
    Traductor traductor = factory.getInstance(formato);
 
-.. caution:: Este método sólo funcionará si el constructor de las clases no
+.. warning::
+   :collapsible: open
+
+   Este método sólo funcionará si el constructor de las clases no
    tiene argumentos y, además, la construcción no tiene dependencias cruzadas
    en el programa. Por ejemplo, si utilizamos :ref:`una clase para gestionar la
    configuración de usuario <cliargs>` es probable que echemos mano de esta

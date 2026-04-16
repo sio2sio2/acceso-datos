@@ -25,7 +25,10 @@ Comencemos por conocer cómo abrir un documento |XML| y acceder a sus nodos:
       // ...
    }
 
-.. caution:: Con este código se producirá un error si el |XML| no es bien
+.. admonition:: Advertencia
+   :collapsible: closed
+
+   Con este código se producirá un error si el |XML| no es bien
    formado, pero no se realizará con un |DTD| ninguna comprobación sobre su
    validez. Sin embargo, si hay una declaración de tipo de documento:
 
@@ -117,7 +120,10 @@ hacer diversas pesquisas:
          }
       }
 
-  .. tip:: Pese a que, a priori, sólo podemos utilizar el `for` tradicional
+  .. tip::
+     :collapsible: closed
+
+     Pese a que, a priori, sólo podemos utilizar el `for` tradicional
      para recorrer |NodeList|, podemos buscarnos las vueltas para convertirlo
      en un flujo y poder usar con él técnicas de :ref:`Java funcional <funcional>`:
 
@@ -341,7 +347,10 @@ si la ruta es relativa, hace una distinción:
 * Si no es así, se resuelve de forma normal la ruta relativa usando como base el
   |XML| (``baseURI``).
 
-.. tip:: El argumento del constructor de `InputSource` también puede ser un
+.. tip::
+   :collapsible: closed
+
+   El argumento del constructor de `InputSource` también puede ser un
    :java-io:`Reader <Reader>`, así que si nuestra intención es que el programa no
    escupa nunca un error (incluso aunque el |DTD| de la declaración no se
    encuentre), podemos hacer lo siguiente:

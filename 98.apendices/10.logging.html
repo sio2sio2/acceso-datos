@@ -445,8 +445,8 @@ de este apéndice nos centraremos en aconsejar sin más una posible elección:</
 terminología de <abbr title="Simple Logging Facade For Java">SLF4J</abbr>, como proveedor. La librería la ha desarrollado el
 mismo programador que <abbr title="Simple Logging Facade For Java">SLF4J</abbr> con lo que no presenta una interfaz alternativa.</p></li>
 </ul>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<details class="admonition warning">
+<summary class="admonition-title">Advertencia</summary>
 <p>La especificación se limita a definir cómo se envían mensajes al
 sistema de registros, pero no entra en aspectos de configuración. Por tanto:</p>
 <div class="pst-scrollable-table-container"><table class="table" id="aspectos-logging">
@@ -469,7 +469,7 @@ sistema de registros, pero no entra en aspectos de configuración. Por tanto:</p
 </tbody>
 </table>
 </div>
-</div>
+</details>
 <div class="admonition seealso">
 <p class="admonition-title">Ver también</p>
 <p>Es interesantísimo y esclarecedor el artículo <a class="reference external" href="https://www.marcobehler.com/guides/java-logging">How To Do Logging in
@@ -686,11 +686,11 @@ evaluación gratuita de expresiones costosas era usar condiciones:</p>
 </section>
 <section id="configuracion-adicional">
 <span id="logging-conf"></span><h2><span class="section-number">3.3. </span>Configuración adicional<a class="headerlink" href="#configuracion-adicional" title="Link to this heading">#</a></h2>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
 <p><abbr title="Simple Logging Facade For Java">SLF4J</abbr> se limita a especificar el envío de mensajes, por lo que
 toda la configuración adicional que queramos hacer a ese envío depende de
-la librería de implementación. En nuestro caso, este apartado se centra e
+la librería de implementación. En nuestro caso, este apartado se centra en
 cómo configurar <a class="reference external" href="https://logback.qos.ch/">Logback</a>.</p>
 </div>
 <p>Pese a que ya sabemos cómo enviar mensajes, no es aún suficiente. Es muy común
@@ -743,8 +743,8 @@ Maven o Gradle) y denominarse <cite>logback.xml</cite>.</p>
 </pre></div>
 </div>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
+<details class="admonition tip">
+<summary class="admonition-title">Truco</summary>
 <p>El atributo <code class="docutils literal notranslate"><span class="pre">debug</span></code> provoca que se vuelquen en la consola mensajes
 relacionados con el procesamiento inicial del archivo de configuración. Para
 una depuración más extensa puede usarse en cambio:</p>
@@ -757,7 +757,7 @@ una depuración más extensa puede usarse en cambio:</p>
 </div>
 <p>Puede consultarse <a class="reference external" href="https://logback.qos.ch/apidocs/ch.qos.logback.core/ch/qos/logback/core/status/package-summary.html">ch.qos.logback.core.status</a>
 para ver otras posibles salidas distintas a la consola.</p>
-</div>
+</details>
 <p>En caso de querer definir archivos como soporte de salida, podemos hacer:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Ejemplo de registros en archivo</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
@@ -832,8 +832,8 @@ caso anterior.</p>
 </div>
 </li>
 </ul>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
+<details class="admonition tip">
+<summary class="admonition-title">Truco</summary>
 <p>En un sistema UNIX también existe la posibilidad de integrar los
 mensajes en los registros del sistema:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
@@ -860,7 +860,7 @@ mensajes en los registros del sistema:</p>
 </pre></div>
 </div>
 </div>
-</div>
+</details>
 <p>Por supuesto, si hemos definido múltiples soportes, podemos indicar que se
 registros los mensajes en varios de ellos:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;root</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;INFO&quot;</span><span class="nt">&gt;</span>

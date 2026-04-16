@@ -42,7 +42,10 @@ de este apéndice nos centraremos en aconsejar sin más una posible elección:
   terminología de |SLF4J|, como proveedor. La librería la ha desarrollado el
   mismo programador que |SLF4J| con lo que no presenta una interfaz alternativa.
 
-.. caution:: La especificación se limita a definir cómo se envían mensajes al
+.. warning::
+   :collapsible: closed
+
+   La especificación se limita a definir cómo se envían mensajes al
    sistema de registros, pero no entra en aspectos de configuración. Por tanto:
 
    .. table::
@@ -263,9 +266,9 @@ nivel de gravedad tienen.
 
 Configuración adicional
 =======================
-.. caution:: |SLF4J| se limita a especificar el envío de mensajes, por lo que
+.. note:: |SLF4J| se limita a especificar el envío de mensajes, por lo que
    toda la configuración adicional que queramos hacer a ese envío depende de
-   la librería de implementación. En nuestro caso, este apartado se centra e
+   la librería de implementación. En nuestro caso, este apartado se centra en
    cómo configurar Logback_.
 
 Pese a que ya sabemos cómo enviar mensajes, no es aún suficiente. Es muy común
@@ -324,7 +327,10 @@ Un ejemplo sencillo de configuración podría ser este:
       </root>
    </configuration>
 
-.. tip:: El atributo ``debug`` provoca que se vuelquen en la consola mensajes
+.. tip::
+   :collapsible: closed
+
+   El atributo ``debug`` provoca que se vuelquen en la consola mensajes
    relacionados con el procesamiento inicial del archivo de configuración. Para
    una depuración más extensa puede usarse en cambio:
 
@@ -422,7 +428,10 @@ alternativas:
      <!-- En un sistema UNIX esto equivale a /tmp/app.log -->
      <file>${java.io.tmpdir}/app.log</file>
 
-.. tip:: En un sistema UNIX también existe la posibilidad de integrar los
+.. tip::
+   :collapsible: closed
+
+   En un sistema UNIX también existe la posibilidad de integrar los
    mensajes en los registros del sistema:
 
    .. code-block:: xml

@@ -1,6 +1,9 @@
 Colecciones
 ***********
-.. note:: Las colecciones, en realidad, están disponibles desde muy
+.. note::
+   :collapsible: closed
+
+   Las colecciones, en realidad, están disponibles desde muy
    tempranamente (desde `Java1.2
    <https://en.wikipedia.org/wiki/Java_version_history#J2SE_1.2>`_ en 1998). Se
    incluyen, no obstante, porque se usan habitualmente en el estilo funcional de
@@ -115,8 +118,8 @@ asociados a que el objeto sea una colección entre ellos:
          System.out.println(c);
       }
 
-.. caution:: No todas las colecciones son mutables, por lo que con aquellas que
-   no lo sean no será posible usar los métodos que alteran su contenido
+.. attention:: No todas las colecciones son mutables, por lo que con aquellas
+   que no lo sean no será posible usar los métodos que alteran su contenido
    (``add``, ``remove``, etc.)
 
 Implementaciones
@@ -182,10 +185,10 @@ Implementaciones particulares de las listas son:
       al.trimToSize(); // Error.
       ((ArrayList) al).trimToSize(); // No da problemas.
 
-   .. note:: Obsérvese que no se ha definido la variable `al` como `ArrayList`,
-      sino como `List`. Esto significa que tendremos disponibles los métodos
-      definidos en la interfaz :java-util:`List <List>`, pero no los que añade
-      la clase `ArrayList`.
+   .. note:: Obsérvese que no se ha definido la variable ``al`` como
+      ``ArrayList``, sino como ``List``. Esto significa que tendremos disponibles
+      los métodos definidos en la interfaz :java-util:`List <List>`, pero no los
+      que añade la clase :java-util:`ArrayList <ArrayList>`.
 
 :java-util:`Stack <Stack>`
    es la implementación de una `pila
@@ -213,7 +216,10 @@ Implementaciones particulares de las listas son:
       disponibles, pero es absurdo utilizarlos, porque en ese caso es muy
       probable que lo que se necesitase es un `ArrayList`, y no una pila.
 
-.. caution:: Cuando se define el método de una clase es conveniente que los
+.. hint::
+   :collapsible: closed
+
+   Cuando se define el método de una clase es conveniente que los
    tipos de sus argumentos sean los mas generales posibles. Por ejemplo, si lo
    único que se pretende hacer dentro del método es recorrer el grupo de objetos
    con una estructura *foreach*, debería definirse el método como:

@@ -101,7 +101,10 @@ sin necesidad de configurar un servidor:
 En cualquier caso, las explicaciones serán totalmente válidas para cualquier
 |SGBD| relacional.
 
-.. note:: La librería sqlite-jdbc_ incluye un motor de SQLite_ para facilitar
+.. hint::
+   :collapsible: closed
+
+   La librería sqlite-jdbc_ incluye un motor de SQLite_ para facilitar
    su uso, pero es conveniente que tengamos instalado nosotros mismos el motor
    en el sistema operativo, por si queremos hacer pruebas:
 
@@ -140,9 +143,9 @@ el cual en |SQL| se define así:
    :language: sql
    :end-before: -- Datos
 
-.. hint:: Mucho de lo propuesto en esta unidad está incluido en un `repositorio
-   de Github llamado sqlutils <https://github.com/sio2sio2/sqlutils>`_ listo
-   para su uso\ [#]_:
+.. note:: Algunas de las estrategias de programación propuestas en esta unidad
+   requieren un `repositorio de Github llamado sqlutils
+   <https://github.com/sio2sio2/sqlutils>`_ listo para su uso\ [#]_:
 
    .. code-block:: xml
 

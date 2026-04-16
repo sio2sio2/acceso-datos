@@ -412,13 +412,13 @@
                   
   <section id="colecciones">
 <h1><span class="section-number">1.2. </span>Colecciones<a class="headerlink" href="#colecciones" title="Link to this heading">#</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
 <p>Las colecciones, en realidad, están disponibles desde muy
 tempranamente (desde <a class="reference external" href="https://en.wikipedia.org/wiki/Java_version_history#J2SE_1.2">Java1.2</a> en 1998). Se
 incluyen, no obstante, porque se usan habitualmente en el estilo funcional de
 programación.</p>
-</div>
+</details>
 <p>El tipo más básico de agrupar datos en <em>Java</em> es el <em>Array</em>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="p">};</span><span class="w"> </span><span class="c1">// O, simplemente, {&quot;A&quot;, &quot;B&quot;, &quot;C&quot;}</span>
 <span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">t</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span><span class="w">  </span><span class="c1">// Pone todos los elementos a 0.</span>
@@ -504,10 +504,10 @@ una estructura de tipo <cite>for-each</cite> como alternativa a este método:</p
 </div>
 </dd>
 </dl>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>No todas las colecciones son mutables, por lo que con aquellas que
-no lo sean no será posible usar los métodos que alteran su contenido
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
+<p>No todas las colecciones son mutables, por lo que con aquellas
+que no lo sean no será posible usar los métodos que alteran su contenido
 (<code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>, etc.)</p>
 </div>
 </section>
@@ -564,10 +564,10 @@ redimensiona automáticamente.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Obsérvese que no se ha definido la variable <cite>al</cite> como <cite>ArrayList</cite>,
-sino como <cite>List</cite>. Esto significa que tendremos disponibles los métodos
-definidos en la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>, pero no los que añade
-la clase <cite>ArrayList</cite>.</p>
+<p>Obsérvese que no se ha definido la variable <code class="docutils literal notranslate"><span class="pre">al</span></code> como
+<code class="docutils literal notranslate"><span class="pre">ArrayList</span></code>, sino como <code class="docutils literal notranslate"><span class="pre">List</span></code>. Esto significa que tendremos disponibles
+los métodos definidos en la interfaz <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>, pero no los
+que añade la clase <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/ArrayList.html">ArrayList</a>.</p>
 </div>
 </dd>
 <dt><a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/Stack.html">Stack</a></dt><dd><p>es la implementación de una <a class="reference external" href="https://es.wikipedia.org/wiki/Pila_(inform%C3%A1tica)">pila</a> y añade algunos
@@ -594,8 +594,8 @@ probable que lo que se necesitase es un <cite>ArrayList</cite>, y no una pila.</
 </div>
 </dd>
 </dl>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<details class="admonition hint">
+<summary class="admonition-title">Consejo</summary>
 <p>Cuando se define el método de una clase es conveniente que los
 tipos de sus argumentos sean los mas generales posibles. Por ejemplo, si lo
 único que se pretende hacer dentro del método es recorrer el grupo de objetos
@@ -607,7 +607,7 @@ con una estructura <em>foreach</em>, debería definirse el método como:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">foobar</span><span class="p">(</span><span class="n">ArrayList</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
+</details>
 </section>
 <section id="conjuntos">
 <h4><span class="section-number">1.2.1.2.2. </span>Conjuntos<a class="headerlink" href="#conjuntos" title="Link to this heading">#</a></h4>

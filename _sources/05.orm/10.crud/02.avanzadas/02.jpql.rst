@@ -66,7 +66,10 @@ o un conjunto de campos individuales:
 .. caution:: Los nombres son nombres de atributos, no nombres de columnas. Recuerde
    que siempre se refieren clases y atributos, no tablas y columnas.
 
-.. tip:: Cuando se obtiene varias columnas, en vez de obtener un
+.. tip::
+   :collapsible: closed
+
+   Cuando se obtiene varias columnas, en vez de obtener un
    ``Object[].class`` se puede pedir la obtención de una tupla (|Tuple|) y
    asignar alias a los nombres, lo que hará más amable la obtención posterior de
    los campos individules:
@@ -244,7 +247,10 @@ También puede usarse ``GROUP BY`` y funciones agregadas:
    identificadores son iguales. De hecho, la consulta interna |SQL| agrupará por
    el identificador del centro.
 
-.. note:: Obsérvese que al estar consultando ``Estudiante``, los centros sin
+.. note::
+   :collapsible: closed
+
+   Obsérvese que al estar consultando ``Estudiante``, los centros sin
    estudiantes no aparecen listados. En cambio, podríamos haber abordado la
    consulta así aprovechando la relación bidireccional:
 
@@ -276,7 +282,10 @@ ellas:
       Estudiante.class
    ).setParameter("nombre", "IES Castillo de Luna");
 
-.. note:: La consulta es equivalente a esta otra:
+.. note::
+   :collapsible: closed
+
+   La consulta es equivalente a esta otra:
 
    .. code-block:: java
 

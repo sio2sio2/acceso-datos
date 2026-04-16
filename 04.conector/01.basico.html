@@ -500,8 +500,8 @@ podríamos haber definido el método ahorrándonos los dos argumentos:</p>
 </div>
 </li>
 </ul>
-<div class="admonition tip" id="scope-runtime">
-<p class="admonition-title">Truco</p>
+<details class="admonition hint" id="scope-runtime">
+<summary class="admonition-title">Consejo</summary>
 <p>Cuando en nuestra aplicación queremos cargar como dependencia la
 librería que nos proporciona un driver es conveniente hacerlo con el <em>scope</em>
 <code class="docutils literal notranslate"><span class="pre">runtime</span></code>. Por ejemplo:</p>
@@ -518,17 +518,17 @@ aplicación, pero evita que esté disponible en tiempo de compilación, lo que
 se traduce en que el <abbr title="Integrated Development Environment">IDE</abbr> nunca nos sugerirá clases y métodos incluidos en
 ella. Esto último es de importancia, ya que nosotros lo que debemos usar
 exclusivamente son clases proporcionadas por <abbr title="Java DataBase Connectivity">JDBC</abbr><a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
-</div>
+</details>
 <p>Por supuesto, el código es <em>completamente inútil</em>: nos hemos conectado a la base
 de datos para no hacer absolutamente nada. En los siguientes apartados veremos
 como leer y escribir datos.</p>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
-<p>La conexión a una base de datos es una <strong>operación costosa</strong>, por lo
-que, si la aplicación abre y cierra constantemente conexiones, el rendimiento
-se penalizará. Lo habitual en una aplicación que sea algo más que una prueba
-de concepto, es utilizar un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>, el cual es
-capaz de reaprovechar las conexiones. Lo trataremos más adelante.</p>
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
+<p>La conexión a una base de datos es una <strong>operación costosa</strong>, por
+lo que, si la aplicación abre y cierra constantemente conexiones, el
+rendimiento se penalizará. Lo habitual en una aplicación que sea algo más que
+una prueba de concepto, es utilizar un <a class="reference internal" href="04.pool.html#conn-pool"><span class="std std-ref">pool de conexiones</span></a>,
+el cual es capaz de reaprovechar las conexiones. Lo trataremos más adelante.</p>
 </div>
 </section>
 <section id="ejecucion-de-sentencias">
@@ -597,8 +597,8 @@ ella.</p>
 <li><p>Las sentencias <abbr title="Structured Query Language">SQL</abbr>, que son sentencias <abbr title="Structured Query Language">SQL</abbr> cuya comprensión no
 forma parte de los objetivos de esta unidad<a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>, por lo que no entraremos en
 comentarlas.</p>
-<div class="admonition hint">
-<p class="admonition-title">Consejo</p>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
 <p>No obstante, sí conviene precisar que procuremos al escribirlas
 ceñirnos al estándar, a fin de que sean lo más universales posibles y nos
 sea menos costoso cambiar de <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. A este respecto:</p>
@@ -612,18 +612,17 @@ cambiando entre mayúsculas y minúsculas (p.e. que una tabla se llame
 <li><p>Escribimos para los tipos los nombres que define el estándar.</p></li>
 <li><p>Las cadenas se encierran entre comillas simples.</p></li>
 </ul>
-</div>
+</details>
 </li>
-<li><p>La ejecución de esas sentencias usando <abbr title="Java DataBase Connectivity">JDBC</abbr>. Obsérvese que:</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
+<li><p>La ejecución de esas sentencias usando <abbr title="Java DataBase Connectivity">JDBC</abbr>. Obsérvese que:</p>
+<ul class="simple">
 <li><p>Reaprovechamos el mismo objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Statement.html">Statement</a> para
 ejecutarlas todas.</p></li>
 <li><p>Las ejecutamos usando el método <code class="docutils literal notranslate"><span class="pre">executeUpdate</span></code>, puesto que su función es
 modificar el contenido de la base de datos, no obtener información.</p></li>
 </ul>
-</div></blockquote>
+</li>
+</ol>
 <p>Tampoco las sentencias de inserción devuelven resultados, por lo que supuesto
 que hayamos definido la clase <code class="docutils literal notranslate"><span class="pre">Centro</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="clase-centro">
@@ -791,8 +790,8 @@ mejor.</p>
 </div>
 <p>Como se ilustra arriba, el resultado de las consultas se obtiene a través de un
 objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> que se va consumiendo a medida que obtenemos registros de él.</p>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<div class="admonition hint">
+<p class="admonition-title">Consejo</p>
 <p>El objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/ResultSet.html">ResultSet</a> hay también que cerrarlo, aunque debería
 cerrarse automáticamente al cerrarse la sentencia que lo originó. En
 cualquier caso, no está de más asegurarnos de que se cierra en cuanto deja de
@@ -996,8 +995,8 @@ resultados de la consulta:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Advertencia</p>
+<details class="admonition warning" open="open">
+<summary class="admonition-title">Advertencia</summary>
 <p>El método es de ejecución perezosa, esto es, genera objetos a
 medida que se consumen. Esto implica que, mientras necesitemos obtener
 elementos del flujo, tanto el objeto de consulta como el de conexión deben
@@ -1026,7 +1025,7 @@ al método los objetos <a class="extlink-java-sql reference external" href="http
 asegurarnos de cerrar el flujo al acabar con él, razón por la cual en el
 ejemplo ilustrativo de su uso hemos usado una sentencia
 <em>try-with-resources</em>.</p>
-</div>
+</details>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>El método <code class="docutils literal notranslate"><span class="pre">resultSetToStream</span></code> permite no definir la función que
@@ -1041,7 +1040,7 @@ obtendrá con cada elemento del flujo la propia fila:</p>
 <div class="admonition tip">
 <p class="admonition-title">Truco</p>
 <p>Si no nos interesa cerrar la conexión al cerrar el flujo, podemos pasar
-<code class="docutils literal notranslate"><span class="pre">null</span></code> en el argummento correspondiente.</p>
+<code class="docutils literal notranslate"><span class="pre">null</span></code> en el argumento correspondiente.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">

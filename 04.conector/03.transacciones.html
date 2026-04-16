@@ -520,7 +520,7 @@ definida al crear cada instancia.</p></li>
 <li><p>Automatiza la gestión de transacciones para que el programadador sólo se
 tenga que preocupar de definir una expresión <em>lambda</em> que contenga todas las
 operaciones que constituyen la transacción.</p></li>
-<li><p>La expresión lambda tiene disponible un contexto al cual puede recurrise para
+<li><p>La expresión lambda tiene disponible un contexto al cual puede recurrirse para
 realizar las operaciones. Por ejemplo, este contexto provee de la conexión
 asociada a la transacción. La gestión de esta conexión (su creación y su
 cierre) debe correr a cuenta del gestor de transacciones, por lo que está
@@ -581,8 +581,8 @@ bases de datos:</p>
 <span class="p">});</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
 <p>El método también puede capturar el resultado que devuelve la expresión lamda:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// obtenerEstudiantes es un método que con una conexión hace un SELECT * FROM Estudiante</span>
 <span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">obtenerEstudiantes</span><span class="p">(</span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">()));</span>

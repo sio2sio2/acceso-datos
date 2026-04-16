@@ -457,8 +457,8 @@ consulta (objetos <code class="docutils literal notranslate"><span class="pre">C
 <p>Los nombres son nombres de atributos, no nombres de columnas. Recuerde
 que siempre se refieren clases y atributos, no tablas y columnas.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Truco</p>
+<details class="admonition tip">
+<summary class="admonition-title">Truco</summary>
 <p>Cuando se obtiene varias columnas, en vez de obtener un
 <code class="docutils literal notranslate"><span class="pre">Object[].class</span></code> se puede pedir la obtención de una tupla (<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/Tuple">Tuple</a>) y
 asignar alias a los nombres, lo que hará más amable la obtención posterior de
@@ -482,7 +482,7 @@ ordinal:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">registro</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
+</details>
 <p>Una vez hemos tratado cómo construir la consulta, centrémos en la obtención de
 resultados, esto es, en aquello que por ahora hemos despachado con un simple
 <code class="docutils literal notranslate"><span class="pre">.getResultList()</span></code>:</p>
@@ -617,8 +617,8 @@ para las entidades que maneja las considera iguales cuando sus
 identificadores son iguales. De hecho, la consulta interna <abbr title="Structured Query Language">SQL</abbr> agrupará por
 el identificador del centro.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
 <p>Obsérvese que al estar consultando <code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>, los centros sin
 estudiantes no aparecen listados. En cambio, podríamos haber abordado la
 consulta así aprovechando la relación bidireccional:</p>
@@ -635,7 +635,7 @@ consulta así aprovechando la relación bidireccional:</p>
 </pre></div>
 </div>
 <p>Y en este caso, sí aparecerán todos los centros.</p>
-</div>
+</details>
 </section>
 <section id="relaciones">
 <h2><span class="section-number">5.6.2.2.5. </span>Relaciones<a class="headerlink" href="#relaciones" title="Link to this heading">#</a></h2>
@@ -648,8 +648,8 @@ ellas:</p>
 <span class="p">).</span><span class="na">setParameter</span><span class="p">(</span><span class="s">&quot;nombre&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
+<details class="admonition note">
+<summary class="admonition-title">Nota</summary>
 <p>La consulta es equivalente a esta otra:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">TypedQuery</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">em</span><span class="p">.</span><span class="na">createQuery</span><span class="p">(</span>
 <span class="w">   </span><span class="s">&quot;SELECT e FROM Centro c JOIN c.estudiantes e WHERE c.nombre = :nombre&quot;</span><span class="p">,</span>
@@ -658,7 +658,7 @@ ellas:</p>
 </pre></div>
 </div>
 <p>en que hemos intercambiado el orden de las entidades.</p>
-</div>
+</details>
 <p><abbr title="Java Persistence Query Language">JPQL</abbr> soporta tres <em>joins</em> distintos:</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code></dt><dd><p>que es el que se ha escrito más arriba simplemente con <code class="docutils literal notranslate"><span class="pre">JOIN</span></code>, aunque se

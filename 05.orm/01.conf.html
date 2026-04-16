@@ -491,8 +491,8 @@ evaluación dinámica de cadenas. Por ejemplo:</p>
 </div>
 </li>
 </ul>
-<div class="admonition caution">
-<p class="admonition-title">Prudencia</p>
+<details class="admonition attention">
+<summary class="admonition-title">Atención</summary>
 <p>Obsérvense los <em>scopes</em> de las dependencias. Como nuestra intención
 es ceñirnos estrictamente a la especificación <abbr title="Java Persistence API">JPA</abbr>, las implementaciones de
 <a class="reference external" href="https://www.hibernate.org">Hibernate</a> están en el <em>scope</em> <code class="docutils literal notranslate"><span class="pre">runtime</span></code> (véase <a class="reference internal" href="../04.conector/01.basico.html#scope-runtime"><span class="std std-ref">el comentario al
@@ -503,7 +503,7 @@ prefiere prescindir de hacer explícita la dependencia a las especificaciones
 como <code class="docutils literal notranslate"><span class="pre">runtime</span></code>, <a class="reference internal" href="../98.apendices/80.maven.html#maven"><span class="std std-ref">Maven</span></a> resolverá la dependencia de las
 especificaciones también con ese <em>scope</em> y no las tendremos disponibles en la
 compilación de la <abbr title="Application Programming Interface">API</abbr>.</p>
-</div>
+</details>
 </section>
 <section id="configuracion-de-la-persistencia">
 <h2><span class="section-number">5.1.2. </span>Configuración de la persistencia<a class="headerlink" href="#configuracion-de-la-persistencia" title="Link to this heading">#</a></h2>
@@ -677,8 +677,8 @@ Por ejemplo:</p>
 <span class="n">EntityManagerFactory</span><span class="w"> </span><span class="n">emf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Persistence</span><span class="p">.</span><span class="na">createEntityManagerFactory</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="admonition attention">
-<p class="admonition-title">Atención</p>
+<div class="admonition caution">
+<p class="admonition-title">Prudencia</p>
 <p>Es necesario que el archivo
 <code class="file docutils literal notranslate"><span class="pre">META-INF/persistence.xml</span></code> pase a la compilación, que es lo que debería
 ocurrir… a menos que haya usted <a class="reference internal" href="../98.apendices/15.cli.html#add-resources"><span class="std std-ref">cambiado ese comportamiento al añadir

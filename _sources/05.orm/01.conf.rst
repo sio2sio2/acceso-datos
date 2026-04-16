@@ -99,7 +99,10 @@ En resumidas cuentas es:
      @Min(value = 18, message = "La edad debe ser mayor a {value} años")
      private int edad;
 
-.. caution:: Obsérvense los *scopes* de las dependencias. Como nuestra intención
+.. attention::
+   :collapsible: closed
+
+   Obsérvense los *scopes* de las dependencias. Como nuestra intención
    es ceñirnos estrictamente a la especificación |JPA|, las implementaciones de
    Hibernate_ están en el *scope* ``runtime`` (véase :ref:`el comentario al
    respecto que se hizo sobre sqlite-jdbc <scope-runtime>`). Ahora bien, si se
@@ -213,7 +216,7 @@ Por ejemplo:
 
    EntityManagerFactory emf = Persistence.createEntityManagerFactory("MiUnidadP", props);
 
-.. attention:: Es necesario que el archivo
+.. caution:: Es necesario que el archivo
    :file:`META-INF/persistence.xml` pase a la compilación, que es lo que debería
    ocurrir... a menos que haya usted :ref:`cambiado ese comportamiento al añadir
    una sección resources al archivo pom.xml <add-resources>`.

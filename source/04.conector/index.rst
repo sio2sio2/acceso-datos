@@ -140,6 +140,8 @@ el cual en |SQL| se define así:
 
 .. literalinclude:: files/ec.sql
    :name: ec-esquema
+   :caption: Esquema SQL
+   :class: toggle
    :language: sql
    :end-before: -- Datos
 
@@ -161,7 +163,7 @@ el cual en |SQL| se define así:
         <dependency>
             <groupId>com.github.sio2sio2.sqlutils</groupId>
             <artifactId>sqlutils-jdbc</artifactId>
-            <version>4.2.0</version>
+            <version>4.3.0</version>
         </dependency>
       </dependencies>
 
@@ -179,9 +181,18 @@ el cual en |SQL| se define así:
    propuesta para las herramientas |ORM| llamada :ref:`JPA <orm>`, por lo que es
    trivial cambiar de herramienta |ORM| entre todas las que la soportan.
 
-.. [#] La librería la componen dos módulos más: ``sqlutils-hikaricp``, para
-   crear un :ref:`pool de conexiones <conn-pool>` con HikariCP_ y
-   ``sqlutils-orm``, que implementa un *pseudoorm* muy básico.
+.. [#] Esta librería, en realidad, está compuesta por varios módulos:
+
+   * El *core* incluido en ``sqlutils-core`` que contiene código común al
+     resto de módulos.
+   * La librería que se ha importado (``sqlutils-jdbc``) que implementa
+     utilidades para |JDBC| que introduciremos más tarde.
+   * ``sqlutils-hikari``, que implementa un :ref:`pool de conexiones <conn-pool>`
+     con HikariCP_ y complementa al módulo anterior.
+   * ``sqlutils-orm``, que implementa un *pseudoorm* muy básico, que es más
+     una prueba de concepto que una utilidad con aplicación real.
+   * ``sqlutils-jpa``, que es el módulo especular de ``sqlutils-jdbc``, pero
+     para |JPA| y nos será útil en :ref:`la próxima unidad <orm>`.
 
 .. |POO| replace:: :abbr:`POO (Programación Orientada a Objetos)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
@@ -190,6 +201,7 @@ el cual en |SQL| se define así:
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |JDK| replace:: :abbr:`JDK (Java Development Kit)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |JPA| replace:: :abbr:`JPA (Java Persistence API)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
 .. |E/R| replace:: :abbr:`E/R (Entidad/Relación)`
 

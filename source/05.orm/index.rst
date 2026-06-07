@@ -17,9 +17,30 @@ sí podemos afinar qué implica su uso. Si hemos utilizado :ref:`el patrón ORM 
 programar con conectores <conn-prog>`, habremos notado que las clases |DAO| son
 las que definen propiamente la traducción entre el objeto Java y el registro
 |SQL|. Por tanto, utilizar un |ORM| con la misma estrategia de programación
-implica ahorrarnos la creación de estas clases y sustituirlas por unas pequeñas
-indicaciones (anotaciones en las clases del modelo) que ayuden a la librería a
-aclarar la traducción.
+implica ahorrarnos la creación de estas clases y sustituirlas por una
+descripción de cómo hacer la traducción (p.ej. anotaciones en las clases del
+modelo) que ayuden a la librería a realizarla.
+
+Si comparamos clases en :ref:`el ejercicio que ya resolvimos estructuradamente en la unidad
+anterior <conn-dao>`, tenemos la siguiente tabla:
+
+.. table:: **Comparativa Conectores-Herramientas ORM**
+   :name: comp-jdbc-jpa
+
+   +----------------------+----------------+--------------------------------------------+
+   |  Conectores          |  ORM           | Aclaración                                 |
+   +======================+================+============================================+
+   | ``Conexion``         | ``Conexion``   | Necesaria para definir cómo conectar, pero |
+   |                      |                | más sencilla porque no nos preocupamos de  |
+   |                      |                | optimizar con *pool* de conexiones.        |
+   +----------------------+----------------+--------------------------------------------+
+   | ``CentroSqlDao``     |                | De la definición de las operaciones |CRUD| |
+   +----------------------+      \-        | y la conversión de registros a objetos     |
+   | ``EstudianteSqlDao`` |                | se encarga la propia librería.             |
+   +----------------------+----------------+--------------------------------------------+
+   | ``AppService``       | ``AppService`` | Necesaria también para abstraer al         |
+   |                      |                | resto de la aplicación.                    |
+   +----------------------+----------------+--------------------------------------------+
 
 *Java* presenta la enorme ventaja de que define una especificación muy completa
 llamada |JPA| para el uso de |ORM|, de manera que, si usamos |ORM|\ s
@@ -55,3 +76,4 @@ aseguráramos de que es compatible con |JPA|\ [#]_. Los ejemplos los basaremos e
 .. |JPA| replace:: :abbr:`JPA (Java Persistent API)`
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update. Delete)`

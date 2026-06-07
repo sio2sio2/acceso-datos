@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -408,7 +408,15 @@ entidades.</p></li>
 </ol>
 <section id="mapeo">
 <span id="orm-bas-map"></span><h2><span class="section-number">5.2.1. </span>Mapeo<a class="headerlink" href="#mapeo" title="Link to this heading">#</a></h2>
-<p>Se basa en las anotaciones que define la especificación <abbr title="Java Persistent API">JPA</abbr>:</p>
+<p>Al estudiar <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">conectores</span></a> hemos visto que un patrón de diseño muy
+adecuado es el patrón <abbr title="Data Access Object">DAO</abbr>. En este patrón, la conversión de cada clase de
+objeto en registro de la base de datos la realizamos codificando las operaciones
+<abbr title="Create, Read, Update, Delete">CRUD</abbr> en la clase <abbr title="Data Access Object">DAO</abbr> correspondiente. Esta conversión que salva el
+desacoplamiento entre el modelo relacional y el modelo de objetos es bastante
+tediosa y repetitiva. Las herramientas <abbr title="Object-Relational Mapping">ORM</abbr> nos liberan de esta monótona tarea:
+en vez de obligarnos a codificar la conversión, nos permiten describir el mapeo de
+algún modo. En el caso de la especificación <abbr title="Java Persistent API">JPA</abbr>, la descripción se realiza
+mediante anotaciones en las propias clases del modelo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@Entity</span>
 <span class="nd">@Table</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Centro&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Sólo útil si la table se llama de modo diferente.</span>
 <span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Centro</span><span class="w"> </span><span class="p">{</span>

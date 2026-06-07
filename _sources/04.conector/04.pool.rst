@@ -253,42 +253,6 @@ cuarto argumento al metodo ``create``:
    // Le decimos explícitamente a JdbcConnection cómo
    JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared", null, null, factory);
 
-El objeto puede utilizarse tal como se ha ilustrado para obtener su |DataSource|
-y, a partir de él, distintas conexiones |Connection| (que habrá que cerrar
-convenientemente), pero es más conveniente aprovechar las posibilidades de
-:ref:`TransactionManager <conn-transaction-manager>` y dejar que sea el gestor
-de transacción el que se encargue de crear y cerrar la conexión que necesitamos.
-
-.. code-block:: java
-   :emphasize-lines: 3, 6
-
-   // Pool de conexiones de una base SQLite en memoria.
-   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
-      // Creamos un gestor de transacciones para él y, de paso,
-      // registramos un gestor de registros.
-      jc.initTransactionManager(Map.of(
-         "logging", new LoggingManager()
-      ));
-
-      TransactionManager tm = jc.getTransactionManager(); // También puede obtenerse con la clave 'DB'
-
-      // Usamos conexiones gestionadas por el gestor
-      tm.transaction(ctxt -> {
-         Connection conn = ctxt.handle();
-
-        // ... Hacemos operaciones dentro de una misma transacción con "conn" ...
-      });
-   }
-
-.. admonition:: Advertencia
-
-   Las clases JdbcConnection_ y TransactionManager_ son independientes y puede
-   usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
-   correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
-   de que es conveniente manejar las conexiones a través del gestor, que para
-   eso se ha creado.
-
 Naturalmente, la clase permite pasar otra fábrica que use otro mecanismo
 totalmente distinto para crear el |DataSource|. Por ejemplo, aprovechando que
 hemos visto cómo crear uno con el gestor integrado de H2_, si utilizáramos este
@@ -298,6 +262,63 @@ hemos visto cómo crear uno con el gestor integrado de H2_, si utilizáramos est
    :caption: H2CPFactoryJava (:download:`descarga <files/H2CPFactory.java>`)
    :class: toggle
    :start-at: /**
+
+Sea como sea, el objeto puede utilizarse tal como se ha ilustrado para obtener
+su |DataSource| y, a partir de él, distintas conexiones |Connection| (que habrá
+que cerrar convenientemente), pero es más conveniente aprovechar las
+posibilidades de :ref:`TransactionManager <conn-transaction-manager>` y dejar
+que sea el gestor de transacción el que se encargue de crear y cerrar la
+conexión que necesitamos.
+
+.. code-block:: java
+   :emphasize-lines: 3, 6
+
+   // Pool de conexiones de una base SQLite en memoria.
+   try(JdbcConnection jc = JdbcConnection.create("BD", "jdbc:sqlite:file::memory:?cache=shared")) {
+      // Creamos un gestor de transacciones para él y, de paso,
+      // registramos un gestor de registros.
+      jc.withTransactionManager(Map.of(
+         "logging", new LoggingManager()
+      ));
+
+      TransactionManager tm = jc.getTransactionManager(); // También puede obtenerse con la clave 'DB'
+
+      // Usamos conexiones gestionadas por el gestor
+      tm.transaction(ctxt -> {
+         Connection conn = ctxt.handle();
+
+         // Recuperamos el gestor de registros para usarlo en esta transacción.
+         LogginManager lm = ctxt.getEventListener("logging", LoggingManager.class);
+
+         // ... Hacemos operaciones dentro de una misma transacción con "conn" ...
+      });
+   }
+
+.. tip:: Si al definir el evento, tenemos la prevención de crearle una clave
+   estática única que lo identifique, entonces no necesitaremos recordar con qué
+   nombre lo registramos. Es el caso de ``LoggingManager`` que tiene definido
+   ``LoggingManager.KEY``. Por tanto, habría sido más inteligente haber hecho:
+
+   .. code-block:: java
+
+      jc.withTransactionManager(Map.of(
+         LoggingManager.KEY, new LoggingManager()
+      ));
+
+   y así ya podremos recuperarlo siempre con esa clave:
+
+   .. code-block:: java
+
+      LogginManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+
+.. admonition:: Advertencia
+
+   Las clases JdbcConnection_ y TransactionManager_ son independientes y puede
+   usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
+   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+   correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
+   de que es conveniente manejar las conexiones a través del gestor, que para
+   eso se ha creado.
 
 .. rubric:: Notas al pie
 

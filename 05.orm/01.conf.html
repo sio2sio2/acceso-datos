@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -549,6 +549,8 @@ compilación de la <abbr title="Application Programming Interface">API</abbr>.</
 <li><p>Debemos recordar el nombre que le damos a la unidad de persistencia, porque
 la usaremos luego; y hay propiedades cuyos valores dependen del <abbr title="Object-Relational Mapping">ORM</abbr> y el
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> utilizados.</p></li>
+<li><p>Las propiedades (dentro de <code class="docutils literal notranslate"><span class="pre">&lt;properties&gt;</span></code>) pueden alterarse dinámicamente
+durante la ejecución del programa antes de conectar a la base de datos.</p></li>
 <li><p>El proveedor indica cuál es la implementación <abbr title="Java Persistence API">JPA</abbr> que usaremos. Algunos
 muy usados son:</p>
 <div class="pst-scrollable-table-container"><table class="url-sql table">
@@ -579,6 +581,14 @@ un <abbr title="Object-Relational Mapping">ORM</abbr> distinto, necesitamos crea
 </li>
 <li><p>En caso de que no se detecten, se pueden registrar las clases del modelo
 cuyos objetos se quieren hacer persistentes.</p></li>
+<li><p>Las propiedades son de dos tipos:</p>
+<ul class="simple">
+<li><p>Las propias de <abbr title="Java Persistence API">JPA</abbr> y que son independientes de la implementación
+utilizada.</p></li>
+<li><p>Las propias de la implementación concreta. En el ejemplo, la implementación
+es <a class="reference external" href="https://www.hibernate.org">Hibernate</a>.</p></li>
+</ul>
+</li>
 <li><p>La <em>url</em>, el <em>driver</em> y dialecto específico dependen de cuál sea el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> que
 utilicemos. La enumeración de los más utilizados la tenemos en <a class="reference internal" href="../04.conector/01.basico.html#conn-drivers"><span class="std std-ref">una tabla
 de la unidad anterior</span></a>, pero necesitamos añadir a ella cómo se

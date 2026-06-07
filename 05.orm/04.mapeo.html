@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -491,7 +491,7 @@ anotación de la clase Centro</span></a>:</p>
 <p>Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
 ampliar nuestros conocimientos sobre las anotaciones válidas:</p>
 <dl>
-<dt><code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code></dt><dd><p>Por lo general, todos los atributos de la clase, aunque no estén anotados en
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Basic</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code></dt><dd><p>Por lo general, todos los atributos de la clase, aunque no estén anotados en
 absoluto, se consideran campos de la tabla correspondiente. Las excepciones
 son:</p>
 <ul class="simple">
@@ -503,11 +503,23 @@ son:</p>
 <li><p>Los atributos que se heredan de una clase base que no se anotó con
 <code class="docutils literal notranslate"><span class="pre">&#64;Entity</span></code>.</p></li>
 </ul>
-<p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> fuerza a que un atributo se traduzca a campo y
+<p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code> evita que el atributo se mapee como campo,
+mientras que <code class="docutils literal notranslate"><span class="pre">&#64;Basic</span></code> refuerza que se mape y puede añadir, adicionalmente,
+dos parámetros que ayudan a modificar el comportamiento predeterminado:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">optional</span></code>, que puede ser <code class="docutils literal notranslate"><span class="pre">true</span></code> o <code class="docutils literal notranslate"><span class="pre">false</span></code> y permite indicar si la
+aplicación admite un valor nulo para el campo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fetch</span></code>, que permite definir si se obtiene el campo al pedir el objeto
+(<code class="docutils literal notranslate"><span class="pre">EAGER</span></code>) o al pedir el campo usando el <em>getter</em> correspondiente (<code class="docutils literal notranslate"><span class="pre">LAZY</span></code>).
+Tiene sentido en campos que sean muy pesados como un <code class="docutils literal notranslate"><span class="pre">BLOB</span></code>.</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code></dt><dd><p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> fuerza a que un atributo se traduzca a campo y
 además permite añadir información sobre la traducción mediante parámetros:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> permite indicar un nombre para el campo distinto al nombre del atributo.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">nullable</span></code>, si puede contener valores nulos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nullable</span></code>, que dependiendo de su valor <em>booleano</em> añade o no <code class="docutils literal notranslate"><span class="pre">NOT</span>
+<span class="pre">NULL</span></code> a la definición del campo.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">unique</span></code>, si su valor debe ser único.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">length</span></code>, la longitud de la cadena.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> y <code class="docutils literal notranslate"><span class="pre">scale</span></code> para tipos como <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/BigDecimal.html">BigDecimal</a> permiten indicar el número total de dígitos y el de dígitos
@@ -524,8 +536,18 @@ del campo que se incluiría en una sentencia <code class="docutils literal notra
 </div>
 </li>
 </ul>
-<p>La anotación <code class="docutils literal notranslate"><span class="pre">&#64;Transient</span></code> evita que el atributo se mapee como campo.</p>
 </dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Tanto <code class="docutils literal notranslate"><span class="pre">&#64;Column</span></code> como <code class="docutils literal notranslate"><span class="pre">&#64;Basic</span></code> permiten indicar si un valor puede
+ser nulo. El primero es una pura indicación de <abbr title="Data Definition Language">DDL</abbr> para el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> y, por lo
+tanto, la aplicación no sabe absolutamente nada sobre la validez del valor
+nulo. El segundo, en cambio, sí informa a la aplicación, aunque es muy común
+que los <abbr title="Object-Relational Mapping">ORM</abbr> se limiten a generar un <code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code> en la definición del campo
+y el error sólo salte cuando el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> se niegue a guardar el valor inválido.</p>
+</div>
+<dl>
 <dt><code class="docutils literal notranslate"><span class="pre">&#64;Id</span></code>/<code class="docutils literal notranslate"><span class="pre">&#64;GeneratedValue</span></code></dt><dd><p>Como ya hemos visto, la anotación <code class="docutils literal notranslate"><span class="pre">&#64;Id</span></code> sirve para marcar un atributo como
 identificador; y <code class="docutils literal notranslate"><span class="pre">&#64;GeneratedValue</span></code> para indicar cómo se generan
 automáticamente sus valores. Lo más socorrido es:</p>

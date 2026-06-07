@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -399,9 +399,42 @@ sí podemos afinar qué implica su uso. Si hemos utilizado <a class="reference i
 programar con conectores</span></a>, habremos notado que las clases <abbr title="Data Access Object">DAO</abbr> son
 las que definen propiamente la traducción entre el objeto Java y el registro
 <abbr title="Structured Query Language">SQL</abbr>. Por tanto, utilizar un <abbr title="Object-Relational Mapping">ORM</abbr> con la misma estrategia de programación
-implica ahorrarnos la creación de estas clases y sustituirlas por unas pequeñas
-indicaciones (anotaciones en las clases del modelo) que ayuden a la librería a
-aclarar la traducción.</p>
+implica ahorrarnos la creación de estas clases y sustituirlas por una
+descripción de cómo hacer la traducción (p.ej. anotaciones en las clases del
+modelo) que ayuden a la librería a realizarla.</p>
+<p>Si comparamos clases en <a class="reference internal" href="../04.conector/15.dao.html#conn-dao"><span class="std std-ref">el ejercicio que ya resolvimos estructuradamente en la unidad
+anterior</span></a>, tenemos la siguiente tabla:</p>
+<div class="pst-scrollable-table-container"><table class="table" id="comp-jdbc-jpa">
+<caption><span class="caption-text"><strong>Comparativa Conectores-Herramientas ORM</strong></span><a class="headerlink" href="#comp-jdbc-jpa" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Conectores</p></th>
+<th class="head"><p>ORM</p></th>
+<th class="head"><p>Aclaración</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Conexion</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Conexion</span></code></p></td>
+<td><p>Necesaria para definir cómo conectar, pero
+más sencilla porque no nos preocupamos de
+optimizar con <em>pool</em> de conexiones.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CentroSqlDao</span></code></p></td>
+<td rowspan="2"><p>-</p></td>
+<td rowspan="2"><p>De la definición de las operaciones <abbr title="Create, Read, Update. Delete">CRUD</abbr>
+y la conversión de registros a objetos
+se encarga la propia librería.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EstudianteSqlDao</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AppService</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AppService</span></code></p></td>
+<td><p>Necesaria también para abstraer al
+resto de la aplicación.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p><em>Java</em> presenta la enorme ventaja de que define una especificación muy completa
 llamada <abbr title="Java Persistent API">JPA</abbr> para el uso de <abbr title="Object-Relational Mapping">ORM</abbr>, de manera que, si usamos <abbr title="Object-Relational Mapping">ORM</abbr>s
 compatibles con ella, podremos migrar de uno a otro con un mínimo esfuerzo. El

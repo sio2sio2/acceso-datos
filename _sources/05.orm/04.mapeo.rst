@@ -37,7 +37,7 @@ anotación de la clase Centro <orm-bas-map>`:
 Y convendría leer lo explicado allí para no repetirlo. Ahora bien, podemos
 ampliar nuestros conocimientos sobre las anotaciones válidas:
 
-``@Column``/``@Transient``
+``@Basic``/``@Transient``
    Por lo general, todos los atributos de la clase, aunque no estén anotados en
    absoluto, se consideran campos de la tabla correspondiente. Las excepciones
    son:
@@ -50,11 +50,23 @@ ampliar nuestros conocimientos sobre las anotaciones válidas:
    - Los atributos que se heredan de una clase base que no se anotó con
      ``@Entity``.
 
+   La anotación ``@Transient`` evita que el atributo se mapee como campo,
+   mientras que ``@Basic`` refuerza que se mape y puede añadir, adicionalmente,
+   dos parámetros que ayudan a modificar el comportamiento predeterminado:
+
+   - ``optional``, que puede ser ``true`` o ``false`` y permite indicar si la
+     aplicación admite un valor nulo para el campo.
+   - ``fetch``, que permite definir si se obtiene el campo al pedir el objeto
+     (``EAGER``) o al pedir el campo usando el *getter* correspondiente (``LAZY``).
+     Tiene sentido en campos que sean muy pesados como un ``BLOB``.
+
+``@Column``
    La anotación ``@Column`` fuerza a que un atributo se traduzca a campo y
    además permite añadir información sobre la traducción mediante parámetros:
 
    + ``name`` permite indicar un nombre para el campo distinto al nombre del atributo.
-   + ``nullable``, si puede contener valores nulos.
+   + ``nullable``, que dependiendo de su valor *booleano* añade o no ``NOT
+     NULL`` a la definición del campo.
    + ``unique``, si su valor debe ser único.
    + ``length``, la longitud de la cadena.
    + ``precision`` y ``scale`` para tipos como :java-util:`BigDecimal
@@ -72,7 +84,12 @@ ampliar nuestros conocimientos sobre las anotaciones válidas:
         @Column(name = "precio", columnDefinition = "DECIMAL(10, 2) CHECK(precio > 0)")
         private BigDecimal precio;
 
-   La anotación ``@Transient`` evita que el atributo se mapee como campo.
+.. note:: Tanto ``@Column`` como ``@Basic`` permiten indicar si un valor puede
+   ser nulo. El primero es una pura indicación de |DDL| para el |SGBD| y, por lo
+   tanto, la aplicación no sabe absolutamente nada sobre la validez del valor
+   nulo. El segundo, en cambio, sí informa a la aplicación, aunque es muy común
+   que los |ORM| se limiten a generar un ``NOT NULL`` en la definición del campo
+   y el error sólo salte cuando el |SGBD| se niegue a guardar el valor inválido.
 
 ``@Id``/``@GeneratedValue``
    Como ya hemos visto, la anotación ``@Id`` sirve para marcar un atributo como
@@ -491,4 +508,5 @@ Hay tres tipos de relaciones binarias en el modelo relacional:
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |DDL| replace:: :abbr:`DDL (Data Definition Language)`
 .. _Hibernate: https://www.hibernate.org

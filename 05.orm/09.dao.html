@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -386,18 +386,23 @@
   <section id="estrategias-de-diseno">
 <span id="orm-pattern"></span><h1><span class="section-number">5.5. </span>Estrategias de diseño<a class="headerlink" href="#estrategias-de-diseno" title="Link to this heading">#</a></h1>
 <p>Cuando analizamos <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">conectores</span></a>, ya expusimos que uno de los patrones
-de diseño más socorridos es el patrón <abbr title="Data Access Object">DAO</abbr>. Al usar un <abbr title="Object-Relational Mapping">ORM</abbr> podemos seguir
-esta misma estrategia sabiendo que hemos sustituido las clases <abbr title="Data Access Object">DAO</abbr> por
-anotaciones en las propias clases del modelo.</p>
-<p>Es conveniente también definir una clase que abstraiga de la conexión, aunque en
-el caso de <abbr title="Java Persistence API">JPA</abbr> es bastante más sencilla que el uso de un pool de conexiones; y
-también podemos facilitar la gestión de transacciones aportando un enfoque
-funcional como ya hicimos. Por todo ello, <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> dispone de un módulo
+de diseño más socorridos es el patrón <abbr title="Data Access Object">DAO</abbr>. Con este patrón, la conversión de
+registro a objeto, y viceversa, la realizamos codificando las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>
+en la clase <abbr title="Data Access Object">DAO</abbr> correspondiente. La librería <abbr title="Object-Relational Mapping">ORM</abbr> nos exime de la
+repetitiva tarea de crear estas clases y nos ofrece unas herramientas que lo
+suplen.</p>
+<p>Sin embargo, necesitaremos aún definir una clase (<code class="docutils literal notranslate"><span class="pre">Conexion</span></code>) que se encarga
+de definir cómo se conecta a la base de datos; y una o varias clases de servicio
+(<code class="docutils literal notranslate"><span class="pre">AppService</span></code>) que abstraigan al resto de la aplicación de las
+particularidades de las operaciones con datos.  Aunque <abbr title="Java Persistence API">JPA</abbr> facilita las cosas,
+podemos facilitar la gestión de transacciones aportando un enfoque funcional
+como ya hicimos y que acerque la sintaxis entre las estrategias con conectores y
+con herramientas <abbr title="Object-Relational Mapping">ORM</abbr>. Por todo ello, <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> dispone de un módulo
 <code class="docutils literal notranslate"><span class="pre">sqlutils-jpa</span></code>:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2.sqlutils<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>sqlutils-jpa<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.2.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.3.0<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
@@ -442,9 +447,10 @@ ilustrar su uso sin muchos preámbulos:</p>
 <p>Obsérvese que el uso de la clase es prácticamente idéntico al de
 <code class="docutils literal notranslate"><span class="pre">JdbcConnection</span></code>:</p>
 <ul class="simple">
-<li><p>Creamos la clase para lo cual necesitamos el nombre de la unidad de
-persistencia y las propiedades de conexión que modifiquen dinámicamente
-los valores estáticos definidos en el <abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
+<li><p>Creamos la clase para lo cual usamos como clave el nombre de la unidad de
+persistencia (definido en <code class="file docutils literal notranslate"><span class="pre">persistence.xml</span></code> ) y las propiedades de
+conexión que modifiquen dinámicamente los valores estáticos definidos en el
+<abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
 <li><p>La clase también implementa un patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a> cuya clave identificativa
 es el nombre de la propia unidad de persistencia.</p></li>
 <li><p>Le asociamos un gestor de transacciones que se comporta igual que su

@@ -58,7 +58,7 @@ public class Conexion implements AutoCloseable {
             Connection conn = ctxt.connection();
 
             // Si la base de datos ya está inicializada, no hacemos nada.
-            if(SqlUtils.isDatabaseEmpty(conn)) return;
+            if(!SqlUtils.isDatabaseEmpty(conn)) return;
 
             try {
                 SqlUtils.executeSQL(conn, schema);
@@ -110,23 +110,17 @@ public class Conexion implements AutoCloseable {
    }
 
    /**
-    * Devuelve la conexión asociada a la transacción activa.
-    * @return La conexión solicitada
-    * @throws IllegalStateException Si la conexión ya está cerrada o no hay conexión activa.
+    * Obtiene un DAO para la clase de entidad dada.
+    * @param <E> El tipo de entidad para el que se solicita el DAO.
+    * @param clazz La clase de entidad para la que se solicita el DAO.
+    * @return El DAO solicitado.
     */
-   public Connection getConnection() {
-      if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return jc.getTransactionManager().getConnection();
-   }
-
-   /**
-    * Acceso cómodo al gestor de registros diferidos.
-    * Permite registrar mensajes al término de la transacción
-    * para conocer si se confirma o se deshace.
-    * @return El gestor de registros solicitado.
-    */
-   public LoggingManager getLoggingManager() {
-      if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      return jc.getTransactionManager().getListener(LoggingManager.KEY, LoggingManager.class);
+   @SuppressWarnings("unchecked")
+   public <E extends Entity> Crud<E> getDao(Class<E> clazz) {
+       return switch(clazz.getSimpleName()) {
+           case "Centro" -> (Crud<E>) new CentroSqlDao(jc.getKey());
+           case "Estudiante" -> (Crud<E>) new EstudianteSqlDao(jc.getKey());
+           default -> throw new IllegalArgumentException("No se ha definido un DAO para la clase %s".formatted(clazz.getName()));
+       };
    }
 }

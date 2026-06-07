@@ -60,7 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '04.conector/04.pool';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="4.5. Programación con conectores" href="15.dao.html" />
+    <link rel="next" title="4.5. Estrategia de programación" href="15.dao.html" />
     <link rel="prev" title="4.3. Transacciones" href="03.transacciones.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -620,39 +620,6 @@ cuarto argumento al metodo <code class="docutils literal notranslate"><span clas
 <span class="hll"><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">factory</span><span class="p">);</span>
 </span></pre></div>
 </div>
-<p>El objeto puede utilizarse tal como se ha ilustrado para obtener su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>
-y, a partir de él, distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá que cerrar
-convenientemente), pero es más conveniente aprovechar las posibilidades de
-<a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> y dejar que sea el gestor
-de transacción el que se encargue de crear y cerrar la conexión que necesitamos.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
-<span class="k">try</span><span class="p">(</span><span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="hll"><span class="w">   </span><span class="c1">// Creamos un gestor de transacciones para él y, de paso,</span>
-</span><span class="w">   </span><span class="c1">// registramos un gestor de registros.</span>
-<span class="w">   </span><span class="n">jc</span><span class="p">.</span><span class="na">initTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
-<span class="hll"><span class="w">      </span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
-</span><span class="w">   </span><span class="p">));</span>
-
-<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// También puede obtenerse con la clave &#39;DB&#39;</span>
-
-<span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
-<span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">();</span>
-
-<span class="w">     </span><span class="c1">// ... Hacemos operaciones dentro de una misma transacción con &quot;conn&quot; ...</span>
-<span class="w">   </span><span class="p">});</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition-advertencia admonition">
-<p class="admonition-title">Advertencia</p>
-<p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
-usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
-correspondiente, el método <code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo
-de que es conveniente manejar las conexiones a través del gestor, que para
-eso se ha creado.</p>
-</div>
 <p>Naturalmente, la clase permite pasar otra fábrica que use otro mecanismo
 totalmente distinto para crear el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>. Por ejemplo, aprovechando que
 hemos visto cómo crear uno con el gestor integrado de <a class="reference external" href="https://www.h2database.com/">H2</a>, si utilizáramos este
@@ -684,6 +651,59 @@ hemos visto cómo crear uno con el gestor integrado de <a class="reference exter
 <span class="p">}</span>
 </pre></div>
 </div>
+</div>
+<p>Sea como sea, el objeto puede utilizarse tal como se ha ilustrado para obtener
+su <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> y, a partir de él, distintas conexiones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> (que habrá
+que cerrar convenientemente), pero es más conveniente aprovechar las
+posibilidades de <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> y dejar
+que sea el gestor de transacción el que se encargue de crear y cerrar la
+conexión que necesitamos.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">   </span><span class="c1">// Creamos un gestor de transacciones para él y, de paso,</span>
+</span><span class="w">   </span><span class="c1">// registramos un gestor de registros.</span>
+<span class="w">   </span><span class="n">jc</span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+<span class="hll"><span class="w">      </span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
+</span><span class="w">   </span><span class="p">));</span>
+
+<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// También puede obtenerse con la clave &#39;DB&#39;</span>
+
+<span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
+<span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">();</span>
+
+<span class="w">      </span><span class="c1">// Recuperamos el gestor de registros para usarlo en esta transacción.</span>
+<span class="w">      </span><span class="n">LogginManager</span><span class="w"> </span><span class="n">lm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">getEventListener</span><span class="p">(</span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">      </span><span class="c1">// ... Hacemos operaciones dentro de una misma transacción con &quot;conn&quot; ...</span>
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Si al definir el evento, tenemos la prevención de crearle una clave
+estática única que lo identifique, entonces no necesitaremos recordar con qué
+nombre lo registramos. Es el caso de <code class="docutils literal notranslate"><span class="pre">LoggingManager</span></code> que tiene definido
+<code class="docutils literal notranslate"><span class="pre">LoggingManager.KEY</span></code>. Por tanto, habría sido más inteligente haber hecho:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">jc</span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+<span class="w">   </span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<p>y así ya podremos recuperarlo siempre con esa clave:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">LogginManager</span><span class="w"> </span><span class="n">lm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">getEventListener</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-advertencia admonition">
+<p class="admonition-title">Advertencia</p>
+<p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
+usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
+conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+correspondiente, el método <code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo
+de que es conveniente manejar las conexiones a través del gestor, que para
+eso se ha creado.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
@@ -733,7 +753,7 @@ que implementa la interfaz <a class="reference external" href="https://github.co
        title="siguiente página">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">siguiente</p>
-        <p class="prev-next-title"><span class="section-number">4.5. </span>Programación con conectores</p>
+        <p class="prev-next-title"><span class="section-number">4.5. </span>Estrategia de programación</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

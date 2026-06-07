@@ -126,6 +126,9 @@ En este archivo:
   la usaremos luego; y hay propiedades cuyos valores dependen del |ORM| y el
   |SGBD| utilizados.
 
+* Las propiedades (dentro de ``<properties>``) pueden alterarse dinámicamente
+  durante la ejecución del programa antes de conectar a la base de datos.
+
 * El proveedor indica cuál es la implementación |JPA| que usaremos. Algunos
   muy usados son:
 
@@ -147,6 +150,13 @@ En este archivo:
 
 * En caso de que no se detecten, se pueden registrar las clases del modelo
   cuyos objetos se quieren hacer persistentes.
+
+* Las propiedades son de dos tipos:
+
+  - Las propias de |JPA| y que son independientes de la implementación
+    utilizada.
+  - Las propias de la implementación concreta. En el ejemplo, la implementación
+    es Hibernate_.
 
 * La *url*, el *driver* y dialecto específico dependen de cuál sea el |SGBD| que
   utilicemos. La enumeración de los más utilizados la tenemos en :ref:`una tabla

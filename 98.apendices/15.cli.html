@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Programación con conectores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/15.dao.html">4.5. Estrategia de programación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
 </ul>
 </details></li>
@@ -442,15 +442,15 @@ estático que arranca la aplicación sea:</p>
 </div>
 <div class="admonition caution">
 <p class="admonition-title">Prudencia</p>
-<p>En <em>Java</em>, los elementos de este array incluyen (en orden)
-exclusivamente los argumentos del programa, por lo que el primer elemento (el
-elemento 0) también es argumento y no el nombre con el que se invocó el
-programa, como ocurre en otros lenguajes com o <em>Python</em>.</p>
+<p>En <em>Java</em>, los elementos de este array incluyen (en orden) exclusivamente los
+argumentos del programa, por lo que el primer elemento (el elemento 0)
+también es argumento y no el nombre con el que se invocó el programa, como
+ocurre en otros lenguajes como <em>Python</em> o <em>C</em>.</p>
 </div>
 <p>Sin embargo, basar la introducción de parámetros de entrada en la posición y
 obtenerlos de este array es un engorro para el usuario que ejecuta la
 aplicación, por lo que lo más juicioso es habilitar que la línea de órdenes
-cumpla con el <cite>estándar POSIX &lt;:linux:ordenar&gt;</cite>. Para ello, hay distintas
+cumpla con el <a class="reference external" href="https://sio2sio2.github.io/doc-linux/02.conbas/01.preliminares/index.html#ordenar" title="(in Linuxnomicón rolling)"><span class="xref std std-ref">estándar POSIX</span></a>. Para ello, hay distintas
 librerías: nosotros estudiaremos <a class="reference external" href="https://picocli.info/">picocli</a>.</p>
 <p>Otro aspecto a tener en cuenta es la necesidad de acceso a esos datos desde
 cualquier lugar de la aplicación, porque sus valores pueden condicionar

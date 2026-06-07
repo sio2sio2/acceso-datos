@@ -54,10 +54,9 @@ Este patrón básicamente:
   usa el resto de la aplicación para trabajar con los datos.
 
 Por lo general, aunque no forzosamente, cada clase del modelo tendrá asociada
-una clase |DAO|. Recordemos las clases del modelo (``Centro`` y
-``Estudiante``), aunque en esta ocasión para intentar uniformizar la
-implementación forzaremos a que ambas deriven de una interfaz que nos asegura que
-ambas manejan de igual modo su identificador:
+una clase |DAO|. Además, forzaremos a que las clases de nuestro modelo (``Centro`` y
+``Estudiante``) deriven de una interfaz que nos asegure que ambas manejan de
+igual modo su identificador:
 
 .. literalinclude:: files/Entity.java
    :language: java
@@ -90,7 +89,7 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:
 .. admonition:: Aclaración
 
    Esta interfaz no tiene por qué ser definida exactamente así: podría definirse
-   otra que satisfaga también la necesidad de implementar las cuatro operaciones
+   otra que satisfaga también la obligación de implementar las cuatro operaciones
    básicas. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
    podrían devolverlas en forma de |Stream| en vez de |List|.
 
@@ -104,7 +103,7 @@ de objeto que quiera almacenarse en la base de datos. En nuestro ejemplo, se
 particularizará para :ref:`Centro <clase-centro>` y para :ref:`Estudiante
 <clase-estudiante>`.
 
-Llegamos por fin a la parte en la que implementamos la lógica de la
+Llegamos, por fin, a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, cuatro clases:
 
 a. Una clase (``Conexion``) que abstraiga de la creación y uso del
@@ -193,12 +192,12 @@ obtener conexiones.  Tenemos dos alternativas:
          return cx.getDataSource().getConnection();
       }
 
-   En este caso, el |Connection| recibido es una conexión exclusiva para
-   la operación |CRUD| (*delete*). Tal como hemos escrito el código de la
-   operación la conexión se abre y se cierra (bien). pero al ser exclusiva
-   es imposible que se comparta con otra operación |CRUD|, por lo que nunca
-   podremos construir transacciones que involucren varias operaciones (mal).
-   No tener soporte para transacciones es inasumible.
+   En este caso, el |Connection| recibido es una conexión que se usa
+   exclusivmente en la operación |CRUD| (*delete*), puesto que tal como está
+   escrito el código de la operación, la conexión se abre y se cierra. Esto
+   tiene un inconveniente: es imposible que se comparta con otra operación
+   |CRUD|, por lo que nunca podremos construir transacciones que involucren
+   varias operaciones.  No tener soporte para transacciones es inasumible.
 
 #. ``Conexion`` ofrece un |Connection|, por lo que:
 
@@ -209,19 +208,23 @@ obtener conexiones.  Tenemos dos alternativas:
       }
 
    En este caso, el objeto |Connection| nos lo proporciona ``Conexion`` y
-   dependiendo de cómo se haya implementado allí, podremos decidir si nos
-   conviene o no. Por ejemplo, si en ``Conexion`` nos limitáramos a usar un
-   |DataSource| para obtener el |Connection| estaríamos en el mismo caso
-   anterior que era inaceptable. Podríamos optar por soluciones más
-   sofisticadas, pero que implicarán gestionar manualmente los cierres de las
-   conexiones, lo cual es propenso a error.
+   dependiendo de cómo se haya implementado allí, tendremos o no la limitación
+   de no poder hacer transacciones de varias operaciones.
+   Por ejemplo, si en ``Conexion`` nos limitáramos a usar un
+   |DataSource| para obtener el |Connection| sí existiría la limitación
+   anterior, que era inaceptable. Podríamos optar por soluciones más
+   sofisticadas que generar un *proxy* que no se cierra\ [#]_, para soslayar la
+   limitación de no soportar transacciones, pero inevitablemente tendríamos que
+   gestionar cuándo se abren y cierran conexiones, lo cual es un engorro que
+   tiene a los fallos.
 
-Así pues, el camino correcto es el segundo, pero complicado.
+Como se ve todo es o muy limitado o excesivamente complicado.
 
 .. admonition:: Apunte didáctico
 
-   Antes de continuar, puede implementarse una clase ``Connection`` muy simple
-   que use |DriverManager|. Así se ven en concreto los problemas planteados.
+   Antes de continuar, puede implementarse una clase ``Conexion`` muy simple
+   que use |DriverManager| o un *pool* manual para ver en concreto estos
+   problemas planteados.
 
 Afortunadamente, la solución al problema de gestionar la conexión ya la tenemos:
 nuestro :ref:`gestor de transacciones <conn-transaction-manager>`: soporta
@@ -230,7 +233,7 @@ hilos (por si realizamos programación concurrente). Además, lo programamos de
 modo que la conexión que ofrece está protegida contra cierres manuales, ya que
 es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
 el problema y complementar este patrón nos basta con usar en ``Connection`` un
-|JdbcConnection| con su su |TransactionManager| correspondiente.
+|JdbcConnection| con su |TransactionManager| correspondiente.
 
 Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
 establezca la conexión gracias a un |JdbcConnection| con |TransactionManager|.
@@ -315,8 +318,8 @@ La ventaja de escribir la operación de este modo, es que tenemos acceso a todo
 el contexto de la transacción, incluidos los observadores que hubiéramos podido
 definir. ¿Implica algo abrir la transacción en la implementación de la
 operación? Sí, sí implica algo: comodidad. Ya no es necesario declarar
-explícitamente la transacción cuando sólo está constituida por una operación y,
-cuando esté constituida por varias, tampoco habrá problemas ya que nuestro
+explícitamente la transacción cuando sólo está constituida por una operación.
+Además, cuando esté constituida por varias, no habrá problemas, ya que nuestro
 gestor de transacción soporta anidación de transacciones.
 
 .. literalinclude:: files/Conexion.java
@@ -392,6 +395,10 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 .. rubric:: Notas al pie
 
 .. [#] En realidad, esta es la gran dificultad.
+
+.. [#] También podemos no cerrar la conexión en el código de la operación
+   y, en ese caso, ambas soluciones permitirán transacciones de varias
+   operaciones, pero implicarán la gestión manual de las transacciones.
 
 .. _sqlutils: https://github.com/sio2sio2/sqlutils
 .. _Singleton: https://es.wikipedia.org/wiki/Singleton

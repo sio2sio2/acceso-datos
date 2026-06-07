@@ -440,10 +440,9 @@ base de datos. Son estos servicios (y no directamente los objetos DAO) los que
 usa el resto de la aplicación para trabajar con los datos.</p></li>
 </ul>
 <p>Por lo general, aunque no forzosamente, cada clase del modelo tendrá asociada
-una clase <abbr title="Data Access Object">DAO</abbr>. Recordemos las clases del modelo (<code class="docutils literal notranslate"><span class="pre">Centro</span></code> y
-<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>), aunque en esta ocasión para intentar uniformizar la
-implementación forzaremos a que ambas deriven de una interfaz que nos asegura que
-ambas manejan de igual modo su identificador:</p>
+una clase <abbr title="Data Access Object">DAO</abbr>. Además, forzaremos a que las clases de nuestro modelo (<code class="docutils literal notranslate"><span class="pre">Centro</span></code> y
+<code class="docutils literal notranslate"><span class="pre">Estudiante</span></code>) deriven de una interfaz que nos asegure que ambas manejan de
+igual modo su identificador:</p>
 <div class="literal-block-wrapper docutils container" id="clase-entity">
 <div class="code-block-caption"><span class="caption-text">Entity.java</span><a class="headerlink" href="#clase-entity" title="Link to this code">#</a></div>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Entity</span><span class="w"> </span><span class="p">{</span>
@@ -637,7 +636,7 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:</p>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
 <p>Esta interfaz no tiene por qué ser definida exactamente así: podría definirse
-otra que satisfaga también la necesidad de implementar las cuatro operaciones
+otra que satisfaga también la obligación de implementar las cuatro operaciones
 básicas. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
 podrían devolverlas en forma de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
 </div>
@@ -648,7 +647,7 @@ de datos almacenados.</p>
 <p>Nótese que la interfaz es genérica, porque tiene que servir para cualquier tipo
 de objeto que quiera almacenarse en la base de datos. En nuestro ejemplo, se
 particularizará para <a class="reference internal" href="01.basico.html#clase-centro"><span class="std std-ref">Centro</span></a> y para <a class="reference internal" href="#clase-estudiante"><span class="std std-ref">Estudiante</span></a>.</p>
-<p>Llegamos por fin a la parte en la que implementamos la lógica de la
+<p>Llegamos, por fin, a la parte en la que implementamos la lógica de la
 persistencia. Necesitamos, en principio, cuatro clases:</p>
 <ol class="loweralpha simple">
 <li><p>Una clase (<code class="docutils literal notranslate"><span class="pre">Conexion</span></code>) que abstraiga de la creación y uso del
@@ -689,7 +688,7 @@ definir los métodos de acceso a datos que necesita la aplicación.</p></li>
 </div>
 <p>Si partiéramos de que tenemos un método <code class="docutils literal notranslate"><span class="pre">.getConnection()</span></code> en ambas clases
 <abbr title="Data Access Object">DAO</abbr> que nos proporciona una objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> para realizar las operaciones
-<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación sería trivial, puesto que ya la hemos ensayado
+<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación sería trivial, puesto que ya la hemos ensayado
 bajo epígrafes anteriores. Por ejemplo:</p>
 <div class="highlight-java notranslate" id="dao-delete"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
 <span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
@@ -746,12 +745,12 @@ obtener conexiones.  Tenemos dos alternativas:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>En este caso, el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> recibido es una conexión exclusiva para
-la operación <abbr title="Create, Read, Update, Delete">CRUD</abbr> (<em>delete</em>). Tal como hemos escrito el código de la
-operación la conexión se abre y se cierra (bien). pero al ser exclusiva
-es imposible que se comparta con otra operación <abbr title="Create, Read, Update, Delete">CRUD</abbr>, por lo que nunca
-podremos construir transacciones que involucren varias operaciones (mal).
-No tener soporte para transacciones es inasumible.</p>
+<p>En este caso, el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> recibido es una conexión que se usa
+exclusivmente en la operación <abbr title="Create, Read, Update, Delete">CRUD</abbr> (<em>delete</em>), puesto que tal como está
+escrito el código de la operación, la conexión se abre y se cierra. Esto
+tiene un inconveniente: es imposible que se comparta con otra operación
+<abbr title="Create, Read, Update, Delete">CRUD</abbr>, por lo que nunca podremos construir transacciones que involucren
+varias operaciones.  No tener soporte para transacciones es inasumible.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Conexion</span></code> ofrece un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>, por lo que:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -760,19 +759,23 @@ No tener soporte para transacciones es inasumible.</p>
 </pre></div>
 </div>
 <p>En este caso, el objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> nos lo proporciona <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> y
-dependiendo de cómo se haya implementado allí, podremos decidir si nos
-conviene o no. Por ejemplo, si en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> nos limitáramos a usar un
-<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> para obtener el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> estaríamos en el mismo caso
-anterior que era inaceptable. Podríamos optar por soluciones más
-sofisticadas, pero que implicarán gestionar manualmente los cierres de las
-conexiones, lo cual es propenso a error.</p>
+dependiendo de cómo se haya implementado allí, tendremos o no la limitación
+de no poder hacer transacciones de varias operaciones.
+Por ejemplo, si en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> nos limitáramos a usar un
+<a class="extlink-javax-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/javax/sql/DataSource.html">DataSource</a> para obtener el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> sí existiría la limitación
+anterior, que era inaceptable. Podríamos optar por soluciones más
+sofisticadas que generar un <em>proxy</em> que no se cierra<a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, para soslayar la
+limitación de no soportar transacciones, pero inevitablemente tendríamos que
+gestionar cuándo se abren y cierran conexiones, lo cual es un engorro que
+tiene a los fallos.</p>
 </li>
 </ol>
-<p>Así pues, el camino correcto es el segundo, pero complicado.</p>
+<p>Como se ve todo es o muy limitado o excesivamente complicado.</p>
 <div class="admonition-apunte-didactico admonition">
 <p class="admonition-title">Apunte didáctico</p>
-<p>Antes de continuar, puede implementarse una clase <code class="docutils literal notranslate"><span class="pre">Connection</span></code> muy simple
-que use <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a>. Así se ven en concreto los problemas planteados.</p>
+<p>Antes de continuar, puede implementarse una clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> muy simple
+que use <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a> o un <em>pool</em> manual para ver en concreto estos
+problemas planteados.</p>
 </div>
 <p>Afortunadamente, la solución al problema de gestionar la conexión ya la tenemos:
 nuestro <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">gestor de transacciones</span></a>: soporta
@@ -781,7 +784,7 @@ hilos (por si realizamos programación concurrente). Además, lo programamos de
 modo que la conexión que ofrece está protegida contra cierres manuales, ya que
 es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
 el problema y complementar este patrón nos basta con usar en <code class="docutils literal notranslate"><span class="pre">Connection</span></code> un
-<a class="reference internal" href="04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con su su <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> correspondiente.</p>
+<a class="reference internal" href="04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con su <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> correspondiente.</p>
 <p>Así pues, la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> puede ser simplemente una clase <em>Singleton</em> que
 establezca la conexión gracias a un <a class="reference internal" href="04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>.
 Si se obrara así, la obtención del <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> podría ser así:</p>
@@ -857,8 +860,8 @@ operación <em>delete</em> se escribiría así:</p>
 el contexto de la transacción, incluidos los observadores que hubiéramos podido
 definir. ¿Implica algo abrir la transacción en la implementación de la
 operación? Sí, sí implica algo: comodidad. Ya no es necesario declarar
-explícitamente la transacción cuando sólo está constituida por una operación y,
-cuando esté constituida por varias, tampoco habrá problemas ya que nuestro
+explícitamente la transacción cuando sólo está constituida por una operación.
+Además, cuando esté constituida por varias, no habrá problemas, ya que nuestro
 gestor de transacción soporta anidación de transacciones.</p>
 <div class="literal-block-wrapper docutils container" id="clase-conexion">
 <div class="code-block-caption"><span class="caption-text">Conexion.java (<a class="reference download internal" download="" href="../_downloads/f8ae5864257f3cd519a772840cec69c8/Conexion.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-conexion" title="Link to this code">#</a></div>
@@ -1297,9 +1300,15 @@ es más inteligente utilizarlas.</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p>En realidad, esta es la gran dificultad.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>También podemos no cerrar la conexión en el código de la operación
+y, en ese caso, ambas soluciones permitirán transacciones de varias
+operaciones, pero implicarán la gestión manual de las transacciones.</p>
 </aside>
 </aside>
 </section>

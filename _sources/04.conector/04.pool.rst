@@ -22,8 +22,7 @@ Para utilizar este mecanismo tenemos dos vías:
 
 + Usar el mecanismo básico que proporciona, si lo proporciona, el driver |JDBC|
   en cada caso.
-+ Lo más recomendable, usar una librería especializada como `HikariCP
-  <https://github.com/brettwooldridge/HikariCP>`_.
++ Lo más recomendable, usar una librería especializada como HikariCP_.
 
 Creación del gestor
 ===================
@@ -281,7 +280,7 @@ conexión que necesitamos.
          "logging", new LoggingManager()
       ));
 
-      TransactionManager tm = jc.getTransactionManager(); // También puede obtenerse con la clave 'DB'
+      TransactionManager tm = jc.getTransactionManager();
 
       // Usamos conexiones gestionadas por el gestor
       tm.transaction(ctxt -> {
@@ -315,7 +314,7 @@ conexión que necesitamos.
 
    Las clases JdbcConnection_ y TransactionManager_ son independientes y puede
    usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-   conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+   conjuntamente. Por eso, cuando existe el gestor de transacciones
    correspondiente, el método ``getDataSource()`` genera un mensaje advirtiendo
    de que es conveniente manejar las conexiones a través del gestor, que para
    eso se ha creado.
@@ -349,3 +348,4 @@ conexión que necesitamos.
 .. _TransactionManager: https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java
 .. _SQLite: https://sqlite.org/
 .. _H2: https://www.h2database.com/
+.. _HikariCP: https://github.com/brettwooldridge/HikariCP

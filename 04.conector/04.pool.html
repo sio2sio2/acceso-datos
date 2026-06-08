@@ -383,7 +383,7 @@
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-gestor">4.4.1. Creación del gestor</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1.1. Gestor integrado</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.1.2. HikariCP</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hikaricp">4.4.1.2. HikariCP</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-avanzada">4.4.2. Gestión avanzada</a></li>
@@ -528,10 +528,10 @@ integrado funcional:</p>
 <p>En este caso, los ejemplos que para <a class="reference external" href="https://sqlite.org/">SQLite</a> no funcionaron correctamente, para
 <a class="reference external" href="https://www.h2database.com/">H2</a> sí lo harán.</p>
 </section>
-<section id="id1">
-<h3><span class="section-number">4.4.1.2. </span>HikariCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<section id="hikaricp">
+<h3><span class="section-number">4.4.1.2. </span>HikariCP<a class="headerlink" href="#hikaricp" title="Link to this heading">#</a></h3>
 <p>La alternativa, común a cualquier controlador, es usar una librería
-especializada como <a href="#id7"><span class="problematic" id="id8">HikariCP_</span></a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
+especializada como <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>, que tiene <a class="reference external" href="https://mvnrepository.com/artifact/com.zaxxer/HikariCP">repositorio de Maven</a>.</p>
 <p>Su uso es muy sencillo:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span><span class="w"> </span><span class="n">dbPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test.db&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">dbUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dbProtocol</span><span class="p">,</span><span class="w"> </span><span class="n">dbPath</span><span class="p">);</span>
@@ -578,7 +578,7 @@ especializada como <a href="#id7"><span class="problematic" id="id8">HikariCP_</
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a href="#id9"><span class="problematic" id="id10">HikariCP_</span></a>,
+<p>Para el caso particular de usar una base de datos <em>SQLite</em> en memoria con <a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>,
 la ruta debe ser <code class="file docutils literal notranslate"><span class="pre">file::memory:?cache=shared</span></code> y no simplemente
 <code class="file docutils literal notranslate"><span class="pre">:memory:</span></code>.</p>
 </div>
@@ -591,7 +591,7 @@ conviene que, al crear un programa, afinemos y abstraigamos al resto de la
 aplicación de cómo se crea el <em>pool</em> encerrado toda la lógica en una clase como
 <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a>.</p>
 <p>La clase sigue el patrón ya ensayado para <a class="reference internal" href="03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>: un <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">patrón Multiton</a> que asocia a cada <em>pool</em> de
-conexiones una clave<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+conexiones una clave<a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pool de conexiones de una base SQLite en memoria.</span>
 <span class="hll"><span class="k">try</span><span class="p">(</span><span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;BD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:file::memory:?cache=shared&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">   </span><span class="n">DataSource</span><span class="w"> </span><span class="n">ds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getDataSource</span><span class="p">();</span>
@@ -608,7 +608,7 @@ conexiones una clave<a class="footnote-reference brackets" href="#id4" id="id2" 
 siempre que no se haya cerrado.</p>
 <p>Ahora bien, ¿cómo obtiene esta clase un objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>? Cuando el
 desarrollador no se preocupa de ello, como es el caso, la clase intenta usar
-<a href="#id11"><span class="problematic" id="id12">HikariCP_</span></a><a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, porque la creación anterior es equivalente a haber añadido un
+<a class="reference external" href="https://github.com/brettwooldridge/HikariCP">HikariCP</a><a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, porque la creación anterior es equivalente a haber añadido un
 cuarto argumento al metodo <code class="docutils literal notranslate"><span class="pre">create</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Fábrica de objetos DataSource que usa HikariCP.</span>
 <span class="c1">// Opcionalmente se le puede pasar como argumento</span>
@@ -666,7 +666,7 @@ conexión que necesitamos.</p>
 <span class="hll"><span class="w">      </span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()</span>
 </span><span class="w">   </span><span class="p">));</span>
 
-<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span><span class="w"> </span><span class="c1">// También puede obtenerse con la clave &#39;DB&#39;</span>
+<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span>
 
 <span class="w">   </span><span class="c1">// Usamos conexiones gestionadas por el gestor</span>
 <span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -700,15 +700,15 @@ nombre lo registramos. Es el caso de <code class="docutils literal notranslate">
 <p class="admonition-title">Advertencia</p>
 <p>Las clases <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/JdbcConnection.java">JdbcConnection</a> y <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-jdbc/src/main/java/edu/acceso/sqlutils/jdbc/tx/TransactionManager.java">TransactionManager</a> son independientes y puede
 usarse una sin necesidad de utilizar la otra, pero están pensadas para usarse
-conjuntamente. Por eso, cuando cuando existe el gestor de transacciones
+conjuntamente. Por eso, cuando existe el gestor de transacciones
 correspondiente, el método <code class="docutils literal notranslate"><span class="pre">getDataSource()</span></code> genera un mensaje advirtiendo
 de que es conveniente manejar las conexiones a través del gestor, que para
 eso se ha creado.</p>
 </div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Al método sólo se le proporciona la <abbr title="Uniform Resource Locator">URL</abbr>, porque usamos <em>SQLite</em> como
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Si fuera otro como <em>MySQL</em>, tendríamos también que proporcionar un
 usuario y una contraseña. Por otro lado, en el caso particular de <em>SQLite</em>
@@ -717,8 +717,8 @@ que de lo contrario cada conexión que devuelva el <em>pool</em> será una base 
 datos distinta en memoria. Con una base de datos persistente, no habría sido
 necesario.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Pero tendremos que haber cargado el módulo <code class="docutils literal notranslate"><span class="pre">sqlutils-hikaricp</span></code> en las
 dependencias del proyecto. En ese módulo hay una clase denominada
 <a class="reference external" href="https://github.com/sio2sio2/sqlutils/blob/main/sqlutils-hikaricp/src/main/java/edu/acceso/sqlutils/hikari/HikariCPFactory.java">HikariCPFactory</a>
@@ -777,7 +777,7 @@ que implementa la interfaz <a class="reference external" href="https://github.co
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creacion-del-gestor">4.4.1. Creación del gestor</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gestor-integrado">4.4.1.1. Gestor integrado</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.4.1.2. HikariCP</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hikaricp">4.4.1.2. HikariCP</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gestion-avanzada">4.4.2. Gestión avanzada</a></li>

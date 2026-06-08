@@ -88,10 +88,15 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:
 
 .. admonition:: Aclaración
 
-   Esta interfaz no tiene por qué ser definida exactamente así: podría definirse
-   otra que satisfaga también la obligación de implementar las cuatro operaciones
-   básicas. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
-   podrían devolverlas en forma de |Stream| en vez de |List|.
+   El único requisito que debe cumnplir la interfaz es que realice las operaciones |CRUD|,
+   por lo que podríamos haberla definido de otra manera y seguiría siendo
+   válida. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
+   podrían devolverse en forma de |Stream| en vez de |List|.
+
+   Además, hemos introducido la excepción definida en ``sqlutils-core`` llamada
+   ``DataAccessException`` para abstraernos de cuál sea la excepción que
+   devuelve la librería particular que usemos para el acceso a datos, la cual en
+   el caso de |JDBC| será muy probablemente |SQLException|.
 
 Como puede verse, tanto las definiciones de las clases como la interfaz
 son independientes de cuál sea el soporte de almacenamiento y responden las
@@ -314,13 +319,20 @@ operación *delete* se escribiría así:
       });
    }
 
-La ventaja de escribir la operación de este modo, es que tenemos acceso a todo
-el contexto de la transacción, incluidos los observadores que hubiéramos podido
-definir. ¿Implica algo abrir la transacción en la implementación de la
-operación? Sí, sí implica algo: comodidad. Ya no es necesario declarar
-explícitamente la transacción cuando sólo está constituida por una operación.
-Además, cuando esté constituida por varias, no habrá problemas, ya que nuestro
-gestor de transacción soporta anidación de transacciones.
+Tenemos un par de ventajas al escribir la operación con este estilo funcional y no
+como lo hicimos anteriormente:
+
+a. Tenemos acceso a todo el contexto de la transacción, incluidos los
+   observadores que hubiéramos podido definir.
+#. No necesitamos capturar las excepciones |SQLException|, porque ya se encarga
+   la librería de convertir todas a ``DataAccessException``.
+#. Invocar al objeto |DAO| para realizar la operación implica abrir forzosamente
+   una transacción, por lo que sólo será necesario abrir explícitamente una cuando
+   la transacción esté constituida por varias operaciones. ¿Y hay algún problema
+   para juntar varias en una transacción? Ninguno, porque nuestra librería
+   soporta el anidamiento de transacciones.
+
+Sabido todo esto, rematemos la escritura de las clases.
 
 .. literalinclude:: files/Conexion.java
    :language: java
@@ -332,8 +344,8 @@ gestor de transacción soporta anidación de transacciones.
 .. attention:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
    necesario. Esta que se muestra aquí es una simplificación.
 
-Con estos mimbres, ya podemos rematar nuestro patrón |DAO|, puesto que la conexión
-que necesitamos, podremos obtenerla de la clase ``Conexion``.
+Ahora usemos esta clase para definir la clase |DAO| que implementa las
+operaciones |CRUD| con la entidad *Centro*:
 
 .. literalinclude:: files/CentroSqlDao.java
    :language: java

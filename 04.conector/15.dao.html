@@ -635,10 +635,14 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:</p>
 </div>
 <div class="admonition-aclaracion admonition">
 <p class="admonition-title">Aclaración</p>
-<p>Esta interfaz no tiene por qué ser definida exactamente así: podría definirse
-otra que satisfaga también la obligación de implementar las cuatro operaciones
-básicas. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
-podrían devolverlas en forma de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
+<p>El único requisito que debe cumnplir la interfaz es que realice las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>,
+por lo que podríamos haberla definido de otra manera y seguiría siendo
+válida. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
+podrían devolverse en forma de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
+<p>Además, hemos introducido la excepción definida en <code class="docutils literal notranslate"><span class="pre">sqlutils-core</span></code> llamada
+<code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code> para abstraernos de cuál sea la excepción que
+devuelve la librería particular que usemos para el acceso a datos, la cual en
+el caso de <abbr title="Java DataBase Connectivity">JDBC</abbr> será muy probablemente <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a>.</p>
 </div>
 <p>Como puede verse, tanto las definiciones de las clases como la interfaz
 son independientes de cuál sea el soporte de almacenamiento y responden las
@@ -856,13 +860,20 @@ operación <em>delete</em> se escribiría así:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>La ventaja de escribir la operación de este modo, es que tenemos acceso a todo
-el contexto de la transacción, incluidos los observadores que hubiéramos podido
-definir. ¿Implica algo abrir la transacción en la implementación de la
-operación? Sí, sí implica algo: comodidad. Ya no es necesario declarar
-explícitamente la transacción cuando sólo está constituida por una operación.
-Además, cuando esté constituida por varias, no habrá problemas, ya que nuestro
-gestor de transacción soporta anidación de transacciones.</p>
+<p>Tenemos un par de ventajas al escribir la operación con este estilo funcional y no
+como lo hicimos anteriormente:</p>
+<ol class="loweralpha simple">
+<li><p>Tenemos acceso a todo el contexto de la transacción, incluidos los
+observadores que hubiéramos podido definir.</p></li>
+<li><p>No necesitamos capturar las excepciones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a>, porque ya se encarga
+la librería de convertir todas a <code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code>.</p></li>
+<li><p>Invocar al objeto <abbr title="Data Access Object">DAO</abbr> para realizar la operación implica abrir forzosamente
+una transacción, por lo que sólo será necesario abrir explícitamente una cuando
+la transacción esté constituida por varias operaciones. ¿Y hay algún problema
+para juntar varias en una transacción? Ninguno, porque nuestra librería
+soporta el anidamiento de transacciones.</p></li>
+</ol>
+<p>Sabido todo esto, rematemos la escritura de las clases.</p>
 <div class="literal-block-wrapper docutils container" id="clase-conexion">
 <div class="code-block-caption"><span class="caption-text">Conexion.java (<a class="reference download internal" download="" href="../_downloads/f8ae5864257f3cd519a772840cec69c8/Conexion.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-conexion" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
@@ -999,8 +1010,8 @@ gestor de transacción soporta anidación de transacciones.</p>
 <p>En <a class="reference external" href="https://github.com/josem-dam/TestDAO">TestDAO</a> la clase implementa el patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a>, aun no siendo
 necesario. Esta que se muestra aquí es una simplificación.</p>
 </div>
-<p>Con estos mimbres, ya podemos rematar nuestro patrón <abbr title="Data Access Object">DAO</abbr>, puesto que la conexión
-que necesitamos, podremos obtenerla de la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code>.</p>
+<p>Ahora usemos esta clase para definir la clase <abbr title="Data Access Object">DAO</abbr> que implementa las
+operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entidad <em>Centro</em>:</p>
 <div class="literal-block-wrapper docutils container" id="clase-centrosqldao">
 <div class="code-block-caption"><span class="caption-text">CentroSqlDao.java</span><a class="headerlink" href="#clase-centrosqldao" title="Link to this code">#</a></div>
 <div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>

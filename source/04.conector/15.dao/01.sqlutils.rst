@@ -1,0 +1,288 @@
+.. _conn-dao-sqlutils:
+
+sqlutils
+========
+Una primera posibilidad para gestionar de forma eficiente la conexión y soportar
+transacciones, ya la hemos visto: echar mano de
+nuestro :ref:`gestor de transacciones <conn-transaction-manager>`: soporta
+múltiples bases de datos (asociando una clave a cada uno de ellos) y múltiples
+hilos (por si realizamos programación concurrente). Además, lo programamos de
+modo que la conexión que ofrece está protegida contra cierres manuales, ya que
+es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
+el problema y complementar este patrón |DAO| nos basta con usar en ``Conexion`` 
+un |JdbcConnection| con su |TransactionManager| correspondiente.
+
+Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
+establezca la conexión gracias a un |JdbcConnection| con |TransactionManager|.
+Si se obra así, la obtención en ``Conexion`` del |Connection| que requiere la
+operación |SQL| puede hacerse así:
+
+.. code-block:: java
+
+   /**
+    * Devuelve la conexión asociada a la transacción activa.
+    * @return La conexión solicitada protegida contra cierres
+    * @throws IllegalStateException Si la conexión ya está cerrada o no hay conexión activa.
+    */
+   public Connection getConnection() {
+      // .isOpen() es un método de Conexion que hemos definido también.
+      if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
+      // jc es el objeto JdbcConnection que se encarga de abrir y utilizar Conexion.
+      return jc.getTransactionManager().getHandle();
+   }
+
+De esto modo, si ya hay una transacción abierta, ``Conexion`` y, en
+consecuencia, los objetos |DAO|, dispondrán de una conexión protegida contra
+cierres que no necesitan gestionar: simplemente la obtienen gracias al :ref:`código
+simple que propusimos al tratar el patrón DAO <met-connection>`. Eso sí, si conservamos
+tal cual el :ref:`código propuesto para delete <dao-delete>`, necesitaremos
+abrir explícitamente siempre una transacción.  Por ejemplo, para implementar el
+método ``.borrarCentro(Centro centro)`` en ``AppService`` tendremos que hacer
+esto:
+
+.. code-block:: java
+
+   /**
+    * Elimina un centro de la base de datos.
+    * @param centro El centro que desea ser borrado.
+    */
+   public void borrarCentro(Centro centro) {
+      // Suponemos que en Conexion hemos definido cómo crear DAOs y transacciones
+      // Véase más adelante el código de Conexion
+      cx.transaction(ctxt -> {
+         var centroDao = cx.getDao(Centro.class);
+         centroDao.delete(centro.getId());
+      });
+   }
+
+Esta es una muy buena (y muy cómoda) solución. Sin embargo, podemos simplificar
+todo aún más una vez que hemos decidido usar nuestro gestor de transacciones.
+¿Cómo? Simplemente, utilizando en los propios |DAO| también el mecanismo que
+ideamos para abrir transacciones con el gestor, en vez de intentar reproducir
+fielmente la forma básica de operar con |JDBC|. Siguiendo este camino la
+operación *delete* se escribiría así:
+
+.. code-block:: java
+   :emphasize-lines: 6
+   :name: dao-delete-trans
+
+   @Override
+   public void delete(Long id) {
+      String sqlString = "DELETE FROM Centro WHERE id = ?";
+
+      // cx es el objeto Conexion al que tiene acceso el objeto DAO.
+      cx.transaction(ctxt -> {
+         Connection conn = ctxt.handle();
+         LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+
+         try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
+             pstmt.setLong(1, id);
+             boolean deleted = pstmt.executeUpdate() > 0;
+             if(deleted) {
+                 lm.sendMessage(
+                     getClass(),
+                     Level.DEBUG,
+                     "Borrado el centro con ID=%s".formatted(id),
+                     "Transacción fallida: no llega a borrarse el centro con ID=%s".formatted(id)
+                 );
+             } else {
+                logger.debug("Borrado fallido: el centro con ID={} no existe", id);
+             }
+         }
+      });
+   }
+
+Tenemos un par de ventajas al escribir la operación con este estilo funcional y no
+como lo hicimos anteriormente:
+
+a. Tenemos acceso a todo el contexto de la transacción, incluidos los
+   observadores que hubiéramos podido definir.
+#. No necesitamos capturar las excepciones |SQLException|, porque ya se encarga
+   la librería de convertir todas a la excepción no protegida ``DataAccessException``.
+#. Invocar al objeto |DAO| para realizar la operación implica abrir forzosamente
+   una transacción, por lo que sólo será necesario abrir explícitamente una cuando
+   la transacción esté constituida por varias operaciones. ¿Y hay algún problema
+   para juntar varias en una transacción? Ninguno, porque nuestra librería
+   soporta el anidamiento de transacciones.
+
+Sabido todo esto, rematemos la escritura de las clases.
+
+.. literalinclude:: files/Conexion.java
+   :language: java
+   :class: toggle
+   :name: clase-conexion
+   :caption: Conexion.java (:download:`descarga <files/Conexion.java>`)
+   :start-at: /**
+
+.. attention:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
+   necesario. Esta que se muestra aquí es una simplificación.
+
+Ahora usemos esta clase para definir la clase |DAO| que implementa las
+operaciones |CRUD| con la entidad *Centro*:
+
+.. literalinclude:: files/CentroSqlDao.java
+   :language: java
+   :class: toggle
+   :name: clase-centrosqldao
+   :caption: CentroSqlDao.java
+   :start-at: /**
+
+.. note:: Como la clase es tan sencilla (también la relativa a ``Estudiante``),
+   usa |SQL| estándar y, por consiguiente, el código no depende del |SGBD|
+   particular. Por eso hemos elegido nombres que hacen referencia a |SQL| y
+   no a :program:`SQLite`.
+
+``EstudianteSqlDao`` se implementará de modo análogo.
+
+Por último, es necesario implementar una clase de servicio que utilice los
+objetos |DAO| e implemente las operaciones que necesita la aplicación:
+
+.. literalinclude:: files/AppService.java
+   :language: java
+   :class: toggle
+   :name: clase-appservice
+   :caption: AppService.java
+   :start-at: /**
+
+Finalmente, hay un último detalle. Al cargar un estudiante, la relación exige
+que se obtenga también el centro en el que está matriculado. Esta carga podría
+ser perezosa o inmediata. En nuestro caso, la carga es inmediata, ya que la
+perezosa implicaría la necesidad de implementar un *proxy* que permitiera
+diferir la carga hasta el momento en que se pidiera de manera efectiva en
+centro.
+
+Además, la carga inmediata la hemos hecho mediante un JOIN y no mediante un
+segundo *SELECT*.
+
+Aún podemos dar una vuelta de tuerca. La definición de las clases |DAO| es muy
+tediosa, puesto que hay mucho código repetitivo en ellas. Para paliarlo, la
+librería facilita una clase SqlAssistant_ que simplifica mucho la codificación
+de las operaciones. Para usarla es necesario, crear el |JdbcConnection| con
+soporte:
+
+.. code-block:: java
+   :emphasize-lines: 1-9, 15
+
+   // La configuración del asistente indica cómo se quieren registrar los mensajes.
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig((ctxt, message, notCommittedMassage) -> {
+      LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+      lm.sendMessage(
+          getClass(),
+          Level.DEBUG,
+          message,
+          errorMessage
+      );
+   });
+
+   // Sin especificar configuración para el asistente, el nivel es TRACE.
+   // También puede definirse el nivel como null para deshabilitar los registros.
+   JdbcConnection jc = JdbcConnection.create(key, dbUrl, user, password)
+               .withTransactionManager(Map.of(LoggingManager.KEY, new LoggingManager()));
+               .withSqlAssistant(sqlConfig);
+
+La configuración del asistente define cómo se quieren mandar mensajes al
+registro. Pueden deshabilitarse no proporcionando argumentos:
+
+.. code-block:: java
+
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig();
+
+o, simplemente, indicar un nivel para los mensajes:
+
+.. code-block:: java
+
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig(Level.DEBUG);
+
+En este segundo caso, los mensajes se enviarán al nivel ``DEBUG`` del registro,
+pero al no haber especificado cómo diferirlos, ya que no se ha proporcionado una
+expresión lambda que indique el modo, podrán aparecer mensajes equívocos en
+transacciones constituidas por varias operaciones que han debido anularse al
+fallar una de ellas.
+
+Con ello, podemos usar el asistente para realizar operaciones. El borrado, por
+ejemplo, podría hacerse así:
+
+.. code-block:: java
+   :emphasize-lines: 4
+
+   String sqlString = "DELETE FROM Centro WHERE id = ?";
+
+   // Los parámetros de la sentencia se pasan como argumentos.
+   jc.getSqlAssistant().execute(sqlString, 11004866L);
+
+Si volvemos al patrón |DAO| que hemos estado desarrollando y suponiendo que al
+crear dentro de ``Conexion`` hemos añadido la creación del asistente, podemos
+añadir un método a ``Conexion`` que lo devuelva (ya que el objeto no expone
+directamente el ``JdbcConnection``):
+
+.. code-block:: java
+
+   public SqlAssistant getSqlAssistant() {
+      return jc.getSqlAssistant();
+   }
+
+De este modo, podremos redefinir los objetos |DAO| usando el asistente en vez de
+escribir el repetitivo código |JDBC|:
+
+.. code-block:: java
+
+   public void delete(Long id) {
+      String sqlString = "DELETE FROM Centro WHERE id = ?";
+      cx.getSqlAssistant().execute(sqlString, id);
+   }
+
+.. tip:: Los mensajes de registro que puede escribir el asistente son vagos, ya
+   que éste se limita a ejecutar la sentencia sin saber realmente qué está
+   haciendo. Por tanto, no podrá decir "*Borrado el centro, etc.*", porque ni
+   siquiera sabe que está borrando, sino indicarnos, simplemente, que se ha
+   completado (o no) la operación. Podemos suplir esta carencia deshabilitando
+   que el asistente escriba registros y definiendo nosotros mismos los mensajes
+   al definir la operación:
+
+   .. code-block:: java
+
+      public void delete(Long id) {
+         String sqlString = "DELETE FROM Centro WHERE id = ?";
+
+         cx.transaction(ctxt -> {
+            LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+
+            try {
+               cx.getSqlAssistant().execute(sqlString, id);
+               lm.sendMessage(
+                  getClass(),
+                  Level.DEBUG,
+                  "Borrado el centro con ID=%".formatted(id),
+                  "Transacción fallida: imposible borrar el centro con ID=%".formatted(id)
+               );
+            } catch(DataAccessException e) {
+               logger.error("Error al intentar borrar el centro {con ID=} [{}]", id, e.getMessage());
+               throw e;
+            }
+         });
+      }
+
+El asistente dispone de varios métodos para facilitar las operaciones inspirados
+en la sintaxis de :ref:`Spring <jdbc-spring>`. Puede consultar la documentación
+de SqlAssistant_ y, como ejemplo de uso, las clases |DAO| definidas en el código
+fuente de TestDAO_
+
+.. note:: La librería sqlutils_ implementa, además, una suerte de |ORM| muy
+   básico como prueba de concepto. Para ello sí se ha implementado la
+   posibilidad de usar carga perezosa y puede echarse un ojo al código para
+   hacerse una idea de cómo puede lograrse.
+
+.. |JdbcConnection| replace:: :ref:`JdbcConnection <conn-pool-extra>`
+.. |TransactionManager| replace:: :ref:`TransactionManager <conn-transaction-manager>`
+.. |DAO| replace:: :abbr:`DAO (Data Access Object)`
+.. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
+.. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |Connection| replace:: :java-sql:`Connection <Connection>`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |SGBD| replace:: :abbr:`SGBD (Sistema Gestor de Bases de Datos)`
+.. |SQLException| replace:: :java-sql:`SQLException <SQLException>`
+
+.. _TestDAO: https://github.com/josem-dam/TestDAO
+.. _Multiton: https://en.wikipedia.org/wiki/Multiton
+.. _SqlAssistant: https://sio2sio2.github.io/sqlutils/edu/acceso/sqlutils/jdbc/SqlAssistant.html

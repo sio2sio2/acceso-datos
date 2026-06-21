@@ -67,7 +67,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public Optional<Centro> get(Long id) throws DataAccessException {
+    public Optional<Centro> get(Long id) {
         String sqlString = "SELECT * FROM Centro WHERE id = ?";
 
         return cx.transactionR(ctxt -> {
@@ -89,7 +89,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public List<Centro> get() throws DataAccessException {
+    public List<Centro> get() {
         String sqlString = "SELECT * FROM Centro";
 
         return cx.transactionR(ctxt -> {
@@ -109,7 +109,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public void delete(Long id) throws DataAccessException {
+    public void delete(Long id) {
         String sqlString = "DELETE FROM Centro WHERE id = ?";
 
         cx.transaction(ctxt -> {
@@ -133,7 +133,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public void insert(Centro centro) throws DataAccessException {
+    public void insert(Centro centro) {
         String sqlString = "INSERT INTO Centro (nombre, titularidad, id) VALUES (?, ?, ?)";
 
         cx.transaction(ctxt -> {
@@ -157,7 +157,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public void update(Centro centro) throws DataAccessException {
+    public void update(Centro centro) {
         String sqlString = "UPDATE Centro SET nombre = ?, titularidad = ? WHERE id = ?";
 
         cx.transaction(ctxt -> {
@@ -181,7 +181,7 @@ public class CentroSqlDao implements Crud<Centro> {
     }
 
     @Override
-    public void update(Long oldId, Long newId) throws DataAccessException {
+    public void update(Long oldId, Long newId) {
         String sqlString = "UPDATE Centro SET id_centro = ? WHERE id_centro = ?";
 
         cx.transaction(ctxt -> {

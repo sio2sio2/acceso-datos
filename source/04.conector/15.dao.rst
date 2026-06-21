@@ -1,7 +1,7 @@
 .. _conn-prog:
 
-Estrategia de programación
-**************************
+Estrategia de diseño
+********************
 Como se ha podido ver hasta aquí, el acceso de una aplicación a una base de
 datos relacional es relativamente sencillo y medianamente semejante sea cual
 sea el lenguaje de programación y el |SGBD|. Por tanto, el usar de modo básico
@@ -88,15 +88,16 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:
 
 .. admonition:: Aclaración
 
-   El único requisito que debe cumnplir la interfaz es que realice las operaciones |CRUD|,
+   El único requisito que debe cumplir la interfaz es que realice las operaciones |CRUD|,
    por lo que podríamos haberla definido de otra manera y seguiría siendo
    válida. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
    podrían devolverse en forma de |Stream| en vez de |List|.
 
-   Además, hemos introducido la excepción definida en ``sqlutils-core`` llamada
-   ``DataAccessException`` para abstraernos de cuál sea la excepción que
-   devuelve la librería particular que usemos para el acceso a datos, la cual en
-   el caso de |JDBC| será muy probablemente |SQLException|.
+   Además, no hemos significado que las operaciones |CRUD| generen excepciones y
+   téngase presente que en el acceso a bases de datos pueden producirse. De
+   hecho, |JDBC| genera excepciones |SQLException|.  Esto no es debido a que
+   pretendamos eliminar las excepciones, sino a que nuestra intención es
+   reconvertilas a excepciones no protegidas para mayor versatilidad\ [#]_.
 
 Como puede verse, tanto las definiciones de las clases como la interfaz
 son independientes de cuál sea el soporte de almacenamiento y responden las
@@ -114,7 +115,7 @@ persistencia. Necesitamos, en principio, cuatro clases:
 a. Una clase (``Conexion``) que abstraiga de la creación y uso del
    pool de conexiones. Recordemos que ya hemos discutido sobre cómo afinar esto
    :ref:`dentro del epígrafe anterior <conn-pool-extra>`.
-#. Dos clases |DAO|: una implemente las operaciones |CRUD| para ``Centro``, y otra
+#. Dos clases |DAO|: una que implemente las operaciones |CRUD| para ``Centro``, y otra
    que haga lo propio para ``Estudiante``.
 #. Una clase de servicio (``AppService``) que utilice los objetos |DAO| para
    definir los métodos de acceso a datos que necesita la aplicación.
@@ -143,7 +144,7 @@ bajo epígrafes anteriores. Por ejemplo:
    :name: dao-delete
 
    @Override
-   public void delete(Long id) throws DataAccessException {
+   public void delete(Long id) {
       String sqlString = "DELETE FROM Centro WHERE id = ?";
 
       try(Connection conn = getConnection()) {
@@ -183,47 +184,28 @@ realmente en lo que se ha dejado de hacer:
 + Lo realmente complicado no está resuelto: el método ``getConnection()``. ¿Cómo
   obtenemos la conexión?
 
-Analicemos esto segundo. Ya hemos indicado que la forma de acceder a la base de
-datos es mediante un objeto ``Conexion``. Por tanto, en la construcción de los
-objetos |DAO| pasaremos este objeto y gracias a él el |DAO| será capaz de
-obtener conexiones.  Tenemos dos alternativas:
+Analicemos esto segundo. Pongamos que obtenemos la conexión del objeto
+``Conexion`` lo cual no es descabellado, ya que hemos creado esta clase para
+modelar el acceso a la base de datos:
 
-1. ``Conexion`` ofrece un |DataSource|, por lo que:
+.. code-block:: java
+   :name: met-connection
 
-   .. code-block:: java
+   private Connection getConnection() {
+      return cx.getConnection();
+   }
 
-      private Connection getConnection() {
-         // cx es el objeto Conexion
-         return cx.getDataSource().getConnection();
-      }
+Es obvio que no hemos resuelto nada: nos hemos limitado a trasladar el problema
+a la clase ``Conexion``. Si lo resolvemos de un modo trivial: ``Conexion`` crea
+un *pool* de conexiones, el cual nos proporciona un objeto ``DataSource`` y,
+a partir de este, obtenemos las conexiones, nos encontraremos con una limitación
+gravísima: como cada operación tiene asociada una conexiones que abrimos y cerramos,
+no **podremos construir transacciones constituidas por varias operaciones**, lo
+cual es inaceptable.
 
-   En este caso, el |Connection| recibido es una conexión que se usa
-   exclusivmente en la operación |CRUD| (*delete*), puesto que tal como está
-   escrito el código de la operación, la conexión se abre y se cierra. Esto
-   tiene un inconveniente: es imposible que se comparta con otra operación
-   |CRUD|, por lo que nunca podremos construir transacciones que involucren
-   varias operaciones.  No tener soporte para transacciones es inasumible.
-
-#. ``Conexion`` ofrece un |Connection|, por lo que:
-
-   .. code-block:: java
-
-      private Connection getConnection() {
-         return cx.getConnection();
-      }
-
-   En este caso, el objeto |Connection| nos lo proporciona ``Conexion`` y
-   dependiendo de cómo se haya implementado allí, tendremos o no la limitación
-   de no poder hacer transacciones de varias operaciones.
-   Por ejemplo, si en ``Conexion`` nos limitáramos a usar un
-   |DataSource| para obtener el |Connection| sí existiría la limitación
-   anterior, que era inaceptable. Podríamos optar por soluciones más
-   sofisticadas que generar un *proxy* que no se cierra\ [#]_, para soslayar la
-   limitación de no soportar transacciones, pero inevitablemente tendríamos que
-   gestionar cuándo se abren y cierran conexiones, lo cual es un engorro que
-   tiene a los fallos.
-
-Como se ve todo es o muy limitado o excesivamente complicado.
+Podríamos modificar las operaciones CRUD para no cerrar la conexiones. Esto
+sería una solución a la limitación anterior, pero nos obligaría a gestionar
+manualmente el cierre de las operaciones, lo cual es propenso a errores.
 
 .. admonition:: Apunte didáctico
 
@@ -231,160 +213,14 @@ Como se ve todo es o muy limitado o excesivamente complicado.
    que use |DriverManager| o un *pool* manual para ver en concreto estos
    problemas planteados.
 
-Afortunadamente, la solución al problema de gestionar la conexión ya la tenemos:
-nuestro :ref:`gestor de transacciones <conn-transaction-manager>`: soporta
-múltiples bases de datos (asociando una clave a cada uno de ellos) y múltiples
-hilos (por si realizamos programación concurrente). Además, lo programamos de
-modo que la conexión que ofrece está protegida contra cierres manuales, ya que
-es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
-el problema y complementar este patrón nos basta con usar en ``Connection`` un
-|JdbcConnection| con su |TransactionManager| correspondiente.
+Lo suyo es recurrir a soluciones más sofisticadas que nos permitan soportar
+transacciones a la vez que nos faciliten la codificación. Vamos a ello:
 
-Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
-establezca la conexión gracias a un |JdbcConnection| con |TransactionManager|.
-Si se obrara así, la obtención del |Connection| en ``Conexion`` podría ser así:
+.. toctree::
+   :maxdepth: 1
+   :glob:
 
-.. code-block:: java
-
-   /**
-    * Devuelve la conexión asociada a la transacción activa.
-    * @return La conexión solicitada protegida contra cierres
-    * @throws IllegalStateException Si la conexión ya está cerrada o no hay conexión activa.
-    */
-   public Connection getConnection() {
-      // .isOpen() es un método de Conexion que hemos definido también.
-      if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      // jc es el objeto JdbcConnection que usa Conexion.
-      return jc.getTransactionManager().getHandle();
-   }
-
-De esto modo, si ya hay una transacción abierta, ``Conexion`` y, en
-consecuencia, los objetos DAO, dispondrán de una conexión protegida contra
-cierres que no necesitan gestionar: simplemente la usan utilizando exactamente
-el código que propusimos más arriba para la operación *delete*. Eso sí, para
-cualquier operación necesitaremos abrir explícitamente siempre una transacción.
-Por ejemplo, para implementar el método ``.borrarCentro(Centro centro)`` en
-``AppService`` tendremos que hacer esto:
-
-.. code-block:: java
-
-   /**
-    * Elimina un centro de la base de datos.
-    * @param centro El centro que desea ser borrado.
-    * @throws DataAccessException Si ocurre un error al realizar la operación.
-    */
-   public void borrarCentro(Centro centro) {
-      // Suponemos que en Conexion hemos definido cómo crear DAOs y transacciones
-      // Véase más adelante el código de Conexion
-      cx.transaction(ctxt -> {
-         var centroDao = cx.getDao(Centro.class);
-         centroDao.delete(centro.getId());
-      });
-   }
-
-Esta es una muy buena (y muy cómoda) solución. Sin embargo, podemos simplificar
-todo aún más una vez que hemos decidido usar nuestro gestor de transacciones.
-¿Cómo? Simplemente, utilizando en los propios |DAO| también el mecanismo que
-ideamos para abrir transacciones con el gestor, en vez de intentar reproducir
-fielmente la forma básica de operar con |JDBC|. Siguiendo este camino la
-operación *delete* se escribiría así:
-
-.. code-block:: java
-   :emphasize-lines: 6
-   :name: dao-delete-trans
-
-   @Override
-   public void delete(Long id) throws DataAccessException {
-      String sqlString = "DELETE FROM Centro WHERE id = ?";
-
-      // cx es el objeto Conexion al que tiene acceso el objeto DAO.
-      cx.transaction(ctxt -> {
-         Connection conn = ctxt.handle();
-         LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
-
-         try(PreparedStatement pstmt = conn.prepareStatement(sqlString)) {
-             pstmt.setLong(1, id);
-             boolean deleted = pstmt.executeUpdate() > 0;
-             if(deleted) {
-                 lm.sendMessage(
-                     getClass(),
-                     Level.DEBUG,
-                     "Borrado el centro con ID=%s".formatted(id),
-                     "Transacción fallida: no llega a borrarse el centro con ID=%s".formatted(id)
-                 );
-             } else {
-                logger.debug("Borrado fallido: el centro con ID={} no existe", id);
-             }
-         }
-      });
-   }
-
-Tenemos un par de ventajas al escribir la operación con este estilo funcional y no
-como lo hicimos anteriormente:
-
-a. Tenemos acceso a todo el contexto de la transacción, incluidos los
-   observadores que hubiéramos podido definir.
-#. No necesitamos capturar las excepciones |SQLException|, porque ya se encarga
-   la librería de convertir todas a ``DataAccessException``.
-#. Invocar al objeto |DAO| para realizar la operación implica abrir forzosamente
-   una transacción, por lo que sólo será necesario abrir explícitamente una cuando
-   la transacción esté constituida por varias operaciones. ¿Y hay algún problema
-   para juntar varias en una transacción? Ninguno, porque nuestra librería
-   soporta el anidamiento de transacciones.
-
-Sabido todo esto, rematemos la escritura de las clases.
-
-.. literalinclude:: files/Conexion.java
-   :language: java
-   :class: toggle
-   :name: clase-conexion
-   :caption: Conexion.java (:download:`descarga <files/Conexion.java>`)
-   :start-at: /**
-
-.. attention:: En TestDAO_ la clase implementa el patrón Multiton_, aun no siendo
-   necesario. Esta que se muestra aquí es una simplificación.
-
-Ahora usemos esta clase para definir la clase |DAO| que implementa las
-operaciones |CRUD| con la entidad *Centro*:
-
-.. literalinclude:: files/CentroSqlDao.java
-   :language: java
-   :class: toggle
-   :name: clase-centrosqldao
-   :caption: CentroSqlDao.java
-   :start-at: /**
-
-.. note:: Como la clase es tan sencilla (también la relativa a ``Estudiante``),
-   usa |SQL| estándar y, por consiguiente, el código no depende del |SGBD|
-   particular. Por eso hemos elegido nombres que hacen referencia a |SQL| y
-   no a :program:`SQLite`.
-
-``EstudianteSqlDao`` se implementará de modo análogo.
-
-Por último, es necesario implementar una clase de servicio que utilice los
-objetos |DAO| e implemente las operaciones que necesita la aplicación:
-
-.. literalinclude:: files/AppService.java
-   :language: java
-   :class: toggle
-   :name: clase-appservice
-   :caption: AppService.java
-   :start-at: /**
-
-Finalmente, hay un último detalle. Al cargar un estudiante, la relación exige
-que se obtenga también el centro en el que está matriculado. Esta carga podría
-ser perezosa o inmediata. En nuestro caso, la carga es inmediata, ya que la
-perezosa implicaría la necesidad de implementar un *proxy* que permitiera
-diferir la carga hasta el momento en que se pidiera de manera efectiva en
-centro.
-
-Además, la carga inmediata la hemos hecho mediante un JOIN y no mediante un
-segundo *SELECT*.
-
-.. note:: La librería sqlutils_ implementa, además, una suerte de |ORM| muy
-   básico como prueba de concepto. Para ello sí se ha implementado la
-   posibilidad de usar carga perezosa y puede echarse un ojo al código para
-   hacerse una idea de cómo puede lograrse.
+   15.dao/[0-9]*
 
 Conclusiones
 ============
@@ -406,17 +242,14 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 
 .. rubric:: Notas al pie
 
-.. [#] En realidad, esta es la gran dificultad.
+.. [#] En las dos alternativas que plantearemos más adelante, ocurre esto mismo:
+   ambas definen una excepción no protegida llamada ``DataAccessException``.
 
-.. [#] También podemos no cerrar la conexión en el código de la operación
-   y, en ese caso, ambas soluciones permitirán transacciones de varias
-   operaciones, pero implicarán la gestión manual de las transacciones.
+.. [#] En realidad, esta es la gran dificultad.
 
 .. _sqlutils: https://github.com/sio2sio2/sqlutils
 .. _Singleton: https://es.wikipedia.org/wiki/Singleton
-.. _Multiton: https://en.wikipedia.org/wiki/Multiton
 
-.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
 .. |DAO| replace:: :abbr:`DAO (Data Access Object)`
 .. |CRUD| replace:: :abbr:`CRUD (Create, Read, Update, Delete)`
@@ -425,14 +258,12 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
 .. |List| replace:: :java-util:`List <List>`
 .. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
 .. |URL| replace:: :abbr:`URL (Uniform Resource Locator)`
+.. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
 .. |DataSource| replace:: :javax-sql:`DataSource <DataSource>`
 .. |DriverManager| replace:: :java-sql:`DriverManager <DriverManager>`
 .. |Connection| replace:: :java-sql:`Connection <Connection>`
 .. |Statement| replace:: :java-sql:`Statement <Statement>`
 .. |SQLException| replace:: :java-sql:`SQLException <SQLException>`
 .. |Consumer| replace:: :java-function:`Consumer <Consumer>`
-.. |JdbcConnection| replace:: :ref:`JdbcConnection <conn-pool-extra>`
-.. |TransactionManager| replace:: :ref:`TransactionManager <conn-transaction-manager>`
 
 .. _God Class: https://linearb.io/blog/what-is-a-god-class
-.. _TestDAO: https://github.com/josem-dam/TestDAO

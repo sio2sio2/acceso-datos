@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.5. Estrategia de programación &#8212; documentación de Acceso a datos - rolling</title>
+    <title>4.5. Estrategia de diseño &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">4.5. Estrategia de programación</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">4.5. Estrategia de diseño</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="15.dao/01.sqlutils.html">4.5.1.1. sqlutils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="15.dao/05.spring.html">4.5.1.2. Spring</a></li>
 </ul>
@@ -375,7 +375,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Estrategia de programación</h1>
+    <h1>Estrategia de diseño</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -398,8 +398,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="estrategia-de-programacion">
-<span id="conn-prog"></span><h1><span class="section-number">4.5. </span>Estrategia de programación<a class="headerlink" href="#estrategia-de-programacion" title="Link to this heading">#</a></h1>
+  <section id="estrategia-de-diseno">
+<span id="conn-prog"></span><h1><span class="section-number">4.5. </span>Estrategia de diseño<a class="headerlink" href="#estrategia-de-diseno" title="Link to this heading">#</a></h1>
 <p>Como se ha podido ver hasta aquí, el acceso de una aplicación a una base de
 datos relacional es relativamente sencillo y medianamente semejante sea cual
 sea el lenguaje de programación y el <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr>. Por tanto, el usar de modo básico
@@ -563,74 +563,64 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:</p>
 <span class="cm">     * Obtiene una entidad a partir de su identificador.</span>
 <span class="cm">     * @param id Identificador de la entidad.</span>
 <span class="cm">     * @return La entidad requerida.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Obtiene la relación completa de entidades de un tipo.</span>
 <span class="cm">     * @return Una lista con todas las entidades.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">();</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Borra una entidad con un determinado identificador.</span>
 <span class="cm">     * @param id Identificador de la entidad.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Borra una entidad.</span>
 <span class="cm">     * @param obj La entidad que se quiere borrar.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso a los datos.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">delete</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Agrega una entidad a la base de datos.</span>
 <span class="cm">     * @param obj La entidad que se quiere agregar.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía una entidad con ese identificador.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">);</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Agrega una multitud de entidades de un determinado tipo a la base de datos.</span>
 <span class="cm">     * @param objs Las entidades a agregar.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía alguna de las entidades.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">:</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="n">insert</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Agrega un array de entidades a la base de datos.</span>
 <span class="cm">     * @param objs Las entidades a agregar.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso o ya existía alguna de las entidades.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="o">[]</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">T</span><span class="o">[]</span><span class="w"> </span><span class="n">objs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">       </span><span class="n">insert</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">objs</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Actualiza los campos de una entidad cuyo identificador no ha cambiado.</span>
 <span class="cm">     * @param obj La entidad con los valores actualizados.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">);</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Actualiza el identificador de una entidad.</span>
 <span class="cm">     * @param oldId El valor antiguo del identificador.</span>
 <span class="cm">     * @param newId El nuevo valor de identificador.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
 <span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Actualiza el identificador de una entidad.</span>
 <span class="cm">     * @param obj La entidad con el identificador sin actualizar. </span>
 <span class="cm">     * @param newId El nuevo valor de identificador.</span>
-<span class="cm">     * @throws DataAccessException Si hubo algún problema en el acceso.</span>
 <span class="cm">     */</span>
-<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -643,12 +633,11 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:</p>
 por lo que podríamos haberla definido de otra manera y seguiría siendo
 válida. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
 podrían devolverse en forma de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/stream/Stream.html">Stream</a> en vez de <a class="extlink-java-util reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/List.html">List</a>.</p>
-<p>Además, hemos introducido la excepción definida en <code class="docutils literal notranslate"><span class="pre">sqlutils-core</span></code> llamada
-<code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code> para abstraernos de cuál sea la excepción que
-devuelve la librería particular que usemos para el acceso a datos, la cual en
-el caso de <abbr title="Java DataBase Connectivity">JDBC</abbr> será muy probablemente <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a>. En cualquier caso,
-esta excepción no está protegida, por lo que podríamops habernos ahorrado su
-expresión.</p>
+<p>Además, no hemos significado que las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> generen excepciones y
+téngase presente que en el acceso a bases de datos pueden producirse. De
+hecho, <abbr title="Java DataBase Connectivity">JDBC</abbr> genera excepciones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a>.  Esto no es debido a que
+pretendamos eliminar las excepciones, sino a que nuestra intención es
+reconvertilas a excepciones no protegidas para mayor versatilidad<a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 </div>
 <p>Como puede verse, tanto las definiciones de las clases como la interfaz
 son independientes de cuál sea el soporte de almacenamiento y responden las
@@ -698,10 +687,10 @@ definir los métodos de acceso a datos que necesita la aplicación.</p></li>
 </div>
 <p>Si partiéramos de que tenemos un método <code class="docutils literal notranslate"><span class="pre">.getConnection()</span></code> en ambas clases
 <abbr title="Data Access Object">DAO</abbr> que nos proporciona una objeto <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> para realizar las operaciones
-<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, la implementación sería trivial, puesto que ya la hemos ensayado
+<abbr title="Create, Read, Update, Delete">CRUD</abbr><a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, la implementación sería trivial, puesto que ya la hemos ensayado
 bajo epígrafes anteriores. Por ejemplo:</p>
 <div class="highlight-java notranslate" id="dao-delete"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
-<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
 
 <span class="hll"><span class="w">   </span><span class="k">try</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getConnection</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -746,7 +735,7 @@ obtenemos la conexión?</p></li>
 <p>Analicemos esto segundo. Pongamos que obtenemos la conexión del objeto
 <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> lo cual no es descabellado, ya que hemos creado esta clase para
 modelar el acceso a la base de datos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-java notranslate" id="met-connection"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">cx</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
@@ -767,8 +756,8 @@ manualmente el cierre de las operaciones, lo cual es propenso a errores.</p>
 que use <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DriverManager.html">DriverManager</a> o un <em>pool</em> manual para ver en concreto estos
 problemas planteados.</p>
 </div>
-<p>Lo suyo es recurrir a soluciones más sofisticadas que nos faciliten la
-codificación.</p>
+<p>Lo suyo es recurrir a soluciones más sofisticadas que nos permitan soportar
+transacciones a la vez que nos faciliten la codificación. Vamos a ello:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="15.dao/01.sqlutils.html">4.5.1.1. sqlutils</a></li>
@@ -796,8 +785,13 @@ es más inteligente utilizarlas.</p></li>
 </ul>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id3" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>En las dos alternativas que plantearemos más adelante, ocurre esto mismo:
+ambas definen una excepción no protegida llamada <code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code>.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p>En realidad, esta es la gran dificultad.</p>
 </aside>
 </aside>

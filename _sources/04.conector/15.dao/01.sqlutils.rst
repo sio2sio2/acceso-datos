@@ -1,20 +1,21 @@
+.. _conn-dao-sqlutils:
+
 sqlutils
 ========
-
-.. todo:: REPASAR TODO ESTE APARTADO
-
-Afortunadamente, la solución al problema de gestionar la conexión ya la tenemos:
+Una primera posibilidad para gestionar de forma eficiente la conexión y soportar
+transacciones, ya la hemos visto: echar mano de
 nuestro :ref:`gestor de transacciones <conn-transaction-manager>`: soporta
 múltiples bases de datos (asociando una clave a cada uno de ellos) y múltiples
 hilos (por si realizamos programación concurrente). Además, lo programamos de
 modo que la conexión que ofrece está protegida contra cierres manuales, ya que
 es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
-el problema y complementar este patrón nos basta con usar en ``Connection`` un
-|JdbcConnection| con su |TransactionManager| correspondiente.
+el problema y complementar este patrón |DAO| nos basta con usar en ``Conexion`` 
+un |JdbcConnection| con su |TransactionManager| correspondiente.
 
 Así pues, la clase ``Conexion`` puede ser simplemente una clase *Singleton* que
 establezca la conexión gracias a un |JdbcConnection| con |TransactionManager|.
-Si se obrara así, la obtención del |Connection| en ``Conexion`` podría ser así:
+Si se obra así, la obtención en ``Conexion`` del |Connection| que requiere la
+operación |SQL| puede hacerse así:
 
 .. code-block:: java
 
@@ -26,24 +27,24 @@ Si se obrara así, la obtención del |Connection| en ``Conexion`` podría ser as
    public Connection getConnection() {
       // .isOpen() es un método de Conexion que hemos definido también.
       if(!isOpen()) throw new IllegalStateException("La conexión está cerrada");
-      // jc es el objeto JdbcConnection que usa Conexion.
+      // jc es el objeto JdbcConnection que se encarga de abrir y utilizar Conexion.
       return jc.getTransactionManager().getHandle();
    }
 
 De esto modo, si ya hay una transacción abierta, ``Conexion`` y, en
-consecuencia, los objetos DAO, dispondrán de una conexión protegida contra
-cierres que no necesitan gestionar: simplemente la usan utilizando exactamente
-el código que propusimos más arriba para la operación *delete*. Eso sí, para
-cualquier operación necesitaremos abrir explícitamente siempre una transacción.
-Por ejemplo, para implementar el método ``.borrarCentro(Centro centro)`` en
-``AppService`` tendremos que hacer esto:
+consecuencia, los objetos |DAO|, dispondrán de una conexión protegida contra
+cierres que no necesitan gestionar: simplemente la obtienen gracias al :ref:`código
+simple que propusimos al tratar el patrón DAO <met-connection>`. Eso sí, si conservamos
+tal cual el :ref:`código propuesto para delete <dao-delete>`, necesitaremos
+abrir explícitamente siempre una transacción.  Por ejemplo, para implementar el
+método ``.borrarCentro(Centro centro)`` en ``AppService`` tendremos que hacer
+esto:
 
 .. code-block:: java
 
    /**
     * Elimina un centro de la base de datos.
     * @param centro El centro que desea ser borrado.
-    * @throws DataAccessException Si ocurre un error al realizar la operación.
     */
    public void borrarCentro(Centro centro) {
       // Suponemos que en Conexion hemos definido cómo crear DAOs y transacciones
@@ -66,7 +67,7 @@ operación *delete* se escribiría así:
    :name: dao-delete-trans
 
    @Override
-   public void delete(Long id) throws DataAccessException {
+   public void delete(Long id) {
       String sqlString = "DELETE FROM Centro WHERE id = ?";
 
       // cx es el objeto Conexion al que tiene acceso el objeto DAO.
@@ -97,7 +98,7 @@ como lo hicimos anteriormente:
 a. Tenemos acceso a todo el contexto de la transacción, incluidos los
    observadores que hubiéramos podido definir.
 #. No necesitamos capturar las excepciones |SQLException|, porque ya se encarga
-   la librería de convertir todas a ``DataAccessException``.
+   la librería de convertir todas a la excepción no protegida ``DataAccessException``.
 #. Invocar al objeto |DAO| para realizar la operación implica abrir forzosamente
    una transacción, por lo que sólo será necesario abrir explícitamente una cuando
    la transacción esté constituida por varias operaciones. ¿Y hay algún problema
@@ -153,7 +154,88 @@ centro.
 Además, la carga inmediata la hemos hecho mediante un JOIN y no mediante un
 segundo *SELECT*.
 
-.. todo:: Usar ``SqlAssistant`` para simplificar los DAOs.
+Aún podemos dar una vuelta de tuerca. La definición de las clases |DAO| es muy
+tediosa, puesto que hay mucho código repetitivo en ellas. Para paliarlo, la
+librería facilita una clase SqlAssistant_ que simplifica mucho la codificación
+de las operaciones. Para usarla es necesario, crear el |JdbcConnection| con
+soporte:
+
+.. code-block:: java
+   :emphasize-lines: 5
+
+   // Sin especificar configuración para el asistente, el nivel es TRACE.
+   // También puede definirse el nivel como null para deshabilitar los registros.
+   JdbcConnection jc = JdbcConnection.create(key, dbUrl, user, password)
+               .withTransactionManager(Map.of(LoggingManager.KEY, new LoggingManager()));
+               .withSqlAssistant(new SqlAssistantConfig(Level.DEBUG));
+
+Con ello, podemos usar el asistente para realizar operaciones. El borrado, por
+ejemplo, podría hacerse así:
+
+.. code-block:: java
+   :emphasize-lines: 4
+
+   String sqlString = "DELETE FROM Centro WHERE id = ?";
+
+   // Los parámetros de la sentencia se pasan como argumentos.
+   jc.getSqlAssistant().execute(sqlString, 11004866L);
+
+Si volvemos al patrón |DAO| que hemos estado desarrollando y suponiendo que al
+crear dentro de ``Conexion`` hemos añadido la creación del asistente, podemos
+añadir un método a ``Conexion`` que lo devuelva (ya que el objeto no expone
+directamente el ``JdbcConnection``):
+
+.. code-block:: java
+
+   public SqlAssistant getSqlAssistant() {
+      return jc.getSqlAssistant();
+   }
+
+De este modo, podremos redefinir los objetos |DAO| usando el asistente en vez de
+escribir el repetitivo código |JDBC|:
+
+.. code-block:: java
+
+   public void delete(Long id) {
+      String sqlString = "DELETE FROM Centro WHERE id = ?";
+      cx.getSqlAssistant().execute(sqlString, id);
+   }
+
+.. tip:: Los mensajes de registro que puede escribir el asistente son vagos, ya
+   que éste se limita a ejecutar la sentencia sin saber realmente qué está
+   haciendo. Por tanto, no podrá decir "*Borrado el centro, etc.*", porque ni
+   siquiera sabe que está borrando, sino indicarnos, simplemente, que se ha
+   completado (o no) la operación. Podemos suplir esta carencia deshabilitando
+   que el asistente escriba registros y definiendo nosotros mismos los mensajes
+   al definir la operación:
+
+   .. code-block:: java
+
+      public void delete(Long id) {
+         String sqlString = "DELETE FROM Centro WHERE id = ?";
+
+         cx.transaction(ctxt -> {
+            LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+
+            try {
+               cx.getSqlAssistant().execute(sqlString, id);
+               lm.sendMessage(
+                  getClass(),
+                  Level.DEBUG,
+                  "Borrado el centro con ID=%".formatted(id),
+                  "Transacción fallida: imposible borrar el centro con ID=%".formatted(id)
+               );
+            } catch(DataAccessException e) {
+               logger.error("Error al intentar borrar el centro {con ID=} [{}]", id, e.getMessage());
+               throw e;
+            }
+         });
+      }
+
+El asistente dispone de varios métodos para facilitar las operaciones inspirados
+en la sintaxis de :ref:`Spring <jdbc-spring>`. Puede consultar la documentación
+de SqlAssistant_ y, como ejemplo de uso, las clases |DAO| definidas en el código
+fuente de TestDAO_
 
 .. note:: La librería sqlutils_ implementa, además, una suerte de |ORM| muy
    básico como prueba de concepto. Para ello sí se ha implementado la
@@ -173,3 +255,4 @@ segundo *SELECT*.
 
 .. _TestDAO: https://github.com/josem-dam/TestDAO
 .. _Multiton: https://en.wikipedia.org/wiki/Multiton
+.. _SqlAssistant: https://sio2sio2.github.io/sqlutils/edu/acceso/sqlutils/jdbc/SqlAssistant.html

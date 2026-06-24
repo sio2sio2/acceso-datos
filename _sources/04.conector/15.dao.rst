@@ -1,7 +1,7 @@
 .. _conn-prog:
 
-Estrategia de programación
-**************************
+Estrategia de diseño
+********************
 Como se ha podido ver hasta aquí, el acceso de una aplicación a una base de
 datos relacional es relativamente sencillo y medianamente semejante sea cual
 sea el lenguaje de programación y el |SGBD|. Por tanto, el usar de modo básico
@@ -93,12 +93,11 @@ mientras recoja todas las operaciones necesarias. Por ejemplo:
    válida. Por ejemplo, los métodos que obtienen todas las entidades de un tipo
    podrían devolverse en forma de |Stream| en vez de |List|.
 
-   Además, hemos introducido la excepción definida en ``sqlutils-core`` llamada
-   ``DataAccessException`` para abstraernos de cuál sea la excepción que
-   devuelve la librería particular que usemos para el acceso a datos, la cual en
-   el caso de |JDBC| será muy probablemente |SQLException|. En cualquier caso,
-   esta excepción no está protegida, por lo que podríamops habernos ahorrado su
-   expresión.
+   Además, no hemos significado que las operaciones |CRUD| generen excepciones y
+   téngase presente que en el acceso a bases de datos pueden producirse. De
+   hecho, |JDBC| genera excepciones |SQLException|.  Esto no es debido a que
+   pretendamos eliminar las excepciones, sino a que nuestra intención es
+   reconvertilas a excepciones no protegidas para mayor versatilidad\ [#]_.
 
 Como puede verse, tanto las definiciones de las clases como la interfaz
 son independientes de cuál sea el soporte de almacenamiento y responden las
@@ -145,7 +144,7 @@ bajo epígrafes anteriores. Por ejemplo:
    :name: dao-delete
 
    @Override
-   public void delete(Long id) throws DataAccessException {
+   public void delete(Long id) {
       String sqlString = "DELETE FROM Centro WHERE id = ?";
 
       try(Connection conn = getConnection()) {
@@ -190,6 +189,7 @@ Analicemos esto segundo. Pongamos que obtenemos la conexión del objeto
 modelar el acceso a la base de datos:
 
 .. code-block:: java
+   :name: met-connection
 
    private Connection getConnection() {
       return cx.getConnection();
@@ -213,8 +213,8 @@ manualmente el cierre de las operaciones, lo cual es propenso a errores.
    que use |DriverManager| o un *pool* manual para ver en concreto estos
    problemas planteados.
 
-Lo suyo es recurrir a soluciones más sofisticadas que nos faciliten la
-codificación.
+Lo suyo es recurrir a soluciones más sofisticadas que nos permitan soportar
+transacciones a la vez que nos faciliten la codificación. Vamos a ello:
 
 .. toctree::
    :maxdepth: 1
@@ -241,6 +241,9 @@ Toca para cerrar enumerar algunas conclusiones a las que hemos llegado:
   es más inteligente utilizarlas.
 
 .. rubric:: Notas al pie
+
+.. [#] En las dos alternativas que plantearemos más adelante, ocurre esto mismo:
+   ambas definen una excepción no protegida llamada ``DataAccessException``.
 
 .. [#] En realidad, esta es la gran dificultad.
 

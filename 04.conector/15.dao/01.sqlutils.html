@@ -61,7 +61,7 @@
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
     <link rel="next" title="4.5.1.2. Spring" href="05.spring.html" />
-    <link rel="prev" title="4.5. Estrategia de programación" href="../15.dao.html" />
+    <link rel="prev" title="4.5. Estrategia de diseño" href="../15.dao.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="es"/>
   <meta name="docsearch:version" content="" />
@@ -184,7 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../02.datos.html">4.2. Datos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../03.transacciones.html">4.3. Transacciones</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../04.pool.html">4.4. <em>Pool</em> de conexiones</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../15.dao.html">4.5. Estrategia de programación</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../15.dao.html">4.5. Estrategia de diseño</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">4.5.1.1. sqlutils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="05.spring.html">4.5.1.2. Spring</a></li>
 </ul>
@@ -388,22 +388,20 @@
                 <article class="bd-article">
                   
   <section id="sqlutils">
-<h1><span class="section-number">4.5.1.1. </span>sqlutils<a class="headerlink" href="#sqlutils" title="Link to this heading">#</a></h1>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Por hacer</p>
-<p>REPASAR TODO ESTE APARTADO</p>
-</div>
-<p>Afortunadamente, la solución al problema de gestionar la conexión ya la tenemos:
+<span id="conn-dao-sqlutils"></span><h1><span class="section-number">4.5.1.1. </span>sqlutils<a class="headerlink" href="#sqlutils" title="Link to this heading">#</a></h1>
+<p>Una primera posibilidad para gestionar de forma eficiente la conexión y soportar
+transacciones, ya la hemos visto: echar mano de
 nuestro <a class="reference internal" href="../03.transacciones.html#conn-transaction-manager"><span class="std std-ref">gestor de transacciones</span></a>: soporta
 múltiples bases de datos (asociando una clave a cada uno de ellos) y múltiples
 hilos (por si realizamos programación concurrente). Además, lo programamos de
 modo que la conexión que ofrece está protegida contra cierres manuales, ya que
 es el gestor el que se encarga de abrirla y cerrarla.  Por tanto, para resolver
-el problema y complementar este patrón nos basta con usar en <code class="docutils literal notranslate"><span class="pre">Connection</span></code> un
-<a class="reference internal" href="../04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con su <a class="reference internal" href="../03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> correspondiente.</p>
+el problema y complementar este patrón <abbr title="Data Access Object">DAO</abbr> nos basta con usar en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code>
+un <a class="reference internal" href="../04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con su <a class="reference internal" href="../03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a> correspondiente.</p>
 <p>Así pues, la clase <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> puede ser simplemente una clase <em>Singleton</em> que
 establezca la conexión gracias a un <a class="reference internal" href="../04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con <a class="reference internal" href="../03.transacciones.html#conn-transaction-manager"><span class="std std-ref">TransactionManager</span></a>.
-Si se obrara así, la obtención del <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> podría ser así:</p>
+Si se obra así, la obtención en <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> del <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> que requiere la
+operación <abbr title="Structured Query Language">SQL</abbr> puede hacerse así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Devuelve la conexión asociada a la transacción activa.</span>
 <span class="cm"> * @return La conexión solicitada protegida contra cierres</span>
@@ -412,22 +410,22 @@ Si se obrara así, la obtención del <a class="extlink-java-sql reference extern
 <span class="kd">public</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="nf">getConnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// .isOpen() es un método de Conexion que hemos definido también.</span>
 <span class="w">   </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;La conexión está cerrada&quot;</span><span class="p">);</span>
-<span class="w">   </span><span class="c1">// jc es el objeto JdbcConnection que usa Conexion.</span>
+<span class="w">   </span><span class="c1">// jc es el objeto JdbcConnection que se encarga de abrir y utilizar Conexion.</span>
 <span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">().</span><span class="na">getHandle</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>De esto modo, si ya hay una transacción abierta, <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> y, en
-consecuencia, los objetos DAO, dispondrán de una conexión protegida contra
-cierres que no necesitan gestionar: simplemente la usan utilizando exactamente
-el código que propusimos más arriba para la operación <em>delete</em>. Eso sí, para
-cualquier operación necesitaremos abrir explícitamente siempre una transacción.
-Por ejemplo, para implementar el método <code class="docutils literal notranslate"><span class="pre">.borrarCentro(Centro</span> <span class="pre">centro)</span></code> en
-<code class="docutils literal notranslate"><span class="pre">AppService</span></code> tendremos que hacer esto:</p>
+consecuencia, los objetos <abbr title="Data Access Object">DAO</abbr>, dispondrán de una conexión protegida contra
+cierres que no necesitan gestionar: simplemente la obtienen gracias al <a class="reference internal" href="../15.dao.html#met-connection"><span class="std std-ref">código
+simple que propusimos al tratar el patrón DAO</span></a>. Eso sí, si conservamos
+tal cual el <a class="reference internal" href="../15.dao.html#dao-delete"><span class="std std-ref">código propuesto para delete</span></a>, necesitaremos
+abrir explícitamente siempre una transacción.  Por ejemplo, para implementar el
+método <code class="docutils literal notranslate"><span class="pre">.borrarCentro(Centro</span> <span class="pre">centro)</span></code> en <code class="docutils literal notranslate"><span class="pre">AppService</span></code> tendremos que hacer
+esto:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Elimina un centro de la base de datos.</span>
 <span class="cm"> * @param centro El centro que desea ser borrado.</span>
-<span class="cm"> * @throws DataAccessException Si ocurre un error al realizar la operación.</span>
 <span class="cm"> */</span>
 <span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">borrarCentro</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="c1">// Suponemos que en Conexion hemos definido cómo crear DAOs y transacciones</span>
@@ -446,7 +444,7 @@ ideamos para abrir transacciones con el gestor, en vez de intentar reproducir
 fielmente la forma básica de operar con <abbr title="Java DataBase Connectivity">JDBC</abbr>. Siguiendo este camino la
 operación <em>delete</em> se escribiría así:</p>
 <div class="highlight-java notranslate" id="dao-delete-trans"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
-<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
 
 <span class="w">   </span><span class="c1">// cx es el objeto Conexion al que tiene acceso el objeto DAO.</span>
@@ -478,7 +476,7 @@ como lo hicimos anteriormente:</p>
 <li><p>Tenemos acceso a todo el contexto de la transacción, incluidos los
 observadores que hubiéramos podido definir.</p></li>
 <li><p>No necesitamos capturar las excepciones <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/SQLException.html">SQLException</a>, porque ya se encarga
-la librería de convertir todas a <code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code>.</p></li>
+la librería de convertir todas a la excepción no protegida <code class="docutils literal notranslate"><span class="pre">DataAccessException</span></code>.</p></li>
 <li><p>Invocar al objeto <abbr title="Data Access Object">DAO</abbr> para realizar la operación implica abrir forzosamente
 una transacción, por lo que sólo será necesario abrir explícitamente una cuando
 la transacción esté constituida por varias operaciones. ¿Y hay algún problema
@@ -673,7 +671,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cx</span><span class="p">.</span><span class="na">transactionR</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -695,7 +693,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cx</span><span class="p">.</span><span class="na">transactionR</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -715,7 +713,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="n">cx</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -739,7 +737,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro (nombre, titularidad, id) VALUES (?, ?, ?)&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="n">cx</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -763,7 +761,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET nombre = ?, titularidad = ? WHERE id = ?&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="n">cx</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -787,7 +785,7 @@ operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr> con la entida
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@Override</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">DataAccessException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET id_centro = ? WHERE id_centro = ?&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="n">cx</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -895,10 +893,79 @@ diferir la carga hasta el momento en que se pidiera de manera efectiva en
 centro.</p>
 <p>Además, la carga inmediata la hemos hecho mediante un JOIN y no mediante un
 segundo <em>SELECT</em>.</p>
-<div class="admonition-todo admonition" id="id2">
-<p class="admonition-title">Por hacer</p>
-<p>Usar <code class="docutils literal notranslate"><span class="pre">SqlAssistant</span></code> para simplificar los DAOs.</p>
+<p>Aún podemos dar una vuelta de tuerca. La definición de las clases <abbr title="Data Access Object">DAO</abbr> es muy
+tediosa, puesto que hay mucho código repetitivo en ellas. Para paliarlo, la
+librería facilita una clase <a class="reference external" href="https://sio2sio2.github.io/sqlutils/edu/acceso/sqlutils/jdbc/SqlAssistant.html">SqlAssistant</a> que simplifica mucho la codificación
+de las operaciones. Para usarla es necesario, crear el <a class="reference internal" href="../04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con
+soporte:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Sin especificar configuración para el asistente, el nivel es TRACE.</span>
+<span class="c1">// También puede definirse el nivel como null para deshabilitar los registros.</span>
+<span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()));</span>
+<span class="hll"><span class="w">            </span><span class="p">.</span><span class="na">withSqlAssistant</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SqlAssistantConfig</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">));</span>
+</span></pre></div>
 </div>
+<p>Con ello, podemos usar el asistente para realizar operaciones. El borrado, por
+ejemplo, podría hacerse así:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="c1">// Los parámetros de la sentencia se pasan como argumentos.</span>
+<span class="hll"><span class="n">jc</span><span class="p">.</span><span class="na">getSqlAssistant</span><span class="p">().</span><span class="na">execute</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">);</span>
+</span></pre></div>
+</div>
+<p>Si volvemos al patrón <abbr title="Data Access Object">DAO</abbr> que hemos estado desarrollando y suponiendo que al
+crear dentro de <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> hemos añadido la creación del asistente, podemos
+añadir un método a <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> que lo devuelva (ya que el objeto no expone
+directamente el <code class="docutils literal notranslate"><span class="pre">JdbcConnection</span></code>):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">SqlAssistant</span><span class="w"> </span><span class="nf">getSqlAssistant</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getSqlAssistant</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>De este modo, podremos redefinir los objetos <abbr title="Data Access Object">DAO</abbr> usando el asistente en vez de
+escribir el repetitivo código <abbr title="Java DataBase Connectivity">JDBC</abbr>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
+<span class="w">   </span><span class="n">cx</span><span class="p">.</span><span class="na">getSqlAssistant</span><span class="p">().</span><span class="na">execute</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Los mensajes de registro que puede escribir el asistente son vagos, ya
+que éste se limita a ejecutar la sentencia sin saber realmente qué está
+haciendo. Por tanto, no podrá decir «<em>Borrado el centro, etc.</em>», porque ni
+siquiera sabe que está borrando, sino indicarnos, simplemente, que se ha
+completado (o no) la operación. Podemos suplir esta carencia deshabilitando
+que el asistente escriba registros y definiendo nosotros mismos los mensajes
+al definir la operación:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">   </span><span class="n">cx</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">LoggingManager</span><span class="w"> </span><span class="n">lm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">getEventListener</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">cx</span><span class="p">.</span><span class="na">getSqlAssistant</span><span class="p">().</span><span class="na">execute</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">         </span><span class="n">lm</span><span class="p">.</span><span class="na">sendMessage</span><span class="p">(</span>
+<span class="w">            </span><span class="n">getClass</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;Borrado el centro con ID=%&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">            </span><span class="s">&quot;Transacción fallida: imposible borrar el centro con ID=%&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">         </span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error al intentar borrar el centro {con ID=} [{}]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+<span class="w">         </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>El asistente dispone de varios métodos para facilitar las operaciones inspirados
+en la sintaxis de <a class="reference internal" href="05.spring.html#jdbc-spring"><span class="std std-ref">Spring</span></a>. Puede consultar la documentación
+de <a class="reference external" href="https://sio2sio2.github.io/sqlutils/edu/acceso/sqlutils/jdbc/SqlAssistant.html">SqlAssistant</a> y, como ejemplo de uso, las clases <abbr title="Data Access Object">DAO</abbr> definidas en el código
+fuente de <a class="reference external" href="https://github.com/josem-dam/TestDAO">TestDAO</a></p>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
 <p>La librería <a class="reference internal" href="#sqlutils">sqlutils</a> implementa, además, una suerte de <abbr title="Object-Relational Mapping">ORM</abbr> muy
@@ -925,7 +992,7 @@ hacerse una idea de cómo puede lograrse.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">anterior</p>
-        <p class="prev-next-title"><span class="section-number">4.5. </span>Estrategia de programación</p>
+        <p class="prev-next-title"><span class="section-number">4.5. </span>Estrategia de diseño</p>
       </div>
     </a>
     <a class="right-next"

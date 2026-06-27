@@ -898,13 +898,38 @@ tediosa, puesto que hay mucho código repetitivo en ellas. Para paliarlo, la
 librería facilita una clase <a class="reference external" href="https://sio2sio2.github.io/sqlutils/edu/acceso/sqlutils/jdbc/SqlAssistant.html">SqlAssistant</a> que simplifica mucho la codificación
 de las operaciones. Para usarla es necesario, crear el <a class="reference internal" href="../04.pool.html#conn-pool-extra"><span class="std std-ref">JdbcConnection</span></a> con
 soporte:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Sin especificar configuración para el asistente, el nivel es TRACE.</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1">// La configuración del asistente indica cómo se quieren registrar los mensajes.</span>
+</span><span class="hll"><span class="n">SqlAssistantConfig</span><span class="w"> </span><span class="n">sqlConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SqlAssistantConfig</span><span class="p">((</span><span class="n">ctxt</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">notCommittedMassage</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">   </span><span class="n">LoggingManager</span><span class="w"> </span><span class="n">lm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">getEventListener</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</span><span class="hll"><span class="w">   </span><span class="n">lm</span><span class="p">.</span><span class="na">sendMessage</span><span class="p">(</span>
+</span><span class="hll"><span class="w">       </span><span class="n">getClass</span><span class="p">(),</span>
+</span><span class="hll"><span class="w">       </span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">,</span>
+</span><span class="hll"><span class="w">       </span><span class="n">message</span><span class="p">,</span>
+</span><span class="hll"><span class="w">       </span><span class="n">errorMessage</span>
+</span><span class="hll"><span class="w">   </span><span class="p">);</span>
+</span><span class="p">});</span>
+
+<span class="c1">// Sin especificar configuración para el asistente, el nivel es TRACE.</span>
 <span class="c1">// También puede definirse el nivel como null para deshabilitar los registros.</span>
 <span class="n">JdbcConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">dbUrl</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">)</span>
-<span class="w">            </span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()));</span>
-<span class="hll"><span class="w">            </span><span class="p">.</span><span class="na">withSqlAssistant</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SqlAssistantConfig</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">));</span>
-</span></pre></div>
+<span class="hll"><span class="w">            </span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">LoggingManager</span><span class="p">.</span><span class="na">KEY</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()));</span>
+</span><span class="w">            </span><span class="p">.</span><span class="na">withSqlAssistant</span><span class="p">(</span><span class="n">sqlConfig</span><span class="p">);</span>
+</pre></div>
 </div>
+<p>La configuración del asistente define cómo se quieren mandar mensajes al
+registro. Pueden deshabilitarse no proporcionando argumentos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">SqlAssistantConfig</span><span class="w"> </span><span class="n">sqlConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SqlAssistantConfig</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>o, simplemente, indicar un nivel para los mensajes:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">SqlAssistantConfig</span><span class="w"> </span><span class="n">sqlConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SqlAssistantConfig</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>En este segundo caso, los mensajes se enviarán al nivel <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> del registro,
+pero al no haber especificado cómo diferirlos, ya que no se ha proporcionado una
+expresión lambda que indique el modo, podrán aparecer mensajes equívocos en
+transacciones constituidas por varias operaciones que han debido anularse al
+fallar una de ellas.</p>
 <p>Con ello, podemos usar el asistente para realizar operaciones. El borrado, por
 ejemplo, podría hacerse así:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>

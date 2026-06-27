@@ -161,13 +161,43 @@ de las operaciones. Para usarla es necesario, crear el |JdbcConnection| con
 soporte:
 
 .. code-block:: java
-   :emphasize-lines: 5
+   :emphasize-lines: 1-9, 15
+
+   // La configuración del asistente indica cómo se quieren registrar los mensajes.
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig((ctxt, message, notCommittedMassage) -> {
+      LoggingManager lm = ctxt.getEventListener(LoggingManager.KEY, LoggingManager.class);
+      lm.sendMessage(
+          getClass(),
+          Level.DEBUG,
+          message,
+          errorMessage
+      );
+   });
 
    // Sin especificar configuración para el asistente, el nivel es TRACE.
    // También puede definirse el nivel como null para deshabilitar los registros.
    JdbcConnection jc = JdbcConnection.create(key, dbUrl, user, password)
                .withTransactionManager(Map.of(LoggingManager.KEY, new LoggingManager()));
-               .withSqlAssistant(new SqlAssistantConfig(Level.DEBUG));
+               .withSqlAssistant(sqlConfig);
+
+La configuración del asistente define cómo se quieren mandar mensajes al
+registro. Pueden deshabilitarse no proporcionando argumentos:
+
+.. code-block:: java
+
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig();
+
+o, simplemente, indicar un nivel para los mensajes:
+
+.. code-block:: java
+
+   SqlAssistantConfig sqlConfig = new SqlAssistantConfig(Level.DEBUG);
+
+En este segundo caso, los mensajes se enviarán al nivel ``DEBUG`` del registro,
+pero al no haber especificado cómo diferirlos, ya que no se ha proporcionado una
+expresión lambda que indique el modo, podrán aparecer mensajes equívocos en
+transacciones constituidas por varias operaciones que han debido anularse al
+fallar una de ellas.
 
 Con ello, podemos usar el asistente para realizar operaciones. El borrado, por
 ejemplo, podría hacerse así:

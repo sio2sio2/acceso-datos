@@ -362,7 +362,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -378,6 +380,17 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion">4.5.1.2.1. Configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.5.1.2.2. Conexión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-dao">4.5.1.2.3. Clases <abbr title="Data Access Object">DAO</abbr></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#servicio">4.5.1.2.4. Servicio</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -389,6 +402,287 @@
                   
   <section id="spring">
 <span id="jdbc-spring"></span><h1><span class="section-number">4.5.1.2. </span>Spring<a class="headerlink" href="#spring" title="Link to this heading">#</a></h1>
+<p><a class="reference external" href="https://spring.io/">Spring</a> es un <em>framework</em> para el desarrollo de aplicaciones en <em>Java</em> pensado
+para simplificar la estructura y la gestión de dependencias lo que permite
+centrarse más en la lógica de negocio. Para ello aplica como principios de
+diseño la <a class="reference external" href="https://www.oscarblancarteblog.com/2016/12/01/concepto-inversion-of-control/">inversión de control</a>
+(<abbr title="Inversion Of Control">IoC</abbr>) y la <a class="reference external" href="https://es.wikipedia.org/wiki/Programaci%C3%B3n_orientada_a_aspectos">programación orientada a aspectos</a>
+(<abbr title="Aspect-Oriented Programming">AOP</abbr>), aspecto este último que permite separar las preocupaciones tranversales
+(como el <em>logging</em>) del código propiamente del negocio. Dispone de muy variados
+módulos que cubren distintos temas y es muy, muy utilizado para la creación del
+<em>backend</em> en aplicaciones web, microservicios y procesos <em>batch</em>.</p>
+<p>Uno de estos temas, muy socorrido en cualquier <em>backend</em>, es el acceso a datos,
+por lo que es recomendable que echemos un vistazo a cómo se integra con <abbr title="Java DataBase Connectivity">JDBC</abbr>
+para facilitar todas las operaciones con bases de datos que hemos venido
+tratando en esta unidad.</p>
+<p>Por supuesto, podemos seguir aplicando el patrón <abbr title="Data Access Object">DAO</abbr>, por lo que nos
+centraremos en cómo utilizar escribir usando <em>Spring</em> las <a class="reference internal" href="../15.dao.html#clase-dao"><span class="std std-ref">clases propugnadas
+ya anteriormente</span></a>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Conexion</span></code>, para implementar la conexión con la base de datos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AppService</span></code>, para definir los métodos que el resto de la aplicación usa
+para acceder a los datos.</p></li>
+<li><p>Una clase <abbr title="Data Access Object">DAO</abbr> por cada entidad.</p></li>
+</ul>
+<section id="configuracion">
+<h2><span class="section-number">4.5.1.2.1. </span>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h2>
+<p>Para que <em>Spring</em> nos facilite el acceso a los datos usando <abbr title="Java DataBase Connectivity">JDBC</abbr> necesitamos
+añadir las siguientes dependencias:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springframework<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-context<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>7.0.8<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springframework<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>7.0.8<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="conexion">
+<h2><span class="section-number">4.5.1.2.2. </span>Conexión<a class="headerlink" href="#conexion" title="Link to this heading">#</a></h2>
+<p>Comencemos por implementar la clase para establecer la conexión a la base de
+datos y demás aspectos generales. Por analogía con la solución anterior la
+llamaremos también <code class="docutils literal notranslate"><span class="pre">Conexion</span></code> y debe resolver:</p>
+<ul class="simple">
+<li><p>Cómo se obtiene el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> que se usa internamente para abrir
+conexiones.</p></li>
+<li><p>Cómo inicializar la base de datos.</p></li>
+<li><p>Cómo generar el gestor de transacciones.</p></li>
+<li><p>Cómo generar el asistente <abbr title="Structured Query Language">SQL</abbr> para simplificar la ejecución de operaciones
+<abbr title="Structured Query Language">SQL</abbr>.</p></li>
+</ul>
+<p>Hela aquí:</p>
+<div class="literal-block-wrapper docutils container" id="clase-conexion-spring">
+<div class="code-block-caption"><span class="caption-text">Conexion.java (<a class="reference download internal" download="" href="../../_downloads/ff9a8162a8d540fbfc8bc4abb54714b3/ConexionSpring.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-conexion-spring" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Gestiona la conexión a la base de datos.</span>
+<span class="cm"> */</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@ComponentScan</span><span class="p">(</span><span class="n">basePackages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;edu.acceso.test_dao.persistence&quot;</span><span class="p">)</span>
+<span class="nd">@EnableTransactionManagement</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Conexion</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">esquema</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Conexion</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">esquema</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">url</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">esquema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">esquema</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">DataSource</span><span class="w"> </span><span class="nf">getDataSource</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">HikariConfig</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariConfig</span><span class="p">();</span>
+<span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="na">setJdbcUrl</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+<span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="na">setUsername</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+<span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HikariDataSource</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">JdbcTemplate</span><span class="w"> </span><span class="nf">getJdbcTemplate</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">dataSource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JdbcTemplate</span><span class="p">(</span><span class="n">dataSource</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">PlatformTransactionManager</span><span class="w"> </span><span class="nf">getTransactionManager</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">dataSource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataSourceTransactionManager</span><span class="p">(</span><span class="n">dataSource</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">DataSourceInitializer</span><span class="w"> </span><span class="nf">getDataSourceInitializer</span><span class="p">(</span><span class="n">DataSource</span><span class="w"> </span><span class="n">dataSource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ResourceDatabasePopulator</span><span class="w"> </span><span class="n">populator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ResourceDatabasePopulator</span><span class="p">();</span>
+<span class="w">        </span><span class="n">populator</span><span class="p">.</span><span class="na">addScript</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamResource</span><span class="p">(</span><span class="n">esquema</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// Un error en la inicialización provocará un ScriptStatementFailedException</span>
+<span class="w">        </span><span class="n">populator</span><span class="p">.</span><span class="na">setContinueOnError</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">DataSourceInitializer</span><span class="w"> </span><span class="n">initializer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DataSourceInitializer</span><span class="p">();</span>
+<span class="w">        </span><span class="n">initializer</span><span class="p">.</span><span class="na">setDataSource</span><span class="p">(</span><span class="n">dataSource</span><span class="p">);</span>
+<span class="w">        </span><span class="n">initializer</span><span class="p">.</span><span class="na">setDatabasePopulator</span><span class="p">(</span><span class="n">populator</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">initializer</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Las anotaciones a la clase sirve para indicarle a <em>Spring</em>:</p>
+<ul class="simple">
+<li><p>Que la clase contiene configuración (<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Configuration.html">&#64;Configuration</a>).</p></li>
+<li><p>En qué paquete debe buscar las clases <abbr title="Data Access Object">DAO</abbr> y de servicio (<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/ComponentScan.html">&#64;ComponentScan</a>).</p></li>
+<li><p>Que habilite un gestor de transacciones (<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/annotation/EnableTransactionManagement.html">&#64;EnableTransactionManager</a>).</p></li>
+</ul>
+<p>Por otro lado, existen métodos decorados con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a>, mientras que otros como
+el constructor no lo tienen. Esta anotación significa que el método devolverá un
+objeto que el <em>framework</em> debe registrar. Esto se debe al principio de diseño
+<abbr title="Inversion Of Control">IoC</abbr> en que se basa <em>Spring</em> y que supone que no seamos nosotros lo que
+tengamos que pasar manualmente esos objetos. Por ejemplo, para crear el objeto
+<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a> es necesario el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>. Como ya veremos, jamás
+invocaremos nosotros el método que crea ese <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a>, sino que
+internamente el <em>framework</em> se encargará de ejecutarlo. Como para ejecutarlo se
+necesita el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>, es necesario que el <em>framework</em> lo haya registrado y,
+por tanto, hay que anotar con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a> el método que genera el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>.</p>
+<div class="toggle docutils container">
+<div class="admonition attention">
+<p class="admonition-title">Atención</p>
+<p>El nombre que demos a los métodos que devuelven estos objetos que
+deben registrarse es, en principio, irrelevante… a menos que registremos
+con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a> dos métodos que devuelven objetos del mismo tipo. En ese caso,
+la regla es que nombremos al método del mismo modo en que se nombra al
+argumento del método que necesita obtener el método registrado. En nuestro
+código, el método que genera el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> se llama <code class="docutils literal notranslate"><span class="pre">getDataSource</span></code>,
+mientras que el argumento de <code class="docutils literal notranslate"><span class="pre">getJdbcTemplate</span></code>, esto es, el método que lo
+usa, se llama <em>dataSource</em>. No hay coincidencia en los nombres, pero eso
+no provoca problemas, porque no hay ningún otro método anotado con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a>
+que genere objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>.</p>
+</div>
+</div>
+<p>En cuanto a la implementación de los métodos, es conveniente hacer algunas
+aclaraciones:</p>
+<ul>
+<li><p>Para crear el <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>, hemos usado <a class="reference internal" href="../04.pool.html#conn-hikaricp"><span class="std std-ref">HikariCP</span></a>,
+aunque podríamos haber usado cualquier otro mecanismo.</p></li>
+<li><p>Al objeto se le proporciona el esquema <abbr title="Structured Query Language">SQL</abbr> en forma de <a class="extlink-java-io reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/InputStream.html">InputStream</a>. Si
+lo hubiéramos proporcionado en forma de <a class="extlink-java-nio reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/nio/file/Path.html">Path</a>, podríamos haber hecho:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">populator</span><span class="p">.</span><span class="na">addScript</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileSystemResource</span><span class="p">(</span><span class="n">esquema</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Y si en forma de <a class="extlink-java-lang reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/String.html">String</a>:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DefaultResourceLoader</span><span class="w"> </span><span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DefaultResourceLoader</span><span class="p">();</span>
+<span class="n">populator</span><span class="p">.</span><span class="na">addScript</span><span class="p">(</span><span class="n">loader</span><span class="p">.</span><span class="na">getResource</span><span class="p">(</span><span class="n">esquema</span><span class="p">));</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="clases-dao">
+<h2><span class="section-number">4.5.1.2.3. </span>Clases <abbr title="Data Access Object">DAO</abbr><a class="headerlink" href="#clases-dao" title="Link to this heading">#</a></h2>
+<p>Las clases <abbr title="Data Access Object">DAO</abbr> son muy cómodas de implementar gracias a <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a>:</p>
+<div class="literal-block-wrapper docutils container" id="clase-centrosqldao-spring">
+<div class="code-block-caption"><span class="caption-text">CentroSqlDao.java (<a class="reference download internal" download="" href="../../_downloads/72b98bcdd964bb2a1a4d7e195c59ab38/CentroSqlDaoSpring.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-centrosqldao-spring" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Implementación de {@link Crud} para la entidad {@link Centro} usando SQL.</span>
+<span class="cm"> * Esta clase proporciona métodos para realizar operaciones CRUD sobre centros</span>
+<span class="cm"> * en una base de datos relacional.</span>
+<span class="cm"> */</span>
+<span class="nd">@Repository</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CentroSqlDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">CentroSqlDao</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">JdbcTemplate</span><span class="w"> </span><span class="n">jt</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor que inicializa el proveedor de conexiones con una conexión existente.</span>
+<span class="cm">     * @param jt El {@link JdbcTemplate} a usar para las operaciones de base de datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CentroSqlDao</span><span class="p">(</span><span class="n">JdbcTemplate</span><span class="w"> </span><span class="n">jt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">jt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Convierte un {@link ResultSet} en un objeto {@link Centro}.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param rs El {@link ResultSet} que contiene los datos del centro.</span>
+<span class="cm">     * @return Un objeto {@link Centro} con los datos del {@link ResultSet}.</span>
+<span class="cm">     * @throws SQLException Si ocurre un error al acceder a los datos del {@link ResultSet}.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">Centro</span><span class="w"> </span><span class="nf">resultSetToCentro</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">prefix</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Titularidad</span><span class="w"> </span><span class="n">titularidad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;titularidad&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">titularidad</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">queryForObject</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">rowNum</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">resultSetToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} encontrado: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">EmptyResultDataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">ofNullable</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT * FROM Centro&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">rowNum</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">resultSetToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;{} centros encontrados&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centros</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">centros</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Centro WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// TODO: Por ahora no se tiene en cuenta que abortar una transacción podría generar un registro fantasma.</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">deleted</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} borrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Centro (nombre, titularidad, id) VALUES (?, ?, ?)&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">().</span><span class="na">toString</span><span class="p">(),</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">        </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} insertado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET nombre = ?, titularidad = ? WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getTitularidad</span><span class="p">().</span><span class="na">toString</span><span class="p">(),</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} actualizado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Centro SET id = ? WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} actualizado a ID={}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Centro con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>La implementación es trivial, pero conviene fijar en algunos aspectos:</p>
+<ul class="simple">
+<li><p>Está anotada con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Repository.html">&#64;Repository</a> a fin de que al <em>escanear</em> el paquete indicado
+con <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/ComponentScan.html">&#64;ComponentScan</a>, la clase se identifique como una de aquellas cuyos
+objetos deben registrarse. Como es una clase <abbr title="Data Access Object">DAO</abbr>, la anotación adecuada es
+<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Repository.html">&#64;Repository</a>. ¿Por qué deben registrarse sus objetos? Ya veremos la
+necesidad al implementar <code class="docutils literal notranslate"><span class="pre">AppService</span></code>.</p></li>
+<li><p>Que la clase necesite un objeto <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a> para construirse y que sus objetos
+nunca los lleguemos a instanciar manualmente porque se encarga el propio
+<em>framework</em> (recordemos que se basa en <abbr title="Inversion Of Control">IoC</abbr>), es la razón por la que al
+implementar el método <code class="docutils literal notranslate"><span class="pre">Conexion.getJdbcTemplate</span></code> tuvimos que anotarlo con
+<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a>.</p></li>
+<li><p>La clase prescinde de mucho código <abbr title="Java DataBase Connectivity">JDBC</abbr> repetitivo gracias a <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a>.</p></li>
+</ul>
+</section>
+<section id="servicio">
+<h2><span class="section-number">4.5.1.2.4. </span>Servicio<a class="headerlink" href="#servicio" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -426,6 +720,26 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion">4.5.1.2.1. Configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.5.1.2.2. Conexión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-dao">4.5.1.2.3. Clases <abbr title="Data Access Object">DAO</abbr></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#servicio">4.5.1.2.4. Servicio</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

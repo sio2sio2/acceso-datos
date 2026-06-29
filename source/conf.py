@@ -61,7 +61,8 @@ extlinks = {
     'jakarta-persistence': ('https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/%s', '%s'),
     'java-slf4j': ('https://www.slf4j.org/api/org/slf4j/%s.html', '%s'),
     'jackson-databind': ('https://www.javadoc.io/doc/tools.jackson.core/jackson-databind/latest/tools.jackson.databind/tools/jackson/databind/%s.html', '%s'),
-    'jackson-core': ('https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/%s.html', '%s')
+    'jackson-core': ('https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/tools.jackson.core/tools/jackson/core/%s.html', '%s'),
+    'spring': ('https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/%s.html', '%s')
 }
 
 intersphinx_mapping = {

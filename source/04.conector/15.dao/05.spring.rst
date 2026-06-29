@@ -2,3 +2,257 @@
 
 Spring
 ======
+Spring_ es un *framework* para el desarrollo de aplicaciones en *Java* pensado
+para simplificar la estructura y la gestión de dependencias lo que permite
+centrarse más en la lógica de negocio. Para ello aplica como principios de
+diseño la `inversión de control
+<https://www.oscarblancarteblog.com/2016/12/01/concepto-inversion-of-control/>`_
+(|IoC|) y la `programación orientada a aspectos
+<https://es.wikipedia.org/wiki/Programaci%C3%B3n_orientada_a_aspectos>`_
+(|AOP|), aspecto este último que permite separar las preocupaciones tranversales
+(como el *logging*) del código propiamente del negocio. Dispone de muy variados
+módulos que cubren distintos temas y es muy, muy utilizado para la creación del
+*backend* en aplicaciones web, microservicios y procesos *batch*.
+
+Uno de estos temas, muy socorrido en cualquier *backend*, es el acceso a datos,
+por lo que es recomendable que echemos un vistazo a cómo se integra con |JDBC|
+para facilitar todas las operaciones con bases de datos que hemos venido
+tratando en esta unidad.
+
+Por supuesto, podemos seguir aplicando el patrón |DAO|, por lo que nos
+centraremos en cómo utilizar escribir usando *Spring* las :ref:`clases propugnadas
+ya anteriormente <clase-dao>`:
+
+* ``Conexion``, para implementar la conexión con la base de datos.
+* ``AppService``, para definir los métodos que el resto de la aplicación usa
+  para acceder a los datos.
+* Una clase |DAO| por cada entidad.
+
+.. seealso:: La rama *spring* del `repositorio TestDAO
+   <https://github.com/josem-dam/TestDAO>`_ contiene la resolución completa del
+   ejemplo.
+
+Configuración
+-------------
+Para que *Spring* nos facilite el acceso a los datos usando |JDBC| necesitamos
+añadir las siguientes dependencias:
+
+.. code-block:: xml
+
+   <dependency>
+       <groupId>org.springframework</groupId>
+       <artifactId>spring-context</artifactId>
+       <version>7.0.8</version>
+   </dependency>
+
+   <dependency>
+       <groupId>org.springframework</groupId>
+       <artifactId>spring-jdbc</artifactId>
+       <version>7.0.8</version>
+   </dependency>
+
+Conexión
+--------
+Comencemos por implementar la clase para establecer la conexión a la base de
+datos y demás aspectos generales. Por analogía con la solución anterior la
+llamaremos también ``Conexion`` y debe resolver:
+
++ Cómo se obtiene el |DataSource| que se usa internamente para abrir
+  conexiones.
++ Cómo inicializar la base de datos.
++ Cómo generar el gestor de transacciones.
++ Cómo generar el asistente |SQL| para simplificar la ejecución de operaciones
+  |SQL|.
+
+Hela aquí:
+
+.. literalinclude:: files/ConexionSpring.java
+   :language: java
+   :class: toggle
+   :name: clase-conexion-spring
+   :caption: Conexion.java (:download:`descarga <files/ConexionSpring.java>`)
+   :start-at: /**
+
+Las anotaciones a la clase sirve para indicarle a *Spring*:
+
+- Que la clase contiene configuración (|@Configuration|).
+- En qué paquete debe buscar las clases |DAO| y de servicio (|@ComponentScan|).
+- Que habilite un gestor de transacciones (|@EnableTransactionManager|).
+
+Por otro lado, existen métodos decorados con |@Bean|, mientras que otros como
+el constructor no lo tienen. Esta anotación significa que el método devolverá un
+objeto que el *framework* debe registrar. Esto se debe al principio de diseño
+|IoC| en que se basa *Spring* y que supone que no seamos nosotros lo que
+tengamos que pasar manualmente esos objetos. Por ejemplo, para crear el objeto
+|JdbcTemplate| es necesario el |DataSource|. Como ya veremos, jamás
+invocaremos nosotros el método que crea ese |JdbcTemplate|, sino que
+internamente el *framework* se encargará de ejecutarlo. Como para ejecutarlo se
+necesita el |DataSource|, es necesario que el *framework* lo haya registrado y,
+por tanto, hay que anotar con |@Bean| el método que genera el |DataSource|.
+
+.. toggle:: 
+
+   .. attention:: El nombre que demos a los métodos que devuelven estos objetos que
+      deben registrarse es, en principio, irrelevante... a menos que registremos
+      con |@Bean| dos métodos que devuelven objetos del mismo tipo. En ese caso,
+      la regla es que nombremos al método del mismo modo en que se nombra al
+      argumento del método que necesita obtener el método registrado. En nuestro
+      código, el método que genera el |DataSource| se llama ``getDataSource``,
+      mientras que el argumento de ``getJdbcTemplate``, esto es, el método que lo
+      usa, se llama *dataSource*. No hay coincidencia en los nombres, pero eso
+      no provoca problemas, porque no hay ningún otro método anotado con |@Bean|
+      que genere objetos |DataSource|.
+
+En cuanto a la implementación de los métodos, es conveniente hacer algunas
+aclaraciones:
+
+* Para crear el |DataSource|, hemos usado :ref:`HikariCP <conn-hikaricp>`,
+  aunque podríamos haber usado cualquier otro mecanismo.
+
+* Al objeto se le proporciona el esquema |SQL| en forma de |InputStream|. Si
+  lo hubiéramos proporcionado en forma de |Path|, podríamos haber hecho:
+
+  .. code-block:: java
+
+     populator.addScript(new FileSystemResource(esquema)); 
+
+  Y si en forma de |String|:
+
+  .. code-block:: java
+
+     DefaultResourceLoader loader = new DefaultResourceLoader();
+     populator.addScript(loader.getResource(esquema));
+
+Clases |DAO|
+------------
+Las clases |DAO| son muy cómodas de implementar gracias a |JdbcTemplate|:
+
+.. literalinclude:: files/CentroSqlDaoSpring.java
+   :language: java
+   :class: toggle
+   :name: clase-centrosqldao-spring
+   :caption: CentroSqlDao.java (:download:`descarga <files/CentroSqlDaoSpring.java>`)
+   :start-at: /**
+
+La implementación es trivial, pero conviene fijar en algunos aspectos:
+
+* Está anotada con |@Repository| a fin de que al *escanear* el paquete indicado
+  con |@ComponentScan|, la clase se identifique como una de aquellas cuyos
+  objetos deben registrarse. Como es una clase |DAO|, la anotación adecuada es
+  |@Repository|. ¿Por qué deben registrarse sus objetos? Ya veremos la
+  necesidad al implementar ``AppService``.
+
+* Que la clase necesite un objeto |JdbcTemplate| para construirse y que sus objetos
+  nunca los lleguemos a instanciar manualmente porque se encarga el propio
+  *framework* (recordemos que se basa en |IoC|), es la razón por la que al
+  implementar el método ``Conexion.getJdbcTemplate`` tuvimos que anotarlo con
+  |@Bean|.
+
+* La clase prescinde de mucho código |JDBC| repetitivo gracias a |JdbcTemplate|.
+
+Para la clase ``EstudianteSqlDao`` la implementación es semajante. Su única novedad
+es que hay que actualizar el objeto estudiante que se agrega a la base de datos, ya
+que el identificador es autogenerado:
+
+.. literalinclude:: files/EstudianteSqlDaoSpring.java
+   :language: java
+   :class: toggle
+   :name: clase-estudianteqldao-spring
+   :caption: EstudianteSqlDao.java (:download:`descarga <files/EstudianteSqlDaoSpring.java>`)
+   :start-at: /**
+
+Servicio
+--------
+La clase ``AppService`` utiliza sendos objetos |DAO| para implementar las
+operaciones que requiere la aplicación:
+
+.. literalinclude:: files/AppServiceSpring.java
+   :language: java
+   :class: toggle
+   :name: clase-appservice-spring
+   :caption: AppService.java (:download:`descarga <files/AppServiceSpring.java>`)
+   :start-at: /**
+
+Como no llegaremos nunca a crear directamente nosotros el objeto, pero para su
+creación se requieren los dos objetos |DAO|, dichos objetos |DAO| deben haberse
+registrado en el *framework*, de ahí que se requiriera la anotación
+|@Repository| y el escaneo del paquete en el que se encuentran.
+
+La implementación es sencilla, aunque tiene dos particularidades:
+
+- La anotación |@Service| en la clase para que el escaneo del paquete la
+  detecte como clase de la que deben registrarse sus objetos.
+
+- La anotación |@Transactional| que implica que todas las operaciones que
+  incluye el método tienes que constituir una única transacción. Sólo es
+  necesaria en el método ``operacionMultiple``, porque es el único constituido
+  por dos operaciones.
+
+Ejecución
+---------
+Con todos los componentes implementados, toca saber cómo ponerlos en funcionamiento:
+
+.. code-block:: java
+
+   AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+   // Hay que registrar manualmente conexión, porque no tiene
+   // ninguna anotación que lo posibilite.
+   context.registerBean(Conexion.class, db, null, null, esquema);
+
+   try {
+       // Se ejecuta propiamente el código inicializador contenido en Conexion
+       // y se crean todos los objetos "bean" (como el servicio o los objetos DAO).
+       context.refresh();
+       logger.debug("Contexto de Spring inicializado con los parámetros de conexión");
+   } catch (ScriptStatementFailedException e) {
+       logger.error("Error en la inicialización o la base de datos ya está inicializada: {}", e.getMessage());
+   }
+
+Llegados a este punto, habremos conectado con la base de datos (usando un
+*pool* :ref:`HikariCP <conn-hikaricp>`) y se habrá ejecutado el esquema |SQL|. En caso de que se
+produjera un error al intentar ejecutar alguno de las sentencias contenidas en
+el esquema, se lanza una excepción |ScriptStatementFailedException|. Este hecho
+puede haberse debido a que la base de datos ya estuviera inicializada, por lo
+que capturamos el error, lo registramos y continuamos.
+
+Por último para operar con la base de datos:
+
+.. code-block:: java
+
+    // try-with-resources para cerrar context al acabar.
+    try(context) {
+        AppService service = context.getBean(AppService.class);
+
+        // Usamos services para operar.
+
+        try {
+            List<Centro> centros = service.listarCentros();
+        } catch(DataAccessException e) {
+            System.err.println("No pueden listarse los centros: %s".formatted(e.getMessage()));
+        }
+    }
+
+Las operaciones con la base de datos, al fallar, provocan la excepción
+no protegida |DataAccessException|.
+
+.. |IoC| replace:: :abbr:`IoC (Inversion Of Control)`
+.. |AOP| replace:: :abbr:`AOP (Aspect-Oriented Programming)`
+.. |JDBC| replace:: :abbr:`JDBC (Java DataBase Connectivity)`
+.. |DAO| replace:: :abbr:`DAO (Data Access Object)`
+.. |SQL| replace:: :abbr:`SQL (Structured Query Language)`
+.. |DataSource| replace:: :java-sql:`DataSource <DataSource>`
+.. |InputStream| replace:: :java-io:`InputStream <InputStream>`
+.. |Path| replace:: :java-nio:`Path <Path>`
+.. |String| replace:: :java-lang:`String <String>`
+
+.. _Spring: https://spring.io/
+.. |@Transactional| replace:: :spring:`@Transactional <transaction/annotation/Transactional>`
+.. |@Configuration| replace:: :spring:`@Configuration </context/annotation/Configuration>`
+.. |@ComponentScan| replace:: :spring:`@ComponentScan </context/annotation/ComponentScan>`
+.. |@EnableTransactionManager| replace:: :spring:`@EnableTransactionManager <transaction/annotation/EnableTransactionManagement>`
+.. |@Bean| replace:: :spring:`@Bean </context/annotation/Bean>`
+.. |JdbcTemplate| replace:: :spring:`JdbcTemplate <jdbc/core/JdbcTemplate>`
+.. |@Repository| replace:: :spring:`@Repository <stereotype/Repository>`
+.. |@Service| replace:: :spring:`@Service <stereotype/Service>`
+.. |DataAccessException| replace:: :spring:`DataAccessException <dao/DataAccessException>`
+.. |ScriptStatementFailedException| replace:: :spring:`ScriptStatementFailedException <jdbc/datasource/init/ScriptStatementFailedException>`

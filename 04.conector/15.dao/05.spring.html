@@ -389,6 +389,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.5.1.2.2. Conexión</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-dao">4.5.1.2.3. Clases <abbr title="Data Access Object">DAO</abbr></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#servicio">4.5.1.2.4. Servicio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion">4.5.1.2.5. Ejecución</a></li>
 </ul>
             </nav>
         </div>
@@ -424,6 +425,11 @@ ya anteriormente</span></a>:</p>
 para acceder a los datos.</p></li>
 <li><p>Una clase <abbr title="Data Access Object">DAO</abbr> por cada entidad.</p></li>
 </ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>La rama <em>spring</em> del <a class="reference external" href="https://github.com/josem-dam/TestDAO">repositorio TestDAO</a> contiene la resolución completa del
+ejemplo.</p>
+</div>
 <section id="configuracion">
 <h2><span class="section-number">4.5.1.2.1. </span>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h2>
 <p>Para que <em>Spring</em> nos facilite el acceso a los datos usando <abbr title="Java DataBase Connectivity">JDBC</abbr> necesitamos
@@ -679,9 +685,278 @@ implementar el método <code class="docutils literal notranslate"><span class="p
 <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework//context/annotation/Bean.html">&#64;Bean</a>.</p></li>
 <li><p>La clase prescinde de mucho código <abbr title="Java DataBase Connectivity">JDBC</abbr> repetitivo gracias a <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html">JdbcTemplate</a>.</p></li>
 </ul>
+<p>Para la clase <code class="docutils literal notranslate"><span class="pre">EstudianteSqlDao</span></code> la implementación es semajante. Su única novedad
+es que hay que actualizar el objeto estudiante que se agrega a la base de datos, ya
+que el identificador es autogenerado:</p>
+<div class="literal-block-wrapper docutils container" id="clase-estudianteqldao-spring">
+<div class="code-block-caption"><span class="caption-text">EstudianteSqlDao.java (<a class="reference download internal" download="" href="../../_downloads/ee5f649e667d29f3ab9366c8ed2c7b1e/EstudianteSqlDaoSpring.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-estudianteqldao-spring" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Implementación de {@link Crud} para la entidad {@link Estudiante} usando SQL.</span>
+<span class="cm"> * Esta clase proporciona métodos para realizar operaciones CRUD sobre estudiantes</span>
+<span class="cm"> * en una base de datos relacional.</span>
+<span class="cm"> */</span>
+<span class="nd">@Repository</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">EstudianteSqlDao</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">CentroSqlDao</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">JdbcTemplate</span><span class="w"> </span><span class="n">jt</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor que inicializa el proveedor de conexiones con una conexión existente.</span>
+<span class="cm">     * @param jt El {@link JdbcTemplate} a usar para las operaciones de base de datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">EstudianteSqlDao</span><span class="p">(</span><span class="n">JdbcTemplate</span><span class="w"> </span><span class="n">jt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">jt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Convierte un {@link ResultSet} en un objeto {@link Estudiante}.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param rs El {@link ResultSet} que contiene los datos del estudiante.</span>
+<span class="cm">     * @param prefix Prefijo para los nombres de las columnas del estudiante.</span>
+<span class="cm">     * @param cPrefix Prefijo para los nombres de las columnas del centro.</span>
+<span class="cm">     * @return Un objeto {@link Estudiante} con los datos del {@link ResultSet}.</span>
+<span class="cm">     * @throws SQLException Si ocurre un error al acceder a los datos del {@link ResultSet}.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="nf">resultSetToEstudiante</span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">cPrefix</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;nombre&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">nac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getDate</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;nacimiento&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nac</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">nac</span><span class="p">.</span><span class="na">toLocalDate</span><span class="p">();</span>
+<span class="w">    </span>
+<span class="w">        </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="s">&quot;centro&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">wasNull</span><span class="p">()</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">CentroSqlDao</span><span class="p">.</span><span class="na">resultSetToCentro</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">cPrefix</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Estudiante</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">nombre</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Establece los parámetros de un {@link PreparedStatement} con los datos de un {@link Estudiante}.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param pstmt El {@link PreparedStatement} donde se establecerán los parámetros.</span>
+<span class="cm">     * @param estudiante El objeto {@link Estudiante} cuyos datos se usarán para establecer los parámetros.</span>
+<span class="cm">     * @throws SQLException Si ocurre un error al establecer los parámetros en el {@link PreparedStatement}.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">estudianteToParams</span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNombre</span><span class="p">());</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNacimiento</span><span class="p">();</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setDate</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">nacimiento</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">Date</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">nacimiento</span><span class="p">));</span>
+<span class="w">        </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getCentro</span><span class="p">();</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">centro</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">BIGINT</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pstmt</span><span class="p">.</span><span class="na">setObject</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">Types</span><span class="p">.</span><span class="na">BIGINT</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            SELECT e.*, c.id_centro AS c_id, c.nombre AS c_nombre, c.titularidad AS c_titularidad</span>
+<span class="s">            FROM Centro c JOIN Estudiante e ON e.centro = c.id </span>
+<span class="s">            WHERE e.id = ?</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">estudiante</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">queryForObject</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">rowNum</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">resultSetToEstudiante</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c_&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} encontrado: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">EmptyResultDataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">ofNullable</span><span class="p">(</span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            SELECT e.*, c.id_centro AS c_id, c.nombre AS c_nombre, c.titularidad AS c_titularidad</span>
+<span class="s">            FROM Centro c JOIN Estudiante e ON e.centro = c.id</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudiantes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="n">rowNum</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">resultSetToEstudiante</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c_&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;{} estudiantes encontrados&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">estudiantes</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DELETE FROM Estudiante WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">deleted</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} borrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;INSERT INTO Estudiante (nombre, nacimiento, centro, id) VALUES (?, ?, ?, ?)&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">KeyHolder</span><span class="w"> </span><span class="n">keyHolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GeneratedKeyHolder</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">conn</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">pstmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="p">.</span><span class="na">RETURN_GENERATED_KEYS</span><span class="p">);</span>
+<span class="w">            </span><span class="n">estudianteToParams</span><span class="p">(</span><span class="n">pstmt</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">pstmt</span><span class="p">;</span>
+<span class="w">        </span><span class="p">},</span><span class="w"> </span><span class="n">keyHolder</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">keyHolder</span><span class="p">.</span><span class="na">getKey</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">estudiante</span><span class="p">.</span><span class="na">setId</span><span class="p">(</span><span class="n">keyHolder</span><span class="p">.</span><span class="na">getKey</span><span class="p">().</span><span class="na">longValue</span><span class="p">());</span>
+<span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} agregado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;No se pudo obtener el ID generado para el estudiante agregado&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Estudiante SET nombre = ?, nacimiento = ?, centro = ? WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNombre</span><span class="p">(),</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getNacimiento</span><span class="p">(),</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getCentro</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="o">?</span><span class="kc">null</span><span class="p">:</span><span class="n">estudiante</span><span class="p">.</span><span class="na">getCentro</span><span class="p">().</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} actualizado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">estudiante</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">newId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sqlString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;UPDATE Estudiante SET id = ? WHERE id = ?&quot;</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jt</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">sqlString</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} actualizado a ID={}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">,</span><span class="w"> </span><span class="n">newId</span><span class="p">);</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">logger</span><span class="p">.</span><span class="na">trace</span><span class="p">(</span><span class="s">&quot;Estudiante con ID={} no encontrado&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">oldId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="servicio">
 <h2><span class="section-number">4.5.1.2.4. </span>Servicio<a class="headerlink" href="#servicio" title="Link to this heading">#</a></h2>
+<p>La clase <code class="docutils literal notranslate"><span class="pre">AppService</span></code> utiliza sendos objetos <abbr title="Data Access Object">DAO</abbr> para implementar las
+operaciones que requiere la aplicación:</p>
+<div class="literal-block-wrapper docutils container" id="clase-appservice-spring">
+<div class="code-block-caption"><span class="caption-text">AppService.java (<a class="reference download internal" download="" href="../../_downloads/a48126fcf59cebec23e19ecda1c4e449/AppServiceSpring.java"><code class="xref download docutils literal notranslate"><span class="pre">descarga</span></code></a>)</span><a class="headerlink" href="#clase-appservice-spring" title="Link to this code">#</a></div>
+<div class="toggle highlight-java notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Clase de servicio para manejar la lógica de negocio relacionada con la persistencia de datos.</span>
+<span class="cm"> * Como apenas hay operaciones, creamos una única clase para todas las operaciones de persistencia.</span>
+<span class="cm"> */</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">AppService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor</span>
+<span class="cm">     * @param key La clave de la conexión a usar para acceder a la base de datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">AppService</span><span class="p">(</span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centroDao</span><span class="p">,</span><span class="w"> </span><span class="n">Crud</span><span class="o">&lt;</span><span class="n">Estudiante</span><span class="o">&gt;</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">centroDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">centroDao</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">estudianteDao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">estudianteDao</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Obtiene la lista de centros educativos desde la base de datos.</span>
+<span class="cm">     * @return La lista solicitada</span>
+<span class="cm">     * @throws DataAccessException Si ocurre un error al acceder a los datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">listarCentros</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">centroDao</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Agrega un nuevo estudiante a la base de datos.</span>
+<span class="cm">     * @param estudiante El estudiante a agregar.</span>
+<span class="cm">     * @throws DataAccessException Si ocurre un error al acceder a los datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">agregarEstudiante</span><span class="p">(</span><span class="n">Estudiante</span><span class="w"> </span><span class="n">estudiante</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">estudianteDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">estudiante</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Modifica un centro educativo existente en la base de datos.</span>
+<span class="cm">     * @param centro El centro con los datos modificados (el ID debe seguir siendo el mismo).</span>
+<span class="cm">     * @throws DataAccessException Si ocurre un error al acceder a los datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">modificarCentro</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">centroDao</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Agrega un nuevo centro educativo a la base de datos.</span>
+<span class="cm">     * @param centro El centro a agregar (su ID se asignará automáticamente al insertarlo).</span>
+<span class="cm">     * @throws DataAccessException Si ocurre un error al acceder a los datos.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">agregarCentro</span><span class="p">(</span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Método que implica varias operaciones de persistencia (un borrado y una inserción).</span>
+<span class="cm">     * Conceptualemente, no tienen relación: simplemente sirven para probar que ambas</span>
+<span class="cm">     * forman parte de una misma transacción.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="nd">@Transactional</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">operacionMultiple</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">centroDao</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="mi">11701164L</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// Intentamos añadir un centro cuyo ID ya existe.</span>
+<span class="w">            </span><span class="n">centroDao</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Centro repetido&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Como no llegaremos nunca a crear directamente nosotros el objeto, pero para su
+creación se requieren los dos objetos <abbr title="Data Access Object">DAO</abbr>, dichos objetos <abbr title="Data Access Object">DAO</abbr> deben haberse
+registrado en el <em>framework</em>, de ahí que se requiriera la anotación
+<a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Repository.html">&#64;Repository</a> y el escaneo del paquete en el que se encuentran.</p>
+<p>La implementación es sencilla, aunque tiene dos particularidades:</p>
+<ul class="simple">
+<li><p>La anotación <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Service.html">&#64;Service</a> en la clase para que el escaneo del paquete la
+detecte como clase de la que deben registrarse sus objetos.</p></li>
+<li><p>La anotación <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/annotation/Transactional.html">&#64;Transactional</a> que implica que todas las operaciones que
+incluye el método tienes que constituir una única transacción. Sólo es
+necesaria en el método <code class="docutils literal notranslate"><span class="pre">operacionMultiple</span></code>, porque es el único constituido
+por dos operaciones.</p></li>
+</ul>
+</section>
+<section id="ejecucion">
+<h2><span class="section-number">4.5.1.2.5. </span>Ejecución<a class="headerlink" href="#ejecucion" title="Link to this heading">#</a></h2>
+<p>Con todos los componentes implementados, toca saber cómo ponerlos en funcionamiento:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">AnnotationConfigApplicationContext</span><span class="w"> </span><span class="n">context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AnnotationConfigApplicationContext</span><span class="p">();</span>
+<span class="c1">// Hay que registrar manualmente conexión, porque no tiene</span>
+<span class="c1">// ninguna anotación que lo posibilite.</span>
+<span class="n">context</span><span class="p">.</span><span class="na">registerBean</span><span class="p">(</span><span class="n">Conexion</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">db</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">esquema</span><span class="p">);</span>
+
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Se ejecuta propiamente el código inicializador contenido en Conexion</span>
+<span class="w">    </span><span class="c1">// y se crean todos los objetos &quot;bean&quot; (como el servicio o los objetos DAO).</span>
+<span class="w">    </span><span class="n">context</span><span class="p">.</span><span class="na">refresh</span><span class="p">();</span>
+<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;Contexto de Spring inicializado con los parámetros de conexión&quot;</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">ScriptStatementFailedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error en la inicialización o la base de datos ya está inicializada: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Llegados a este punto, habremos conectado con la base de datos (usando un
+<em>pool</em> <a class="reference internal" href="../04.pool.html#conn-hikaricp"><span class="std std-ref">HikariCP</span></a>) y se habrá ejecutado el esquema <abbr title="Structured Query Language">SQL</abbr>. En caso de que se
+produjera un error al intentar ejecutar alguno de las sentencias contenidas en
+el esquema, se lanza una excepción <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/datasource/init/ScriptStatementFailedException.html">ScriptStatementFailedException</a>. Este hecho
+puede haberse debido a que la base de datos ya estuviera inicializada, por lo
+que capturamos el error, lo registramos y continuamos.</p>
+<p>Por último para operar con la base de datos:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// try-with-resources para cerrar context al acabar.</span>
+<span class="k">try</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">AppService</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">getBean</span><span class="p">(</span><span class="n">AppService</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Usamos services para operar.</span>
+
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Centro</span><span class="o">&gt;</span><span class="w"> </span><span class="n">centros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">service</span><span class="p">.</span><span class="na">listarCentros</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">DataAccessException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;No pueden listarse los centros: %s&quot;</span><span class="p">.</span><span class="na">formatted</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Las operaciones con la base de datos, al fallar, provocan la excepción
+no protegida <a class="extlink-spring reference external" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/dao/DataAccessException.html">DataAccessException</a>.</p>
 </section>
 </section>
 
@@ -736,6 +1011,7 @@ implementar el método <code class="docutils literal notranslate"><span class="p
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conexion">4.5.1.2.2. Conexión</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-dao">4.5.1.2.3. Clases <abbr title="Data Access Object">DAO</abbr></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#servicio">4.5.1.2.4. Servicio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ejecucion">4.5.1.2.5. Ejecución</a></li>
 </ul>
   </nav></div>
 

@@ -189,7 +189,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../04.conector/15.dao/05.spring.html">4.5.1.2. Spring</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Otros aspectos</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -197,7 +197,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">5.2. Operativa básica</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.pool.html">5.5. Pool de conexiones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -208,7 +208,8 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.7. Otros aspectos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12.dao.html">5.7. Estrategias de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.8. Otros aspectos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -574,11 +575,22 @@ simple.</p></li>
 <li><p>Es conveniente no reutilizar los objetos <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a>,
 de suerte que cada transacción debería usar uno nuevo.</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Vemos que el objeto <a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManagerFactory">EntityManagerFactory</a> nos
+permite a partir de él crear distintos objetos
+<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a> del mismo modo que un objeto
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a> nos permite crear distintos objetos
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>. De hecho, internamente, aunque nos lo oculte, el proveedor de
+<abbr title="Java Persistent API">JPA</abbr> sigue necesitando abrir objetos <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a> a partir de un
+<a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/DataSource.html">DataSource</a>. Volveremos, más adelante, a tratar el <a class="reference internal" href="09.pool.html#orm-pool"><span class="std std-ref">asunto del pool de
+conexiones en JPA</span></a>.</p>
+</div>
 <p class="rubric">Notas al pie</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Más adelante sugerimos <a class="reference internal" href="09.dao.html#orm-pattern"><span class="std std-ref">cómo crear una fábrica que asegure su
+<p>Más adelante sugerimos <a class="reference internal" href="12.dao.html#orm-pattern"><span class="std std-ref">cómo crear una fábrica que asegure su
 unicidad</span></a>.</p>
 </aside>
 </aside>

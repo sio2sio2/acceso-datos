@@ -163,7 +163,7 @@ el cual en |SQL| se define así:
         <dependency>
             <groupId>com.github.sio2sio2.sqlutils</groupId>
             <artifactId>sqlutils-jdbc</artifactId>
-            <version>4.4.1</version>
+            <version>4.5.0</version>
         </dependency>
       </dependencies>
 

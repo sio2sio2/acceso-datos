@@ -124,6 +124,15 @@ Como puede verse:
 * Es conveniente no reutilizar los objetos :jakarta-persistence:`EntityManager`,
   de suerte que cada transacción debería usar uno nuevo.
 
+.. note:: Vemos que el objeto :jakarta-persistence:`EntityManagerFactory` nos
+   permite a partir de él crear distintos objetos
+   :jakarta-persistence:`EntityManager` del mismo modo que un objeto
+   |DataSource| nos permite crear distintos objetos
+   |Connection|. De hecho, internamente, aunque nos lo oculte, el proveedor de
+   |JPA| sigue necesitando abrir objetos |Connection| a partir de un
+   |DataSource|. Volveremos, más adelante, a tratar el :ref:`asunto del pool de
+   conexiones en JPA <orm-pool>`.
+
 .. rubric:: Notas al pie
 
 .. [#] Más adelante sugerimos :ref:`cómo crear una fábrica que asegure su
@@ -137,3 +146,5 @@ Como puede verse:
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. |API| replace:: :abbr:`API (Application Programming Interface)`
 .. |ORM| replace:: :abbr:`ORM (Object-Relational Mapping)`
+.. |Connection| replace:: :java-sql:`Connection <Connection>`
+.. |DataSource| replace:: :java-sql:`DataSource <DataSource>`

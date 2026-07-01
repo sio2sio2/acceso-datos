@@ -189,7 +189,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../04.conector/15.dao/05.spring.html">4.5.1.2. Spring</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Otros aspectos</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -197,7 +197,7 @@
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="09.dao.html">5.5. Estrategias de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09.pool.html">5.5. Pool de conexiones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -208,7 +208,8 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.7. Otros aspectos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12.dao.html">5.7. Estrategias de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.8. Otros aspectos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -530,10 +531,9 @@ compilación de la <abbr title="Application Programming Interface">API</abbr>.</
 <span class="w">        </span><span class="cm">&lt;!-- Más clases ... --&gt;</span>
 
 <span class="w">        </span><span class="nt">&lt;properties&gt;</span>
-<span class="w">            </span><span class="cm">&lt;!-- Propiedades generales (conexión a la base de datos) --&gt;</span>
+<span class="w">            </span><span class="cm">&lt;!-- Propiedades de conexión (es mejor no incluirlas aquí) --&gt;</span>
 <span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.driver&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;org.sqlite.JDBC&quot;</span><span class="nt">/&gt;</span>
 <span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;jdbc:sqlite:file::memory:&quot;</span><span class="nt">/&gt;</span>
-<span class="w">            </span><span class="cm">&lt;!-- Innecesarios para SQLite --&gt;</span>
 <span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.user&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
 <span class="w">            </span><span class="nt">&lt;property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;jakarta.persistence.jdbc.password&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
 
@@ -554,7 +554,9 @@ compilación de la <abbr title="Application Programming Interface">API</abbr>.</
 la usaremos luego; y hay propiedades cuyos valores dependen del <abbr title="Object-Relational Mapping">ORM</abbr> y el
 <abbr title="Sistema Gestor de Bases de Datos">SGBD</abbr> utilizados.</p></li>
 <li><p>Las propiedades (dentro de <code class="docutils literal notranslate"><span class="pre">&lt;properties&gt;</span></code>) pueden alterarse dinámicamente
-durante la ejecución del programa antes de conectar a la base de datos.</p></li>
+durante la ejecución del programa antes de conectar a la base de datos. De
+hecho, no es conveniente que se incluyan en el archivo, sino que se
+<a class="reference internal" href="#orm-conf-dyn"><span class="std std-ref">añadan dinámicamente</span></a>.</p></li>
 <li><p>El proveedor indica cuál es la implementación <abbr title="Java Persistence API">JPA</abbr> que usaremos. Algunos
 muy usados son:</p>
 <div class="pst-scrollable-table-container"><table class="url-sql table">

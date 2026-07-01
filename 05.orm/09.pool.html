@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5.5. Estrategias de diseño &#8212; documentación de Acceso a datos - rolling</title>
+    <title>5.5. Pool de conexiones &#8212; documentación de Acceso a datos - rolling</title>
   
   
   
@@ -57,7 +57,7 @@
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../_static/translations.js?v=f85f4cfb"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/09.dao';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '05.orm/09.pool';</script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="5.6. Operaciones CRUD" href="10.crud.html" />
@@ -189,7 +189,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../04.conector/15.dao/05.spring.html">4.5.1.2. Spring</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04.conector/20.extras.html">4.6. Otros aspectos</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">5. Herramientas <abbr title="Object-Relational Mapping">ORM</abbr></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -197,7 +197,7 @@
 <li class="toctree-l2"><a class="reference internal" href="02.basico.html">5.2. Operativa básica</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04.mapeo.html">5.3. Mapeo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08.transaction.html">5.4. Transacciones</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5. Estrategias de diseño</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5. Pool de conexiones</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="10.crud.html">5.6. Operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="10.crud/01.simples.html">5.6.1. Simples</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="10.crud/02.avanzadas.html">5.6.2. Avanzadas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -208,7 +208,8 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.7. Otros aspectos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12.dao.html">5.7. Estrategias de diseño</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15.extra.html">5.8. Otros aspectos</a></li>
 </ul>
 </details></li>
 </ul>
@@ -299,7 +300,7 @@
       
       
       
-      <li><a href="../_sources/05.orm/09.dao.rst" target="_blank"
+      <li><a href="../_sources/05.orm/09.pool.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Descargar archivo fuente"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -373,7 +374,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Estrategias de diseño</h1>
+    <h1>Pool de conexiones</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -387,83 +388,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="estrategias-de-diseno">
-<span id="orm-pattern"></span><h1><span class="section-number">5.5. </span>Estrategias de diseño<a class="headerlink" href="#estrategias-de-diseno" title="Link to this heading">#</a></h1>
-<p>Cuando analizamos <a class="reference internal" href="../04.conector/index.html#conn"><span class="std std-ref">conectores</span></a>, ya expusimos que uno de los patrones
-de diseño más socorridos es el patrón <abbr title="Data Access Object">DAO</abbr>. Con este patrón, la conversión de
-registro a objeto, y viceversa, la realizamos codificando las operaciones <abbr title="Create, Read, Update, Delete">CRUD</abbr>
-en la clase <abbr title="Data Access Object">DAO</abbr> correspondiente. La librería <abbr title="Object-Relational Mapping">ORM</abbr> nos exime de la
-repetitiva tarea de crear estas clases y nos ofrece unas herramientas que lo
-suplen.</p>
-<p>Sin embargo, necesitaremos aún definir una clase (<code class="docutils literal notranslate"><span class="pre">Conexion</span></code>) que se encarga
-de definir cómo se conecta a la base de datos; y una o varias clases de servicio
-(<code class="docutils literal notranslate"><span class="pre">AppService</span></code>) que abstraigan al resto de la aplicación de las
-particularidades de las operaciones con datos.  Aunque <abbr title="Java Persistence API">JPA</abbr> facilita las cosas,
-podemos facilitar la gestión de transacciones aportando un enfoque funcional
-como ya hicimos y que acerque la sintaxis entre las estrategias con conectores y
-con herramientas <abbr title="Object-Relational Mapping">ORM</abbr>. Por todo ello, <a class="reference external" href="https://github.com/sio2sio2/sqlutils">sqlutils</a> dispone de un módulo
-<code class="docutils literal notranslate"><span class="pre">sqlutils-jpa</span></code>:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
-<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.github.sio2sio2.sqlutils<span class="nt">&lt;/groupId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>sqlutils-jpa<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.4.1<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
-</div>
-<p>que implementa una clase gemela a <code class="docutils literal notranslate"><span class="pre">JdbcConnection</span></code> llamada
-<code class="docutils literal notranslate"><span class="pre">JpaConnection</span></code> con un uso y una naturaleza semejante, por lo que podemos
-ilustrar su uso sin muchos preámbulos:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Propiedades configuradas en tiempo de ejecución.</span>
-<span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-<span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;jakarta.persistence.jdbc.url&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;jdbc:sqlite:centro.db&quot;</span><span class="p">);</span>
-<span class="n">props</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">);</span>
-
-<span class="c1">// Configuración en persistence.xml + propiedades dinámicas</span>
-<span class="k">try</span><span class="p">(</span><span class="n">JpaConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaConnection</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="c1">// Definimos un gestor de transacciones con registros diferidos</span>
-<span class="w">   </span><span class="n">jc</span><span class="p">.</span><span class="na">withTransactionManager</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;logging&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoggingManager</span><span class="p">()));</span>
-
-<span class="w">   </span><span class="n">TransactionManager</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jc</span><span class="p">.</span><span class="na">getTransactionManager</span><span class="p">();</span>
-
-<span class="w">   </span><span class="c1">// La transacción puede generar un error DataAccessException, exactamente</span>
-<span class="w">   </span><span class="c1">// el mismo que su correspondiente para conectores.</span>
-<span class="w">   </span><span class="n">tm</span><span class="p">.</span><span class="na">transaction</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// En este caso obtenemos un EntityManager, no un objeto Connection.</span>
-<span class="w">      </span><span class="n">EntityManager</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">();</span>
-
-<span class="w">      </span><span class="n">Centro</span><span class="w"> </span><span class="n">centro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Centro</span><span class="p">(</span><span class="mi">11004866L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IES Castillo de Luna&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Centro</span><span class="p">.</span><span class="na">Titularidad</span><span class="p">.</span><span class="na">PUBLICA</span><span class="p">);</span>
-<span class="w">      </span><span class="n">em</span><span class="p">.</span><span class="na">persist</span><span class="p">(</span><span class="n">centro</span><span class="p">);</span>
-<span class="w">      </span><span class="n">lm</span><span class="p">.</span><span class="na">sendMessage</span><span class="p">(</span><span class="n">getClass</span><span class="p">(),</span>
-<span class="w">         </span><span class="n">Level</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">,</span>
-<span class="w">         </span><span class="s">&quot;Centro agregado&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="s">&quot;Transacción fallida: no puede agregarse el centro&quot;</span>
-<span class="w">      </span><span class="p">);</span>
-<span class="w">   </span><span class="p">});</span>
-
-<span class="w">   </span><span class="c1">// Este método es capaz de devolver lo que devuelve la función del argumento.</span>
-<span class="w">   </span><span class="n">Centro</span><span class="w"> </span><span class="n">otro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tm</span><span class="p">.</span><span class="na">transactionR</span><span class="p">(</span><span class="n">ctxt</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ctxt</span><span class="p">.</span><span class="na">handle</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">Centro</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="mi">11004866L</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// ERROR: Como hemos cerrado el objeto, ya no podemos reutilizarlo</span>
-<span class="n">JpaConnection</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JpaConnection</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;MiUnidadP&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>Obsérvese que el uso de la clase es prácticamente idéntico al de
-<code class="docutils literal notranslate"><span class="pre">JdbcConnection</span></code>:</p>
-<ul class="simple">
-<li><p>Creamos la clase para lo cual usamos como clave el nombre de la unidad de
-persistencia (definido en <code class="file docutils literal notranslate"><span class="pre">persistence.xml</span></code> ) y las propiedades de
-conexión que modifiquen dinámicamente los valores estáticos definidos en el
-<abbr title="eXtensible Markup Language">XML</abbr>.</p></li>
-<li><p>La clase también implementa un patrón <a class="reference external" href="https://en.wikipedia.org/wiki/Multiton">Multiton</a> cuya clave identificativa
-es el nombre de la propia unidad de persistencia.</p></li>
-<li><p>Le asociamos un gestor de transacciones que se comporta igual que su
-correspondiente para conectores y, además, soporta los mismos observadores
-(p.ej. <code class="docutils literal notranslate"><span class="pre">LoggingManager</span></code>).</p></li>
-<li><p>Creamos transacciones con la misma estrategia funcional. La diferencia es que,
-en este caso, el objeto que nos permite operar es un
-<a class="extlink-jakarta-persistence reference external" href="https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/EntityManager">EntityManager</a> y no un <a class="extlink-java-sql reference external" href="https://docs.oracle.com/en/java/javase/23/docs/api/java.sql/java/sql/Connection.html">Connection</a>.</p></li>
-</ul>
+  <section id="pool-de-conexiones">
+<span id="orm-pool"></span><h1><span class="section-number">5.5. </span>Pool de conexiones<a class="headerlink" href="#pool-de-conexiones" title="Link to this heading">#</a></h1>
 </section>
 
 
